@@ -1,0 +1,17 @@
+# ProtectedPath
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**Id** | **int32** |  | [optional] [default to null]
+**Name** | **string** |  | [optional] [default to null]
+**Guid** | **string** | guid | [optional] [default to null]
+**ProtectionPolicyId** | **string** | protection policy id | [optional] [default to null]
+**ProtectionPolicyName** | **string** | protection policy name | [optional] [default to null]
+**SourceDir** | **string** | path to replicate | [optional] [default to null]
+**TargetExportedDir** | **string** | where to replicate on the remote | [optional] [default to null]
+**TenantId** | **int32** | Local Tenant ID | [optional] [default to null]
+**RemoteTenantName** | **string** | remote tenant name | [optional] [default to null]
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+

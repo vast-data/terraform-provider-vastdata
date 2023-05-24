@@ -1,0 +1,50 @@
+# ViewpolicyCreateParams
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**Name** | **string** |  | [default to null]
+**AtimeFrequency** | **string** | Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file&#39;s atime value is greater than the atime frequency. Specify as time in seconds. | [optional] [default to null]
+**GidInheritance** | **string** | Specifies how files receive their owning group when they are created. | [optional] [default to null]
+**Flavor** | **string** | Specifies the security flavor, which determines how file and directory permissions are applied in multiprotocol views. | [optional] [default to null]
+**AccessFlavor** | **string** | Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option) | [optional] [default to null]
+**PathLength** | **string** | Specifies the policy for limiting file path component name length. | [optional] [default to null]
+**AllowedCharacters** | **string** | Specifies the policy for which characters are allowed in file names. | [optional] [default to null]
+**Use32bitFileid** | **bool** | Sets the VAST Cluster&#39;s NFS server to use 32bit file IDs. This setting supports legacy 32-bit applications running over NFS. | [optional] [default to null]
+**ExposeIdInFsid** | **bool** |  | [optional] [default to null]
+**ReadWrite** | **[]string** | Specify which NFS client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**ReadOnly** | **[]string** | Specify which NFS client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**NfsReadWrite** | **[]string** | Specify which NFS client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**NfsReadOnly** | **[]string** | Specify which NFS client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**SmbReadWrite** | **[]string** | Specify which SMB client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**SmbReadOnly** | **[]string** | Specify which SMB client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**S3ReadWrite** | **[]string** | Specify which S3 client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**S3ReadOnly** | **[]string** | Specify which S3 client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**TrashAccess** | **[]string** | Specify which NFS client hosts can access the trash folder. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. Trash folder access must also be enabled for the cluster. | [optional] [default to null]
+**UseAuthProvider** | **bool** | Not in use | [optional] [default to null]
+**AuthSource** | **string** | Specifies which source is trusted for the user&#39;s group memberships, when users&#39; access to the view is authorized. | [optional] [default to null]
+**NfsPosixAcl** | **bool** | Enables full support of extended POSIX Access Control Lists (ACL). | [optional] [default to null]
+**NfsReturnOpenPermissions** | **bool** | If enabled for NFS-exposed views, the NFS server unilaterally returns open (777) permission for all files and directories when responding to client side access checks. | [optional] [default to null]
+**NfsNoSquash** | **[]string** | Specify which NFS client hosts have no squash. With no squash, all operations are supported. Use this option if you trust the root user not to perform operations that will corrupt data. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**NfsRootSquash** | **[]string** | Specify which NFS client hosts have root squash. With root squash, the root user is mapped to nobody for all file and folder management operations on the export. This enables you to prevent the strongest super user from corrupting all user data on the VAST Cluster. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**NfsAllSquash** | **[]string** | Specify which NFS client hosts have all squash. With all squash, all client users are mapped to nobody for all file and folder management operations on the export. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. | [optional] [default to null]
+**SmbFileMode** | **int32** | For multiprotocol views, if the security flavor is NFS, this parameter sets default unix permission bits for files created by SMB clients. Use three digit numeric notation, each digit representing the user, group and others compontents of the permissions, in that order. Each digit is the sum of the read bit, write bit and execute bit. If reading is permitted, the read bit adds 4 to the component. If writing is permitted, the write bit adds 2 to the component. If execution is permitted, the execute bit adds 1 to the component. | [optional] [default to null]
+**SmbDirectoryMode** | **int32** | For multiprotocol views, if the security flavor is NFS, this parameter sets default unix permission bits for directories created by SMB clients. Use three digit numeric notation, each digit representing the user, group and others compontents of the permissions, in that order. Each digit is the sum of the read bit, write bit and execute bit. If reading is permitted, the read bit adds 4 to the component. If writing is permitted, the write bit adds 2 to the component. If execution is permitted, the execute bit adds 1 to the component. | [optional] [default to null]
+**S3BucketFullControl** | [**[]interface{}**](interface{}.md) |  | [optional] [default to null]
+**S3ObjectAcl** | [***interface{}**](interface{}.md) |  | [optional] [default to null]
+**ClusterId** | **int32** |  | [optional] [default to null]
+**VipPools** | **[]int32** | Dedicate VIP Pools to the view policy. Specify VIP Pool IDs in a comma separated list. | [optional] [default to null]
+**NfsMinimalProtectionLevel** | **string** |  | [optional] [default to null]
+**S3Visibility** | **[]string** |  | [optional] [default to null]
+**S3VisibilityGroups** | **[]string** |  | [optional] [default to null]
+**AppleSid** | **bool** | apple sid | [optional] [default to null]
+**ProtocolsAudit** | [***interface{}**](interface{}.md) | Map of protocols audit configurations | [optional] [default to null]
+**Protocols** | **[]string** | Protocols to audit | [optional] [default to null]
+**EnableSnapshotLookup** | **bool** | Add Snapshot Link Directories | [optional] [default to null]
+**EnableListingOfSnapshotDir** | **bool** | Enable Access to Snapshot Link Directories | [optional] [default to null]
+**TenantId** | **int32** | Tenant ID | [optional] [default to null]
+**NfsEnforceTls** | **bool** | If this flag is enabled, it will enforce the TLS certificate on all views | [optional] [default to null]
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
