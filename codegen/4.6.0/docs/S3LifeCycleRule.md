@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **Name** | **string** | A unique name | [optional] [default to null]
 **Guid** | **string** |  | [optional] [default to null]
 **Enabled** | **bool** |  | [optional] [default to null]
-**Prefix** | **string** | Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, ��sales/jan�� would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards. | [optional] [default to null]
+**Prefix** | **string** | Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards. | [optional] [default to null]
 **MinSize** | **int64** | The minimum size of the object | [optional] [default to null]
 **MaxSize** | **int64** | The maximum size of the object | [optional] [default to null]
 **ExpirationDays** | **int32** | The number of days from creation until an object expires | [optional] [default to null]

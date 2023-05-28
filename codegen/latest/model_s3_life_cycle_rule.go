@@ -14,7 +14,7 @@ type S3LifeCycleRule struct {
 	Name string `json:"name,omitempty"`
 	Guid string `json:"guid,omitempty"`
 	Enabled bool `json:"enabled,omitempty"`
-	// Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, ��sales/jan�� would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.
+	// Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.
 	Prefix string `json:"prefix,omitempty"`
 	// The minimum size of the object
 	MinSize int64 `json:"min_size,omitempty"`

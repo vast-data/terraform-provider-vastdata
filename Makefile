@@ -41,6 +41,8 @@ sort-versions: codegen
 		echo $${i}>>/tmp/versions.txt; \
 	done ; \
 	cp -av codegen/$$(cat /tmp/versions.txt |sort -V|tail -1) codegen/latest
+	cp -av api/$$(cat /tmp/versions.txt |sort -V|tail -1)/api.yaml codegen/latest
+
 build-provider: sort-versions
 	export BUILD_VERSIONS="$(BUILD_VERSIONS)"; \
 	cd codegen_tools; \

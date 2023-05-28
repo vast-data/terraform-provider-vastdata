@@ -18,6 +18,8 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/pb33f/libopenapi"
+
+	base "github.com/pb33f/libopenapi/datamodel/high/base"
 )
 
 func ToListOfStrings(s string) string {
@@ -31,6 +33,8 @@ func ToListOfStrings(s string) string {
 func AddInt(x, y int) int {
 	return x + y
 }
+
+var apiSchemasMap map[string]*base.SchemaProxy = make(map[string]*base.SchemaProxy)
 
 var re *regexp.Regexp = regexp.MustCompile("\\[\\]")
 
@@ -123,6 +127,20 @@ type ResourceTemplateV2 struct {
 	IgnoreUpdates            *StringSet
 	TfNameToModelName        map[string]string
 	ListFields               map[string][]FakeField
+	ApiSchema                *base.SchemaProxy
+}
+
+func (r *ResourceTemplateV2) GetSchemaProperyDocument(property string) string {
+	if r.ApiSchema != nil {
+		schema := r.ApiSchema.Schema()
+		property_schema, exists := schema.Properties[property]
+		if !exists {
+			return ""
+		}
+		return property_schema.Schema().Description
+	}
+
+	return ""
 }
 
 func (r *ResourceTemplateV2) ConvertTfNameToModelName(tf_name string) string {
@@ -215,6 +233,23 @@ func LoadApi(filename string) (libopenapi.Document, error) {
 
 }
 
+func aPISchemasPopulate(doc libopenapi.Document) {
+	v3, _ := doc.BuildV3Model()
+	//All is converted to lower to preven conversion names with swagger
+	for n, s := range v3.Model.Components.Schemas {
+		apiSchemasMap[strings.ToLower(n)] = s
+	}
+
+}
+func getSchemaProxy(name string) *base.SchemaProxy {
+	name = strings.ToLower(name)
+	p, exists := apiSchemasMap[name]
+	if exists {
+		return p
+	}
+	return nil
+}
+
 func ProcessResourceTemplate(R *ResourceTemplateV2) {
 	var elem_type string
 	TfNameToModelName := map[string]string{}
@@ -288,7 +323,8 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 	}
 	R.Fields = Fields
 	R.TfNameToModelName = TfNameToModelName
-
+	R.ApiSchema = getSchemaProxy(strings.ToLower(R.ResourceName))
+	fmt.Printf("%v , %v\n", strings.ToLower(R.ResourceName), R.ApiSchema)
 }
 
 type ResourceElem struct {
@@ -482,6 +518,11 @@ func build_datasources_tests() {
 }
 
 func main() {
+	doc, err := LoadApi("../codegen/latest/api.yaml")
+	if err != nil {
+		panic(err.Error())
+	}
+	aPISchemasPopulate(doc)
 	gen_datasources()
 	gen_resources()
 	BuildVersionsRefs()
