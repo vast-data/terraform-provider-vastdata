@@ -139,13 +139,15 @@ func DataSourceUser() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 
 						"access_key": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "",
 						},
 
 						"enabled": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "",
 						},
 					},
 				},

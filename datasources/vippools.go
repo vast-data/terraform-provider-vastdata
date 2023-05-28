@@ -138,13 +138,15 @@ func DataSourceVipPool() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 
 						"start_ip": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "",
 						},
 
 						"end_ip": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "",
 						},
 					},
 				},

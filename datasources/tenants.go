@@ -92,13 +92,15 @@ func DataSourceTenant() *schema.Resource {
 					Schema: map[string]*schema.Schema{
 
 						"start_ip": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The first ip of the range",
 						},
 
 						"end_ip": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The last ip of the range",
 						},
 					},
 				},
