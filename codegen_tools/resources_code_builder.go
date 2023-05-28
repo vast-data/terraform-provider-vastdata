@@ -440,6 +440,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	r.Indent = indent
 	tmpl := `     
              {{ $I:=.Indent}}
+             {{ $name:=.Attributes.name}}
 	     {{indent $I " "}}"{{ .Attributes.name }}": &schema.Schema{
 	     {{indent $I " "}}   Type: 	  schema.{{ .Attributes.type }},
 
@@ -469,6 +470,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
                 {{indent $I " "}}               Type:  schema.Type{{ $f.set_type }},
                 {{indent $I " "}}               Computed:  true,
                 {{indent $I " "}}               Optional:  true,
+                {{indent $I " "}}               Description: "{{GetFakeFieldDescription $name $t}}",
                 {{indent $I " "}}         },
                 {{end}}
                 {{else}} 
@@ -482,8 +484,15 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	if !exists {
 		funcMap["BuildResourceTemplateFromModelName"] = BuildResourceTemplateFromModelName
 	}
+	//Create a local copy to have local only changes
+	localFuncMap := template.FuncMap{}
 
-	t := template.Must(template.New("tf").Funcs(funcMap).Parse(tmpl))
+	for k, v := range funcMap {
+		localFuncMap[k] = v
+	}
+	localFuncMap["GetFakeFieldDescription"] = r.Parent.GetFakeFieldDescription
+
+	t := template.Must(template.New("tf").Funcs(localFuncMap).Parse(tmpl))
 	err := t.Execute(&b, r)
 	if err != nil {
 		fmt.Println(err)

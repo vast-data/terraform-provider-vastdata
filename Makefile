@@ -16,6 +16,8 @@ BUILD_DEST=build
 BUILD_DIR=build
 GINKGO_FLAGS=""
 
+clean:
+	rm -rf $(BUILD_DEST)/terraform-provider-vastdata
 
 $(BUILD_DIR)/swagger-codegen-cli.jar:
 	(! test -e $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE)  && wget $(SWAGGER_CODEGEN_URL)$(SWAGGER_CODEGEN_FILE) -O $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE)) || ( test -e $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE))
@@ -52,10 +54,12 @@ build-formatter: build-provider
 	echo "################Formatting Vast Versions code################" ; \
 	go fmt ./vast_versions/ 
 
-build: $(BUILD_DEST)/terraform-provider-vastdata
+$(BUILD_DEST)/terraform-provider-vastdata:
 	go build -o $(BUILD_DEST)/terraform-provider-vastdata
+
+build: $(BUILD_DEST)/terraform-provider-vastdata
 
 test:
 	ginkgo $(GINKGO_FLAGS) ./...
 
-build-all: build-formatter build
+build-all: clean build-formatter build

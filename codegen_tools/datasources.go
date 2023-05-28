@@ -240,6 +240,9 @@ var datasources_templates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_tenant",
+		ListFields: map[string][]FakeField{"client_ip_ranges": []FakeField{
+			FakeField{Name: "start_ip", Description: "The first ip of the range"},
+			FakeField{Name: "end_ip", Description: "The last ip of the range"}}},
 	},
 
 	ResourceTemplateV2{

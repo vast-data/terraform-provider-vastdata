@@ -101,15 +101,17 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"start_ip": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: true,
-						Optional: true,
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: "The first ip of the range",
 					},
 
 					"end_ip": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: true,
-						Optional: true,
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: "The last ip of the range",
 					},
 				},
 			},

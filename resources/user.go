@@ -148,15 +148,17 @@ func getResourceUserSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"access_key": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: true,
-						Optional: true,
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: "",
 					},
 
 					"enabled": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: true,
-						Optional: true,
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: "",
 					},
 				},
 			},

@@ -144,15 +144,17 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"start_ip": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: true,
-						Optional: true,
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: "",
 					},
 
 					"end_ip": &schema.Schema{
-						Type:     schema.TypeString,
-						Computed: true,
-						Optional: true,
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: "",
 					},
 				},
 			},

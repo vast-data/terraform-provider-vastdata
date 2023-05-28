@@ -101,6 +101,11 @@ func NewStringSet(s ...string) *StringSet {
 	return &new_string_set
 }
 
+type FakeField struct {
+	Name        string
+	Description string
+}
+
 type ResourceTemplateV2 struct {
 	ResourceName             string
 	Fields                   []ResourceElem
@@ -117,6 +122,7 @@ type ResourceTemplateV2 struct {
 	ResponseGetByURL         bool
 	IgnoreUpdates            *StringSet
 	TfNameToModelName        map[string]string
+	ListFields               map[string][]FakeField
 }
 
 func (r *ResourceTemplateV2) ConvertTfNameToModelName(tf_name string) string {
@@ -127,8 +133,47 @@ func (r *ResourceTemplateV2) ConvertTfNameToModelName(tf_name string) string {
 	return ""
 }
 
-func (r *ResourceTemplateV2) X() []string {
-	return []string{}
+func (r *ResourceTemplateV2) GetFakeFieldDescription(fieldName string, fieldListName string) string {
+	// Get the description of fake filed X item in list Y , if either X or Y are not founf "" is returned
+	f, exists := r.ListFields[fieldName]
+	if !exists {
+		return ""
+	}
+	for _, fk := range f {
+		if fk.Name == fieldListName {
+			return fk.Description
+		}
+	}
+
+	return ""
+
+}
+
+func (r *ResourceTemplateV2) HasFakeField(s string) bool {
+	_, exists := r.ListFields[s]
+	return exists
+}
+
+func (r *ResourceTemplateV2) SetupFakeFields(s string, f []FakeField, m *map[string]string) {
+	re := regexp.MustCompile("\\[\\]")
+	t := re.FindAllString(s, -1)
+	(*m)["type"] = "TypeList"
+	(*m)["list_type"] = "simple"
+	(*m)["length"] = strconv.Itoa(len(t))
+
+	n := make([]string, len(f), len(f))
+	for i, j := range f {
+		n[i] = j.Name
+	}
+	(*m)["names"] = strings.Join(n, ",")
+	if strings.Contains(s, "string") {
+		(*m)["set_type"] = "String"
+	} else if strings.Contains(s, "int") {
+		(*m)["set_type"] = "Int"
+	} else if strings.Contains(s, "Float") {
+		(*m)["set_type"] = "Float"
+	}
+
 }
 
 func (r *ResourceTemplateV2) SetupListProperties(s string, m *map[string]string) {
@@ -217,7 +262,11 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 		case "bool":
 			m["type"] = "TypeBool"
 		case "[]string", "[]int", "[]int32", "[]int64", "[]float", "[]float32", "[]float64", "[][]string", "[][]int", "[][]int32", "[][]int64", "[][]float", "[][]float32", "[][]float64":
-			R.SetupListProperties(elem_type, &m)
+			if R.HasFakeField(m["name"]) {
+				R.SetupFakeFields(elem_type, R.ListFields[m["name"]], &m)
+			} else {
+				R.SetupListProperties(elem_type, &m)
+			}
 		default:
 			//If we got here than we are not dealing with primitive / primitives array
 			m["type"] = "TypeList"
@@ -234,7 +283,7 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 			}
 			m["set_type"] = e.Type.Elem().Name()
 		}
-		Fields = append(Fields, NewResourceElem(m))
+		Fields = append(Fields, NewResourceElem(m, R))
 
 	}
 	R.Fields = Fields
@@ -246,6 +295,7 @@ type ResourceElem struct {
 	Attributes   map[string]string
 	ResourceElem *ResourceElem
 	Indent       int
+	Parent       *ResourceTemplateV2
 }
 
 func (r *ResourceElem) IsReferance() bool {
@@ -255,10 +305,11 @@ func (r *ResourceElem) IsReferance() bool {
 	return false
 }
 
-func NewResourceElem(m map[string]string) ResourceElem {
+func NewResourceElem(m map[string]string, p *ResourceTemplateV2) ResourceElem {
 	return ResourceElem{
 		Attributes:   m,
 		ResourceElem: nil,
+		Parent:       p,
 	}
 
 }
