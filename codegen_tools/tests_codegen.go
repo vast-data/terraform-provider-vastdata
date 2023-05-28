@@ -9,7 +9,7 @@ import (
 
 	"text/template"
 
-	"github.com/vast-data/terraform-provider-vastdata.git/utils"
+	"github.com/vast-data/terraform-provider-vastdata/utils"
 )
 
 func fillArr(i interface{}, dim int) interface{} {
@@ -165,14 +165,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vast-data/terraform-provider-vastdata.git/resources"
-	utils "github.com/vast-data/terraform-provider-vastdata.git/utils"
+	"github.com/vast-data/terraform-provider-vastdata/resources"
+	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
 
-	api_latest "github.com/vast-data/terraform-provider-vastdata.git/codegen/latest"
-	vast_client "github.com/vast-data/terraform-provider-vastdata.git/vast-client"
+	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"github.com/hashicorp/terraform-plugin-log/tflogtest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -455,14 +455,14 @@ import (
 	"strings"
         "net/url"
 
-	"github.com/vast-data/terraform-provider-vastdata.git/datasources"
-	utils "github.com/vast-data/terraform-provider-vastdata.git/utils"
+	"github.com/vast-data/terraform-provider-vastdata/datasources"
+	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
 
-	api_latest "github.com/vast-data/terraform-provider-vastdata.git/codegen/latest"
-	vast_client "github.com/vast-data/terraform-provider-vastdata.git/vast-client"
+	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"github.com/hashicorp/terraform-plugin-log/tflogtest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )

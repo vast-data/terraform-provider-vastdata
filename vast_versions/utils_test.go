@@ -6,8 +6,8 @@ import (
 
 	"reflect"
 
-	version_4_7_0 "github.com/vast-data/terraform-provider-vastdata.git/codegen/4.7.0"
-	vast_versions "github.com/vast-data/terraform-provider-vastdata.git/vast_versions"
+	version_4_7_0 "github.com/vast-data/terraform-provider-vastdata/codegen/4.7.0"
+	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
 )
 
 var _ = Describe("Test Vast Version", func() {

@@ -18,11 +18,11 @@ import (
         "strconv"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
         "github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-        vast_client "github.com/vast-data/terraform-provider-vastdata.git/vast-client"
-        api_latest "github.com/vast-data/terraform-provider-vastdata.git/codegen/latest"
+        vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
+        api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
         "github.com/hashicorp/terraform-plugin-log/tflog"
         "net/url"
-        utils "github.com/vast-data/terraform-provider-vastdata.git/utils"
+        utils "github.com/vast-data/terraform-provider-vastdata/utils"
        
         
 )

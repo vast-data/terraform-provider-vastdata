@@ -7,9 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	api_latest "github.com/vast-data/terraform-provider-vastdata.git/codegen/latest"
-	utils "github.com/vast-data/terraform-provider-vastdata.git/utils"
-	vast_client "github.com/vast-data/terraform-provider-vastdata.git/vast-client"
+	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	utils "github.com/vast-data/terraform-provider-vastdata/utils"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
 	"strconv"
 )

@@ -11,13 +11,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/ghttp"
-	"github.com/vast-data/terraform-provider-vastdata.git/resources"
-	utils "github.com/vast-data/terraform-provider-vastdata.git/utils"
+	"github.com/vast-data/terraform-provider-vastdata/resources"
+	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 
 	"github.com/hashicorp/terraform-plugin-log/tflogtest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	api_latest "github.com/vast-data/terraform-provider-vastdata.git/codegen/latest"
-	vast_client "github.com/vast-data/terraform-provider-vastdata.git/vast-client"
+	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
 var _ = Describe(" S3Policy", func() {

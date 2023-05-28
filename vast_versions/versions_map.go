@@ -1,8 +1,8 @@
 package vast_versions
 
 import (
-	version_4_6_0 "github.com/vast-data/terraform-provider-vastdata.git/codegen/4.6.0"
-	version_4_7_0 "github.com/vast-data/terraform-provider-vastdata.git/codegen/4.7.0"
+	version_4_6_0 "github.com/vast-data/terraform-provider-vastdata/codegen/4.6.0"
+	version_4_7_0 "github.com/vast-data/terraform-provider-vastdata/codegen/4.7.0"
 	"reflect"
 )
 

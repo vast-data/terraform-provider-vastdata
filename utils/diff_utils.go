@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	metadata "github.com/vast-data/terraform-provider-vastdata.git/metadata"
+	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 

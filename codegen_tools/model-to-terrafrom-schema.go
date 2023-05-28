@@ -415,7 +415,7 @@ package vast_versions
 import (
       "reflect"
        {{ range $k,$v :=  . -}}
-       version_{{ replaceAll $k "." "_" }} "github.com/vast-data/terraform-provider-vastdata.git/codegen/{{$k}}"
+       version_{{ replaceAll $k "." "_" }} "github.com/vast-data/terraform-provider-vastdata/codegen/{{$k}}"
        {{ end }}
       
 )

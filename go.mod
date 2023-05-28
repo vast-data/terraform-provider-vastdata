@@ -1,4 +1,4 @@
-module github.com/vast-data/terraform-provider-vastdata.git
+module github.com/vast-data/terraform-provider-vastdata
 
 go 1.20
 

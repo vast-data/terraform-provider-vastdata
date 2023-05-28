@@ -1,7 +1,7 @@
 package main
 
 import (
-	api_latest "github.com/vast-data/terraform-provider-vastdata.git/codegen/latest"
+	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
 )
 
 var resources_templates = []ResourceTemplateV2{

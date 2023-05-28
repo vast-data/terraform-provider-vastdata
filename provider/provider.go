@@ -9,11 +9,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
-	datasources "github.com/vast-data/terraform-provider-vastdata.git/datasources"
-	resources "github.com/vast-data/terraform-provider-vastdata.git/resources"
+	datasources "github.com/vast-data/terraform-provider-vastdata/datasources"
+	resources "github.com/vast-data/terraform-provider-vastdata/resources"
 
-	metadata "github.com/vast-data/terraform-provider-vastdata.git/metadata"
-	vast_client "github.com/vast-data/terraform-provider-vastdata.git/vast-client"
+	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
 /*

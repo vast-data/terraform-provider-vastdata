@@ -5,7 +5,7 @@ import (
 
 	"github.com/pb33f/libopenapi"
 
-	api4_6_0 "github.com/vast-data/terraform-provider-vastdata.git/versions/4.6.0/codegen"
+	api4_6_0 "github.com/vast-data/terraform-provider-vastdata/versions/4.6.0/codegen"
 	"os"
 	"reflect"
 	"regexp"

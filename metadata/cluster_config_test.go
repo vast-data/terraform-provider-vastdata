@@ -1,7 +1,7 @@
 package metadata_test
 
 import (
-	"github.com/vast-data/terraform-provider-vastdata.git/metadata"
+	"github.com/vast-data/terraform-provider-vastdata/metadata"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
