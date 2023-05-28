@@ -17,109 +17,124 @@ import (
 func DataSourceProtectionPolicy() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceProtectionPolicyRead,
+		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A unique id given to the replication peer configuration`,
 			},
 
 			"guid": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A unique guid given to the  replication peer configuration`,
 			},
 
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: false,
-				Required: true,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `The name of the replication peer configuration`,
 			},
 
 			"url": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Direct link to the replication policy`,
 			},
 
 			"target_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The target peer name`,
 			},
 
 			"target_object_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The id of the target peer`,
 			},
 
 			"prefix": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The prefix to be given to the replicated data`,
 			},
 
 			"clone_type": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The type the replication`,
 			},
 
 			"frames": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `List of snapshots schedules`,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 
 						"every": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-							Required: false,
-							Optional: false,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `How often to make a snapshot`,
 						},
 
 						"start_at": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-							Required: false,
-							Optional: false,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: ``,
 						},
 
 						"keep_local": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-							Required: false,
-							Optional: false,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: ``,
 						},
 
 						"keep_remote": &schema.Schema{
-							Type:     schema.TypeString,
-							Computed: true,
-							Required: false,
-							Optional: false,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: ``,
 						},
 					},
 				},
 			},
 
 			"indestructible": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Is the snapshot indestructable`,
 			},
 		},
 	}

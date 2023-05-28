@@ -29,7 +29,8 @@ func ResourceS3Policy() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceS3PolicyImporter,
 		},
-		Schema: getResourceS3PolicySchema(),
+		Description: ``,
+		Schema:      getResourceS3PolicySchema(),
 	}
 }
 
@@ -39,8 +40,9 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		"guid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `GUID`,
 		},
 
 		"name": &schema.Schema{
@@ -52,15 +54,17 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		"policy": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"users": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -70,8 +74,9 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		"groups": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -81,15 +86,17 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		"is_replicated": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"enabled": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 	}
 }

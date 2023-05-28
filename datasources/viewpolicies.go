@@ -17,97 +17,111 @@ import (
 func DataSourceViewPolicy() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceViewPolicyRead,
+		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A uniqe guid given to the view policy`,
 			},
 
 			"guid": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A uniqe guid given to the view policy`,
 			},
 
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: false,
-				Required: true,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `A uniqe name given to the view policy.                         `,
 			},
 
 			"gid_inheritance": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Determine the way a file inherits GID`,
 			},
 
 			"flavor": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Security flavor, which determines how file and directory permissions are applied in multiprotocol views.`,
 			},
 
 			"access_flavor": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)`,
 			},
 
 			"path_length": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `How to determine the maximum allowed path length`,
 			},
 
 			"allowed_characters": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `How to determine the allowed characters in a path`,
 			},
 
 			"use32bit_fileid": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"expose_id_in_fsid": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"use_auth_provider": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Use configured Auth Provider(s) to enforce group permissions. Required if SMB Flavor is selected`,
 			},
 
 			"auth_source": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The source of authentication`,
 			},
 
 			"read_write": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with NFS read/write permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -115,10 +129,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with NFS read only permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -126,10 +141,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"nfs_read_write": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with NFS read/write permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -137,10 +153,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"nfs_read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with NFS read only permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -148,10 +165,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"smb_read_write": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with SMB read/write permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -159,10 +177,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"smb_read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with SMB read only permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -170,10 +189,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"s3_read_write": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with S3 read/write permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -181,10 +201,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"s3_read_only": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with S3 read only permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -192,10 +213,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"trash_access": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with trash permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -203,24 +225,27 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"nfs_posix_acl": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Enable POSIX ACL`,
 			},
 
 			"nfs_return_open_permissions": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `when using smb use open permissions for files`,
 			},
 
 			"nfs_no_squash": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with no squash policy`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -228,10 +253,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"nfs_root_squash": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with root squash policy`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -239,10 +265,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"nfs_all_squash": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with all squash policy`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -250,164 +277,187 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"s3_bucket_full_control": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_bucket_listing": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_bucket_read": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_bucket_read_acp": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_bucket_write": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_bucket_write_acp": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_object_full_control": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_object_read": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_object_read_acp": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_object_write": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"s3_object_write_acp": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Hosts with full permissions`,
 			},
 
 			"smb_file_mode": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Default unix type permissions on new file`,
 			},
 
 			"smb_directory_mode": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Default unix type permissions on new folder`,
 			},
 
 			"smb_file_mode_padded": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Default unix type permissions on new file`,
 			},
 
 			"smb_directory_mode_padded": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Default unix type permissions on new folder`,
 			},
 
 			"cluster": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Parent Cluster`,
 			},
 
 			"cluster_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Parent Cluster ID`,
 			},
 
 			"tenant_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Tenant ID`,
 			},
 
 			"tenant_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Tenant Name`,
 			},
 
 			"url": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"atime_frequency": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.`,
 			},
 
 			"sync": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Synchronization state with leader`,
 			},
 
 			"vip_pools": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Comma separated vip pool ids.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -415,24 +465,27 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"sync_time": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Synchronization time with leader`,
 			},
 
 			"nfs_minimal_protection_level": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `NFS 4.1 minimal protection level`,
 			},
 
 			"s3_visibility": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -440,10 +493,11 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"s3_visibility_groups": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -451,17 +505,19 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"apple_sid": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Apple sid`,
 			},
 
 			"protocols": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Protocols to audit`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -469,73 +525,83 @@ func DataSourceViewPolicy() *schema.Resource {
 			},
 
 			"data_create_delete": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Create/Delete Files/Directories/Objects`,
 			},
 
 			"data_modify": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Modify data/MD`,
 			},
 
 			"data_read": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Read data`,
 			},
 
 			"log_full_path": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Log full path`,
 			},
 
 			"log_hostname": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Log hostname`,
 			},
 
 			"log_username": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Log username`,
 			},
 
 			"log_deleted": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Log deleted files/dirs from trash dir`,
 			},
 
 			"count_views": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Number of Policy related Views`,
 			},
 
 			"enable_snapshot_lookup": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Specifies whether to make the .snapshot directory accessible in subdirectories of the View.`,
 			},
 
 			"enable_listing_of_snapshot_dir": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
 			},
 		},
 	}

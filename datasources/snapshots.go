@@ -17,55 +17,63 @@ import (
 func DataSourceSnapshot() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceSnapshotRead,
+		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A unique id given to the snapshot`,
 			},
 
 			"guid": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A unique guid given to the snapshot`,
 			},
 
 			"expiration_time": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `When will this sanpshot expire`,
 			},
 
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: false,
-				Required: true,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `The name of the snapshot`,
 			},
 
 			"path": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The path to make snapshot from`,
 			},
 
 			"tenant_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    true,
+				Description: `The tenant id to use`,
 			},
 
 			"locked": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Is it locked (indestructable)`,
 			},
 		},
 	}

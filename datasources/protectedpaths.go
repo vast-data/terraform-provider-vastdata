@@ -17,69 +17,79 @@ import (
 func DataSourceProtectedPath() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceProtectedPathRead,
+		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: false,
-				Required: true,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"guid": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `guid`,
 			},
 
 			"protection_policy_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `protection policy id`,
 			},
 
 			"protection_policy_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `protection policy name`,
 			},
 
 			"source_dir": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `path to replicate`,
 			},
 
 			"target_exported_dir": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `where to replicate on the remote`,
 			},
 
 			"tenant_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Local Tenant ID`,
 			},
 
 			"remote_tenant_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `remote tenant name`,
 			},
 		},
 	}

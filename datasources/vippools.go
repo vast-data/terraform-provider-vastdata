@@ -17,76 +17,87 @@ import (
 func DataSourceVipPool() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceVipPoolRead,
+		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A uniq id given to the vippool`,
 			},
 
 			"guid": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A uniq guid given to the vippool`,
 			},
 
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: false,
-				Required: true,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `A uniq name given to the vippool`,
 			},
 
 			"subnet_cidr": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `IPv4 Subnet CIDR prefix (bits number)`,
 			},
 
 			"subnet_cidr_ipv6": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `IPv6 Subnet CIDR prefix (bits number)`,
 			},
 
 			"gw_ip": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Gateway IP Address`,
 			},
 
 			"gw_ipv6": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `GW IPv6 Address`,
 			},
 
 			"vlan": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `VIPPool VLAN`,
 			},
 
 			"state": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"cnode_ids": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `IDs of cnodes comprising cnode group`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -94,45 +105,51 @@ func DataSourceVipPool() *schema.Resource {
 			},
 
 			"cluster": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Parent Cluster`,
 			},
 
 			"url": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"domain_name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"role": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Role`,
 			},
 
 			"sync": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Synchronization state with leader`,
 			},
 
 			"ip_ranges": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `IP ranges`,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -153,59 +170,67 @@ func DataSourceVipPool() *schema.Resource {
 			},
 
 			"sync_time": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Synchronization time with leader`,
 			},
 
 			"vms_preferred": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `If true, CNodes participating in the vip pool are preferred in VMS host election`,
 			},
 
 			"enabled": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `True for enable, False for disable`,
 			},
 
 			"port_membership": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The port on the CNode this pool will use. Right, left or all`,
 			},
 
 			"active_interfaces": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Numver of active interfaces`,
 			},
 
 			"enable_l3": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Enables L3 CNode access`,
 			},
 
 			"vast_asn": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `VAST ASN`,
 			},
 
 			"peer_asn": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Peer ASN`,
 			},
 		},
 	}

@@ -44,6 +44,10 @@ var resources_templates_map map[string]ResourceTemplateV2
 
 var spingFuncMap template.FuncMap = sprig.FuncMap()
 
+func GetBT() string {
+	return "`"
+}
+
 var funcMap template.FuncMap = template.FuncMap{
 	"upper":           strings.ToUpper,
 	"split":           strings.Split,
@@ -52,6 +56,7 @@ var funcMap template.FuncMap = template.FuncMap{
 	"indent":          spingFuncMap["indent"],
 	"replace":         strings.Replace,
 	"replaceAll":      strings.ReplaceAll,
+	"getBT":           GetBT,
 }
 
 type StringSet struct {
@@ -128,6 +133,14 @@ type ResourceTemplateV2 struct {
 	TfNameToModelName        map[string]string
 	ListFields               map[string][]FakeField
 	ApiSchema                *base.SchemaProxy
+	ResourceDocumantation    string
+}
+
+func (r *ResourceTemplateV2) GetSchemaDocumentation() string {
+	if r.ApiSchema != nil {
+		return r.ApiSchema.Schema().Description
+	}
+	return ""
 }
 
 func (r *ResourceTemplateV2) GetSchemaProperyDocument(property string) string {
@@ -324,7 +337,7 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 	R.Fields = Fields
 	R.TfNameToModelName = TfNameToModelName
 	R.ApiSchema = getSchemaProxy(strings.ToLower(R.ResourceName))
-	fmt.Printf("%v , %v\n", strings.ToLower(R.ResourceName), R.ApiSchema)
+	R.ResourceDocumantation = R.GetSchemaDocumentation()
 }
 
 type ResourceElem struct {

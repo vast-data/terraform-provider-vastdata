@@ -69,6 +69,7 @@ func Resource{{ .ResourceName }}() *schema.Resource {
      Importer: &schema.ResourceImporter{
                       StateContext: resource{{ .ResourceName }}Importer,
      },
+     Description: {{getBT}}{{ .ResourceDocumantation }}{{getBT}},
      Schema: getResource{{ .ResourceName }}Schema(),
    }
 }
@@ -79,7 +80,7 @@ func getResource{{ .ResourceName }}Schema() map[string]*schema.Schema {
 
 `
 
-	t := template.Must(template.New("header").Parse(header))
+	t := template.Must(template.New("header").Funcs(funcMap).Parse(header))
 	err := t.Execute(&b, r)
 	if err != nil {
 		fmt.Println(err)
@@ -443,7 +444,6 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
              {{ $name:=.Attributes.name}}
 	     {{indent $I " "}}"{{ .Attributes.name }}": &schema.Schema{
 	     {{indent $I " "}}   Type: 	  schema.{{ .Attributes.type }},
-
              {{if eq .Attributes.ignore_update "true" }}
              {{indent $I " "}}   DiffSuppressOnRefresh: false,
              DiffSuppressFunc: utils.DoNothingOnUpdate(),
@@ -454,6 +454,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	     {{ else -}}
 	     {{indent $I " "}}   Computed: true,
 	     {{indent $I " "}}   Optional: true,
+             {{indent $I " "}}   Description: {{getBT}}{{ GetSchemaProperyDocument .Attributes.name }}{{getBT}},
 	     {{ end -}}
              {{ if and (eq .Attributes.length "1") (eq .Attributes.list_type "simple") (eq .Attributes.type "TypeList")}}
                 {{indent $I " "}}Elem: &schema.Schema{
@@ -491,6 +492,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 		localFuncMap[k] = v
 	}
 	localFuncMap["GetFakeFieldDescription"] = r.Parent.GetFakeFieldDescription
+	localFuncMap["GetSchemaProperyDocument"] = r.Parent.GetSchemaProperyDocument
 
 	t := template.Must(template.New("tf").Funcs(localFuncMap).Parse(tmpl))
 	err := t.Execute(&b, r)

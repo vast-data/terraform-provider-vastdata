@@ -29,7 +29,8 @@ func ResourceGroup() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceGroupImporter,
 		},
-		Schema: getResourceGroupSchema(),
+		Description: ``,
+		Schema:      getResourceGroupSchema(),
 	}
 }
 
@@ -39,8 +40,9 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 		"guid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `A uniqe GUID assigned to the group`,
 		},
 
 		"name": &schema.Schema{
@@ -58,15 +60,17 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 		"sid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The group SID`,
 		},
 
 		"s3_policies_ids": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `List of S3 policies IDs`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,

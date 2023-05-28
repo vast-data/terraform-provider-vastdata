@@ -29,7 +29,8 @@ func ResourceNis() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceNisImporter,
 		},
-		Schema: getResourceNisSchema(),
+		Description: ``,
+		Schema:      getResourceNisSchema(),
 	}
 }
 
@@ -39,8 +40,9 @@ func getResourceNisSchema() map[string]*schema.Schema {
 		"guid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `A uniq guid given to the nis server configuration`,
 		},
 
 		"domain_name": &schema.Schema{
@@ -52,8 +54,9 @@ func getResourceNisSchema() map[string]*schema.Schema {
 		"hosts": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `List of ip addresses/hostnames of nis servers`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,

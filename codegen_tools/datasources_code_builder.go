@@ -30,10 +30,11 @@ import (
 func DataSource{{ .ResourceName }}() *schema.Resource {
      return  &schema.Resource{
      ReadContext: dataSource{{ .ResourceName }}Read,
+     Description: {{getBT}}{{ .ResourceDocumantation }}{{getBT}},
      Schema: map[string]*schema.Schema{
 `
 
-	t := template.Must(template.New("header").Parse(header))
+	t := template.Must(template.New("header").Funcs(funcMap).Parse(header))
 	err := t.Execute(&b, r)
 	if err != nil {
 		fmt.Println(err)
@@ -52,6 +53,7 @@ func ResourceTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	     {{indent $I " "}}   Computed: {{ .Attributes.computed }},
              {{indent $I " "}}   Required: {{ .Attributes.required }},
              {{indent $I " "}}   Optional: {{ .Attributes.optional }},
+             {{indent $I " "}}   Description: {{getBT}}{{ GetSchemaProperyDocument .Attributes.name }}{{getBT}},
              {{ if and (eq .Attributes.length "1") (eq .Attributes.list_type "simple") (eq .Attributes.type "TypeList")}}
                 {{indent $I " "}}Elem: &schema.Schema{
                 {{indent $I " "}}            Type: schema.Type{{.Attributes.set_type}},                               
@@ -86,6 +88,7 @@ func ResourceTemplateToTerrafromElem(r ResourceElem, indent int) string {
 		localFuncMap[k] = v
 	}
 	localFuncMap["GetFakeFieldDescription"] = r.Parent.GetFakeFieldDescription
+	localFuncMap["GetSchemaProperyDocument"] = r.Parent.GetSchemaProperyDocument
 
 	t := template.Must(template.New("tf").Funcs(localFuncMap).Parse(tmpl))
 

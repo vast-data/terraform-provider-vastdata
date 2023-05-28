@@ -29,7 +29,8 @@ func ResourceQosPolicy() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceQosPolicyImporter,
 		},
-		Schema: getResourceQosPolicySchema(),
+		Description: ``,
+		Schema:      getResourceQosPolicySchema(),
 	}
 }
 
@@ -39,8 +40,9 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		"guid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `QoS Policy guid`,
 		},
 
 		"name": &schema.Schema{
@@ -52,22 +54,25 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		"mode": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `QoS provisioning mode`,
 		},
 
 		"io_size_bytes": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M`,
 		},
 
 		"static_limits": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -75,57 +80,65 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					"min_reads_bw_mbps": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_reads_bw_mbps": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"min_writes_bw_mbps": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_writes_bw_mbps": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"min_reads_iops": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_reads_iops": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"min_writes_iops": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_writes_iops": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 				},
 			},
@@ -134,8 +147,9 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		"capacity_limits": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -143,29 +157,33 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					"max_reads_bw_mbps_per_gb_capacity": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_writes_bw_mbps_per_gb_capacity": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_reads_iops_per_gb_capacity": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_writes_iops_per_gb_capacity": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 				},
 			},

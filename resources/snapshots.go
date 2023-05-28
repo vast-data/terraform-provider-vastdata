@@ -29,7 +29,8 @@ func ResourceSnapshot() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceSnapshotImporter,
 		},
-		Schema: getResourceSnapshotSchema(),
+		Description: ``,
+		Schema:      getResourceSnapshotSchema(),
 	}
 }
 
@@ -39,15 +40,17 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		"guid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `A unique guid given to the snapshot`,
 		},
 
 		"expiration_time": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `When will this sanpshot expire`,
 		},
 
 		"name": &schema.Schema{
@@ -59,22 +62,25 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		"path": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The path to make snapshot from`,
 		},
 
 		"tenant_id": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The tenant id to use`,
 		},
 
 		"locked": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Is it locked (indestructable)`,
 		},
 	}
 }

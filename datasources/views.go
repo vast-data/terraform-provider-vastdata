@@ -17,125 +17,143 @@ import (
 func DataSourceView() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceViewRead,
+		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A uniqe ID used to identify the View`,
 			},
 
 			"guid": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A uniqe GUID assigned to the View`,
 			},
 
 			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `A uniq name given to the view`,
 			},
 
 			"path": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: false,
-				Required: true,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `File system path. Begin with '/'. Do not include a trailing slash`,
 			},
 
 			"create_dir": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Creates the directory specified by the path`,
 			},
 
 			"alias": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path`,
 			},
 
 			"bucket": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `S3 Bucket name`,
 			},
 
 			"policy_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Associated view policy ID`,
 			},
 
 			"cluster": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Parent Cluster`,
 			},
 
 			"cluster_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Parent Cluster ID`,
 			},
 
 			"tenant_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    true,
+				Description: `The tenant ID related to this view`,
 			},
 
 			"directory": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Create the directory if it does not exist`,
 			},
 
 			"s3_versioning": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Trun on S3 Versioning`,
 			},
 
 			"s3_unverified_lookup": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Allow S3 Unverified Lookup`,
 			},
 
 			"allow_anonymous_access": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Allow S3 anonymous access`,
 			},
 
 			"allow_s3_anonymous_access": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Allow S3 anonymous access`,
 			},
 
 			"protocols": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Protocols exposed by this view`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -143,24 +161,27 @@ func DataSourceView() *schema.Resource {
 			},
 
 			"share": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
 			},
 
 			"bucket_owner": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `S3 Bucket owner`,
 			},
 
 			"bucket_creators": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `List of bucket creators users`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -168,10 +189,11 @@ func DataSourceView() *schema.Resource {
 			},
 
 			"bucket_creators_groups": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `List of bucket creators groups`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -179,119 +201,135 @@ func DataSourceView() *schema.Resource {
 			},
 
 			"s3_locks": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `S3 Object Lock`,
 			},
 
 			"s3_locks_retention_mode": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `S3 Locks retention mode`,
 			},
 
 			"s3_locks_retention_period": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Period should be positive in format like 0d|2d|1y|2y`,
 			},
 
 			"physical_capacity": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Physical Capacity`,
 			},
 
 			"logical_capacity": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Logical Capacity`,
 			},
 
 			"nfs_interop_flags": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.`,
 			},
 
 			"is_remote": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: ``,
 			},
 
 			"share_acl": &schema.Schema{
-				Type:     schema.TypeList,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Share-level ACL details`,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 
 						"enabled": &schema.Schema{
-							Type:     schema.TypeBool,
-							Computed: true,
-							Required: false,
-							Optional: false,
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: ``,
 						},
 
 						"acl": &schema.Schema{
-							Type:     schema.TypeList,
-							Computed: true,
-							Required: false,
-							Optional: false,
+							Type:        schema.TypeList,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: ``,
 
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 
 									"grantee": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-										Required: false,
-										Optional: false,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    false,
+										Description: ``,
 									},
 
 									"permissions": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-										Required: false,
-										Optional: false,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    false,
+										Description: ``,
 									},
 
 									"sid_str": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-										Required: false,
-										Optional: false,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    false,
+										Description: ``,
 									},
 
 									"uid_or_gid": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-										Required: false,
-										Optional: false,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    false,
+										Description: ``,
 									},
 
 									"name": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: false,
-										Required: true,
-										Optional: false,
+										Type:        schema.TypeString,
+										Computed:    false,
+										Required:    true,
+										Optional:    false,
+										Description: ``,
 									},
 
 									"fqdn": &schema.Schema{
-										Type:     schema.TypeString,
-										Computed: true,
-										Required: false,
-										Optional: false,
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    false,
+										Description: ``,
 									},
 								},
 							},
@@ -301,10 +339,11 @@ func DataSourceView() *schema.Resource {
 			},
 
 			"qos_policy_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Computed: true,
-				Required: false,
-				Optional: false,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `QoS Policy ID`,
 			},
 		},
 	}

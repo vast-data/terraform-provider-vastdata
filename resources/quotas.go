@@ -29,7 +29,8 @@ func ResourceQuota() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceQuotaImporter,
 		},
-		Schema: getResourceQuotaSchema(),
+		Description: ``,
+		Schema:      getResourceQuotaSchema(),
 	}
 }
 
@@ -39,8 +40,9 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		"guid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Quota guid`,
 		},
 
 		"name": &schema.Schema{
@@ -52,211 +54,241 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		"state": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"sync_state": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"pretty_state": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"path": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Directory path`,
 		},
 
 		"pretty_grace_period": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m`,
 		},
 
 		"grace_period": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
 		},
 
 		"time_to_block": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Grace period expiration time`,
 		},
 
 		"soft_limit": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Soft quota limit`,
 		},
 
 		"hard_limit": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Hard quota limit`,
 		},
 
 		"hard_limit_inodes": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Hard inodes quota limit`,
 		},
 
 		"soft_limit_inodes": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Soft inodes quota limit`,
 		},
 
 		"used_inodes": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Used inodes`,
 		},
 
 		"used_capacity": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Used capacity in bytes`,
 		},
 
 		"used_capacity_tb": &schema.Schema{
 			Type: schema.TypeFloat,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Used capacity in TB`,
 		},
 
 		"used_effective_capacity": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Used effective capacity in bytes`,
 		},
 
 		"used_effective_capacity_tb": &schema.Schema{
 			Type: schema.TypeFloat,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Used effective capacity in TB`,
 		},
 
 		"tenant_id": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Tenant ID`,
 		},
 
 		"tenant_name": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Tenant Name`,
 		},
 
 		"cluster": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Parent Cluster`,
 		},
 
 		"cluster_id": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Parent Cluster ID`,
 		},
 
 		"system_id": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"is_user_quota": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"enable_email_providers": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"num_exceeded_users": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"num_blocked_users": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 		},
 
 		"enable_alarms": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Enable alarms when users or groups are exceeding their limit`,
 		},
 
 		"default_email": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The default Email if there is no suffix and no address in the providers`,
 		},
 
 		"percent_inodes": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Percent of used inodes out of the hard limit`,
 		},
 
 		"percent_capacity": &schema.Schema{
 			Type: schema.TypeInt,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Percent of used capacity out of the hard limit`,
 		},
 
 		"default_user_quota": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -264,43 +296,49 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					"quota_system_id": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The system ID of the quota`,
 					},
 
 					"soft_limit": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The size soft limit in bytes`,
 					},
 
 					"hard_limit": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The size hard limit in bytes`,
 					},
 
 					"sof_limit_inodes": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The sof limit of inodes number`,
 					},
 
 					"hard_limit_inodes": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The hard limit in inode number`,
 					},
 
 					"grace_period": &schema.Schema{
 						Type: schema.TypeString,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
 					},
 				},
 			},
@@ -309,8 +347,9 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		"default_group_quota": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -318,43 +357,49 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					"quota_system_id": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The system ID of the quota`,
 					},
 
 					"soft_limit": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The size soft limit in bytes`,
 					},
 
 					"hard_limit": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The size hard limit in bytes`,
 					},
 
 					"sof_limit_inodes": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The sof limit of inodes number`,
 					},
 
 					"hard_limit_inodes": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `The hard limit in inode number`,
 					},
 
 					"grace_period": &schema.Schema{
 						Type: schema.TypeString,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
 					},
 				},
 			},
@@ -363,8 +408,9 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		"user_quotas": &schema.Schema{
 			Type: schema.TypeList,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -372,78 +418,89 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					"grace_period": &schema.Schema{
 						Type: schema.TypeString,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
 					},
 
 					"time_to_block": &schema.Schema{
 						Type: schema.TypeString,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Grace period expiration time`,
 					},
 
 					"soft_limit": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Soft quota limit`,
 					},
 
 					"hard_limit": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Hard quota limit`,
 					},
 
 					"hard_limit_inodes": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Hard inodes quota limit`,
 					},
 
 					"soft_limit_inodes": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Soft inodes quota limit`,
 					},
 
 					"used_inodes": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Used inodes`,
 					},
 
 					"used_capacity": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: `Used capacity in bytes`,
 					},
 
 					"is_accountable": &schema.Schema{
 						Type: schema.TypeBool,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
 					},
 
 					"quota_system_id": &schema.Schema{
 						Type: schema.TypeInt,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
 					},
 
 					"entity": &schema.Schema{
 						Type: schema.TypeList,
 
-						Computed: true,
-						Optional: true,
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
 
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
@@ -457,36 +514,41 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								"vast_id": &schema.Schema{
 									Type: schema.TypeInt,
 
-									Computed: true,
-									Optional: true,
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
 								},
 
 								"email": &schema.Schema{
 									Type: schema.TypeString,
 
-									Computed: true,
-									Optional: true,
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
 								},
 
 								"is_group": &schema.Schema{
 									Type: schema.TypeBool,
 
-									Computed: true,
-									Optional: true,
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
 								},
 
 								"identifier": &schema.Schema{
 									Type: schema.TypeString,
 
-									Computed: true,
-									Optional: true,
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
 								},
 
 								"identifier_type": &schema.Schema{
 									Type: schema.TypeString,
 
-									Computed: true,
-									Optional: true,
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
 								},
 							},
 						},

@@ -29,7 +29,8 @@ func ResourceReplicationPeers() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceReplicationPeersImporter,
 		},
-		Schema: getResourceReplicationPeersSchema(),
+		Description: ``,
+		Schema:      getResourceReplicationPeersSchema(),
 	}
 }
 
@@ -39,8 +40,9 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		"guid": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `A unique guid given to the  replication peer configuration`,
 		},
 
 		"name": &schema.Schema{
@@ -52,57 +54,65 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		"url": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Direct url of the replication peer configurations`,
 		},
 
 		"leading_vip": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The vip provided for the replication peer configuration`,
 		},
 
 		"remote_vip_range": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The vip range which were reported by the peer`,
 		},
 
 		"version": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The version of the source`,
 		},
 
 		"remote_version": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The version of the remote peer`,
 		},
 
 		"is_local": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Is the source of the replication local (this host is the source)`,
 		},
 
 		"peer_name": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `The name of the peer cluster`,
 		},
 
 		"secure_mode": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed: true,
-			Optional: true,
+			Computed:    true,
+			Optional:    true,
+			Description: `Is the connection secure`,
 		},
 	}
 }
