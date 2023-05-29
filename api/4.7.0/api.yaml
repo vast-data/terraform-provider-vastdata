@@ -32,23 +32,6 @@ components:
          items:
            type: "integer"
          description: "List of S3 policies IDs"
-    GroupPost:
-     type: "object"
-     properties:
-       name:
-         type: "string"
-         description: "A uniq name given to the group"
-       gid:
-         type: "integer"
-         description: "The group linux gid"
-       sid:
-         type: "string"
-         description: "The group SID"
-       s3_policies_ids:
-         type: "array"
-         items:
-           type: "integer"
-         description: "List of S3 policies IDs"
     ShareAcl:
       type: "object"
       properties:
@@ -361,72 +344,6 @@ components:
           items:
             type: "integer"
           description: "List S3 policies IDs"
-    UserPost:
-      type: "object"
-      properties:
-        name:
-          type: "string"
-          description: "A uniq name given to the user"
-        uid:
-          type: "integer"
-          description: "The user unix UID"
-        leading_gid:
-          type: "integer"
-          description: "The user leading unix GID"
-        gids:
-          type: "array"
-          items:
-            type: "integer"
-          description: "List of supplementary GID list"
-        groups:
-          type: "array"
-          items:
-            type: "string"
-          description: "List of supplementary Group list"
-        group_count:
-          type: "integer"
-          description: "Group Count"
-        leading_group_name:
-          type: "string"
-          description: "Leading Group Name"
-        leading_group_gid:
-          type: "string"
-          description: "Leading Group GID"
-        sid:
-          type: "string"
-          description: "The user SID"
-        primary_group_sid :
-          type: "string"
-          description: "The user primary group SID"
-        sids:
-          type: "array"
-          items:
-            type: "string"
-          description: "supplementary SID list"
-        local:
-          type: "boolean"
-          description: "IS this a local user"
-        access_keys:
-          type: "array"
-          items:
-             type: "array"
-             items:
-               type: "string"
-          description: "List of User Access Keys"
-        allow_create_bucket:
-          type: "boolean"
-          description: "Allow create bucket"
-        allow_delete_bucket:
-          type: "boolean"
-          description: "Allow delete bucket"
-        s3_superuser:
-          type: "boolean"
-          description: "Is S3 superuser"
-        s3_policies_ids:
-          type: "array"
-          items:
-            type: "integer"
-          description: "List S3 policies IDs"
     Nis:
       type: "object"
       properties:
@@ -436,17 +353,6 @@ components:
         guid:
           type: "string"
           description: "A uniq guid given to the nis server configuration"
-        domain_name:
-          type: "string"
-          description: "The nis server domain name"
-        hosts:
-          type: "array"
-          items:
-            type: "string"
-          description: "List of ip addresses/hostnames of nis servers"
-    NisrPost:
-      type: "object"
-      properties:
         domain_name:
           type: "string"
           description: "The nis server domain name"
@@ -512,57 +418,6 @@ components:
         encryption_crn:
           type: "string"
           description: "Tenant's encryption group unique identifier"
-    TenantPost:
-      type: "object"
-      properties:
-        name:
-          type: "string"
-          description: "A uniqe name given to the tenant"
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
-        smb_privileged_user_name:
-          type: "string"
-          description: "Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'"
-        smb_privileged_group_sid:
-          type: "string"
-          description: "Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group."
-        smb_administrators_group_name:
-          type: "string"
-          description: "Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group."
-        default_others_share_level_perm:
-          type: "string"
-          description: "Default Share-level permissions for Others"
-          enum: [READ, CHANGE, FULL]
-        trash_gid:
-          type: "integer"
-          description: "GID with permissions to the trash folder"
-        client_ip_ranges:
-          type: "array"
-          items:
-            type: "array"
-            items:
-              type: "string"
-          description: "Array of source IP ranges to allow for the tenant."
-        posix_primary_provider:
-          type: "string"
-          enum: [NONE, LDAP, NIS, AD, LOCAL]
-          description: "POSIX primary provider type"
-        ad_provider_id:
-          type: "integer"
-          description: "AD provider ID"
-        ldap_provider_id:
-          type: "integer"
-          description: "Open-LDAP provider ID specified separately by the user"
-        nis_provider_id:
-          type: "integer"
-          description: "NIS provider ID"
-        encryption_crn:
-          type: "string"
-          description: "Tenant's encryption group unique identifier"
     ViewPolicy:
       type: "object"
       required:
@@ -577,6 +432,9 @@ components:
         name:
           type: "string"
           description: "A uniqe name given to the view policy.                         "
+        created:
+          type: "string"
+          format: "date-time"
         gid_inheritance:
           type: "string"
           description: "Determine the way a file inherits GID"
@@ -799,239 +657,6 @@ components:
         enable_listing_of_snapshot_dir:
           type: "boolean"
           description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
-    ViewPolicyPost:
-      type: "object"
-      required:
-      - "name"
-      properties:
-        name:
-          type: "string"
-          description: "A uniqe name given to the view policy.                         "
-        created:
-          type: "string"
-          format: "date-time"
-        gid_inheritance:
-          type: "string"
-          description: "Determine the way a file inherits GID"
-        flavor:
-          type: "string"
-          description: "Security flavor, which determines how file and directory permissions are applied in multiprotocol views."
-        access_flavor:
-          type: "string"
-          description: "Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)"
-        path_length:
-          type: "string"
-          description: "How to determine the maximum allowed path length"
-        allowed_characters:
-          type: "string"
-          description: "How to determine the allowed characters in a path"
-        use_32bit_fileid:
-          type: "boolean"
-          description: ""
-        expose_id_in_fsid:
-          type: "boolean"
-          description: ""
-        use_auth_provider:
-          type: "boolean"
-          description: "Use configured Auth Provider(s) to enforce group permissions. Required if SMB Flavor is selected"
-        auth_source:
-          type: "string"
-          description: "The source of authentication"
-        read_write:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with NFS read/write permissions"
-        read_only:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with NFS read only permissions"
-        nfs_read_write:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with NFS read/write permissions"
-        nfs_read_only:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with NFS read only permissions"
-        smb_read_write:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with SMB read/write permissions"
-        smb_read_only:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with SMB read only permissions"
-        s3_read_write:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with S3 read/write permissions"
-        s3_read_only:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with S3 read only permissions"
-        trash_access:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with trash permissions"
-        nfs_posix_acl:
-          type: "boolean"
-          description: "Enable POSIX ACL"
-        nfs_return_open_permissions:
-          type: "boolean"
-          description: "when using smb use open permissions for files"
-        nfs_no_squash:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with no squash policy"
-        nfs_root_squash:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with root squash policy"
-        nfs_all_squash:
-          type: "array"
-          items:
-            type: "string"
-          description: "Hosts with all squash policy"
-        s3_bucket_full_control:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_bucket_listing:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_bucket_read:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_bucket_read_acp:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_bucket_write:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_bucket_write_acp:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_object_full_control:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_object_read:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_object_read_acp:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_object_write:
-          type: "string"
-          description: "Hosts with full permissions"
-        s3_object_write_acp:
-          type: "string"
-          description: "Hosts with full permissions"
-        smb_file_mode:
-          type: "integer"
-          description: "Default unix type permissions on new file"
-        smb_directory_mode:
-          type: "integer"
-          description: "Default unix type permissions on new folder"
-        smb_file_mode_padded:
-          type: "string"
-          description: "Default unix type permissions on new file"
-        smb_directory_mode_padded:
-          type: "string"
-          description: "Default unix type permissions on new folder"
-        cluster:
-          type: "string"
-          description: "Parent Cluster"
-        cluster_id:
-          type: "integer"
-          description: "Parent Cluster ID"
-        tenant_id:
-          type: "integer"
-          description: "Tenant ID"
-        tenant_name:
-          type: string
-          description: Tenant Name
-        url:
-          type: "string"
-          description: ""
-        atime_frequency:
-          type: "string"
-          description: "Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds."
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
-        vip_pools:
-          type: "array"
-          items:
-            type: "integer"
-          description: "Comma separated vip pool ids."
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
-        nfs_minimal_protection_level:
-          type: "string"
-          description: "NFS 4.1 minimal protection level"
-        s3_visibility:
-          type: "array"
-          items:
-            type: "string"
-        s3_visibility_groups:
-          type: "array"
-          items:
-            type: "string"
-        apple_sid:
-          type: "boolean"
-          description: "Apple sid"
-        protocols_audit:
-          type: "object"
-          description: "Map of protocols audit configurations"
-        protocols:
-          type: "array"
-          items:
-            type: "string"
-          description: "Protocols to audit"
-        data_create_delete:
-          type: "boolean"
-          description: "Create/Delete Files/Directories/Objects"
-        data_modify:
-          type: "boolean"
-          description: "Modify data/MD"
-        data_read:
-          type: "boolean"
-          description: "Read data"
-        log_full_path:
-          type: "boolean"
-          description: "Log full path"
-        log_hostname:
-          type: "boolean"
-          description: "Log hostname"
-        log_username:
-          type: "boolean"
-          description: "Log username"
-        log_deleted:
-          type: "boolean"
-          description: "Log deleted files/dirs from trash dir"
-        remote_mapping:
-          type: "object"
-          description: ""
-        count_views:
-          type: integer
-          description: Number of Policy related Views
-        enable_snapshot_lookup:
-          type: "boolean"
-          description: "Specifies whether to make the .snapshot directory accessible in subdirectories of the View."
-        enable_listing_of_snapshot_dir:
-          type: "boolean"
-          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
     VIPPool:
       type: "object"
       properties:
@@ -1113,131 +738,7 @@ components:
         peer_asn:
           type: "integer"
           description: "Peer ASN"
-    VIPPoolPost:
-      type: "object"
-      properties:
-        name:
-          type: "string"
-          description: "A uniq name given to the vippool"
-        subnet_cidr:
-          type: "integer"
-          description: "IPv4 Subnet CIDR prefix (bits number)"
-        subnet_cidr_ipv6:
-          type: "integer"
-          description: "IPv6 Subnet CIDR prefix (bits number)"
-        gw_ip:
-          type: "string"
-          description: "Gateway IP Address"
-        gw_ipv6:
-          type: "string"
-          description: "GW IPv6 Address"
-        vlan:
-          type: "int"
-          description: "VIPPool VLAN"
-        state:
-          type: "string"
-          description: ""
-        cnode_ids:
-          type: "array"
-          items:
-            type: "integer"
-          description: "IDs of cnodes comprising cnode group"
-        cluster:
-          type: "string"
-          description: "Parent Cluster"
-        url:
-          type: "string"
-          description: ""
-        domain_name:
-          type: "string"
-          description: ""
-        role:
-          type: "string"
-          description: "Role"
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
-        ip_ranges:
-          type: "array"
-          items:
-            type: "array"
-            items:
-              type: "string"
-          description: "IP ranges"
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
-        vms_preferred:
-          type: "boolean"
-          description: "If true, CNodes participating in the vip pool are preferred in VMS host election"
-        enabled:
-          type: "boolean"
-          description: "True for enable, False for disable"
-        port_membership:
-          type: "string"
-          description: "The port on the CNode this pool will use. Right, left or all"
-        active_interfaces:
-          type: "integer"
-          description: "Numver of active interfaces"
-        enable_l3:
-          type: "boolean"
-          description: "Enables L3 CNode access"
-        vast_asn:
-          type: "integer"
-          description: "VAST ASN"
-        peer_asn:
-          type: "integer"
-          description: "Peer ASN" 
     Dns:
-      type: "object"
-      properties:
-        name:
-          type: "string"
-          description: "Specifies a name for the VAST DNS server configuration"
-        id:
-          type: "integer"
-          description: "A uniqe id given to the VAST DNS server configurations"
-        vip:
-          type: "string"
-          description: "Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP."
-        domain_suffix:
-          type: "string"
-          description: "Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target."
-        vip_gateway:
-          type: "string"
-          description: "Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface."
-        enabled:
-          type: "boolean"
-          description: "Enable the VAST DNS server configurations"
-        guid:
-          type: "string"
-          description: "A uniqe guid assigned to the VAST DNS server configurations"
-        vip_subnet_cidr:
-          type: "integer"
-          description: "Specifies the subnet, as a CIDR index, on which the DNS resides."
-        vip_vlan:
-          type: "integer"
-          description: "Specifies a VLAN if needed to enable communication with external DNS server(s)."
-        cnode_ids:
-          type: "array"
-          items:
-            type: "integer"
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
-        vip_ipv6:
-          type: "string"
-          description: "Assigns an IPv6 to the DNS service."
-        vip_ipv6_subnet_cidr:
-          type: "integer"
-          description: "Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]"
-        vip_ipv6_gateway:
-          type: "string"
-          description: "Specifies a gateway IPv6 to external DNS server if on different subnet."
-    DnsPost:
       type: "object"
       properties:
         name:
@@ -1375,6 +876,9 @@ components:
         enable_alarms:
           type: "boolean"
           description: "Enable alarms when users or groups are exceeding their limit"
+        last_user_quotas_update:
+          type: "string"
+          format: "date-time"
         default_email:
           type: "string"
           description: "The default Email if there is no suffix and no address in the providers"
