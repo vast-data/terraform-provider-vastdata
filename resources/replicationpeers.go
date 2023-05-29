@@ -41,7 +41,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A unique guid given to the  replication peer configuration`,
 		},
 
@@ -361,7 +361,6 @@ func resourceReplicationPeersCreate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/nativereplicationremotetargets/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ReplicationPeers %v", create_err))
 
@@ -427,6 +426,7 @@ func resourceReplicationPeersUpdate(ctx context.Context, d *schema.ResourceData,
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ReplicationPeers"))
 	reflect_ReplicationPeers := reflect.TypeOf((*api_latest.ReplicationPeers)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ReplicationPeers.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

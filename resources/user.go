@@ -41,7 +41,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A uniq guid given to the user`,
 		},
 
@@ -558,7 +558,6 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/users/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  User %v", create_err))
 
@@ -624,6 +623,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource User"))
 	reflect_User := reflect.TypeOf((*api_latest.User)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_User.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

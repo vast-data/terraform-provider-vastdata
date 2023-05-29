@@ -41,7 +41,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A unique guid given to the global snapshot`,
 		},
 
@@ -381,7 +381,6 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/globalsnapstreams/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", create_err))
 
@@ -447,6 +446,7 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource GlobalSnapshot"))
 	reflect_GlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

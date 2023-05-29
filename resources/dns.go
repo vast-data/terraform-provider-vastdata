@@ -79,7 +79,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A uniqe guid assigned to the VAST DNS server configurations`,
 		},
 
@@ -405,7 +405,6 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/latest/dns/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", create_err))
 
@@ -471,6 +470,7 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Dns"))
 	reflect_Dns := reflect.TypeOf((*api_latest.Dns)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Dns.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

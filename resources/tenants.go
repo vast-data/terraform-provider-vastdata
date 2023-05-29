@@ -41,7 +41,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A uniq guid given to the tenant`,
 		},
 
@@ -442,7 +442,6 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/tenants/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Tenant %v", create_err))
 
@@ -508,6 +507,7 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Tenant"))
 	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Tenant.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

@@ -426,9 +426,6 @@ components:
         name:
           type: "string"
           description: "A uniqe name given to the view policy.                         "
-        created:
-          type: "string"
-          format: "date-time"
         gid_inheritance:
           type: "string"
           description: "Determine the way a file inherits GID"
@@ -764,6 +761,7 @@ components:
           type: "string"
           description: "Specifies a gateway IPv6 to external DNS server if on different subnet."
     Quota:
+      description: "This is a quota"
       type: "object"
       properties:
         id:
@@ -850,9 +848,6 @@ components:
         enable_alarms:
           type: "boolean"
           description: "Enable alarms when users or groups are exceeding their limit"
-        last_user_quotas_update:
-          type: "string"
-          format: "date-time"
         default_email:
           type: "string"
           description: "The default Email if there is no suffix and no address in the providers"
@@ -872,7 +867,12 @@ components:
           type: "array"
           items:
             type: "object"
-            $ref: "#/components/schemas/UserQuota"           
+            $ref: "#/components/schemas/UserQuota"
+        group_quotas:
+          type: "array"
+          items:
+            type: "object"
+            $ref: "#/components/schemas/UserQuota"
     DefaultQuota:
       type: "object"
       properties:
@@ -942,6 +942,8 @@ components:
           $ref: "#/components/schemas/QuotaEntityInfo"
     QuotaEntityInfo:
       type: "object"
+      required:
+        - "is_group"
       properties:
         name:
           type: "string"

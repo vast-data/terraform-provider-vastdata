@@ -47,7 +47,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: ``,
 		},
 
@@ -441,7 +441,6 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/s3lifecyclerules/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", create_err))
 
@@ -507,6 +506,7 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3LifeCycleRule"))
 	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

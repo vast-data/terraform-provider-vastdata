@@ -41,7 +41,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `QoS Policy guid`,
 		},
 
@@ -389,7 +389,6 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/qospolicies/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", create_err))
 
@@ -455,6 +454,7 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource QosPolicy"))
 	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_QosPolicy.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

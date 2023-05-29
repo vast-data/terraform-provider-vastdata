@@ -15,9 +15,14 @@ SHELL:=bash
 BUILD_DEST=build
 BUILD_DIR=build
 GINKGO_FLAGS=""
+TFPLUGIN_DOCS_OPTIONS = ""
+
+document:
+	tfplugindocs $(TFPLUGIN_DOCS_OPTIONS)
 
 clean:
 	rm -rf $(BUILD_DEST)/terraform-provider-vastdata
+	rm -rf docs
 
 $(BUILD_DIR)/swagger-codegen-cli.jar:
 	(! test -e $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE)  && wget $(SWAGGER_CODEGEN_URL)$(SWAGGER_CODEGEN_FILE) -O $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE)) || ( test -e $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE))
@@ -64,4 +69,4 @@ build: $(BUILD_DEST)/terraform-provider-vastdata
 test:
 	ginkgo $(GINKGO_FLAGS) ./...
 
-build-all: clean build-formatter build
+build-all: clean build-formatter build document

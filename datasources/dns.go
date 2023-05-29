@@ -32,7 +32,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `A uniqe id given to the VAST DNS server configurations`,
 			},
 
@@ -40,7 +40,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Enable the VAST DNS server configurations`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Specifies the subnet, as a CIDR index, on which the DNS resides.`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Specifies a VLAN if needed to enable communication with external DNS server(s).`,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 
 				Elem: &schema.Schema{
@@ -108,7 +108,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Assigns an IPv6 to the DNS service.`,
 			},
 
@@ -116,7 +116,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
 			},
 
@@ -124,7 +124,7 @@ func DataSourceDns() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Specifies a gateway IPv6 to external DNS server if on different subnet.`,
 			},
 		},

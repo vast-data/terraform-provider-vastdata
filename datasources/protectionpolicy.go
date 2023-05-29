@@ -24,7 +24,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `A unique id given to the replication peer configuration`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Direct link to the replication policy`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The target peer name`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The id of the target peer`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The prefix to be given to the replicated data`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The type the replication`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `List of snapshots schedules`,
 
 				Elem: &schema.Resource{
@@ -98,7 +98,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `How often to make a snapshot`,
 						},
 
@@ -106,7 +106,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 
@@ -114,7 +114,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 
@@ -122,7 +122,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 					},
@@ -133,7 +133,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Is the snapshot indestructable`,
 			},
 		},

@@ -24,7 +24,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `A uniqe ID used to identify the View`,
 			},
 
@@ -40,7 +40,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `A uniq name given to the view`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Creates the directory specified by the path`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `S3 Bucket name`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Associated view policy ID`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Parent Cluster`,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Parent Cluster ID`,
 			},
 
@@ -112,7 +112,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Create the directory if it does not exist`,
 			},
 
@@ -120,7 +120,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Trun on S3 Versioning`,
 			},
 
@@ -128,7 +128,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Allow S3 Unverified Lookup`,
 			},
 
@@ -136,7 +136,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Allow S3 anonymous access`,
 			},
 
@@ -144,7 +144,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Allow S3 anonymous access`,
 			},
 
@@ -152,7 +152,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Protocols exposed by this view`,
 
 				Elem: &schema.Schema{
@@ -164,7 +164,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
 			},
 
@@ -172,7 +172,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `S3 Bucket owner`,
 			},
 
@@ -180,7 +180,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `List of bucket creators users`,
 
 				Elem: &schema.Schema{
@@ -192,7 +192,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `List of bucket creators groups`,
 
 				Elem: &schema.Schema{
@@ -204,7 +204,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `S3 Object Lock`,
 			},
 
@@ -212,7 +212,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `S3 Locks retention mode`,
 			},
 
@@ -220,7 +220,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Period should be positive in format like 0d|2d|1y|2y`,
 			},
 
@@ -228,7 +228,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Physical Capacity`,
 			},
 
@@ -236,7 +236,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Logical Capacity`,
 			},
 
@@ -244,7 +244,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.`,
 			},
 
@@ -252,7 +252,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -260,7 +260,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Share-level ACL details`,
 
 				Elem: &schema.Resource{
@@ -270,7 +270,7 @@ func DataSourceView() *schema.Resource {
 							Type:        schema.TypeBool,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 
@@ -278,7 +278,7 @@ func DataSourceView() *schema.Resource {
 							Type:        schema.TypeList,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 
 							Elem: &schema.Resource{
@@ -288,7 +288,7 @@ func DataSourceView() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -296,7 +296,7 @@ func DataSourceView() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -304,7 +304,7 @@ func DataSourceView() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -312,7 +312,7 @@ func DataSourceView() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -328,7 +328,7 @@ func DataSourceView() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 								},
@@ -342,7 +342,7 @@ func DataSourceView() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `QoS Policy ID`,
 			},
 		},

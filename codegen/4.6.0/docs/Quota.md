@@ -31,13 +31,13 @@ Name | Type | Description | Notes
 **NumExceededUsers** | **int32** |  | [optional] [default to null]
 **NumBlockedUsers** | **int32** |  | [optional] [default to null]
 **EnableAlarms** | **bool** | Enable alarms when users or groups are exceeding their limit | [optional] [default to null]
-**LastUserQuotasUpdate** | [**time.Time**](time.Time.md) |  | [optional] [default to null]
 **DefaultEmail** | **string** | The default Email if there is no suffix and no address in the providers | [optional] [default to null]
 **PercentInodes** | **int32** | Percent of used inodes out of the hard limit | [optional] [default to null]
 **PercentCapacity** | **int32** | Percent of used capacity out of the hard limit | [optional] [default to null]
 **DefaultUserQuota** | [***DefaultQuota**](DefaultQuota.md) |  | [optional] [default to null]
 **DefaultGroupQuota** | [***DefaultQuota**](DefaultQuota.md) |  | [optional] [default to null]
 **UserQuotas** | [**[]UserQuota**](UserQuota.md) |  | [optional] [default to null]
+**GroupQuotas** | [**[]UserQuota**](UserQuota.md) |  | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

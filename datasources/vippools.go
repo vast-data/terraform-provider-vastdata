@@ -24,7 +24,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `A uniq id given to the vippool`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `IPv4 Subnet CIDR prefix (bits number)`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `IPv6 Subnet CIDR prefix (bits number)`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Gateway IP Address`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `GW IPv6 Address`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `VIPPool VLAN`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `IDs of cnodes comprising cnode group`,
 
 				Elem: &schema.Schema{
@@ -108,7 +108,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Parent Cluster`,
 			},
 
@@ -116,7 +116,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -124,7 +124,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -132,7 +132,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Role`,
 			},
 
@@ -140,7 +140,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `IP ranges`,
 
 				Elem: &schema.Resource{
@@ -165,7 +165,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `If true, CNodes participating in the vip pool are preferred in VMS host election`,
 			},
 
@@ -173,7 +173,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `True for enable, False for disable`,
 			},
 
@@ -181,7 +181,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The port on the CNode this pool will use. Right, left or all`,
 			},
 
@@ -189,7 +189,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Numver of active interfaces`,
 			},
 
@@ -197,7 +197,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Enables L3 CNode access`,
 			},
 
@@ -205,7 +205,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `VAST ASN`,
 			},
 
@@ -213,7 +213,7 @@ func DataSourceVipPool() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Peer ASN`,
 			},
 		},

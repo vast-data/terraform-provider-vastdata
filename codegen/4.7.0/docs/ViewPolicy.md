@@ -6,7 +6,6 @@ Name | Type | Description | Notes
 **Id** | **int32** | A uniqe guid given to the view policy | [optional] [default to null]
 **Guid** | **string** | A uniqe guid given to the view policy | [optional] [default to null]
 **Name** | **string** | A uniqe name given to the view policy.                          | [default to null]
-**Created** | [**time.Time**](time.Time.md) |  | [optional] [default to null]
 **GidInheritance** | **string** | Determine the way a file inherits GID | [optional] [default to null]
 **Flavor** | **string** | Security flavor, which determines how file and directory permissions are applied in multiprotocol views. | [optional] [default to null]
 **AccessFlavor** | **string** | Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option) | [optional] [default to null]

@@ -47,6 +47,26 @@ var _ = Describe(" Quota", func() {
       "soft_limit": 100
    },
    "grace_period": "string",
+   "group_quotas": [
+      {
+         "entity": {
+            "email": "string",
+            "identifier": "string",
+            "identifier_type": "string",
+            "name": "string",
+            "vast_id": 100
+         },
+         "grace_period": "string",
+         "hard_limit": 100,
+         "hard_limit_inodes": 100,
+         "quota_system_id": 100,
+         "soft_limit": 100,
+         "soft_limit_inodes": 100,
+         "time_to_block": "string",
+         "used_capacity": 100,
+         "used_inodes": 100
+      }
+   ],
    "guid": "string",
    "hard_limit": 100,
    "hard_limit_inodes": 100,

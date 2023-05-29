@@ -41,7 +41,7 @@ func getResourceNisSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A uniq guid given to the nis server configuration`,
 		},
 
@@ -225,7 +225,6 @@ func resourceNisCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/nis/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Nis %v", create_err))
 
@@ -291,6 +290,7 @@ func resourceNisUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Nis"))
 	reflect_Nis := reflect.TypeOf((*api_latest.Nis)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Nis.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

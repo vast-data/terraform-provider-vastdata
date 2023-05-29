@@ -134,6 +134,8 @@ type ResourceTemplateV2 struct {
 	ListFields               map[string][]FakeField
 	ApiSchema                *base.SchemaProxy
 	ResourceDocumantation    string
+	BeforePostFunc           string
+	BeforePatchFunc          string
 }
 
 func (r *ResourceTemplateV2) GetSchemaDocumentation() string {
@@ -293,10 +295,14 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 			m["computed"] = "true"
 			m["required"] = "false"
 			m["optional"] = "true"
-		} else {
+		} else if m["name"] == "guid" {
 			m["computed"] = "true"
 			m["required"] = "false"
 			m["optional"] = "false"
+		} else {
+			m["computed"] = "true"
+			m["required"] = "false"
+			m["optional"] = "true"
 		}
 		elem_type = e.Type.String()
 		m["elem_type"] = elem_type

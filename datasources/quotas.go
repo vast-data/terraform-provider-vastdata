@@ -17,14 +17,14 @@ import (
 func DataSourceQuota() *schema.Resource {
 	return &schema.Resource{
 		ReadContext: dataSourceQuotaRead,
-		Description: ``,
+		Description: `This is a quota`,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Directory path`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Grace period expiration time`,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Soft quota limit`,
 			},
 
@@ -104,7 +104,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Hard quota limit`,
 			},
 
@@ -112,7 +112,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Hard inodes quota limit`,
 			},
 
@@ -120,7 +120,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Soft inodes quota limit`,
 			},
 
@@ -128,7 +128,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Used inodes`,
 			},
 
@@ -136,7 +136,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Used capacity in bytes`,
 			},
 
@@ -144,7 +144,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeFloat,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Used capacity in TB`,
 			},
 
@@ -152,7 +152,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Used effective capacity in bytes`,
 			},
 
@@ -160,7 +160,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeFloat,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Used effective capacity in TB`,
 			},
 
@@ -176,7 +176,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Tenant Name`,
 			},
 
@@ -184,7 +184,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Parent Cluster`,
 			},
 
@@ -192,7 +192,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Parent Cluster ID`,
 			},
 
@@ -200,7 +200,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -208,7 +208,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -216,7 +216,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -224,7 +224,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -232,7 +232,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -240,7 +240,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Enable alarms when users or groups are exceeding their limit`,
 			},
 
@@ -248,7 +248,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The default Email if there is no suffix and no address in the providers`,
 			},
 
@@ -256,7 +256,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Percent of used inodes out of the hard limit`,
 			},
 
@@ -264,7 +264,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Percent of used capacity out of the hard limit`,
 			},
 
@@ -272,7 +272,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 
 				Elem: &schema.Resource{
@@ -282,7 +282,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The system ID of the quota`,
 						},
 
@@ -290,7 +290,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The size soft limit in bytes`,
 						},
 
@@ -298,7 +298,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The size hard limit in bytes`,
 						},
 
@@ -306,7 +306,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The sof limit of inodes number`,
 						},
 
@@ -314,7 +314,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The hard limit in inode number`,
 						},
 
@@ -322,7 +322,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 					},
@@ -333,7 +333,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 
 				Elem: &schema.Resource{
@@ -343,7 +343,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The system ID of the quota`,
 						},
 
@@ -351,7 +351,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The size soft limit in bytes`,
 						},
 
@@ -359,7 +359,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The size hard limit in bytes`,
 						},
 
@@ -367,7 +367,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The sof limit of inodes number`,
 						},
 
@@ -375,7 +375,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `The hard limit in inode number`,
 						},
 
@@ -383,7 +383,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 					},
@@ -394,7 +394,7 @@ func DataSourceQuota() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 
 				Elem: &schema.Resource{
@@ -404,7 +404,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
 						},
 
@@ -412,7 +412,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Grace period expiration time`,
 						},
 
@@ -420,7 +420,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Soft quota limit`,
 						},
 
@@ -428,7 +428,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Hard quota limit`,
 						},
 
@@ -436,7 +436,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Hard inodes quota limit`,
 						},
 
@@ -444,7 +444,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Soft inodes quota limit`,
 						},
 
@@ -452,7 +452,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Used inodes`,
 						},
 
@@ -460,7 +460,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Used capacity in bytes`,
 						},
 
@@ -468,7 +468,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeBool,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 
@@ -476,7 +476,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 						},
 
@@ -484,7 +484,7 @@ func DataSourceQuota() *schema.Resource {
 							Type:        schema.TypeList,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: ``,
 
 							Elem: &schema.Resource{
@@ -502,7 +502,7 @@ func DataSourceQuota() *schema.Resource {
 										Type:        schema.TypeInt,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -510,7 +510,7 @@ func DataSourceQuota() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -518,7 +518,7 @@ func DataSourceQuota() *schema.Resource {
 										Type:        schema.TypeBool,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -526,7 +526,7 @@ func DataSourceQuota() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
-										Optional:    false,
+										Optional:    true,
 										Description: ``,
 									},
 
@@ -534,7 +534,161 @@ func DataSourceQuota() *schema.Resource {
 										Type:        schema.TypeString,
 										Computed:    true,
 										Required:    false,
+										Optional:    true,
+										Description: ``,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+
+			"group_quotas": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    true,
+				Description: ``,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+
+						"grace_period": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+						},
+
+						"time_to_block": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Grace period expiration time`,
+						},
+
+						"soft_limit": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Soft quota limit`,
+						},
+
+						"hard_limit": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Hard quota limit`,
+						},
+
+						"hard_limit_inodes": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Hard inodes quota limit`,
+						},
+
+						"soft_limit_inodes": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Soft inodes quota limit`,
+						},
+
+						"used_inodes": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Used inodes`,
+						},
+
+						"used_capacity": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: `Used capacity in bytes`,
+						},
+
+						"is_accountable": &schema.Schema{
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: ``,
+						},
+
+						"quota_system_id": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: ``,
+						},
+
+						"entity": &schema.Schema{
+							Type:        schema.TypeList,
+							Computed:    true,
+							Required:    false,
+							Optional:    true,
+							Description: ``,
+
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+
+									"name": &schema.Schema{
+										Type:        schema.TypeString,
+										Computed:    false,
+										Required:    true,
 										Optional:    false,
+										Description: `The name of the entity`,
+									},
+
+									"vast_id": &schema.Schema{
+										Type:        schema.TypeInt,
+										Computed:    true,
+										Required:    false,
+										Optional:    true,
+										Description: ``,
+									},
+
+									"email": &schema.Schema{
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    true,
+										Description: ``,
+									},
+
+									"is_group": &schema.Schema{
+										Type:        schema.TypeBool,
+										Computed:    true,
+										Required:    false,
+										Optional:    true,
+										Description: ``,
+									},
+
+									"identifier": &schema.Schema{
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    true,
+										Description: ``,
+									},
+
+									"identifier_type": &schema.Schema{
+										Type:        schema.TypeString,
+										Computed:    true,
+										Required:    false,
+										Optional:    true,
 										Description: ``,
 									},
 								},
@@ -1032,6 +1186,18 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"user_quotas\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "GroupQuotas", resource.GroupQuotas))
+
+	err = d.Set("group_quotas", utils.FlattenListOfModelsToList(ctx, resource.GroupQuotas))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"group_quotas\"",
 			Detail:   err.Error(),
 		})
 	}

@@ -24,7 +24,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `A unique id given to the snapshot`,
 			},
 
@@ -40,7 +40,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `When will this sanpshot expire`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The path to make snapshot from`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Is it locked (indestructable)`,
 			},
 		},

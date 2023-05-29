@@ -130,6 +130,8 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		ResponseGetByURL:         true,
+		BeforePostFunc:           "EntityMergeToUserQuotas",
+		BeforePatchFunc:          "EntityMergeToUserQuotas",
 		DataSourceName:           "vastdata_quota",
 	},
 	ResourceTemplateV2{

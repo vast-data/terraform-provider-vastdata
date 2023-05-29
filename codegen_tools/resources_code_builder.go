@@ -228,7 +228,9 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     tflog.Info(ctx,fmt.Sprintf("Creating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
-    
+    {{ if ne .BeforePostFunc "" }}
+    data=utils.{{.BeforePostFunc}}(data)
+    {{end}}
     version_compare:=utils.VastVersionsWarn(ctx)
    
     if version_compare!= metadata.CLUSTER_VERSION_EQUALS {
@@ -264,7 +266,6 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-
     response ,create_err:=client.Post(ctx,"{{.Path}}",bytes.NewReader(b),map[string]string{});
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , create_err))
     
@@ -330,6 +331,9 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     tflog.Info(ctx,fmt.Sprintf("Updating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
+    {{ if ne .BeforePatchFunc "" }}
+    data=utils.{{.BeforePatchFunc}}(data)
+    {{end}}
     tflog.Debug(ctx,fmt.Sprintf("Data %v" , data ))    
     b,err:=json.MarshalIndent(data,"","   ")
     if err!=nil {
@@ -452,8 +456,8 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	     {{ if eq .Attributes.required "true" -}}
 	     {{indent $I " "}}   Required: true,
 	     {{ else -}}
-	     {{indent $I " "}}   Computed: true,
-	     {{indent $I " "}}   Optional: true,
+	     {{indent $I " "}}   Computed: {{.Attributes.computed}},
+	     {{indent $I " "}}   Optional: {{.Attributes.optional}},
              {{indent $I " "}}   Description: {{getBT}}{{ GetSchemaProperyDocument .Attributes.name }}{{getBT}},
 	     {{ end -}}
              {{ if and (eq .Attributes.length "1") (eq .Attributes.list_type "simple") (eq .Attributes.type "TypeList")}}

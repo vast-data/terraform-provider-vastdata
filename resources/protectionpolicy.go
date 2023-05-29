@@ -41,7 +41,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A unique guid given to the  replication peer configuration`,
 		},
 
@@ -374,7 +374,6 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/protectionpolicies/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectionPolicy %v", create_err))
 
@@ -440,6 +439,7 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ProtectionPolicy"))
 	reflect_ProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectionPolicy.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

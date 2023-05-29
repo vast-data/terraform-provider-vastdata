@@ -24,7 +24,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `A uniq id given to the tenant`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Default Share-level permissions for Others`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `GID with permissions to the trash folder`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Array of source IP ranges to allow for the tenant.`,
 
 				Elem: &schema.Resource{
@@ -113,7 +113,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `POSIX primary provider type`,
 			},
 
@@ -121,7 +121,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `AD provider ID`,
 			},
 
@@ -129,7 +129,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Open-LDAP provider ID specified separately by the user`,
 			},
 
@@ -137,7 +137,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `NIS provider ID`,
 			},
 
@@ -145,7 +145,7 @@ func DataSourceTenant() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Tenant's encryption group unique identifier`,
 			},
 		},

@@ -41,7 +41,7 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A uniqe GUID assigned to the group`,
 		},
 
@@ -263,7 +263,6 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/groups/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Group %v", create_err))
 
@@ -329,6 +328,7 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Group"))
 	reflect_Group := reflect.TypeOf((*api_latest.Group)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Group.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

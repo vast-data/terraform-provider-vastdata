@@ -41,7 +41,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: ``,
 		},
 
@@ -848,7 +848,6 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/ldaps/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Ldap %v", create_err))
 
@@ -914,6 +913,7 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Ldap"))
 	reflect_Ldap := reflect.TypeOf((*api_latest.Ldap)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Ldap.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

@@ -24,7 +24,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `QoS provisioning mode`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 
 				Elem: &schema.Resource{
@@ -74,7 +74,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Minimal amount of performance to provide when there is resource contention`,
 						},
 
@@ -82,7 +82,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance to provide when there is no resource contention`,
 						},
 
@@ -90,7 +90,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Minimal amount of performance to provide when there is resource contention`,
 						},
 
@@ -98,7 +98,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance to provide when there is no resource contention`,
 						},
 
@@ -106,7 +106,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Minimal amount of performance to provide when there is resource contention`,
 						},
 
@@ -114,7 +114,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance to provide when there is no resource contention`,
 						},
 
@@ -122,7 +122,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Minimal amount of performance to provide when there is resource contention`,
 						},
 
@@ -130,7 +130,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance to provide when there is no resource contention`,
 						},
 					},
@@ -141,7 +141,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 
 				Elem: &schema.Resource{
@@ -151,7 +151,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 						},
 
@@ -159,7 +159,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 						},
 
@@ -167,7 +167,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 						},
 
@@ -175,7 +175,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Type:        schema.TypeInt,
 							Computed:    true,
 							Required:    false,
-							Optional:    false,
+							Optional:    true,
 							Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 						},
 					},

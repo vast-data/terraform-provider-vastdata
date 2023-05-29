@@ -41,7 +41,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A unique guid given to the s3 replication peer configuration`,
 		},
 
@@ -325,7 +325,6 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/replicationtargets/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3replicationPeers %v", create_err))
 
@@ -391,6 +390,7 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3replicationPeers"))
 	reflect_S3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3replicationPeers.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

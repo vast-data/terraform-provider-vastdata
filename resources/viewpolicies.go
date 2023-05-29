@@ -41,7 +41,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `A uniqe guid given to the view policy`,
 		},
 
@@ -1465,7 +1465,6 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/viewpolicies/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ViewPolicy %v", create_err))
 
@@ -1531,6 +1530,7 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ViewPolicy"))
 	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ViewPolicy.Elem(), d, &data, "", false)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

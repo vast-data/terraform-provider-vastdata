@@ -29,7 +29,7 @@ func ResourceQuota() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceQuotaImporter,
 		},
-		Description: ``,
+		Description: `This is a quota`,
 		Schema:      getResourceQuotaSchema(),
 	}
 }
@@ -41,7 +41,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Type: schema.TypeString,
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Description: `Quota guid`,
 		},
 
@@ -398,6 +398,158 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"user_quotas": &schema.Schema{
+			Type: schema.TypeList,
+
+			Computed:    true,
+			Optional:    true,
+			Description: ``,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"grace_period": &schema.Schema{
+						Type: schema.TypeString,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+					},
+
+					"time_to_block": &schema.Schema{
+						Type: schema.TypeString,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Grace period expiration time`,
+					},
+
+					"soft_limit": &schema.Schema{
+						Type: schema.TypeInt,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Soft quota limit`,
+					},
+
+					"hard_limit": &schema.Schema{
+						Type: schema.TypeInt,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Hard quota limit`,
+					},
+
+					"hard_limit_inodes": &schema.Schema{
+						Type: schema.TypeInt,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Hard inodes quota limit`,
+					},
+
+					"soft_limit_inodes": &schema.Schema{
+						Type: schema.TypeInt,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Soft inodes quota limit`,
+					},
+
+					"used_inodes": &schema.Schema{
+						Type: schema.TypeInt,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Used inodes`,
+					},
+
+					"used_capacity": &schema.Schema{
+						Type: schema.TypeInt,
+
+						Computed:    true,
+						Optional:    true,
+						Description: `Used capacity in bytes`,
+					},
+
+					"is_accountable": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
+					},
+
+					"quota_system_id": &schema.Schema{
+						Type: schema.TypeInt,
+
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
+					},
+
+					"entity": &schema.Schema{
+						Type: schema.TypeList,
+
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
+
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+
+								"name": &schema.Schema{
+									Type: schema.TypeString,
+
+									Required: true,
+								},
+
+								"vast_id": &schema.Schema{
+									Type: schema.TypeInt,
+
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
+								},
+
+								"email": &schema.Schema{
+									Type: schema.TypeString,
+
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
+								},
+
+								"is_group": &schema.Schema{
+									Type: schema.TypeBool,
+
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
+								},
+
+								"identifier": &schema.Schema{
+									Type: schema.TypeString,
+
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
+								},
+
+								"identifier_type": &schema.Schema{
+									Type: schema.TypeString,
+
+									Computed:    true,
+									Optional:    true,
+									Description: ``,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		"group_quotas": &schema.Schema{
 			Type: schema.TypeList,
 
 			Computed:    true,
@@ -955,6 +1107,18 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "GroupQuotas", resource.GroupQuotas))
+
+	err = d.Set("group_quotas", utils.FlattenListOfModelsToList(ctx, resource.GroupQuotas))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"group_quotas\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	return diags
 
 }
@@ -1038,6 +1202,8 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
 
+	data = utils.EntityMergeToUserQuotas(data)
+
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
@@ -1073,7 +1239,6 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-
 	response, create_err := client.Post(ctx, "/api/latest/quotas/", bytes.NewReader(b), map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", create_err))
 
@@ -1139,6 +1304,9 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Quota"))
 	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
+
+	data = utils.EntityMergeToUserQuotas(data)
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {
