@@ -13,8 +13,6 @@ Name | Type | Description | Notes
 **VipSubnetCidr** | **int32** | Specifies the subnet, as a CIDR index, on which the DNS resides. | [optional] [default to null]
 **VipVlan** | **int32** | Specifies a VLAN if needed to enable communication with external DNS server(s). | [optional] [default to null]
 **CnodeIds** | **[]int32** |  | [optional] [default to null]
-**Sync** | **string** | Synchronization state with leader | [optional] [default to null]
-**SyncTime** | **string** | Synchronization time with leader | [optional] [default to null]
 **VipIpv6** | **string** | Assigns an IPv6 to the DNS service. | [optional] [default to null]
 **VipIpv6SubnetCidr** | **int32** | Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128] | [optional] [default to null]
 **VipIpv6Gateway** | **string** | Specifies a gateway IPv6 to external DNS server if on different subnet. | [optional] [default to null]

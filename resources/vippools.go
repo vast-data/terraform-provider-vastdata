@@ -139,14 +139,6 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 
-		"sync": &schema.Schema{
-			Type: schema.TypeString,
-
-			Computed:    true,
-			Optional:    true,
-			Description: `Synchronization state with leader`,
-		},
-
 		"ip_ranges": &schema.Schema{
 			Type: schema.TypeList,
 
@@ -170,14 +162,6 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 					},
 				},
 			},
-		},
-
-		"sync_time": &schema.Schema{
-			Type: schema.TypeString,
-
-			Computed:    true,
-			Optional:    true,
-			Description: `Synchronization time with leader`,
 		},
 
 		"vms_preferred": &schema.Schema{
@@ -402,18 +386,6 @@ func ResourceVipPoolReadStructIntoSchema(ctx context.Context, resource api_lates
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sync", resource.Sync))
-
-	err = d.Set("sync", resource.Sync)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IpRanges", resource.IpRanges))
 
 	err = d.Set("ip_ranges", utils.FlattenListOfStringsList(&resource.IpRanges, []string{"start_ip", "end_ip"}))
@@ -422,18 +394,6 @@ func ResourceVipPoolReadStructIntoSchema(ctx context.Context, resource api_lates
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"ip_ranges\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SyncTime", resource.SyncTime))
-
-	err = d.Set("sync_time", resource.SyncTime)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync_time\"",
 			Detail:   err.Error(),
 		})
 	}

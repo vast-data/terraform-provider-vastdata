@@ -62,7 +62,6 @@ var _ = Describe(" Quota", func() {
    "soft_limit": 100,
    "soft_limit_inodes": 100,
    "state": "string",
-   "sync_state": "string",
    "system_id": 100,
    "tenant_id": 100,
    "tenant_name": "string",

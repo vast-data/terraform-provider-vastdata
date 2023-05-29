@@ -7,7 +7,6 @@ Name | Type | Description | Notes
 **Guid** | **string** | Quota guid | [optional] [default to null]
 **Name** | **string** | The name | [optional] [default to null]
 **State** | **string** |  | [optional] [default to null]
-**SyncState** | **string** |  | [optional] [default to null]
 **PrettyState** | **string** |  | [optional] [default to null]
 **Path** | **string** | Directory path | [optional] [default to null]
 **PrettyGracePeriod** | **string** | Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m | [optional] [default to null]

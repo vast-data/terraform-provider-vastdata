@@ -52,14 +52,6 @@ func DataSourceQuota() *schema.Resource {
 				Description: ``,
 			},
 
-			"sync_state": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: ``,
-			},
-
 			"pretty_state": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -678,18 +670,6 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"state\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SyncState", resource.SyncState))
-
-	err = d.Set("sync_state", resource.SyncState)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync_state\"",
 			Detail:   err.Error(),
 		})
 	}

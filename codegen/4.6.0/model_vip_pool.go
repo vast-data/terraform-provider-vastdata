@@ -34,12 +34,8 @@ type VipPool struct {
 	DomainName string `json:"domain_name,omitempty"`
 	// Role
 	Role string `json:"role,omitempty"`
-	// Synchronization state with leader
-	Sync string `json:"sync,omitempty"`
 	// IP ranges
 	IpRanges [][]string `json:"ip_ranges,omitempty"`
-	// Synchronization time with leader
-	SyncTime string `json:"sync_time,omitempty"`
 	// If true, CNodes participating in the vip pool are preferred in VMS host election
 	VmsPreferred bool `json:"vms_preferred,omitempty"`
 	// True for enable, False for disable

@@ -91,8 +91,6 @@ var _ = Describe(" VipPool", func() {
    "state": "string",
    "subnet_cidr": 100,
    "subnet_cidr_ipv6": 100,
-   "sync": "string",
-   "sync_time": "string",
    "url": "string",
    "vast_asn": 100,
    "vlan": 100

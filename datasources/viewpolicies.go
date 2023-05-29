@@ -444,14 +444,6 @@ func DataSourceViewPolicy() *schema.Resource {
 				Description: `Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.`,
 			},
 
-			"sync": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `Synchronization state with leader`,
-			},
-
 			"vip_pools": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
@@ -462,14 +454,6 @@ func DataSourceViewPolicy() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
 				},
-			},
-
-			"sync_time": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `Synchronization time with leader`,
 			},
 
 			"nfs_minimal_protection_level": &schema.Schema{
@@ -1234,18 +1218,6 @@ func dataSourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m int
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sync", resource.Sync))
-
-	err = d.Set("sync", resource.Sync)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VipPools", resource.VipPools))
 
 	err = d.Set("vip_pools", utils.FlattenListOfPrimitives(&resource.VipPools))
@@ -1254,18 +1226,6 @@ func dataSourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m int
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"vip_pools\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SyncTime", resource.SyncTime))
-
-	err = d.Set("sync_time", resource.SyncTime)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync_time\"",
 			Detail:   err.Error(),
 		})
 	}

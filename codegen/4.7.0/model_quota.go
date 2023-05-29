@@ -18,7 +18,6 @@ type Quota struct {
 	// The name
 	Name string `json:"name,omitempty"`
 	State string `json:"state,omitempty"`
-	SyncState string `json:"sync_state,omitempty"`
 	PrettyState string `json:"pretty_state,omitempty"`
 	// Directory path
 	Path string `json:"path,omitempty"`

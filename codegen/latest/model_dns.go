@@ -28,10 +28,6 @@ type Dns struct {
 	// Specifies a VLAN if needed to enable communication with external DNS server(s).
 	VipVlan int32 `json:"vip_vlan,omitempty"`
 	CnodeIds []int32 `json:"cnode_ids,omitempty"`
-	// Synchronization state with leader
-	Sync string `json:"sync,omitempty"`
-	// Synchronization time with leader
-	SyncTime string `json:"sync_time,omitempty"`
 	// Assigns an IPv6 to the DNS service.
 	VipIpv6 string `json:"vip_ipv6,omitempty"`
 	// Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]

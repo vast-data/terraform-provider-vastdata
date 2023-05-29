@@ -373,12 +373,6 @@ components:
         name:
           type: "string"
           description: "A uniq name given to the tenant"
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
         smb_privileged_user_name:
           type: "string"
           description: "Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'"
@@ -591,17 +585,11 @@ components:
         atime_frequency:
           type: "string"
           description: "Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds."
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
         vip_pools:
           type: "array"
           items:
             type: "integer"
           description: "Comma separated vip pool ids."
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
         nfs_minimal_protection_level:
           type: "string"
           description: "NFS 4.1 minimal protection level"
@@ -704,9 +692,6 @@ components:
         role:
           type: "string"
           description: "Role"
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
         ip_ranges:
           type: "array"
           items:
@@ -714,9 +699,6 @@ components:
             items:
               type: "string"
           description: "IP ranges"
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
         vms_preferred:
           type: "boolean"
           description: "If true, CNodes participating in the vip pool are preferred in VMS host election"
@@ -772,12 +754,6 @@ components:
           type: "array"
           items:
             type: "integer"
-        sync:
-          type: "string"
-          description: "Synchronization state with leader"
-        sync_time:
-          type: "string"
-          description: "Synchronization time with leader"
         vip_ipv6:
           type: "string"
           description: "Assigns an IPv6 to the DNS service."
@@ -800,8 +776,6 @@ components:
           type: "string"
           description: "The name"
         state:
-          type: "string"
-        sync_state:
           type: "string"
         pretty_state:
           type: "string"

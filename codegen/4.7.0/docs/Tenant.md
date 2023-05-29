@@ -6,8 +6,6 @@ Name | Type | Description | Notes
 **Id** | **int32** | A uniq id given to the tenant | [optional] [default to null]
 **Guid** | **string** | A uniq guid given to the tenant | [optional] [default to null]
 **Name** | **string** | A uniq name given to the tenant | [optional] [default to null]
-**Sync** | **string** | Synchronization state with leader | [optional] [default to null]
-**SyncTime** | **string** | Synchronization time with leader | [optional] [default to null]
 **SmbPrivilegedUserName** | **string** | Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is &#x27;vastadmin&#x27; | [optional] [default to null]
 **SmbPrivilegedGroupSid** | **string** | Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group. | [optional] [default to null]
 **SmbAdministratorsGroupName** | **string** | Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group. | [optional] [default to null]

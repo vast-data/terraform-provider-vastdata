@@ -42,8 +42,6 @@ var _ = Describe(" Dns", func() {
    "domain_suffix": "string",
    "guid": "string",
    "name": "string",
-   "sync": "string",
-   "sync_time": "string",
    "vip": "string",
    "vip_gateway": "string",
    "vip_ipv6": "string",

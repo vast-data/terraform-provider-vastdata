@@ -157,8 +157,6 @@ var _ = Describe(" ViewPolicy", func() {
       "D",
       "E"
    ],
-   "sync": "string",
-   "sync_time": "string",
    "tenant_id": 100,
    "tenant_name": "string",
    "trash_access": [

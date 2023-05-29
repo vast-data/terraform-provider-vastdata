@@ -104,12 +104,8 @@ type ViewPolicy struct {
 	Url string `json:"url,omitempty"`
 	// Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.
 	AtimeFrequency string `json:"atime_frequency,omitempty"`
-	// Synchronization state with leader
-	Sync string `json:"sync,omitempty"`
 	// Comma separated vip pool ids.
 	VipPools []int32 `json:"vip_pools,omitempty"`
-	// Synchronization time with leader
-	SyncTime string `json:"sync_time,omitempty"`
 	// NFS 4.1 minimal protection level
 	NfsMinimalProtectionLevel string `json:"nfs_minimal_protection_level,omitempty"`
 	S3Visibility []string `json:"s3_visibility,omitempty"`

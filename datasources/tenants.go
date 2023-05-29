@@ -44,14 +44,6 @@ func DataSourceTenant() *schema.Resource {
 				Description: `A uniq name given to the tenant`,
 			},
 
-			"sync": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `Synchronization state with leader`,
-			},
-
 			"smb_privileged_user_name": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
@@ -255,18 +247,6 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"name\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sync", resource.Sync))
-
-	err = d.Set("sync", resource.Sync)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync\"",
 			Detail:   err.Error(),
 		})
 	}

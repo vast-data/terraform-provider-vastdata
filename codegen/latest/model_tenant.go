@@ -15,10 +15,6 @@ type Tenant struct {
 	Guid string `json:"guid,omitempty"`
 	// A uniq name given to the tenant
 	Name string `json:"name,omitempty"`
-	// Synchronization state with leader
-	Sync string `json:"sync,omitempty"`
-	// Synchronization time with leader
-	SyncTime string `json:"sync_time,omitempty"`
 	// Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'
 	SmbPrivilegedUserName string `json:"smb_privileged_user_name,omitempty"`
 	// Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.

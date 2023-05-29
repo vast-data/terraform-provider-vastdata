@@ -111,22 +111,6 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"sync": &schema.Schema{
-			Type: schema.TypeString,
-
-			Computed:    true,
-			Optional:    true,
-			Description: `Synchronization state with leader`,
-		},
-
-		"sync_time": &schema.Schema{
-			Type: schema.TypeString,
-
-			Computed:    true,
-			Optional:    true,
-			Description: `Synchronization time with leader`,
-		},
-
 		"vip_ipv6": &schema.Schema{
 			Type: schema.TypeString,
 
@@ -263,30 +247,6 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"cnode_ids\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sync", resource.Sync))
-
-	err = d.Set("sync", resource.Sync)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SyncTime", resource.SyncTime))
-
-	err = d.Set("sync_time", resource.SyncTime)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync_time\"",
 			Detail:   err.Error(),
 		})
 	}

@@ -51,14 +51,6 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 
-		"sync": &schema.Schema{
-			Type: schema.TypeString,
-
-			Computed:    true,
-			Optional:    true,
-			Description: `Synchronization state with leader`,
-		},
-
 		"smb_privileged_user_name": &schema.Schema{
 			Type: schema.TypeString,
 
@@ -196,18 +188,6 @@ func ResourceTenantReadStructIntoSchema(ctx context.Context, resource api_latest
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"name\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sync", resource.Sync))
-
-	err = d.Set("sync", resource.Sync)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sync\"",
 			Detail:   err.Error(),
 		})
 	}
