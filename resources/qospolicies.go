@@ -50,10 +50,11 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"mode": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `QoS provisioning mode`,
+			Type:             schema.TypeString,
+			Computed:         true,
+			Optional:         true,
+			ValidateDiagFunc: utils.OneOf([]string{"STATIC", "USED_CAPACITY", "PROVISIONED_CAPACITY"}),
+			Description:      `QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 		},
 
 		"io_size_bytes": &schema.Schema{

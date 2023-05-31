@@ -224,10 +224,11 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"nfs_interop_flags": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.`,
+			Type:             schema.TypeString,
+			Computed:         true,
+			Optional:         true,
+			ValidateDiagFunc: utils.OneOf([]string{"BOTH_NFS3_AND_NFS4_INTEROP_DISABLED", "ONLY_NFS3_INTEROP_ENABLED", "ONLY_NFS4_INTEROP_ENABLED", "BOTH_NFS3_AND_NFS4_INTEROP_ENABLED"}),
+			Description:      `Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]`,
 		},
 
 		"is_remote": &schema.Schema{
@@ -263,17 +264,19 @@ func getResourceViewSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"grantee": &schema.Schema{
-									Type:        schema.TypeString,
-									Computed:    true,
-									Optional:    true,
-									Description: ``,
+									Type:             schema.TypeString,
+									Computed:         true,
+									Optional:         true,
+									ValidateDiagFunc: utils.OneOf([]string{"users", "groups"}),
+									Description:      ` Allowed Values are [users groups]`,
 								},
 
 								"permissions": &schema.Schema{
-									Type:        schema.TypeString,
-									Computed:    true,
-									Optional:    true,
-									Description: ``,
+									Type:             schema.TypeString,
+									Computed:         true,
+									Optional:         true,
+									ValidateDiagFunc: utils.OneOf([]string{"FULL"}),
+									Description:      ` Allowed Values are [FULL]`,
 								},
 
 								"sid_str": &schema.Schema{

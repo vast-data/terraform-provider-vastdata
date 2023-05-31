@@ -103,10 +103,11 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"method": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: ``,
+			Type:             schema.TypeString,
+			Computed:         true,
+			Optional:         true,
+			ValidateDiagFunc: utils.OneOf([]string{"SIMPLE", "ANONYMOUS"}),
+			Description:      ` Allowed Values are [SIMPLE ANONYMOUS]`,
 		},
 
 		"port": &schema.Schema{
@@ -131,10 +132,11 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"query_groups_mode": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: ``,
+			Type:             schema.TypeString,
+			Computed:         true,
+			Optional:         true,
+			ValidateDiagFunc: utils.OneOf([]string{"COMPATIBLE", "RFC2307BIS_ONLY", "RFC2307_ONLY", "NONE"}),
+			Description:      ` Allowed Values are [COMPATIBLE RFC2307BIS_ONLY RFC2307_ONLY NONE]`,
 		},
 
 		"query_posix_attributes_from_gc": &schema.Schema{

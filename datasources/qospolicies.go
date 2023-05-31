@@ -49,7 +49,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    true,
-				Description: `QoS provisioning mode`,
+				Description: `QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 			},
 
 			"io_size_bytes": &schema.Schema{

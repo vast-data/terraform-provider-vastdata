@@ -36,7 +36,7 @@ description: |-
 - `is_remote` (Boolean)
 - `logical_capacity` (Number) Logical Capacity
 - `name` (String) A uniq name given to the view
-- `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.
+- `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]
 - `physical_capacity` (Number) Physical Capacity
 - `policy_id` (Number) Associated view policy ID
 - `protocols` (List of String) Protocols exposed by this view
@@ -72,7 +72,7 @@ Required:
 Optional:
 
 - `fqdn` (String)
-- `grantee` (String)
-- `permissions` (String)
+- `grantee` (String) Allowed Values are [users groups]
+- `permissions` (String) Allowed Values are [FULL]
 - `sid_str` (String)
 - `uid_or_gid` (String)

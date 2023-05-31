@@ -71,10 +71,11 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `Default Share-level permissions for Others`,
+			Type:             schema.TypeString,
+			Computed:         true,
+			Optional:         true,
+			ValidateDiagFunc: utils.OneOf([]string{"READ", "CHANGE", "FULL"}),
+			Description:      `Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]`,
 		},
 
 		"trash_gid": &schema.Schema{
@@ -111,10 +112,11 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `POSIX primary provider type`,
+			Type:             schema.TypeString,
+			Computed:         true,
+			Optional:         true,
+			ValidateDiagFunc: utils.OneOf([]string{"NONE", "LDAP", "NIS", "AD", "LOCAL"}),
+			Description:      `POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]`,
 		},
 
 		"ad_provider_id": &schema.Schema{

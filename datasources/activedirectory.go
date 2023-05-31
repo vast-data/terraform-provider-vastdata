@@ -109,7 +109,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    true,
-				Description: ``,
+				Description: ` Allowed Values are [SIMPLE ANONYMOUS]`,
 			},
 
 			"port": &schema.Schema{
@@ -141,7 +141,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    true,
-				Description: ``,
+				Description: ` Allowed Values are [COMPATIBLE RFC2307BIS_ONLY RFC2307_ONLY NONE]`,
 			},
 
 			"query_posix_attributes_from_gc": &schema.Schema{

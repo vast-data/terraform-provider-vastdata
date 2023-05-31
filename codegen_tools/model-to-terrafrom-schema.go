@@ -139,6 +139,24 @@ func NewStringSet(s ...string) *StringSet {
 	return &new_string_set
 }
 
+func ListAsStringsList(s []interface{}) []string {
+	//convert any list to a list of strings with the value as the string for each element
+	n := make([]string, len(s), len(s))
+	for i, j := range s {
+		n[i] = fmt.Sprintf("%v", j)
+	}
+	return n
+}
+
+func AsStringListDefentions(s []string) string {
+	a := "[]string{"
+	for _, i := range s {
+		a += "\"" + i + "\","
+	}
+	a += "}"
+	return a
+}
+
 type FakeField struct {
 	Name        string
 	Description string
@@ -166,6 +184,28 @@ type ResourceTemplateV2 struct {
 	BeforePostFunc           utils.ResponseConversionFunc
 	BeforePatchFunc          utils.ResponseConversionFunc
 	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
+}
+
+func (r *ResourceTemplateV2) HasProperty(property string) bool {
+	if r.ApiSchema != nil {
+		schema := r.ApiSchema.Schema()
+		_, exists := schema.Properties[property]
+		return exists
+	}
+	return false
+}
+
+func (r *ResourceTemplateV2) GetEnum(property string) []interface{} {
+	if r.HasProperty(property) {
+		schema := r.ApiSchema.Schema()
+		property_schema := schema.Properties[property].Schema()
+		if property_schema == nil {
+			return []interface{}{}
+		}
+		return property_schema.Enum
+
+	}
+	return []interface{}{}
 }
 
 func (r ResourceTemplateV2) HasValidatorFunc(s string) bool {
@@ -196,7 +236,12 @@ func (r *ResourceTemplateV2) GetSchemaProperyDocument(property string) string {
 		if !exists {
 			return ""
 		}
-		return property_schema.Schema().Description
+		enum := r.GetEnum(property)
+		out := property_schema.Schema().Description
+		if len(enum) > 0 {
+			out += fmt.Sprintf(" Allowed Values are %v", ListAsStringsList(enum))
+		}
+		return out
 	}
 
 	return ""
@@ -314,6 +359,7 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 	TfNameToModelName := map[string]string{}
 	Fields := []ResourceElem{}
 	r := R.Model
+	R.ApiSchema = getSchemaProxy(strings.ToLower(R.ResourceName))
 	t := reflect.TypeOf(r)
 	for _, e := range reflect.VisibleFields(t) {
 		if R.IgnoreFields.In(e.Name) {
@@ -323,11 +369,15 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 		TfNameToModelName[GetTFformatName(e.Name)] = e.Name
 		m["validator_func"] = ""
 		if R.HasValidatorFunc(m["name"]) {
-			fmt.Println(R.ResourceName)
 			m["validator_func"] = R.GetValidatorFunc(m["name"])
-			fmt.Println(m["name"], m["validator_func"])
 		}
-
+		m["enum"] = ""
+		enum := R.GetEnum(m["name"])
+		if len(enum) > 0 && (!R.HasValidatorFunc(m["name"])) {
+			fmt.Println(m["name"])
+			l := ListAsStringsList(enum)
+			m["enum"] = AsStringListDefentions(l)
+		}
 		m["max_items"] = "0"
 		if R.IgnoreUpdates == nil {
 			R.IgnoreUpdates = NewStringSet()

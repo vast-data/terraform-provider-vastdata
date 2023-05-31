@@ -461,6 +461,9 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
              {{-  if  .Attributes.validator_func  }}
              {{indent $I " "}}  ValidateDiagFunc: {{.Attributes.validator_func}},
              {{- end }}
+             {{-  if  .Attributes.enum }}
+             {{indent $I " "}}  ValidateDiagFunc: utils.OneOf({{.Attributes.enum}}),
+             {{- end }}
              {{indent $I " "}}   Description: {{getBT}}{{ GetSchemaProperyDocument .Attributes.name }}{{getBT}},
 	     {{ end -}}
              {{ if and (eq .Attributes.length "1") (eq .Attributes.list_type "simple") (eq .Attributes.type "TypeList")}}

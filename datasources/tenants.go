@@ -73,7 +73,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    true,
-				Description: `Default Share-level permissions for Others`,
+				Description: `Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]`,
 			},
 
 			"trash_gid": &schema.Schema{
@@ -114,7 +114,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    true,
-				Description: `POSIX primary provider type`,
+				Description: `POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]`,
 			},
 
 			"ad_provider_id": &schema.Schema{

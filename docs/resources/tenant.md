@@ -34,11 +34,11 @@ resource vastdata_tenant tenant1 {
 
 - `ad_provider_id` (Number) AD provider ID
 - `client_ip_ranges` (Block List) Array of source IP ranges to allow for the tenant. (see [below for nested schema](#nestedblock--client_ip_ranges))
-- `default_others_share_level_perm` (String) Default Share-level permissions for Others
+- `default_others_share_level_perm` (String) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]
 - `encryption_crn` (String) Tenant's encryption group unique identifier
 - `ldap_provider_id` (Number) Open-LDAP provider ID specified separately by the user
 - `nis_provider_id` (Number) NIS provider ID
-- `posix_primary_provider` (String) POSIX primary provider type
+- `posix_primary_provider` (String) POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]
 - `smb_administrators_group_name` (String) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.
 - `smb_privileged_group_sid` (String) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.
 - `smb_privileged_user_name` (String) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'

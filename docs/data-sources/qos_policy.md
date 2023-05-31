@@ -23,7 +23,7 @@ description: |-
 
 - `capacity_limits` (Block List) (see [below for nested schema](#nestedblock--capacity_limits))
 - `io_size_bytes` (Number) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
-- `mode` (String) QoS provisioning mode
+- `mode` (String) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]
 - `static_limits` (Block List) (see [below for nested schema](#nestedblock--static_limits))
 
 ### Read-Only
