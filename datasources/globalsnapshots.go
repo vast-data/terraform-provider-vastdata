@@ -24,7 +24,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `A unique id given to the global snapshot`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The path to make snapshot from`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The tenant id to use`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The path where to store the snapshot on a Target`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The remote tenant id`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The snapshot id of the snapshot`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The name of the snapshot`,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `IS the snapshot enabled`,
 			},
 
@@ -104,7 +104,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The cluster where the source snapshot is configured`,
 			},
 
@@ -112,7 +112,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The cluster where the snapshot is cloned to`,
 			},
 		},

@@ -184,6 +184,7 @@ type ResourceTemplateV2 struct {
 	BeforePostFunc           utils.ResponseConversionFunc
 	BeforePatchFunc          utils.ResponseConversionFunc
 	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
+	IsDataSource             bool
 }
 
 func (r *ResourceTemplateV2) HasProperty(property string) bool {
@@ -400,10 +401,14 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 			m["computed"] = "true"
 			m["required"] = "false"
 			m["optional"] = "false"
-		} else {
+		} else if !R.IsDataSource {
 			m["computed"] = "true"
 			m["required"] = "false"
 			m["optional"] = "true"
+		} else {
+			m["computed"] = "true"
+			m["required"] = "false"
+			m["optional"] = "false"
 		}
 		elem_type = e.Type.String()
 		m["elem_type"] = elem_type
@@ -509,6 +514,8 @@ func WriteStringToFile(base_path, filename, content string) {
 func gen_datasources() {
 	base_path := "../datasources/"
 	for i, _ := range datasources_templates {
+		d := &datasources_templates[i]
+		d.IsDataSource = true
 		ProcessResourceTemplate(&datasources_templates[i])
 
 	}
@@ -524,6 +531,8 @@ func gen_datasources() {
 func gen_resources() {
 	base_path := "../resources/"
 	for i, _ := range resources_templates {
+		d := &resources_templates[i]
+		d.IsDataSource = false
 		ProcessResourceTemplate(&resources_templates[i])
 
 	}

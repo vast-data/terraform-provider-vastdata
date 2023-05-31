@@ -24,7 +24,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `A unique id given to the s3 replication peer configuration`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Direct link to the s3 replication peer configurations`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The name of the peer bucket to replicate to`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The http protocol user http/https`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List of http procies`,
 
 				Elem: &schema.Schema{
@@ -92,7 +92,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The Bucket AWS region, Valid only when type is AWS_S3`,
 			},
 		},

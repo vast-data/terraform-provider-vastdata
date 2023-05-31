@@ -24,7 +24,7 @@ func DataSourceGroup() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `A uniqe Identifier of a group`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceGroup() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The group linux gid`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceGroup() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The group SID`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceGroup() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List of S3 policies IDs`,
 
 				Elem: &schema.Schema{

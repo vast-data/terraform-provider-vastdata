@@ -24,7 +24,7 @@ func DataSourceNis() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `A uniq id given to the nis server configuration`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceNis() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List of ip addresses/hostnames of nis servers`,
 
 				Elem: &schema.Schema{

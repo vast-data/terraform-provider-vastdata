@@ -24,7 +24,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `A uniq id given to user`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The user unix UID`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The user leading unix GID`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List of supplementary GID list`,
 
 				Elem: &schema.Schema{
@@ -76,7 +76,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List of supplementary Group list`,
 
 				Elem: &schema.Schema{
@@ -88,7 +88,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Group Count`,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Leading Group Name`,
 			},
 
@@ -104,7 +104,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Leading Group GID`,
 			},
 
@@ -112,7 +112,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The user SID`,
 			},
 
@@ -120,7 +120,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The user primary group SID`,
 			},
 
@@ -128,7 +128,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `supplementary SID list`,
 
 				Elem: &schema.Schema{
@@ -140,7 +140,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `IS this a local user`,
 			},
 
@@ -148,7 +148,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List of User Access Keys`,
 
 				Elem: &schema.Resource{
@@ -173,7 +173,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Allow create bucket`,
 			},
 
@@ -181,7 +181,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Allow delete bucket`,
 			},
 
@@ -189,7 +189,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Is S3 superuser`,
 			},
 
@@ -197,7 +197,7 @@ func DataSourceUser() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List S3 policies IDs`,
 
 				Elem: &schema.Schema{

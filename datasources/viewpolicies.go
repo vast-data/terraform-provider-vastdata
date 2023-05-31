@@ -24,7 +24,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `A uniqe guid given to the view policy`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Determine the way a file inherits GID`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Security flavor, which determines how file and directory permissions are applied in multiprotocol views.`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `How to determine the maximum allowed path length`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `How to determine the allowed characters in a path`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -104,7 +104,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Use configured Auth Provider(s) to enforce group permissions. Required if SMB Flavor is selected`,
 			},
 
@@ -112,7 +112,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The source of authentication`,
 			},
 
@@ -120,7 +120,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with NFS read/write permissions`,
 
 				Elem: &schema.Schema{
@@ -132,7 +132,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with NFS read only permissions`,
 
 				Elem: &schema.Schema{
@@ -144,7 +144,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with NFS read/write permissions`,
 
 				Elem: &schema.Schema{
@@ -156,7 +156,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with NFS read only permissions`,
 
 				Elem: &schema.Schema{
@@ -168,7 +168,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with SMB read/write permissions`,
 
 				Elem: &schema.Schema{
@@ -180,7 +180,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with SMB read only permissions`,
 
 				Elem: &schema.Schema{
@@ -192,7 +192,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with S3 read/write permissions`,
 
 				Elem: &schema.Schema{
@@ -204,7 +204,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with S3 read only permissions`,
 
 				Elem: &schema.Schema{
@@ -216,7 +216,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with trash permissions`,
 
 				Elem: &schema.Schema{
@@ -228,7 +228,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Enable POSIX ACL`,
 			},
 
@@ -236,7 +236,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `when using smb use open permissions for files`,
 			},
 
@@ -244,7 +244,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with no squash policy`,
 
 				Elem: &schema.Schema{
@@ -256,7 +256,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with root squash policy`,
 
 				Elem: &schema.Schema{
@@ -268,7 +268,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with all squash policy`,
 
 				Elem: &schema.Schema{
@@ -280,7 +280,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -288,7 +288,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -296,7 +296,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -304,7 +304,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -312,7 +312,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -320,7 +320,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -328,7 +328,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -336,7 +336,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -344,7 +344,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -352,7 +352,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -360,7 +360,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Hosts with full permissions`,
 			},
 
@@ -368,7 +368,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Default unix type permissions on new file`,
 			},
 
@@ -376,7 +376,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Default unix type permissions on new folder`,
 			},
 
@@ -384,7 +384,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Default unix type permissions on new file`,
 			},
 
@@ -392,7 +392,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Default unix type permissions on new folder`,
 			},
 
@@ -400,7 +400,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Parent Cluster`,
 			},
 
@@ -408,7 +408,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Parent Cluster ID`,
 			},
 
@@ -416,7 +416,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Tenant ID`,
 			},
 
@@ -424,7 +424,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Tenant Name`,
 			},
 
@@ -432,7 +432,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -440,7 +440,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.`,
 			},
 
@@ -448,7 +448,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Comma separated vip pool ids.`,
 
 				Elem: &schema.Schema{
@@ -460,7 +460,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `NFS 4.1 minimal protection level`,
 			},
 
@@ -468,7 +468,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 
 				Elem: &schema.Schema{
@@ -480,7 +480,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 
 				Elem: &schema.Schema{
@@ -492,7 +492,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Apple sid`,
 			},
 
@@ -500,7 +500,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Protocols to audit`,
 
 				Elem: &schema.Schema{
@@ -512,7 +512,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Create/Delete Files/Directories/Objects`,
 			},
 
@@ -520,7 +520,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Modify data/MD`,
 			},
 
@@ -528,7 +528,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Read data`,
 			},
 
@@ -536,7 +536,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Log full path`,
 			},
 
@@ -544,7 +544,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Log hostname`,
 			},
 
@@ -552,7 +552,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Log username`,
 			},
 
@@ -560,7 +560,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Log deleted files/dirs from trash dir`,
 			},
 
@@ -568,7 +568,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Number of Policy related Views`,
 			},
 
@@ -576,7 +576,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Specifies whether to make the .snapshot directory accessible in subdirectories of the View.`,
 			},
 
@@ -584,7 +584,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
 			},
 		},
