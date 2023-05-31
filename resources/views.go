@@ -38,24 +38,21 @@ func getResourceViewSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `A uniqe GUID assigned to the View`,
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `A uniq name given to the view`,
 		},
 
 		"path": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
@@ -64,101 +61,88 @@ func getResourceViewSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-
-			Computed:    true,
-			Optional:    true,
-			Description: `Creates the directory specified by the path`,
+			Computed:              true,
+			Optional:              true,
+			Description:           `Creates the directory specified by the path`,
 		},
 
 		"alias": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path`,
 		},
 
 		"bucket": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `S3 Bucket name`,
 		},
 
 		"policy_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:     schema.TypeInt,
 			Required: true,
 		},
 
 		"cluster": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Parent Cluster`,
 		},
 
 		"cluster_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Parent Cluster ID`,
 		},
 
 		"tenant_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The tenant ID related to this view`,
 		},
 
 		"directory": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Create the directory if it does not exist`,
 		},
 
 		"s3_versioning": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Trun on S3 Versioning`,
 		},
 
 		"s3_unverified_lookup": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Allow S3 Unverified Lookup`,
 		},
 
 		"allow_anonymous_access": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Allow S3 anonymous access`,
 		},
 
 		"allow_s3_anonymous_access": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Allow S3 anonymous access`,
 		},
 
 		"protocols": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `Protocols exposed by this view`,
@@ -169,24 +153,21 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"share": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
 		},
 
 		"bucket_owner": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `S3 Bucket owner`,
 		},
 
 		"bucket_creators": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `List of bucket creators users`,
@@ -197,8 +178,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"bucket_creators_groups": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `List of bucket creators groups`,
@@ -209,64 +189,56 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"s3_locks": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `S3 Object Lock`,
 		},
 
 		"s3_locks_retention_mode": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `S3 Locks retention mode`,
 		},
 
 		"s3_locks_retention_period": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Period should be positive in format like 0d|2d|1y|2y`,
 		},
 
 		"physical_capacity": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Physical Capacity`,
 		},
 
 		"logical_capacity": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Logical Capacity`,
 		},
 
 		"nfs_interop_flags": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.`,
 		},
 
 		"is_remote": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"share_acl": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `Share-level ACL details`,
@@ -275,16 +247,14 @@ func getResourceViewSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"enabled": &schema.Schema{
-						Type: schema.TypeBool,
-
+						Type:        schema.TypeBool,
 						Computed:    true,
 						Optional:    true,
 						Description: ``,
 					},
 
 					"acl": &schema.Schema{
-						Type: schema.TypeList,
-
+						Type:        schema.TypeList,
 						Computed:    true,
 						Optional:    true,
 						Description: ``,
@@ -293,46 +263,40 @@ func getResourceViewSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"grantee": &schema.Schema{
-									Type: schema.TypeString,
-
+									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
 									Description: ``,
 								},
 
 								"permissions": &schema.Schema{
-									Type: schema.TypeString,
-
+									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
 									Description: ``,
 								},
 
 								"sid_str": &schema.Schema{
-									Type: schema.TypeString,
-
+									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
 									Description: ``,
 								},
 
 								"uid_or_gid": &schema.Schema{
-									Type: schema.TypeString,
-
+									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
 									Description: ``,
 								},
 
 								"name": &schema.Schema{
-									Type: schema.TypeString,
-
+									Type:     schema.TypeString,
 									Required: true,
 								},
 
 								"fqdn": &schema.Schema{
-									Type: schema.TypeString,
-
+									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
 									Description: ``,
@@ -345,8 +309,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"qos_policy_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `QoS Policy ID`,

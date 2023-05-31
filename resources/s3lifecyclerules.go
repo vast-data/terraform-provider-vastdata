@@ -38,110 +38,96 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: ``,
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"prefix": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
 		},
 
 		"min_size": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The minimum size of the object`,
 		},
 
 		"max_size": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The maximum size of the object`,
 		},
 
 		"expiration_days": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The number of days from creation until an object expires`,
 		},
 
 		"expiration_date": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The expiration date of the object`,
 		},
 
 		"expired_obj_delete_marker": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Remove expired objects delete markers`,
 		},
 
 		"noncurrent_days": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Number of days after objects become noncurrent`,
 		},
 
 		"newer_noncurrent_versions": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The number of newer versions to retain`,
 		},
 
 		"abort_mpu_days_after_initiation": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The number of days until expiration after an incomplete multipart upload`,
 		},
 
 		"view_path": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The path of the related View`,
 		},
 
 		"view_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The ID of the related View`,

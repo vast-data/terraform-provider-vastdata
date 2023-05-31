@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"runtime"
 	"sort"
 
 	"os"
@@ -17,7 +18,9 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/pb33f/libopenapi"
+	"github.com/vast-data/terraform-provider-vastdata/utils"
 
 	base "github.com/pb33f/libopenapi/datamodel/high/base"
 )
@@ -32,6 +35,30 @@ func ToListOfStrings(s string) string {
 
 func AddInt(x, y int) int {
 	return x + y
+}
+
+func GetTypeName(i interface{}) string {
+	return reflect.TypeOf(i).Name()
+
+}
+
+func GetFuncRunTimeTypeName(i interface{}) string {
+	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+
+}
+
+func LastSplit(s, sp string) string {
+	i := strings.Split(s, sp)
+	l := len(i)
+	if l > 0 {
+		return i[l-1]
+	}
+	return ""
+}
+
+func FuncName(i interface{}) string {
+	n := GetFuncRunTimeTypeName(i)
+	return LastSplit(n, "/")
 }
 
 var apiSchemasMap map[string]*base.SchemaProxy = make(map[string]*base.SchemaProxy)
@@ -57,6 +84,8 @@ var funcMap template.FuncMap = template.FuncMap{
 	"replace":         strings.Replace,
 	"replaceAll":      strings.ReplaceAll,
 	"getBT":           GetBT,
+	"getTypeName":     GetTypeName,
+	"funcName":        FuncName,
 }
 
 type StringSet struct {
@@ -134,8 +163,23 @@ type ResourceTemplateV2 struct {
 	ListFields               map[string][]FakeField
 	ApiSchema                *base.SchemaProxy
 	ResourceDocumantation    string
-	BeforePostFunc           string
-	BeforePatchFunc          string
+	BeforePostFunc           utils.ResponseConversionFunc
+	BeforePatchFunc          utils.ResponseConversionFunc
+	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
+}
+
+func (r ResourceTemplateV2) HasValidatorFunc(s string) bool {
+	_, exists := r.FieldsValidators[s]
+	return exists
+}
+
+func (r ResourceTemplateV2) GetValidatorFunc(s string) string {
+	if r.HasValidatorFunc(s) {
+		f, _ := r.FieldsValidators[s]
+		return FuncName(f)
+	}
+	return ""
+
 }
 
 func (r *ResourceTemplateV2) GetSchemaDocumentation() string {
@@ -277,6 +321,13 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 		}
 		m := map[string]string{"name": GetTFformatName(e.Name), "modelName": e.Name}
 		TfNameToModelName[GetTFformatName(e.Name)] = e.Name
+		m["validator_func"] = ""
+		if R.HasValidatorFunc(m["name"]) {
+			fmt.Println(R.ResourceName)
+			m["validator_func"] = R.GetValidatorFunc(m["name"])
+			fmt.Println(m["name"], m["validator_func"])
+		}
+
 		m["max_items"] = "0"
 		if R.IgnoreUpdates == nil {
 			R.IgnoreUpdates = NewStringSet()

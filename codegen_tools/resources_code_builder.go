@@ -228,8 +228,8 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     tflog.Info(ctx,fmt.Sprintf("Creating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
-    {{ if ne .BeforePostFunc "" }}
-    data=utils.{{.BeforePostFunc}}(data)
+    {{ if  .BeforePostFunc  }}
+    data={{ funcName .BeforePostFunc}}(data)
     {{end}}
     version_compare:=utils.VastVersionsWarn(ctx)
    
@@ -331,8 +331,8 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     tflog.Info(ctx,fmt.Sprintf("Updating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
-    {{ if ne .BeforePatchFunc "" }}
-    data=utils.{{.BeforePatchFunc}}(data)
+    {{ if .BeforePatchFunc }}
+    data={{ funcName .BeforePatchFunc}}(data)
     {{end}}
     tflog.Debug(ctx,fmt.Sprintf("Data %v" , data ))    
     b,err:=json.MarshalIndent(data,"","   ")
@@ -436,7 +436,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
 }
 
 func BuildResourceTemplateFromModelName(n string, indent int) string {
-	model, _ := datasources_templates_map[n]
+	model, _ := resources_templates_map[n]
 	return BuildResourceTemplate(model, indent)
 }
 
@@ -453,11 +453,14 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
              DiffSuppressFunc: utils.DoNothingOnUpdate(),
              {{ end }}
 
-	     {{ if eq .Attributes.required "true" -}}
+	     {{- if eq .Attributes.required "true" -}}
 	     {{indent $I " "}}   Required: true,
 	     {{ else -}}
 	     {{indent $I " "}}   Computed: {{.Attributes.computed}},
 	     {{indent $I " "}}   Optional: {{.Attributes.optional}},
+             {{-  if  .Attributes.validator_func  }}
+             {{indent $I " "}}  ValidateDiagFunc: {{.Attributes.validator_func}},
+             {{- end }}
              {{indent $I " "}}   Description: {{getBT}}{{ GetSchemaProperyDocument .Attributes.name }}{{getBT}},
 	     {{ end -}}
              {{ if and (eq .Attributes.length "1") (eq .Attributes.list_type "simple") (eq .Attributes.type "TypeList")}}
@@ -497,7 +500,8 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	}
 	localFuncMap["GetFakeFieldDescription"] = r.Parent.GetFakeFieldDescription
 	localFuncMap["GetSchemaProperyDocument"] = r.Parent.GetSchemaProperyDocument
-
+	localFuncMap["HasValidatorFunc"] = r.Parent.HasValidatorFunc
+	localFuncMap["GetValidatorFunc"] = r.Parent.GetValidatorFunc
 	t := template.Must(template.New("tf").Funcs(localFuncMap).Parse(tmpl))
 	err := t.Execute(&b, r)
 	if err != nil {

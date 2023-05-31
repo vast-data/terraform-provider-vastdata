@@ -38,30 +38,26 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `GUID`,
 		},
 
 		"domain_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The domain name of the AD`,
 		},
 
 		"machine_account_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"preferred_dc_list": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `List of Domain Controllers to prefer for authentication. DCs listed here will be queried exclusively unless they fail or do not respond. In such a case, other DCs will be consulted. Specify as a comma-separated list. Each entry can be a fully-qualified hostname or an IP address.`,
@@ -72,168 +68,147 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"organizational_unit": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Organizational Unit within AD where the Cluster Machine account will be created. If left empty, it will go into default Computers OU`,
 		},
 
 		"is_vms_auth_provider": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"ldap_id": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `the id of the attached LDAP object`,
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `enabled/disabled`,
 		},
 
 		"match_user": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"method": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"port": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"posix_account": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"posix_group": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"query_groups_mode": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"query_posix_attributes_from_gc": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"smb_allowed": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"uid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"uid_member": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"uid_member_value_property_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"use_auto_discovery": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Use auto dicovery with to obtain AD details`,
 		},
 
 		"use_ldaps": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"use_tls": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"user_login_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"username_property_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"state": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Active Directory state`,

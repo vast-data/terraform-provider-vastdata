@@ -38,62 +38,54 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `A uniq guid given to the tenant`,
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"smb_privileged_user_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'`,
 		},
 
 		"smb_privileged_group_sid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.`,
 		},
 
 		"smb_administrators_group_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Default Share-level permissions for Others`,
 		},
 
 		"trash_gid": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `GID with permissions to the trash folder`,
 		},
 
 		"client_ip_ranges": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `Array of source IP ranges to allow for the tenant.`,
@@ -119,40 +111,35 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `POSIX primary provider type`,
 		},
 
 		"ad_provider_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `AD provider ID`,
 		},
 
 		"ldap_provider_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Open-LDAP provider ID specified separately by the user`,
 		},
 
 		"nis_provider_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `NIS provider ID`,
 		},
 
 		"encryption_crn": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Tenant's encryption group unique identifier`,

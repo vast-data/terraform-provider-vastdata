@@ -38,30 +38,26 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `GUID`,
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"policy": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"users": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
@@ -72,8 +68,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		},
 
 		"groups": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
@@ -84,16 +79,14 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		},
 
 		"is_replicated": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,

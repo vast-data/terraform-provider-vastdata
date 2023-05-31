@@ -38,68 +38,59 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `A uniq guid given to the vippool`,
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"subnet_cidr": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:     schema.TypeInt,
 			Required: true,
 		},
 
 		"subnet_cidr_ipv6": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `IPv6 Subnet CIDR prefix (bits number)`,
 		},
 
 		"gw_ip": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Gateway IP Address`,
 		},
 
 		"gw_ipv6": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `GW IPv6 Address`,
 		},
 
 		"vlan": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `VIPPool VLAN`,
 		},
 
 		"state": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"cnode_ids": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `IDs of cnodes comprising cnode group`,
@@ -110,38 +101,33 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Parent Cluster`,
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"domain_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"role": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"ip_ranges": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:     schema.TypeList,
 			Required: true,
 
 			Elem: &schema.Resource{
@@ -165,56 +151,49 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vms_preferred": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `If true, CNodes participating in the vip pool are preferred in VMS host election`,
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `True for enable, False for disable`,
 		},
 
 		"port_membership": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The port on the CNode this pool will use. Right, left or all`,
 		},
 
 		"active_interfaces": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Numver of active interfaces`,
 		},
 
 		"enable_l3": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Enables L3 CNode access`,
 		},
 
 		"vast_asn": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `VAST ASN`,
 		},
 
 		"peer_asn": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Peer ASN`,

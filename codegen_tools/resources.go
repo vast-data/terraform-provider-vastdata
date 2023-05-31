@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 )
 
 var resources_templates = []ResourceTemplateV2{
@@ -130,9 +132,10 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		ResponseGetByURL:         true,
-		BeforePostFunc:           "EntityMergeToUserQuotas",
-		BeforePatchFunc:          "EntityMergeToUserQuotas",
+		BeforePostFunc:           utils.EntityMergeToUserQuotas,
+		BeforePatchFunc:          utils.EntityMergeToUserQuotas,
 		DataSourceName:           "vastdata_quota",
+		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"grace_period": utils.GracePeriodFormatValidation},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "DefaultQuota",
@@ -146,6 +149,7 @@ var resources_templates = []ResourceTemplateV2{
 		Generate:                 false,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_quota",
+		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"grace_period": utils.GracePeriodFormatValidation},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "UserQuota",
@@ -159,6 +163,7 @@ var resources_templates = []ResourceTemplateV2{
 		Generate:                 false,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_quota",
+		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"grace_period": utils.GracePeriodFormatValidation},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "QuotaEntityInfo",
@@ -172,6 +177,7 @@ var resources_templates = []ResourceTemplateV2{
 		Generate:                 false,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_quota",
+		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"grace_period": utils.GracePeriodFormatValidation},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Dns",

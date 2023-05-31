@@ -38,54 +38,47 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `A unique guid given to the s3 replication peer configuration`,
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Direct link to the s3 replication peer configurations`,
 		},
 
 		"bucket_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The name of the peer bucket to replicate to`,
 		},
 
 		"http_protocol": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The http protocol user http/https`,
 		},
 
 		"type_": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
 		},
 
 		"proxies": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `List of http procies`,
@@ -96,8 +89,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"aws_region": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The Bucket AWS region, Valid only when type is AWS_S3`,

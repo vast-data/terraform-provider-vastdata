@@ -38,58 +38,50 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `A unique guid given to the  replication peer configuration`,
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Direct link to the replication policy`,
 		},
 
 		"target_name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `The target peer name`,
 		},
 
 		"target_object_id": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `The id of the target peer`,
 		},
 
 		"prefix": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"clone_type": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"frames": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: `List of snapshots schedules`,
@@ -98,32 +90,28 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"every": &schema.Schema{
-						Type: schema.TypeString,
-
+						Type:        schema.TypeString,
 						Computed:    true,
 						Optional:    true,
 						Description: `How often to make a snapshot`,
 					},
 
 					"start_at": &schema.Schema{
-						Type: schema.TypeString,
-
+						Type:        schema.TypeString,
 						Computed:    true,
 						Optional:    true,
 						Description: ``,
 					},
 
 					"keep_local": &schema.Schema{
-						Type: schema.TypeString,
-
+						Type:        schema.TypeString,
 						Computed:    true,
 						Optional:    true,
 						Description: ``,
 					},
 
 					"keep_remote": &schema.Schema{
-						Type: schema.TypeString,
-
+						Type:        schema.TypeString,
 						Computed:    true,
 						Optional:    true,
 						Description: ``,
@@ -133,8 +121,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"indestructible": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Is the snapshot indestructable`,

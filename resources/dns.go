@@ -38,70 +38,61 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:     schema.TypeString,
 			Required: true,
 		},
 
 		"vip": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.`,
 		},
 
 		"domain_suffix": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.`,
 		},
 
 		"vip_gateway": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
-
+			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Description: `Enable the VAST DNS server configurations`,
 		},
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
 			Description: `A uniqe guid assigned to the VAST DNS server configurations`,
 		},
 
 		"vip_subnet_cidr": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Specifies the subnet, as a CIDR index, on which the DNS resides.`,
 		},
 
 		"vip_vlan": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Specifies a VLAN if needed to enable communication with external DNS server(s).`,
 		},
 
 		"cnode_ids": &schema.Schema{
-			Type: schema.TypeList,
-
+			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
 			Description: ``,
@@ -112,24 +103,21 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_ipv6": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Assigns an IPv6 to the DNS service.`,
 		},
 
 		"vip_ipv6_subnet_cidr": &schema.Schema{
-			Type: schema.TypeInt,
-
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Description: `Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
 		},
 
 		"vip_ipv6_gateway": &schema.Schema{
-			Type: schema.TypeString,
-
+			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
 			Description: `Specifies a gateway IPv6 to external DNS server if on different subnet.`,
