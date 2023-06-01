@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **IsLocal** | **bool** | Is the source of the replication local (this host is the source) | [optional] [default to null]
 **PeerName** | **string** | The name of the peer cluster | [optional] [default to null]
 **SecureMode** | **string** | Is the connection secure | [optional] [default to null]
+**PoolId** | **int** | The replication Vippool id | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

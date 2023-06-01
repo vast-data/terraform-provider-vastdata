@@ -104,6 +104,13 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Optional:    true,
 			Description: `Is the connection secure`,
 		},
+
+		"pool_id": &schema.Schema{
+			Type:        schema.TypeInt,
+			Computed:    true,
+			Optional:    true,
+			Description: `The replication Vippool id`,
+		},
 	}
 }
 
@@ -229,6 +236,18 @@ func ResourceReplicationPeersReadStructIntoSchema(ctx context.Context, resource 
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"secure_mode\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PoolId", resource.PoolId))
+
+	err = d.Set("pool_id", resource.PoolId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"pool_id\"",
 			Detail:   err.Error(),
 		})
 	}

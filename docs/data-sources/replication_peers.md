@@ -32,6 +32,7 @@ data vastdata_replication_peers peer1 {
 - `is_local` (Boolean) Is the source of the replication local (this host is the source)
 - `leading_vip` (String) The vip provided for the replication peer configuration
 - `peer_name` (String) The name of the peer cluster
+- `pool_id` (Number) The replication Vippool id
 - `remote_version` (String) The version of the remote peer
 - `remote_vip_range` (String) The vip range which were reported by the peer
 - `secure_mode` (String) Is the connection secure

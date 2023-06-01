@@ -35,6 +35,7 @@ var _ = Describe(" ReplicationPeers", func() {
    "leading_vip": "string",
    "name": "string",
    "peer_name": "string",
+   "pool_id": 100,
    "remote_version": "string",
    "remote_vip_range": "string",
    "secure_mode": "string",

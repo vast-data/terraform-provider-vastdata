@@ -31,4 +31,6 @@ type ReplicationPeers struct {
 	PeerName string `json:"peer_name,omitempty"`
 	// Is the connection secure
 	SecureMode string `json:"secure_mode,omitempty"`
+	// The replication Vippool id
+	PoolId int `json:"pool_id,omitempty"`
 }

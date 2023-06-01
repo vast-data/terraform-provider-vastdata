@@ -1536,6 +1536,9 @@ components:
         secure_mode:
           type: "string"
           description: "Is the connection secure"
+        pool_id:
+          type: "int"
+          description: "The replication Vippool id"
     ProtectionPolicy:
       type: "object"
       properties:
