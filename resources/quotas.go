@@ -446,8 +446,10 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"name": &schema.Schema{
-									Type:     schema.TypeString,
-									Required: true,
+									Type:        schema.TypeString,
+									Computed:    true,
+									Optional:    true,
+									Description: `The name of the entity`,
 								},
 
 								"vast_id": &schema.Schema{
@@ -472,10 +474,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"identifier": &schema.Schema{
-									Type:        schema.TypeString,
-									Computed:    true,
-									Optional:    true,
-									Description: ``,
+									Type:     schema.TypeString,
+									Required: true,
 								},
 
 								"identifier_type": &schema.Schema{
@@ -581,8 +581,10 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"name": &schema.Schema{
-									Type:     schema.TypeString,
-									Required: true,
+									Type:        schema.TypeString,
+									Computed:    true,
+									Optional:    true,
+									Description: `The name of the entity`,
 								},
 
 								"vast_id": &schema.Schema{
@@ -607,10 +609,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"identifier": &schema.Schema{
-									Type:        schema.TypeString,
-									Computed:    true,
-									Optional:    true,
-									Description: ``,
+									Type:     schema.TypeString,
+									Required: true,
 								},
 
 								"identifier_type": &schema.Schema{

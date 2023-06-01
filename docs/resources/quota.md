@@ -162,14 +162,14 @@ Optional:
 
 Required:
 
-- `name` (String)
+- `identifier` (String)
 
 Optional:
 
 - `email` (String)
-- `identifier` (String)
 - `identifier_type` (String)
 - `is_group` (Boolean)
+- `name` (String) The name of the entity
 - `vast_id` (Number)
 
 
@@ -196,12 +196,12 @@ Optional:
 
 Required:
 
-- `name` (String)
+- `identifier` (String)
 
 Optional:
 
 - `email` (String)
-- `identifier` (String)
 - `identifier_type` (String)
 - `is_group` (Boolean)
+- `name` (String) The name of the entity
 - `vast_id` (Number)
