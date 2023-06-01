@@ -21,6 +21,6 @@ type Snapshot struct {
 	Path string `json:"path,omitempty"`
 	// The tenant id to use
 	TenantId int `json:"tenant_id,omitempty"`
-	// Is it locked (indestructable)
-	Locked bool `json:"locked,omitempty"`
+	// Is it indestructable
+	Indestructible bool `json:"indestructible,omitempty"`
 }

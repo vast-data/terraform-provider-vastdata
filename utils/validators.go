@@ -34,3 +34,13 @@ func OneOf(l []string) schema.SchemaValidateDiagFunc {
 		return diag.Errorf(fmt.Sprintf("Wrong Value Provided %v, Allowed values are %v", i, l))
 	}
 }
+
+func SnapshotExpirationFormatValidation(i interface{}, c cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+	_, e := time.Parse(time.RFC3339, i.(string))
+	if e != nil {
+		return diag.FromErr(e)
+	}
+	return diags
+
+}

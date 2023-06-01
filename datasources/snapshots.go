@@ -68,12 +68,12 @@ func DataSourceSnapshot() *schema.Resource {
 				Description: `The tenant id to use`,
 			},
 
-			"locked": &schema.Schema{
+			"indestructible": &schema.Schema{
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Is it locked (indestructable)`,
+				Description: `Is it indestructable`,
 			},
 		},
 	}
@@ -220,14 +220,14 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Locked", resource.Locked))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Indestructible", resource.Indestructible))
 
-	err = d.Set("locked", resource.Locked)
+	err = d.Set("indestructible", resource.Indestructible)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"locked\"",
+			Summary:  "Error occured setting value to \"indestructible\"",
 			Detail:   err.Error(),
 		})
 	}

@@ -1458,9 +1458,9 @@ components:
         tenant_id:
           type: "int"
           description: "The tenant id to use"
-        locked:
+        indestructible:
           type: "boolean"
-          description: "Is it locked (indestructable)"
+          description: "Is it indestructable"
     GlobalSnapshot:
       type: "object"
       properties:

@@ -52,5 +52,5 @@ data vastdata_snapshot snapshot1 {
 - `expiration_time` (String) When will this sanpshot expire
 - `guid` (String) A unique guid given to the snapshot
 - `id` (Number) A unique id given to the snapshot
-- `locked` (Boolean) Is it locked (indestructable)
+- `indestructible` (Boolean) Is it indestructable
 - `path` (String) The path to make snapshot from

@@ -45,10 +45,11 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_time": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `When will this sanpshot expire`,
+			Type:             schema.TypeString,
+			Computed:         true,
+			Optional:         true,
+			ValidateDiagFunc: utils.SnapshotExpirationFormatValidation,
+			Description:      `When will this sanpshot expire`,
 		},
 
 		"name": &schema.Schema{
@@ -70,11 +71,11 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Description: `The tenant id to use`,
 		},
 
-		"locked": &schema.Schema{
+		"indestructible": &schema.Schema{
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
-			Description: `Is it locked (indestructable)`,
+			Description: `Is it indestructable`,
 		},
 	}
 }
@@ -145,14 +146,14 @@ func ResourceSnapshotReadStructIntoSchema(ctx context.Context, resource api_late
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Locked", resource.Locked))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Indestructible", resource.Indestructible))
 
-	err = d.Set("locked", resource.Locked)
+	err = d.Set("indestructible", resource.Indestructible)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"locked\"",
+			Summary:  "Error occured setting value to \"indestructible\"",
 			Detail:   err.Error(),
 		})
 	}

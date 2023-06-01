@@ -335,6 +335,7 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_snapshot",
+		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"expiration_time": utils.SnapshotExpirationFormatValidation},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "GlobalSnapshot",
