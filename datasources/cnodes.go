@@ -24,7 +24,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Currently used IP Address, bond of ip1 and ip2`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `1st internal IP Address`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `2nd internal IP Address`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `External IPv6 Address`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Host label, used to label container, e.g. 11.0.0.1-4000`,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The host serial number`,
 			},
 
@@ -104,7 +104,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -112,7 +112,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -120,7 +120,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -128,7 +128,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -136,7 +136,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -144,7 +144,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -152,7 +152,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -160,7 +160,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `cnode enabled`,
 			},
 
@@ -168,7 +168,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The cnode is running management`,
 			},
 
@@ -176,7 +176,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Parent CBox`,
 			},
 
@@ -184,7 +184,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Unique Parent CBox identifier`,
 			},
 
@@ -192,7 +192,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Parent CBox id`,
 			},
 
@@ -200,7 +200,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Parent Cluster`,
 			},
 
@@ -208,7 +208,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Node OS version`,
 			},
 
@@ -216,7 +216,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `BMC FW version`,
 			},
 
@@ -224,7 +224,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `VMS preferred CNode`,
 			},
 
@@ -232,7 +232,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -240,7 +240,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Management IP`,
 			},
 
@@ -248,7 +248,7 @@ func DataSourceCnode() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Host Name`,
 			},
 		},

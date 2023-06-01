@@ -24,7 +24,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `protection policy id`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `protection policy name`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `path to replicate`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `where to replicate on the remote`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Local Tenant ID`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `remote tenant name`,
 			},
 		},

@@ -26,11 +26,13 @@ data vastdata_tenant tenant1 {
 
 - `name` (String) A uniq name given to the tenant
 
-### Optional
+### Read-Only
 
 - `ad_provider_id` (Number) AD provider ID
+- `client_ip_ranges` (List of Object) Array of source IP ranges to allow for the tenant. (see [below for nested schema](#nestedatt--client_ip_ranges))
 - `default_others_share_level_perm` (String) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]
 - `encryption_crn` (String) Tenant's encryption group unique identifier
+- `guid` (String) A uniq guid given to the tenant
 - `id` (Number) A uniq id given to the tenant
 - `ldap_provider_id` (Number) Open-LDAP provider ID specified separately by the user
 - `nis_provider_id` (Number) NIS provider ID
@@ -40,15 +42,10 @@ data vastdata_tenant tenant1 {
 - `smb_privileged_user_name` (String) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'
 - `trash_gid` (Number) GID with permissions to the trash folder
 
-### Read-Only
-
-- `client_ip_ranges` (Block List) Array of source IP ranges to allow for the tenant. (see [below for nested schema](#nestedblock--client_ip_ranges))
-- `guid` (String) A uniq guid given to the tenant
-
-<a id="nestedblock--client_ip_ranges"></a>
+<a id="nestedatt--client_ip_ranges"></a>
 ### Nested Schema for `client_ip_ranges`
 
 Read-Only:
 
-- `end_ip` (String) The last ip of the range
-- `start_ip` (String) The first ip of the range
+- `end_ip` (String)
+- `start_ip` (String)

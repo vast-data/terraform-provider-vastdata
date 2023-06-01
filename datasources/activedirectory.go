@@ -24,7 +24,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -40,7 +40,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The domain name of the AD`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `List of Domain Controllers to prefer for authentication. DCs listed here will be queried exclusively unless they fail or do not respond. In such a case, other DCs will be consulted. Specify as a comma-separated list. Each entry can be a fully-qualified hostname or an IP address.`,
 
 				Elem: &schema.Schema{
@@ -68,7 +68,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Organizational Unit within AD where the Cluster Machine account will be created. If left empty, it will go into default Computers OU`,
 			},
 
@@ -76,7 +76,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -84,7 +84,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `the id of the attached LDAP object`,
 			},
 
@@ -92,7 +92,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `enabled/disabled`,
 			},
 
@@ -100,7 +100,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -108,7 +108,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ` Allowed Values are [SIMPLE ANONYMOUS]`,
 			},
 
@@ -116,7 +116,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -124,7 +124,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -132,7 +132,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -140,7 +140,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ` Allowed Values are [COMPATIBLE RFC2307BIS_ONLY RFC2307_ONLY NONE]`,
 			},
 
@@ -148,7 +148,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -156,7 +156,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -164,7 +164,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -172,7 +172,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -180,7 +180,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -188,7 +188,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Use auto dicovery with to obtain AD details`,
 			},
 
@@ -196,7 +196,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -204,7 +204,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -212,7 +212,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -220,7 +220,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: ``,
 			},
 
@@ -228,7 +228,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Active Directory state`,
 			},
 		},

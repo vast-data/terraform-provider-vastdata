@@ -24,7 +24,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `A unique id given to the replication peer configuration`,
 			},
 
@@ -48,7 +48,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Direct url of the replication peer configurations`,
 			},
 
@@ -56,7 +56,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The vip provided for the replication peer configuration`,
 			},
 
@@ -64,7 +64,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The vip range which were reported by the peer`,
 			},
 
@@ -72,7 +72,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The version of the source`,
 			},
 
@@ -80,7 +80,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The version of the remote peer`,
 			},
 
@@ -88,7 +88,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Is the source of the replication local (this host is the source)`,
 			},
 
@@ -96,7 +96,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `The name of the peer cluster`,
 			},
 
@@ -104,7 +104,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
-				Optional:    true,
+				Optional:    false,
 				Description: `Is the connection secure`,
 			},
 		},
