@@ -81,7 +81,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The type the replication`,
+				Description: `The type the replication Allowed Values are [NATIVE_REPLICATION]`,
 			},
 
 			"frames": &schema.Schema{
@@ -102,6 +102,14 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Description: `How often to make a snapshot`,
 						},
 
+						"every_unit": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years Allowed Values are [D W s m H M Y]`,
+						},
+
 						"start_at": &schema.Schema{
 							Type:        schema.TypeString,
 							Computed:    true,
@@ -118,7 +126,23 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Description: ``,
 						},
 
+						"local_period": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: ``,
+						},
+
 						"keep_remote": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: ``,
+						},
+
+						"remote_period": &schema.Schema{
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,

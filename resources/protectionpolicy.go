@@ -96,11 +96,20 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Description: `How often to make a snapshot`,
 					},
 
+					"every_unit": &schema.Schema{
+						Type:             schema.TypeString,
+						Computed:         true,
+						Optional:         true,
+						ValidateDiagFunc: utils.OneOf([]string{"D", "W", "s", "m", "H", "M", "Y"}),
+						Description:      `The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years Allowed Values are [D W s m H M Y]`,
+					},
+
 					"start_at": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: ``,
+						Type:             schema.TypeString,
+						Computed:         true,
+						Optional:         true,
+						ValidateDiagFunc: utils.ProtectionPolicyStartAt,
+						Description:      ``,
 					},
 
 					"keep_local": &schema.Schema{
@@ -110,7 +119,21 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Description: ``,
 					},
 
+					"local_period": &schema.Schema{
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
+					},
+
 					"keep_remote": &schema.Schema{
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    true,
+						Description: ``,
+					},
+
+					"remote_period": &schema.Schema{
 						Type:        schema.TypeString,
 						Computed:    true,
 						Optional:    true,

@@ -120,6 +120,7 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 false,
 		DataSourceName:           "",
+		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"start_at": utils.ProtectionPolicyStartAt},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Quota",

@@ -1566,6 +1566,7 @@ components:
         clone_type:
           type: "string"
           description: "The type the replication"
+          enum: [NATIVE_REPLICATION]
         frames:
           type: "array"
           items:
@@ -1582,15 +1583,27 @@ components:
         every:
           type: "string"
           description: "How often to make a snapshot"
+        every_unit:
+          type: "string"
+          description: "The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years"
+          enum: [D,W,s,m,H,M,Y]
         start-at:
           type: "string"
           description: "The start data of the replication"
         keep-local:
           type: "string"
           description: "For how long to keep a local copy of the replication"
+        local-period:
+          type: "string"
+          description: "The unit of time for the keep-local value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years"
+          enum: [D,W,s,m,H,M,Y]
         keep-remote:
           type: "string"
           description: "For how long to keep the copy on the remote side"
+        remote-period:
+          type: "string"
+          description: "The unit of time for the keep-remote value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years"
+          enum: [D,W,s,m,H,M,Y]
     S3replicationPeers:
       type: "object"
       properties:

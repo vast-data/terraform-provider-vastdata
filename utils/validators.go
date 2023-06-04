@@ -11,7 +11,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-const grace_period_format = "15:04:05"
+const (
+	grace_period_format = "15:04:05"
+	start_at_format     = "2006-01-02 15:04:05"
+)
 
 func GracePeriodFormatValidation(i interface{}, c cty.Path) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -38,6 +41,16 @@ func OneOf(l []string) schema.SchemaValidateDiagFunc {
 func SnapshotExpirationFormatValidation(i interface{}, c cty.Path) diag.Diagnostics {
 	var diags diag.Diagnostics
 	_, e := time.Parse(time.RFC3339, i.(string))
+	if e != nil {
+		return diag.FromErr(e)
+	}
+	return diags
+
+}
+
+func ProtectionPolicyStartAt(i interface{}, c cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+	_, e := time.Parse(start_at_format, i.(string))
 	if e != nil {
 		return diag.FromErr(e)
 	}

@@ -27,7 +27,7 @@ data vastdata_protection_policy policy1 {
 
 ### Read-Only
 
-- `clone_type` (String) The type the replication
+- `clone_type` (String) The type the replication Allowed Values are [NATIVE_REPLICATION]
 - `frames` (List of Object) List of snapshots schedules (see [below for nested schema](#nestedatt--frames))
 - `guid` (String) A unique guid given to the  replication peer configuration
 - `id` (Number) A unique id given to the replication peer configuration
@@ -43,6 +43,9 @@ data vastdata_protection_policy policy1 {
 Read-Only:
 
 - `every` (String)
+- `every_unit` (String)
 - `keep_local` (String)
 - `keep_remote` (String)
+- `local_period` (String)
+- `remote_period` (String)
 - `start_at` (String)

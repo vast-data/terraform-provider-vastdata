@@ -11,10 +11,16 @@ package swagger
 type ProtectionPolicySchedule struct {
 	// How often to make a snapshot
 	Every string `json:"every,omitempty"`
+	// The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years
+	EveryUnit string `json:"every_unit,omitempty"`
 	// The start data of the replication
 	StartAt string `json:"start-at,omitempty"`
 	// For how long to keep a local copy of the replication
 	KeepLocal string `json:"keep-local,omitempty"`
+	// The unit of time for the keep-local value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years
+	LocalPeriod string `json:"local-period,omitempty"`
 	// For how long to keep the copy on the remote side
 	KeepRemote string `json:"keep-remote,omitempty"`
+	// The unit of time for the keep-remote value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years
+	RemotePeriod string `json:"remote-period,omitempty"`
 }
