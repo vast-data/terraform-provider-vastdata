@@ -1422,9 +1422,6 @@ components:
         protection_policy_id:
           type: "string"
           description: "protection policy id"
-        protection_policy_name:
-          type: "string"
-          description: "protection policy name"
         source_dir:
           type: "string"
           description: "path to replicate"
@@ -1434,9 +1431,12 @@ components:
         tenant_id:
           type: "integer"
           description: "Local Tenant ID"
-        remote_tenant_name:
+        remote_tenant_guid:
           type: "string"
-          description: "remote tenant name"
+          description: "The Remote tenant guid"
+        target_id:
+          type: "integer"
+          description: "The remote target object id"
     Snapshot:
       type: "object"
       properties:
@@ -1582,29 +1582,19 @@ components:
       properties:      
         every:
           type: "string"
-          description: "How often to make a snapshot"
-        every_unit:
-          type: "string"
-          description: "The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years"
-          enum: [D,W,s,m,H,M,Y]
+          description: "How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day"
         start-at:
           type: "string"
           description: "The start data of the replication"
         keep-local:
           type: "string"
-          description: "For how long to keep a local copy of the replication"
-        local-period:
-          type: "string"
-          description: "The unit of time for the keep-local value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years"
-          enum: [D,W,s,m,H,M,Y]
+          description: "For how long to keep a local copy of the replication, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day"
         keep-remote:
           type: "string"
-          description: "For how long to keep the copy on the remote side"
-        remote-period:
-          type: "string"
-          description: "The unit of time for the keep-remote value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years"
-          enum: [D,W,s,m,H,M,Y]
+          description: "For how long to keep the copy on the remote side, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day"
     S3replicationPeers:
+      required:
+      - "type"
       type: "object"
       properties:
         id:
@@ -1628,6 +1618,7 @@ components:
         type:
           type: "string"
           description: "The type of the peer bucket CUSTOM_S3/AWS_S3"
+          enum: [CUSTOM_S3,AWS_S3]
         proxies:
           type: "array"
           items:
@@ -1637,5 +1628,14 @@ components:
         aws_region:
           type: "string"
           description: "The Bucket AWS region, Valid only when type is AWS_S3"
+        access_key:
+          type: "string"
+          description: "The S3 access key"
+        secret_key:
+          type: "string"
+          description: "The S3 secret key"
+        custom_bucket_url:
+          type: "string"
+          description: "The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3"
       
       

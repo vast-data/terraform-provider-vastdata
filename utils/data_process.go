@@ -284,7 +284,7 @@ func PopulateResourceMap(ctx context.Context, t reflect.Type, d *schema.Resource
 		if tag == nil {
 			continue
 		}
-		full_tag := *tag
+		full_tag := tf_name
 		if prefix != "" {
 			full_tag = prefix + "." + tf_name
 		}

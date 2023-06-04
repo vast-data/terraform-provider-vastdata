@@ -94,6 +94,27 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Optional:    true,
 			Description: `The Bucket AWS region, Valid only when type is AWS_S3`,
 		},
+
+		"access_key": &schema.Schema{
+			Type:        schema.TypeString,
+			Computed:    true,
+			Optional:    true,
+			Description: `The S3 access key`,
+		},
+
+		"secret_key": &schema.Schema{
+			Type:        schema.TypeString,
+			Computed:    true,
+			Optional:    true,
+			Description: `The S3 secret key`,
+		},
+
+		"custom_bucket_url": &schema.Schema{
+			Type:        schema.TypeString,
+			Computed:    true,
+			Optional:    true,
+			Description: `The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3`,
+		},
 	}
 }
 
@@ -195,6 +216,42 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"aws_region\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AccessKey", resource.AccessKey))
+
+	err = d.Set("access_key", resource.AccessKey)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"access_key\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SecretKey", resource.SecretKey))
+
+	err = d.Set("secret_key", resource.SecretKey)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"secret_key\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "CustomBucketUrl", resource.CustomBucketUrl))
+
+	err = d.Set("custom_bucket_url", resource.CustomBucketUrl)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"custom_bucket_url\"",
 			Detail:   err.Error(),
 		})
 	}

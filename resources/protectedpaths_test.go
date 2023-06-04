@@ -34,10 +34,10 @@ var _ = Describe(" ProtectedPath", func() {
    "guid": "string",
    "name": "string",
    "protection_policy_id": "string",
-   "protection_policy_name": "string",
-   "remote_tenant_name": "string",
+   "remote_tenant_guid": "string",
    "source_dir": "string",
    "target_exported_dir": "string",
+   "target_id": 100,
    "tenant_id": 100
 }
                          `

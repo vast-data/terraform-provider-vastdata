@@ -43,9 +43,6 @@ data vastdata_protection_policy policy1 {
 Read-Only:
 
 - `every` (String)
-- `every_unit` (String)
 - `keep_local` (String)
 - `keep_remote` (String)
-- `local_period` (String)
-- `remote_period` (String)
 - `start_at` (String)

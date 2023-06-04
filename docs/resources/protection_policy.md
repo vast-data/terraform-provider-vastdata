@@ -58,11 +58,8 @@ resource vastdata_protection_policy protection-policy {
         target_object_id = vastdata_replication_peers.clusterA-clusterB-peer.id
         frames {
                 every = "1D"
-                every_unit = "D"
                 keep_local = "2D"
                 keep_remote = "3D"
-                local_period = "D"
-                remote_period = "D"
                 start_at = "2023-06-04 09:00:00"
         }
 
@@ -97,10 +94,7 @@ resource vastdata_protection_policy protection-policy {
 
 Optional:
 
-- `every` (String) How often to make a snapshot
-- `every_unit` (String) The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years Allowed Values are [D W s m H M Y]
+- `every` (String) How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day
 - `keep_local` (String)
 - `keep_remote` (String)
-- `local_period` (String)
-- `remote_period` (String)
 - `start_at` (String)

@@ -43,11 +43,8 @@ resource vastdata_protection_policy protection-policy {
         target_object_id = vastdata_replication_peers.clusterA-clusterB-peer.id
         frames {
                 every = "1D"
-                every_unit = "D"
                 keep_local = "2D"
                 keep_remote = "3D"
-                local_period = "D"
-                remote_period = "D"
                 start_at = "2023-06-04 09:00:00"
         }
 

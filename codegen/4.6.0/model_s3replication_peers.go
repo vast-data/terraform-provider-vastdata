@@ -22,9 +22,15 @@ type S3replicationPeers struct {
 	// The http protocol user http/https
 	HttpProtocol string `json:"http_protocol,omitempty"`
 	// The type of the peer bucket CUSTOM_S3/AWS_S3
-	Type_ string `json:"type,omitempty"`
+	Type_ string `json:"type"`
 	// List of http procies
 	Proxies []string `json:"proxies,omitempty"`
 	// The Bucket AWS region, Valid only when type is AWS_S3
 	AwsRegion string `json:"aws_region,omitempty"`
+	// The S3 access key
+	AccessKey string `json:"access_key,omitempty"`
+	// The S3 secret key
+	SecretKey string `json:"secret_key,omitempty"`
+	// The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3
+	CustomBucketUrl string `json:"custom_bucket_url,omitempty"`
 }

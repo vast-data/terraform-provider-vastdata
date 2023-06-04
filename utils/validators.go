@@ -3,7 +3,9 @@ package utils
 import (
 	//	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
+	"errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/hashicorp/go-cty/cty"
@@ -56,4 +58,13 @@ func ProtectionPolicyStartAt(i interface{}, c cty.Path) diag.Diagnostics {
 	}
 	return diags
 
+}
+
+func ProtectionPolicyTimeIntervalValidation(i interface{}, c cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+	matched, _ := regexp.MatchString(`^[1-9]+[0-9]{0,}[DWHMYsm]{1}`, i.(string))
+	if !matched {
+		return diag.FromErr(errors.New(fmt.Sprintf("The value given does not match the format <integer><time period>  time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day")))
+	}
+	return diags
 }

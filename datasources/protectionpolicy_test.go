@@ -31,11 +31,8 @@ var _ = Describe(" ProtectionPolicy", func() {
    "frames": [
       {
          "every": "string",
-         "every_unit": "string",
          "keep-local": "string",
          "keep-remote": "string",
-         "local-period": "string",
-         "remote-period": "string",
          "start-at": "string"
       }
    ],

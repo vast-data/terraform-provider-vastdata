@@ -99,15 +99,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `How often to make a snapshot`,
-						},
-
-						"every_unit": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Required:    false,
-							Optional:    false,
-							Description: `The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years Allowed Values are [D W s m H M Y]`,
+							Description: `How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day`,
 						},
 
 						"start_at": &schema.Schema{
@@ -126,23 +118,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Description: ``,
 						},
 
-						"local_period": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Required:    false,
-							Optional:    false,
-							Description: ``,
-						},
-
 						"keep_remote": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Required:    false,
-							Optional:    false,
-							Description: ``,
-						},
-
-						"remote_period": &schema.Schema{
 							Type:        schema.TypeString,
 							Computed:    true,
 							Required:    false,

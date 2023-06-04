@@ -27,8 +27,10 @@ var _ = Describe(" S3replicationPeers", func() {
 	var S3replicationPeersDataSourceData *schema.ResourceData
 	var model_json = `
                          {
+   "access_key": "string",
    "aws_region": "string",
    "bucket_name": "string",
+   "custom_bucket_url": "string",
    "guid": "string",
    "http_protocol": "string",
    "id": 100,
@@ -40,6 +42,7 @@ var _ = Describe(" S3replicationPeers", func() {
       "D",
       "E"
    ],
+   "secret_key": "string",
    "url": "string"
 }
                          `

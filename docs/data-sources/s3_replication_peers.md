@@ -27,11 +27,14 @@ data vastdata_s3_replication_peers s3peer1 {
 
 ### Read-Only
 
+- `access_key` (String) The S3 access key
 - `aws_region` (String) The Bucket AWS region, Valid only when type is AWS_S3
 - `bucket_name` (String) The name of the peer bucket to replicate to
+- `custom_bucket_url` (String) The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3
 - `guid` (String) A unique guid given to the s3 replication peer configuration
 - `http_protocol` (String) The http protocol user http/https
 - `id` (Number) A unique id given to the s3 replication peer configuration
 - `proxies` (List of String) List of http procies
+- `secret_key` (String) The S3 secret key
 - `type_` (String)
 - `url` (String) Direct link to the s3 replication peer configurations

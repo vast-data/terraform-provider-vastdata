@@ -56,13 +56,6 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Description: `protection policy id`,
 		},
 
-		"protection_policy_name": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `protection policy name`,
-		},
-
 		"source_dir": &schema.Schema{
 			Type:        schema.TypeString,
 			Computed:    true,
@@ -84,11 +77,18 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Description: `Local Tenant ID`,
 		},
 
-		"remote_tenant_name": &schema.Schema{
+		"remote_tenant_guid": &schema.Schema{
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
-			Description: `remote tenant name`,
+			Description: `The Remote tenant guid`,
+		},
+
+		"target_id": &schema.Schema{
+			Type:        schema.TypeInt,
+			Computed:    true,
+			Optional:    true,
+			Description: `The remote target object id`,
 		},
 	}
 }
@@ -135,18 +135,6 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ProtectionPolicyName", resource.ProtectionPolicyName))
-
-	err = d.Set("protection_policy_name", resource.ProtectionPolicyName)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"protection_policy_name\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SourceDir", resource.SourceDir))
 
 	err = d.Set("source_dir", resource.SourceDir)
@@ -183,14 +171,26 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RemoteTenantName", resource.RemoteTenantName))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RemoteTenantGuid", resource.RemoteTenantGuid))
 
-	err = d.Set("remote_tenant_name", resource.RemoteTenantName)
+	err = d.Set("remote_tenant_guid", resource.RemoteTenantGuid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"remote_tenant_name\"",
+			Summary:  "Error occured setting value to \"remote_tenant_guid\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TargetId", resource.TargetId))
+
+	err = d.Set("target_id", resource.TargetId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"target_id\"",
 			Detail:   err.Error(),
 		})
 	}

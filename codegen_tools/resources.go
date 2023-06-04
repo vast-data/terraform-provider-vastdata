@@ -120,7 +120,11 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 false,
 		DataSourceName:           "",
-		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"start_at": utils.ProtectionPolicyStartAt},
+		FieldsValidators: map[string]schema.SchemaValidateDiagFunc{"start_at": utils.ProtectionPolicyStartAt,
+			"every":       utils.ProtectionPolicyTimeIntervalValidation,
+			"keep_local":  utils.ProtectionPolicyTimeIntervalValidation,
+			"keep_remote": utils.ProtectionPolicyTimeIntervalValidation,
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Quota",
@@ -336,7 +340,9 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_snapshot",
-		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"expiration_time": utils.SnapshotExpirationFormatValidation},
+		FieldsValidators: map[string]schema.SchemaValidateDiagFunc{
+			"expiration_time": utils.SnapshotExpirationFormatValidation,
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "GlobalSnapshot",

@@ -90,18 +90,11 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"every": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: `How often to make a snapshot`,
-					},
-
-					"every_unit": &schema.Schema{
 						Type:             schema.TypeString,
 						Computed:         true,
 						Optional:         true,
-						ValidateDiagFunc: utils.OneOf([]string{"D", "W", "s", "m", "H", "M", "Y"}),
-						Description:      `The unit of time for the every value D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years Allowed Values are [D W s m H M Y]`,
+						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
+						Description:      `How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day`,
 					},
 
 					"start_at": &schema.Schema{
@@ -113,31 +106,19 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"keep_local": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: ``,
-					},
-
-					"local_period": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: ``,
+						Type:             schema.TypeString,
+						Computed:         true,
+						Optional:         true,
+						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
+						Description:      ``,
 					},
 
 					"keep_remote": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: ``,
-					},
-
-					"remote_period": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: ``,
+						Type:             schema.TypeString,
+						Computed:         true,
+						Optional:         true,
+						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
+						Description:      ``,
 					},
 				},
 			},
