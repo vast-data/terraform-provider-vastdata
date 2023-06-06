@@ -41,6 +41,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `GUID`,
 		},
 
@@ -48,6 +49,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The domain name of the AD`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of Domain Controllers to prefer for authentication. DCs listed here will be queried exclusively unless they fail or do not respond. In such a case, other DCs will be consulted. Specify as a comma-separated list. Each entry can be a fully-qualified hostname or an IP address.`,
 
 			Elem: &schema.Schema{
@@ -71,6 +74,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Organizational Unit within AD where the Cluster Machine account will be created. If left empty, it will go into default Computers OU`,
 		},
 
@@ -78,6 +82,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -85,6 +90,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `the id of the attached LDAP object`,
 		},
 
@@ -92,6 +98,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `enabled/disabled`,
 		},
 
@@ -99,6 +106,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -106,6 +114,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:             schema.TypeString,
 			Computed:         true,
 			Optional:         true,
+			Sensitive:        false,
 			ValidateDiagFunc: utils.OneOf([]string{"SIMPLE", "ANONYMOUS"}),
 			Description:      ` Allowed Values are [SIMPLE ANONYMOUS]`,
 		},
@@ -114,6 +123,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -121,6 +131,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -128,6 +139,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -135,6 +147,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:             schema.TypeString,
 			Computed:         true,
 			Optional:         true,
+			Sensitive:        false,
 			ValidateDiagFunc: utils.OneOf([]string{"COMPATIBLE", "RFC2307BIS_ONLY", "RFC2307_ONLY", "NONE"}),
 			Description:      ` Allowed Values are [COMPATIBLE RFC2307BIS_ONLY RFC2307_ONLY NONE]`,
 		},
@@ -143,6 +156,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -150,6 +164,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -157,6 +172,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -164,6 +180,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -171,6 +188,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -178,6 +196,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Use auto dicovery with to obtain AD details`,
 		},
 
@@ -185,6 +204,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -192,6 +212,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -199,6 +220,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -206,6 +228,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -213,6 +236,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Active Directory state`,
 		},
 	}

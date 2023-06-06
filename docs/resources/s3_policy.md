@@ -18,14 +18,11 @@ description: |-
 ### Required
 
 - `name` (String)
+- `policy` (String)
 
 ### Optional
 
 - `enabled` (Boolean)
-- `groups` (List of String)
-- `is_replicated` (Boolean)
-- `policy` (String)
-- `users` (List of String)
 
 ### Read-Only
 

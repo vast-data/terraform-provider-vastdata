@@ -184,6 +184,7 @@ type ResourceTemplateV2 struct {
 	BeforePostFunc           utils.ResponseConversionFunc
 	BeforePatchFunc          utils.ResponseConversionFunc
 	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
+	SensitiveFields          *StringSet
 	IsDataSource             bool
 }
 
@@ -387,6 +388,10 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 			m["ignore_update"] = "true"
 		} else {
 			m["ignore_update"] = "false"
+		}
+		m["sensitive"] = "false"
+		if R.SensitiveFields != nil && R.SensitiveFields.In(m["name"]) {
+			m["sensitive"] = "true"
 		}
 
 		if R.RequiredIdentifierFields.In(m["name"]) {

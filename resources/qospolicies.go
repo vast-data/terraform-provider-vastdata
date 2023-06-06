@@ -41,6 +41,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `QoS Policy guid`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Type:             schema.TypeString,
 			Computed:         true,
 			Optional:         true,
+			Sensitive:        false,
 			ValidateDiagFunc: utils.OneOf([]string{"STATIC", "USED_CAPACITY", "PROVISIONED_CAPACITY"}),
 			Description:      `QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 		},
@@ -61,6 +63,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M`,
 		},
 
@@ -68,6 +71,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 
 			Elem: &schema.Resource{
@@ -77,6 +81,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
@@ -84,6 +89,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 
@@ -91,6 +97,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
@@ -98,6 +105,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 
@@ -105,6 +113,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
@@ -112,6 +121,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 
@@ -119,6 +129,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Minimal amount of performance to provide when there is resource contention`,
 					},
 
@@ -126,6 +137,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance to provide when there is no resource contention`,
 					},
 				},
@@ -136,6 +148,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 
 			Elem: &schema.Resource{
@@ -145,6 +158,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
@@ -152,6 +166,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
@@ -159,6 +174,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
@@ -166,6 +182,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Type:        schema.TypeInt,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: `Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 				},

@@ -41,6 +41,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A unique guid given to the snapshot`,
 		},
 
@@ -48,6 +49,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Type:             schema.TypeString,
 			Computed:         true,
 			Optional:         true,
+			Sensitive:        false,
 			ValidateDiagFunc: utils.SnapshotExpirationFormatValidation,
 			Description:      `When will this sanpshot expire`,
 		},
@@ -61,6 +63,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The path to make snapshot from`,
 		},
 
@@ -68,6 +71,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The tenant id to use`,
 		},
 
@@ -75,6 +79,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Is it indestructable`,
 		},
 	}

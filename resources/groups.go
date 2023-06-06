@@ -41,6 +41,7 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A uniqe GUID assigned to the group`,
 		},
 
@@ -58,6 +59,7 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The group SID`,
 		},
 
@@ -65,6 +67,7 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of S3 policies IDs`,
 
 			Elem: &schema.Schema{

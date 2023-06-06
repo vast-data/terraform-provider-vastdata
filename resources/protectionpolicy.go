@@ -41,6 +41,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A unique guid given to the  replication peer configuration`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Direct link to the replication policy`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The target peer name`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The id of the target peer`,
 		},
 
@@ -84,6 +88,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of snapshots schedules`,
 
 			Elem: &schema.Resource{
@@ -93,6 +98,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Type:             schema.TypeString,
 						Computed:         true,
 						Optional:         true,
+						Sensitive:        false,
 						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 						Description:      `How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day`,
 					},
@@ -101,6 +107,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Type:             schema.TypeString,
 						Computed:         true,
 						Optional:         true,
+						Sensitive:        false,
 						ValidateDiagFunc: utils.ProtectionPolicyStartAt,
 						Description:      ``,
 					},
@@ -109,6 +116,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Type:             schema.TypeString,
 						Computed:         true,
 						Optional:         true,
+						Sensitive:        false,
 						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 						Description:      ``,
 					},
@@ -117,6 +125,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Type:             schema.TypeString,
 						Computed:         true,
 						Optional:         true,
+						Sensitive:        false,
 						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 						Description:      ``,
 					},
@@ -128,6 +137,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Is the snapshot indestructable`,
 		},
 	}

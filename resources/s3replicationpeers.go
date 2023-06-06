@@ -41,6 +41,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A unique guid given to the s3 replication peer configuration`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Direct link to the s3 replication peer configurations`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The name of the peer bucket to replicate to`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The http protocol user http/https`,
 		},
 
@@ -74,6 +78,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -81,6 +86,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of http procies`,
 
 			Elem: &schema.Schema{
@@ -92,27 +98,37 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The Bucket AWS region, Valid only when type is AWS_S3`,
 		},
 
 		"access_key": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `The S3 access key`,
+			Type: schema.TypeString,
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             true,
+			Description:           `The S3 access key`,
 		},
 
 		"secret_key": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: `The S3 secret key`,
+			Type: schema.TypeString,
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             true,
+			Description:           `The S3 secret key`,
 		},
 
 		"custom_bucket_url": &schema.Schema{
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3`,
 		},
 	}

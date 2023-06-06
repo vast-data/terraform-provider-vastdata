@@ -41,6 +41,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A uniq guid given to the tenant`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
 		},
 
@@ -74,6 +78,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:             schema.TypeString,
 			Computed:         true,
 			Optional:         true,
+			Sensitive:        false,
 			ValidateDiagFunc: utils.OneOf([]string{"READ", "CHANGE", "FULL"}),
 			Description:      `Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]`,
 		},
@@ -82,6 +87,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `GID with permissions to the trash folder`,
 		},
 
@@ -89,6 +95,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Array of source IP ranges to allow for the tenant.`,
 
 			Elem: &schema.Resource{
@@ -115,6 +122,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:             schema.TypeString,
 			Computed:         true,
 			Optional:         true,
+			Sensitive:        false,
 			ValidateDiagFunc: utils.OneOf([]string{"NONE", "LDAP", "NIS", "AD", "LOCAL"}),
 			Description:      `POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]`,
 		},
@@ -123,6 +131,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `AD provider ID`,
 		},
 
@@ -130,6 +139,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Open-LDAP provider ID specified separately by the user`,
 		},
 
@@ -137,6 +147,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `NIS provider ID`,
 		},
 
@@ -144,6 +155,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Tenant's encryption group unique identifier`,
 		},
 	}

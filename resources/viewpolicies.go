@@ -41,6 +41,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A uniqe guid given to the view policy`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Determine the way a file inherits GID`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Security flavor, which determines how file and directory permissions are applied in multiprotocol views.`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)`,
 		},
 
@@ -74,6 +78,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `How to determine the maximum allowed path length`,
 		},
 
@@ -81,6 +86,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `How to determine the allowed characters in a path`,
 		},
 
@@ -88,6 +94,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -95,6 +102,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -102,6 +110,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Use configured Auth Provider(s) to enforce group permissions. Required if SMB Flavor is selected`,
 		},
 
@@ -109,6 +118,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The source of authentication`,
 		},
 
@@ -116,6 +126,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with NFS read/write permissions`,
 
 			Elem: &schema.Schema{
@@ -127,6 +138,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with NFS read only permissions`,
 
 			Elem: &schema.Schema{
@@ -138,6 +150,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with NFS read/write permissions`,
 
 			Elem: &schema.Schema{
@@ -149,6 +162,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with NFS read only permissions`,
 
 			Elem: &schema.Schema{
@@ -160,6 +174,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with SMB read/write permissions`,
 
 			Elem: &schema.Schema{
@@ -171,6 +186,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with SMB read only permissions`,
 
 			Elem: &schema.Schema{
@@ -182,6 +198,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with S3 read/write permissions`,
 
 			Elem: &schema.Schema{
@@ -193,6 +210,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with S3 read only permissions`,
 
 			Elem: &schema.Schema{
@@ -204,6 +222,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with trash permissions`,
 
 			Elem: &schema.Schema{
@@ -215,6 +234,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Enable POSIX ACL`,
 		},
 
@@ -222,6 +242,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `when using smb use open permissions for files`,
 		},
 
@@ -229,6 +250,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with no squash policy`,
 
 			Elem: &schema.Schema{
@@ -240,6 +262,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with root squash policy`,
 
 			Elem: &schema.Schema{
@@ -251,6 +274,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with all squash policy`,
 
 			Elem: &schema.Schema{
@@ -262,6 +286,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -269,6 +294,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -276,6 +302,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -283,6 +310,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -290,6 +318,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -297,6 +326,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -304,6 +334,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -311,6 +342,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -318,6 +350,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -325,6 +358,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -332,6 +366,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Hosts with full permissions`,
 		},
 
@@ -339,6 +374,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Default unix type permissions on new file`,
 		},
 
@@ -346,6 +382,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Default unix type permissions on new folder`,
 		},
 
@@ -353,6 +390,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Default unix type permissions on new file`,
 		},
 
@@ -360,6 +398,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Default unix type permissions on new folder`,
 		},
 
@@ -367,6 +406,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Parent Cluster`,
 		},
 
@@ -374,6 +414,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Parent Cluster ID`,
 		},
 
@@ -381,6 +422,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Tenant ID`,
 		},
 
@@ -388,6 +430,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Tenant Name`,
 		},
 
@@ -395,6 +438,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -402,6 +446,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.`,
 		},
 
@@ -409,6 +454,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Comma separated vip pool ids.`,
 
 			Elem: &schema.Schema{
@@ -420,6 +466,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `NFS 4.1 minimal protection level`,
 		},
 
@@ -427,6 +474,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 
 			Elem: &schema.Schema{
@@ -438,6 +486,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 
 			Elem: &schema.Schema{
@@ -449,6 +498,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Apple sid`,
 		},
 
@@ -456,6 +506,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Protocols to audit`,
 
 			Elem: &schema.Schema{
@@ -467,6 +518,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Create/Delete Files/Directories/Objects`,
 		},
 
@@ -474,6 +526,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Modify data/MD`,
 		},
 
@@ -481,6 +534,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Read data`,
 		},
 
@@ -488,6 +542,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Log full path`,
 		},
 
@@ -495,6 +550,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Log hostname`,
 		},
 
@@ -502,6 +558,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Log username`,
 		},
 
@@ -509,6 +566,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Log deleted files/dirs from trash dir`,
 		},
 
@@ -516,6 +574,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Number of Policy related Views`,
 		},
 
@@ -523,6 +582,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Specifies whether to make the .snapshot directory accessible in subdirectories of the View.`,
 		},
 
@@ -530,6 +590,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
 		},
 	}

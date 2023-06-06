@@ -46,6 +46,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `guid`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `protection policy id`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `path to replicate`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `where to replicate on the remote`,
 		},
 
@@ -74,6 +78,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Local Tenant ID`,
 		},
 
@@ -81,6 +86,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The Remote tenant guid`,
 		},
 
@@ -88,6 +94,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The remote target object id`,
 		},
 	}

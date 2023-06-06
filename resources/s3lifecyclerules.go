@@ -46,6 +46,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -53,6 +54,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -60,6 +62,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The minimum size of the object`,
 		},
 
@@ -74,6 +78,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The maximum size of the object`,
 		},
 
@@ -81,6 +86,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The number of days from creation until an object expires`,
 		},
 
@@ -88,6 +94,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The expiration date of the object`,
 		},
 
@@ -95,6 +102,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Remove expired objects delete markers`,
 		},
 
@@ -102,6 +110,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Number of days after objects become noncurrent`,
 		},
 
@@ -109,6 +118,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The number of newer versions to retain`,
 		},
 
@@ -116,6 +126,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The number of days until expiration after an incomplete multipart upload`,
 		},
 
@@ -123,6 +134,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The path of the related View`,
 		},
 
@@ -130,6 +142,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The ID of the related View`,
 		},
 	}

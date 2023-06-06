@@ -41,6 +41,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A unique guid given to the global snapshot`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The path to make snapshot from`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The tenant id to use`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The path where to store the snapshot on a Target`,
 		},
 
@@ -74,6 +78,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The remote tenant id`,
 		},
 
@@ -81,6 +86,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The snapshot id of the snapshot`,
 		},
 
@@ -88,6 +94,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The name of the snapshot`,
 		},
 
@@ -95,6 +102,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `IS the snapshot enabled`,
 		},
 
@@ -102,6 +110,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The cluster where the source snapshot is configured`,
 		},
 
@@ -109,6 +118,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The cluster where the snapshot is cloned to`,
 		},
 	}

@@ -41,6 +41,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `GUID`,
 		},
 
@@ -50,45 +51,15 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		},
 
 		"policy": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Description: ``,
-		},
-
-		"users": &schema.Schema{
-			Type:        schema.TypeList,
-			Computed:    true,
-			Optional:    true,
-			Description: ``,
-
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-
-		"groups": &schema.Schema{
-			Type:        schema.TypeList,
-			Computed:    true,
-			Optional:    true,
-			Description: ``,
-
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-
-		"is_replicated": &schema.Schema{
-			Type:        schema.TypeBool,
-			Computed:    true,
-			Optional:    true,
-			Description: ``,
+			Type:     schema.TypeString,
+			Required: true,
 		},
 
 		"enabled": &schema.Schema{
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 	}
@@ -132,42 +103,6 @@ func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_late
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"policy\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Users", resource.Users))
-
-	err = d.Set("users", utils.FlattenListOfPrimitives(&resource.Users))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"users\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Groups", resource.Groups))
-
-	err = d.Set("groups", utils.FlattenListOfPrimitives(&resource.Groups))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"groups\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsReplicated", resource.IsReplicated))
-
-	err = d.Set("is_replicated", resource.IsReplicated)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_replicated\"",
 			Detail:   err.Error(),
 		})
 	}

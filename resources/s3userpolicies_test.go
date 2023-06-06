@@ -31,23 +31,9 @@ var _ = Describe(" S3Policy", func() {
 	var S3PolicyResourceData *schema.ResourceData
 	var model_json = `
                          {
-   "groups": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
    "guid": "string",
    "name": "string",
-   "policy": "string",
-   "users": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ]
+   "policy": "string"
 }
                          `
 	var server *ghttp.Server

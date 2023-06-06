@@ -310,8 +310,8 @@ var resources_templates = []ResourceTemplateV2{
 		Path:                     ToStringPointer("/api/s3userpolicies/"),
 		Model:                    api_latest.S3Policy{},
 		DestFile:                 ToStringPointer("s3userpolicies.go"),
-		IgnoreFields:             NewStringSet("Id"),
-		RequiredIdentifierFields: NewStringSet("name"),
+		IgnoreFields:             NewStringSet("Id", "Users", "Groups", "IsReplicated"),
+		RequiredIdentifierFields: NewStringSet("name", "policy"),
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{"users": []string{"user"}, "groups": []string{"group"}},
 		Generate:                 true,
@@ -379,5 +379,7 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_replication_peers",
+		SensitiveFields:          NewStringSet("secret_key", "access_key"),
+		IgnoreUpdates:            NewStringSet("secret_key", "access_key"),
 	},
 }

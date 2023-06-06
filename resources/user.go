@@ -41,6 +41,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A uniq guid given to the user`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The user unix UID`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The user leading unix GID`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of supplementary GID list`,
 
 			Elem: &schema.Schema{
@@ -78,6 +82,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of supplementary Group list`,
 
 			Elem: &schema.Schema{
@@ -89,6 +94,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Group Count`,
 		},
 
@@ -96,6 +102,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Leading Group Name`,
 		},
 
@@ -103,6 +110,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Leading Group GID`,
 		},
 
@@ -110,6 +118,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The user SID`,
 		},
 
@@ -117,6 +126,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The user primary group SID`,
 		},
 
@@ -124,6 +134,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `supplementary SID list`,
 
 			Elem: &schema.Schema{
@@ -135,6 +146,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `IS this a local user`,
 		},
 
@@ -142,6 +154,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of User Access Keys`,
 
 			Elem: &schema.Resource{
@@ -168,6 +181,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Allow create bucket`,
 		},
 
@@ -175,6 +189,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Allow delete bucket`,
 		},
 
@@ -182,6 +197,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Is S3 superuser`,
 		},
 
@@ -189,6 +205,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List S3 policies IDs`,
 
 			Elem: &schema.Schema{

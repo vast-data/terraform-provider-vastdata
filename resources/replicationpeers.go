@@ -41,6 +41,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A unique guid given to the  replication peer configuration`,
 		},
 
@@ -53,6 +54,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Direct url of the replication peer configurations`,
 		},
 
@@ -60,6 +62,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The vip provided for the replication peer configuration`,
 		},
 
@@ -67,6 +70,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The vip range which were reported by the peer`,
 		},
 
@@ -74,6 +78,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The version of the source`,
 		},
 
@@ -81,6 +86,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The version of the remote peer`,
 		},
 
@@ -88,6 +94,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Is the source of the replication local (this host is the source)`,
 		},
 
@@ -95,6 +102,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The name of the peer cluster`,
 		},
 
@@ -102,6 +110,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Is the connection secure`,
 		},
 
@@ -109,6 +118,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The replication Vippool id`,
 		},
 	}

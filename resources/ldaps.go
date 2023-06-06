@@ -41,6 +41,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -48,6 +49,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
 		},
 
@@ -55,6 +57,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
 
 			Elem: &schema.Schema{
@@ -66,6 +69,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `LDAP server port. 389 (LDAP)  636 (LDAPS)`,
 		},
 
@@ -73,6 +77,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Distinguished name of LDAP superuser`,
 		},
 
@@ -80,6 +85,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Password for the LDAP superuser`,
 		},
 
@@ -87,6 +93,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
 		},
 
@@ -94,6 +101,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.`,
 		},
 
@@ -101,6 +109,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Bind Authentication Method`,
 		},
 
@@ -108,6 +117,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -115,6 +125,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Tenant ID`,
 		},
 
@@ -122,6 +133,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -129,6 +141,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -136,6 +149,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -143,6 +157,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -150,6 +165,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -157,6 +173,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -164,6 +181,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -171,6 +189,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `configure LDAP with TLS`,
 		},
 
@@ -178,6 +197,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `POSIX support`,
 		},
 
@@ -185,6 +205,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `POSIX primary provider`,
 		},
 
@@ -192,6 +213,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -199,6 +221,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -206,6 +229,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Query group mode`,
 		},
 
@@ -213,6 +237,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Username property name`,
 		},
 
@@ -225,6 +250,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 		},
 
@@ -232,6 +258,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 		},
 
@@ -239,6 +266,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -246,6 +274,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -253,6 +282,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
 		},
 
@@ -260,6 +290,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Use LDAPS for Auto-Discovery`,
 		},
 
@@ -267,13 +298,15 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.`,
 		},
 
 		"query_posix_attributes_from_gc": &schema.Schema{
-			Type:     schema.TypeBool,
-			Computed: true,
-			Optional: true,
+			Type:      schema.TypeBool,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
 			Description: `When set to True - users/groups from non-joined domain POSIX attributes are supported,
 when set to False - Posix attributes of users/groups from non-joined domain are not supported.
 As a condition Global catalog needs to be configured to support Posix attributes.

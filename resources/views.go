@@ -41,6 +41,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    false,
+			Sensitive:   false,
 			Description: `A uniqe GUID assigned to the View`,
 		},
 
@@ -48,6 +49,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `A uniq name given to the view`,
 		},
 
@@ -63,6 +65,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
 			Computed:              true,
 			Optional:              true,
+			Sensitive:             false,
 			Description:           `Creates the directory specified by the path`,
 		},
 
@@ -70,6 +73,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path`,
 		},
 
@@ -77,6 +81,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `S3 Bucket name`,
 		},
 
@@ -89,6 +94,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Parent Cluster`,
 		},
 
@@ -96,6 +102,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Parent Cluster ID`,
 		},
 
@@ -103,6 +110,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `The tenant ID related to this view`,
 		},
 
@@ -110,6 +118,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Create the directory if it does not exist`,
 		},
 
@@ -117,6 +126,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Trun on S3 Versioning`,
 		},
 
@@ -124,6 +134,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Allow S3 Unverified Lookup`,
 		},
 
@@ -131,6 +142,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Allow S3 anonymous access`,
 		},
 
@@ -138,6 +150,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Allow S3 anonymous access`,
 		},
 
@@ -145,6 +158,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Protocols exposed by this view`,
 
 			Elem: &schema.Schema{
@@ -156,6 +170,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
 		},
 
@@ -163,6 +178,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `S3 Bucket owner`,
 		},
 
@@ -170,6 +186,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of bucket creators users`,
 
 			Elem: &schema.Schema{
@@ -181,6 +198,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `List of bucket creators groups`,
 
 			Elem: &schema.Schema{
@@ -192,6 +210,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `S3 Object Lock`,
 		},
 
@@ -199,6 +218,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `S3 Locks retention mode`,
 		},
 
@@ -206,6 +226,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeString,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Period should be positive in format like 0d|2d|1y|2y`,
 		},
 
@@ -213,6 +234,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Physical Capacity`,
 		},
 
@@ -220,6 +242,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Logical Capacity`,
 		},
 
@@ -227,6 +250,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:             schema.TypeString,
 			Computed:         true,
 			Optional:         true,
+			Sensitive:        false,
 			ValidateDiagFunc: utils.OneOf([]string{"BOTH_NFS3_AND_NFS4_INTEROP_DISABLED", "ONLY_NFS3_INTEROP_ENABLED", "ONLY_NFS4_INTEROP_ENABLED", "BOTH_NFS3_AND_NFS4_INTEROP_ENABLED"}),
 			Description:      `Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]`,
 		},
@@ -235,6 +259,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: ``,
 		},
 
@@ -242,6 +267,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeList,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `Share-level ACL details`,
 
 			Elem: &schema.Resource{
@@ -251,6 +277,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 						Type:        schema.TypeBool,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: ``,
 					},
 
@@ -258,6 +285,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 						Type:        schema.TypeList,
 						Computed:    true,
 						Optional:    true,
+						Sensitive:   false,
 						Description: ``,
 
 						Elem: &schema.Resource{
@@ -267,6 +295,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Type:             schema.TypeString,
 									Computed:         true,
 									Optional:         true,
+									Sensitive:        false,
 									ValidateDiagFunc: utils.OneOf([]string{"users", "groups"}),
 									Description:      ` Allowed Values are [users groups]`,
 								},
@@ -275,6 +304,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Type:             schema.TypeString,
 									Computed:         true,
 									Optional:         true,
+									Sensitive:        false,
 									ValidateDiagFunc: utils.OneOf([]string{"FULL"}),
 									Description:      ` Allowed Values are [FULL]`,
 								},
@@ -283,6 +313,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
+									Sensitive:   false,
 									Description: ``,
 								},
 
@@ -290,6 +321,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
+									Sensitive:   false,
 									Description: ``,
 								},
 
@@ -302,6 +334,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Type:        schema.TypeString,
 									Computed:    true,
 									Optional:    true,
+									Sensitive:   false,
 									Description: ``,
 								},
 							},
@@ -315,6 +348,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
+			Sensitive:   false,
 			Description: `QoS Policy ID`,
 		},
 	}

@@ -458,6 +458,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	     {{ else -}}
 	     {{indent $I " "}}   Computed: {{.Attributes.computed}},
 	     {{indent $I " "}}   Optional: {{.Attributes.optional}},
+	     {{indent $I " "}}   Sensitive: {{.Attributes.sensitive}},             
              {{-  if  .Attributes.validator_func  }}
              {{indent $I " "}}  ValidateDiagFunc: {{.Attributes.validator_func}},
              {{- end }}
