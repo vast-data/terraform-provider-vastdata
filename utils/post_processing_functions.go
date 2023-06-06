@@ -34,3 +34,13 @@ func EntityMergeToUserQuotas(m map[string]interface{}) map[string]interface{} {
 	}
 	return m
 }
+
+func EnabledMustBeSet(m map[string]interface{}) map[string]interface{} {
+	_, exists := m["enabled"]
+
+	if !exists {
+		m["enabled"] = false
+	}
+	return m
+
+}

@@ -17,5 +17,5 @@ type S3Policy struct {
 	Users []string `json:"users,omitempty"`
 	Groups []string `json:"groups,omitempty"`
 	IsReplicated bool `json:"is_replicated,omitempty"`
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled bool `json:"enabled"`
 }

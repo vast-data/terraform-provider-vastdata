@@ -307,7 +307,7 @@ var resources_templates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3Policy",
-		Path:                     ToStringPointer("/api/s3userpolicies/"),
+		Path:                     ToStringPointer("/api/s3policies/"),
 		Model:                    api_latest.S3Policy{},
 		DestFile:                 ToStringPointer("s3userpolicies.go"),
 		IgnoreFields:             NewStringSet("Id", "Users", "Groups", "IsReplicated"),
@@ -316,6 +316,8 @@ var resources_templates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{"users": []string{"user"}, "groups": []string{"group"}},
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_policy",
+		BeforePostFunc:           utils.EnabledMustBeSet,
+		BeforePatchFunc:          utils.EnabledMustBeSet,
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ProtectedPath",
