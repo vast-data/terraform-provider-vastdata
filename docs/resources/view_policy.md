@@ -118,3 +118,11 @@ resource vastdata_view_policy vpolicy1{
 
 - `guid` (String) A uniqe guid given to the view policy
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_view_policy.view_policy <guid>
+```

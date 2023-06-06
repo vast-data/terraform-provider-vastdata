@@ -99,3 +99,11 @@ resource vastdata_protected_path protected-path-view {
 
 - `guid` (String) guid
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_protected_path.protected_path <guid>
+```

@@ -205,3 +205,11 @@ Optional:
 - `is_group` (Boolean)
 - `name` (String) The name of the entity
 - `vast_id` (Number)
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_quota.quota <guid>
+```

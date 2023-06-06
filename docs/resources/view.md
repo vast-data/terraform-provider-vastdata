@@ -92,3 +92,11 @@ Optional:
 - `permissions` (String) Allowed Values are [FULL]
 - `sid_str` (String)
 - `uid_or_gid` (String)
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_view.view <guid>
+```

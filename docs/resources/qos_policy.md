@@ -70,3 +70,11 @@ Optional:
 - `min_reads_iops` (Number) Minimal amount of performance to provide when there is resource contention
 - `min_writes_bw_mbps` (Number) Minimal amount of performance to provide when there is resource contention
 - `min_writes_iops` (Number) Minimal amount of performance to provide when there is resource contention
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_qos_policy.qos_policy <guid>
+```

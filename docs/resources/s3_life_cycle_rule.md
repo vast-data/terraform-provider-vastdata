@@ -70,3 +70,11 @@ resource vastdata_s3_life_cycle_rule  s3-bucket-view-lifecycle-rule {
 
 - `guid` (String)
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_s3_life_cycle_rule.s3_life_cycle_rule <guid>
+```

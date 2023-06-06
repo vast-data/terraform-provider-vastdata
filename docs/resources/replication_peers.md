@@ -75,3 +75,11 @@ resource vastdata_replication_peers clusterA-clusterB-peer {
 
 - `guid` (String) A unique guid given to the  replication peer configuration
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_replication_peers.replication_peers <guid>
+```

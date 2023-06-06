@@ -61,3 +61,11 @@ resource vastdata_s3_replication_peers s3peer-aws {
 
 - `guid` (String) A unique guid given to the s3 replication peer configuration
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_s3_replication_peers.s3_replication_peers <guid>
+```

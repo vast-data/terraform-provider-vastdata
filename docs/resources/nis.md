@@ -35,3 +35,11 @@ resource vastdata_nis nis1{
 
 - `guid` (String) A uniq guid given to the nis server configuration
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_nis.nis <guid>
+```

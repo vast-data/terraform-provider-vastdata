@@ -81,3 +81,11 @@ Optional:
 
 - `access_key` (String)
 - `enabled` (String)
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_user.user <guid>
+```

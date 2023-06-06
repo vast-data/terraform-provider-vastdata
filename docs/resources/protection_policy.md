@@ -98,3 +98,11 @@ Optional:
 - `keep_local` (String)
 - `keep_remote` (String)
 - `start_at` (String)
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_protection_policy.protection_policy <guid>
+```

@@ -74,3 +74,11 @@ resource vastdata_snapshot snapshot{
 
 - `guid` (String) A unique guid given to the snapshot
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_snapshot.snapshot <guid>
+```

@@ -45,3 +45,11 @@ resource vastdata_dns dns1 {
 
 - `guid` (String) A uniqe guid assigned to the VAST DNS server configurations
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_dns.dns <guid>
+```

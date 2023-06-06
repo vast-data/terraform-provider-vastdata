@@ -56,3 +56,11 @@ Optional:
 
 - `end_ip` (String) The last ip of the range
 - `start_ip` (String) The first ip of the range
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_tenant.tenant <guid>
+```

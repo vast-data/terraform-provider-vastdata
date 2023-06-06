@@ -16,9 +16,18 @@ BUILD_DEST=build
 BUILD_DIR=build
 GINKGO_FLAGS=""
 TFPLUGIN_DOCS_OPTIONS = ""
+RESOURCES = $(wildcard examples/resources/*)
 
-document:
-	tfplugindocs $(TFPLUGIN_DOCS_OPTIONS)
+document_import:
+	for r in $(RESOURCES) ; do\
+	     echo $${r} ;\
+	     n=$$(echo $$(basename $${r})) ;\
+	     t=$$(echo $${n} |awk -F 'vastdata_' '{print $$2}') ;\
+	     echo terrafrom import $${n}.$${t} "<guid>" >  examples/resources/$${n}/import.sh;\
+	done ;
+
+document: document_import
+	tfplugindocs $(TFPLUGIN_DOCS_OPTIONS) 
 
 clean:
 	rm -rf $(BUILD_DEST)/terraform-provider-vastdata

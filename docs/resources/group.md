@@ -37,3 +37,11 @@ resource vastdata_group group1 {
 
 - `guid` (String) A uniqe GUID assigned to the group
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terrafrom import vastdata_group.group <guid>
+```
