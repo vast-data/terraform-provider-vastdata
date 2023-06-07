@@ -394,7 +394,6 @@ func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, 
 func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, S3LifeCycleRule_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
@@ -402,7 +401,11 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
 
-	data = utils.EnabledMustBeSet(data)
+	var before_post_error error
+	data, before_post_error = utils.EnabledMustBeSet(data, client)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
@@ -472,7 +475,6 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, S3LifeCycleRule_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
@@ -505,7 +507,11 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
 
-	data = utils.EnabledMustBeSet(data)
+	var before_patch_error error
+	data, before_patch_error = utils.EnabledMustBeSet(data, client)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")

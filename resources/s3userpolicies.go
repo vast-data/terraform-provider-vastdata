@@ -194,7 +194,6 @@ func resourceS3PolicyDelete(ctx context.Context, d *schema.ResourceData, m inter
 func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, S3Policy_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
@@ -202,7 +201,11 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 	reflect_S3Policy := reflect.TypeOf((*api_latest.S3Policy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
 
-	data = utils.EnabledMustBeSet(data)
+	var before_post_error error
+	data, before_post_error = utils.EnabledMustBeSet(data, client)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
@@ -272,7 +275,6 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, S3Policy_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
@@ -305,7 +307,11 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	reflect_S3Policy := reflect.TypeOf((*api_latest.S3Policy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
 
-	data = utils.EnabledMustBeSet(data)
+	var before_patch_error error
+	data, before_patch_error = utils.EnabledMustBeSet(data, client)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")

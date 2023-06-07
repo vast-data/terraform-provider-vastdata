@@ -804,7 +804,6 @@ func resourceLdapDelete(ctx context.Context, d *schema.ResourceData, m interface
 func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, Ldap_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
@@ -880,7 +879,6 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, Ldap_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)

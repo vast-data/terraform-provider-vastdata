@@ -1421,7 +1421,6 @@ func resourceViewPolicyDelete(ctx context.Context, d *schema.ResourceData, m int
 func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, ViewPolicy_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
@@ -1497,7 +1496,6 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, ViewPolicy_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)

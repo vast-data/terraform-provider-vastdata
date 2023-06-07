@@ -400,7 +400,6 @@ func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interfa
 func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, Tenant_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
@@ -476,7 +475,6 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
 	new_ctx := context.WithValue(ctx, names_mapping, Tenant_names_mapping)
-
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)

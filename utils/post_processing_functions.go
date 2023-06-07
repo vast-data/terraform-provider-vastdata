@@ -1,8 +1,8 @@
 package utils
 
-type ResponseConversionFunc func(map[string]interface{}) map[string]interface{}
+type ResponseConversionFunc func(map[string]interface{}, interface{}) (map[string]interface{}, error)
 
-func EntityMergeToUserQuotas(m map[string]interface{}) map[string]interface{} {
+func EntityMergeToUserQuotas(m map[string]interface{}, i interface{}) (map[string]interface{}, error) {
 	/*This function should handle the case of the Quota object where sending is defferant than reading sturctue
 	  to move the fields from the entity object into the user quotas
 	*/
@@ -32,15 +32,15 @@ func EntityMergeToUserQuotas(m map[string]interface{}) map[string]interface{} {
 			m[key] = new_quotas
 		}
 	}
-	return m
+	return m, nil
 }
 
-func EnabledMustBeSet(m map[string]interface{}) map[string]interface{} {
+func EnabledMustBeSet(m map[string]interface{}, i interface{}) (map[string]interface{}, error) {
 	_, exists := m["enabled"]
 
 	if !exists {
 		m["enabled"] = false
 	}
-	return m
+	return m, nil
 
 }

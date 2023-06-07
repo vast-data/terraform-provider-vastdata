@@ -221,7 +221,6 @@ func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceDa
 func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
     names_mapping := utils.ContextKey("names_mapping")
     new_ctx := context.WithValue(ctx, names_mapping, {{ .ResourceName }}_names_mapping)
-
     var diags diag.Diagnostics
     data := make(map[string]interface{})
     client:=m.(vast_client.JwtSession)
@@ -229,7 +228,11 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if  .BeforePostFunc  }}
-    data={{ funcName .BeforePostFunc}}(data)
+    var before_post_error error
+    data,before_post_error={{ funcName .BeforePostFunc}}(data,client)
+    if before_post_error!=nil {
+       return diag.FromErr(before_post_error)
+    }
     {{end}}
     version_compare:=utils.VastVersionsWarn(ctx)
    
@@ -299,7 +302,6 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
 func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
     names_mapping := utils.ContextKey("names_mapping")
     new_ctx := context.WithValue(ctx, names_mapping, {{ .ResourceName }}_names_mapping)
-
     var diags diag.Diagnostics
     data := make(map[string]interface{})
     version_compare:=utils.VastVersionsWarn(ctx)
@@ -332,7 +334,12 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if .BeforePatchFunc }}
-    data={{ funcName .BeforePatchFunc}}(data)
+    var before_patch_error error
+    data,before_patch_error={{ funcName .BeforePatchFunc}}(data,client)
+    if before_patch_error!=nil {
+       return diag.FromErr(before_patch_error)
+    }
+
     {{end}}
     tflog.Debug(ctx,fmt.Sprintf("Data %v" , data ))    
     b,err:=json.MarshalIndent(data,"","   ")
