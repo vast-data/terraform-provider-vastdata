@@ -1204,7 +1204,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = utils.EntityMergeToUserQuotas(data, client)
+	data, before_post_error = utils.EntityMergeToUserQuotas(data, client, ctx)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
@@ -1310,7 +1310,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
 
 	var before_patch_error error
-	data, before_patch_error = utils.EntityMergeToUserQuotas(data, client)
+	data, before_patch_error = utils.EntityMergeToUserQuotas(data, client, ctx)
 	if before_patch_error != nil {
 		return diag.FromErr(before_patch_error)
 	}

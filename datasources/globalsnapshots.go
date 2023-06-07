@@ -44,20 +44,12 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Description: `The name of the snapshot`,
 			},
 
-			"source_path": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `The path to make snapshot from`,
-			},
-
-			"tenant_id": &schema.Schema{
+			"loanee_tenant_id": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The tenant id to use`,
+				Description: `The tenant ID of the target`,
 			},
 
 			"loanee_root_path": &schema.Schema{
@@ -73,23 +65,23 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The remote tenant id`,
+				Description: `The remote replication peering id`,
 			},
 
-			"loanee_snapshot_id": &schema.Schema{
-				Type:        schema.TypeInt,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `The snapshot id of the snapshot`,
-			},
-
-			"loanee_snapsho": &schema.Schema{
+			"remote_target_guid": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The name of the snapshot`,
+				Description: `The remote replication peering guid`,
+			},
+
+			"remote_target_path": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `The path on the remote cluster`,
 			},
 
 			"enabled": &schema.Schema{
@@ -97,23 +89,31 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `IS the snapshot enabled`,
+				Description: `Is the snapshot enabled`,
 			},
 
-			"source_cluster": &schema.Schema{
-				Type:        schema.TypeString,
+			"owner_root_snapshot": &schema.Schema{
+				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The cluster where the source snapshot is configured`,
+				Description: ``,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{},
+				},
 			},
 
-			"target_cluster": &schema.Schema{
-				Type:        schema.TypeString,
+			"owner_tenant": &schema.Schema{
+				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The cluster where the snapshot is cloned to`,
+				Description: ``,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{},
+				},
 			},
 		},
 	}
@@ -218,26 +218,14 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SourcePath", resource.SourcePath))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LoaneeTenantId", resource.LoaneeTenantId))
 
-	err = d.Set("source_path", resource.SourcePath)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"source_path\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
-
-	err = d.Set("tenant_id", resource.TenantId)
+	err = d.Set("loanee_tenant_id", resource.LoaneeTenantId)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occured setting value to \"loanee_tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -266,26 +254,26 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LoaneeSnapshotId", resource.LoaneeSnapshotId))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RemoteTargetGuid", resource.RemoteTargetGuid))
 
-	err = d.Set("loanee_snapshot_id", resource.LoaneeSnapshotId)
+	err = d.Set("remote_target_guid", resource.RemoteTargetGuid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"loanee_snapshot_id\"",
+			Summary:  "Error occured setting value to \"remote_target_guid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LoaneeSnapsho", resource.LoaneeSnapsho))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RemoteTargetPath", resource.RemoteTargetPath))
 
-	err = d.Set("loanee_snapsho", resource.LoaneeSnapsho)
+	err = d.Set("remote_target_path", resource.RemoteTargetPath)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"loanee_snapsho\"",
+			Summary:  "Error occured setting value to \"remote_target_path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -302,26 +290,28 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SourceCluster", resource.SourceCluster))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "OwnerRootSnapshot", resource.OwnerRootSnapshot))
 
-	err = d.Set("source_cluster", resource.SourceCluster)
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.OwnerRootSnapshot))
+	err = d.Set("owner_root_snapshot", utils.FlattenModelAsList(ctx, resource.OwnerRootSnapshot))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"source_cluster\"",
+			Summary:  "Error occured setting value to \"owner_root_snapshot\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TargetCluster", resource.TargetCluster))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "OwnerTenant", resource.OwnerTenant))
 
-	err = d.Set("target_cluster", resource.TargetCluster)
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.OwnerTenant))
+	err = d.Set("owner_tenant", utils.FlattenModelAsList(ctx, resource.OwnerTenant))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_cluster\"",
+			Summary:  "Error occured setting value to \"owner_tenant\"",
 			Detail:   err.Error(),
 		})
 	}

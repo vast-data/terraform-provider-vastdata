@@ -33,14 +33,20 @@ var _ = Describe(" GlobalSnapshot", func() {
                          {
    "guid": "string",
    "loanee_root_path": "string",
-   "loanee_snapsho": "string",
-   "loanee_snapshot_id": 100,
+   "loanee_tenant_id": 100,
    "name": "string",
+   "owner_root_snapshot": {
+      "clone_id": 100,
+      "name": "string",
+      "parent_handle_ehandle": "string"
+   },
+   "owner_tenant": {
+      "guid": "string",
+      "name": "string"
+   },
+   "remote_target_guid": "string",
    "remote_target_id": 100,
-   "source_cluster": "string",
-   "source_path": "string",
-   "target_cluster": "string",
-   "tenant_id": 100
+   "remote_target_path": "string"
 }
                          `
 	var server *ghttp.Server

@@ -229,7 +229,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if  .BeforePostFunc  }}
     var before_post_error error
-    data,before_post_error={{ funcName .BeforePostFunc}}(data,client)
+    data,before_post_error={{ funcName .BeforePostFunc}}(data,client,ctx)
     if before_post_error!=nil {
        return diag.FromErr(before_post_error)
     }
@@ -335,7 +335,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if .BeforePatchFunc }}
     var before_patch_error error
-    data,before_patch_error={{ funcName .BeforePatchFunc}}(data,client)
+    data,before_patch_error={{ funcName .BeforePatchFunc}}(data,client,ctx)
     if before_patch_error!=nil {
        return diag.FromErr(before_patch_error)
     }

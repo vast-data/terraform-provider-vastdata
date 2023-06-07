@@ -1475,33 +1475,51 @@ components:
         name:
           type: "string"
           description: "The name of the snapshot"
-        source_path:
-          type: "string"
-          description: "The path to make snapshot from"
-        tenant_id:
+        loanee_tenant_id:
           type: "int"
-          description: "The tenant id to use"
+          description: "The tenant ID of the target"
         loanee_root_path:
           type: "string"
           description: "The path where to store the snapshot on a Target"
         remote_target_id:
           type: "int"
-          description: "The remote tenant id"
-        loanee_snapshot_id:
-          type: "int"
-          description: "The snapshot id of the snapshot"
-        loanee_snapsho:
+          description: "The remote replication peering id"
+        remote_target_guid:
           type: "string"
-          description: "The name of the snapshot"
+          description: "The remote replication peering guid"
+        remote_target_path:
+          type: "string"
+          description: "The path on the remote cluster"
         enabled:
           type: "boolean"
-          description: "IS the snapshot enabled"
-        source_cluster:
+          description: "Is the snapshot enabled"
+        owner_root_snapshot:
+          type: "object"
+          $ref: "#/components/schemas/GlobalSnapshotOwnerRootSnapshot"
+        owner_tenant:
+          type: "object"
+          $ref: "#/components/schemas/GlobalSnapshotOwnerTenant"          
+    GlobalSnapshotOwnerRootSnapshot:
+      type: "object"
+      properties:
+        clone_id:
+          type: "int64"
+          description: "The ID of the clone"
+        name:
           type: "string"
-          description: "The cluster where the source snapshot is configured"
-        target_cluster:
+          description: "Remote Clone Name"
+        parent_handle_ehandle:
           type: "string"
-          description: "The cluster where the snapshot is cloned to"        
+          description: "The remote handle (inode)"
+    GlobalSnapshotOwnerTenant:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "Ten name of the remote Tenant"
+        guid:
+          type: "string"
+          description: "The remote tenant guid"
     ReplicationPeers:
       type: "object"
       properties:

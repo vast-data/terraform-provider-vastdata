@@ -402,7 +402,7 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = utils.EnabledMustBeSet(data, client)
+	data, before_post_error = utils.EnabledMustBeSet(data, client, ctx)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
@@ -508,7 +508,7 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
 
 	var before_patch_error error
-	data, before_patch_error = utils.EnabledMustBeSet(data, client)
+	data, before_patch_error = utils.EnabledMustBeSet(data, client, ctx)
 	if before_patch_error != nil {
 		return diag.FromErr(before_patch_error)
 	}

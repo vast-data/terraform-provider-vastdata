@@ -15,22 +15,18 @@ type GlobalSnapshot struct {
 	Guid string `json:"guid,omitempty"`
 	// The name of the snapshot
 	Name string `json:"name,omitempty"`
-	// The path to make snapshot from
-	SourcePath string `json:"source_path,omitempty"`
-	// The tenant id to use
-	TenantId int `json:"tenant_id,omitempty"`
+	// The tenant ID of the target
+	LoaneeTenantId int `json:"loanee_tenant_id,omitempty"`
 	// The path where to store the snapshot on a Target
 	LoaneeRootPath string `json:"loanee_root_path,omitempty"`
-	// The remote tenant id
+	// The remote replication peering id
 	RemoteTargetId int `json:"remote_target_id,omitempty"`
-	// The snapshot id of the snapshot
-	LoaneeSnapshotId int `json:"loanee_snapshot_id,omitempty"`
-	// The name of the snapshot
-	LoaneeSnapsho string `json:"loanee_snapsho,omitempty"`
-	// IS the snapshot enabled
+	// The remote replication peering guid
+	RemoteTargetGuid string `json:"remote_target_guid,omitempty"`
+	// The path on the remote cluster
+	RemoteTargetPath string `json:"remote_target_path,omitempty"`
+	// Is the snapshot enabled
 	Enabled bool `json:"enabled,omitempty"`
-	// The cluster where the source snapshot is configured
-	SourceCluster string `json:"source_cluster,omitempty"`
-	// The cluster where the snapshot is cloned to
-	TargetCluster string `json:"target_cluster,omitempty"`
+	OwnerRootSnapshot *GlobalSnapshotOwnerRootSnapshot `json:"owner_root_snapshot,omitempty"`
+	OwnerTenant *GlobalSnapshotOwnerTenant `json:"owner_tenant,omitempty"`
 }

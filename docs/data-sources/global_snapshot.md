@@ -28,14 +28,25 @@ data vastdata_global_snapshot global_snapshot1 {
 
 ### Read-Only
 
-- `enabled` (Boolean) IS the snapshot enabled
+- `enabled` (Boolean) Is the snapshot enabled
 - `guid` (String) A unique guid given to the global snapshot
 - `id` (Number) A unique id given to the global snapshot
 - `loanee_root_path` (String) The path where to store the snapshot on a Target
-- `loanee_snapsho` (String) The name of the snapshot
-- `loanee_snapshot_id` (Number) The snapshot id of the snapshot
-- `remote_target_id` (Number) The remote tenant id
-- `source_cluster` (String) The cluster where the source snapshot is configured
-- `source_path` (String) The path to make snapshot from
-- `target_cluster` (String) The cluster where the snapshot is cloned to
-- `tenant_id` (Number) The tenant id to use
+- `loanee_tenant_id` (Number) The tenant ID of the target
+- `owner_root_snapshot` (List of Object) (see [below for nested schema](#nestedatt--owner_root_snapshot))
+- `owner_tenant` (List of Object) (see [below for nested schema](#nestedatt--owner_tenant))
+- `remote_target_guid` (String) The remote replication peering guid
+- `remote_target_id` (Number) The remote replication peering id
+- `remote_target_path` (String) The path on the remote cluster
+
+<a id="nestedatt--owner_root_snapshot"></a>
+### Nested Schema for `owner_root_snapshot`
+
+Read-Only:
+
+
+
+<a id="nestedatt--owner_tenant"></a>
+### Nested Schema for `owner_tenant`
+
+Read-Only:

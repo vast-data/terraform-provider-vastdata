@@ -50,52 +50,32 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 
-		"source_path": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The path to make snapshot from`,
-		},
+		"loanee_tenant_id": &schema.Schema{
+			Type: schema.TypeInt,
 
-		"tenant_id": &schema.Schema{
-			Type:        schema.TypeInt,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The tenant id to use`,
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
+			Required:              true,
 		},
 
 		"loanee_root_path": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The path where to store the snapshot on a Target`,
+			Type:     schema.TypeString,
+			Required: true,
 		},
 
 		"remote_target_id": &schema.Schema{
-			Type:        schema.TypeInt,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The remote tenant id`,
+			Type:     schema.TypeInt,
+			Required: true,
 		},
 
-		"loanee_snapshot_id": &schema.Schema{
-			Type:        schema.TypeInt,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The snapshot id of the snapshot`,
+		"remote_target_guid": &schema.Schema{
+			Type:     schema.TypeString,
+			Required: true,
 		},
 
-		"loanee_snapsho": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The name of the snapshot`,
+		"remote_target_path": &schema.Schema{
+			Type:     schema.TypeString,
+			Required: true,
 		},
 
 		"enabled": &schema.Schema{
@@ -103,23 +83,58 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `IS the snapshot enabled`,
+			Description: `Is the snapshot enabled`,
 		},
 
-		"source_cluster": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The cluster where the source snapshot is configured`,
+		"owner_root_snapshot": &schema.Schema{
+			Type:     schema.TypeList,
+			Required: true,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"clone_id": &schema.Schema{
+						Type:        schema.TypeInt,
+						Computed:    true,
+						Optional:    false,
+						Sensitive:   false,
+						Description: `The ID of the clone`,
+					},
+
+					"name": &schema.Schema{
+						Type:     schema.TypeString,
+						Required: true,
+					},
+
+					"parent_handle_ehandle": &schema.Schema{
+						Type:        schema.TypeString,
+						Computed:    true,
+						Optional:    false,
+						Sensitive:   false,
+						Description: `The remote handle (inode)`,
+					},
+				},
+			},
 		},
 
-		"target_cluster": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The cluster where the snapshot is cloned to`,
+		"owner_tenant": &schema.Schema{
+			Type:     schema.TypeList,
+			Required: true,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"name": &schema.Schema{
+						Type:     schema.TypeString,
+						Required: true,
+					},
+
+					"guid": &schema.Schema{
+						Type:     schema.TypeString,
+						Required: true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -154,26 +169,14 @@ func ResourceGlobalSnapshotReadStructIntoSchema(ctx context.Context, resource ap
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SourcePath", resource.SourcePath))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LoaneeTenantId", resource.LoaneeTenantId))
 
-	err = d.Set("source_path", resource.SourcePath)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"source_path\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
-
-	err = d.Set("tenant_id", resource.TenantId)
+	err = d.Set("loanee_tenant_id", resource.LoaneeTenantId)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occured setting value to \"loanee_tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -202,26 +205,26 @@ func ResourceGlobalSnapshotReadStructIntoSchema(ctx context.Context, resource ap
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LoaneeSnapshotId", resource.LoaneeSnapshotId))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RemoteTargetGuid", resource.RemoteTargetGuid))
 
-	err = d.Set("loanee_snapshot_id", resource.LoaneeSnapshotId)
+	err = d.Set("remote_target_guid", resource.RemoteTargetGuid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"loanee_snapshot_id\"",
+			Summary:  "Error occured setting value to \"remote_target_guid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LoaneeSnapsho", resource.LoaneeSnapsho))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RemoteTargetPath", resource.RemoteTargetPath))
 
-	err = d.Set("loanee_snapsho", resource.LoaneeSnapsho)
+	err = d.Set("remote_target_path", resource.RemoteTargetPath)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"loanee_snapsho\"",
+			Summary:  "Error occured setting value to \"remote_target_path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -238,26 +241,28 @@ func ResourceGlobalSnapshotReadStructIntoSchema(ctx context.Context, resource ap
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SourceCluster", resource.SourceCluster))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "OwnerRootSnapshot", resource.OwnerRootSnapshot))
 
-	err = d.Set("source_cluster", resource.SourceCluster)
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.OwnerRootSnapshot))
+	err = d.Set("owner_root_snapshot", utils.FlattenModelAsList(ctx, resource.OwnerRootSnapshot))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"source_cluster\"",
+			Summary:  "Error occured setting value to \"owner_root_snapshot\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TargetCluster", resource.TargetCluster))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "OwnerTenant", resource.OwnerTenant))
 
-	err = d.Set("target_cluster", resource.TargetCluster)
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.OwnerTenant))
+	err = d.Set("owner_tenant", utils.FlattenModelAsList(ctx, resource.OwnerTenant))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_cluster\"",
+			Summary:  "Error occured setting value to \"owner_tenant\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -343,6 +348,12 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource GlobalSnapshot"))
 	reflect_GlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
+
+	var before_post_error error
+	data, before_post_error = utils.AddStreamInfo(data, client, ctx)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
@@ -443,6 +454,12 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource GlobalSnapshot"))
 	reflect_GlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
+
+	var before_patch_error error
+	data, before_patch_error = utils.UpdateStreamInfo(data, client, ctx)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
