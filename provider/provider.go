@@ -16,18 +16,6 @@ import (
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
-/*
-	func validateVersionValidationMode(i any, c cty.Path) diag.Diagnostic {
-		var d diag.Diagnostic
-		s := strings.ToLower(fmt.Sprintf("%v", i))
-		if (s != "warn") && (s != "strict") {
-			return diag.FromErr(errors.New("Wrong value given when setting version_validation_mode %s, only possiable values are \"warn\" or \"strict\""))
-
-		}
-		return d
-
-}
-*/
 func Provider() *schema.Provider {
 	return &schema.Provider{
 		ResourcesMap:   resources.Resources,
@@ -37,18 +25,21 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Optional:    false,
 				Required:    true,
+				Description: `The VastData Cluster hostname/address , if environmnet variable VASTDATA_HOST exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_HOST", nil),
 			},
 			"port": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Required:    false,
+				Description: `The server API port (Default is 443) ,if environmnet variable VASTDATA_PORT exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_PORT", 443),
 			},
 			"skip_ssl_verify": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Required:    false,
+				Description: `A boolean representing should SSL certificate be verified (Default is False) , if environmnet variable VASTDATA_VERIFY_SSL exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_VERIFY_SSL", false),
 			},
 
@@ -57,6 +48,7 @@ func Provider() *schema.Provider {
 				Optional:    false,
 				Required:    true,
 				Sensitive:   true,
+				Description: `The VastData Cluster username, if environmnet variable VASTDATA_CLUSTER_USERNAME exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_CLUSTER_USERNAME", nil),
 			},
 			"password": &schema.Schema{
@@ -64,13 +56,19 @@ func Provider() *schema.Provider {
 				Optional:    false,
 				Required:    true,
 				Sensitive:   true,
-				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_CLUSTER_USER", nil),
+				Description: `The VastData Cluster password, if environmnet variable VASTDATA_CLUSTER_PASSWORD exists it will be used`,
+				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_CLUSTER_PASSWORD", nil),
 			},
 			"version_validation_mode": &schema.Schema{
-				Type:         schema.TypeString,
-				Optional:     true,
-				Required:     false,
-				Sensitive:    false,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Required:  false,
+				Sensitive: false,
+				Description: `The version validation mode to use , version validation checks if a resource request will work with the current cluster version
+Depanding on the value the operation will abort from happening if according to the version the operation might not work.
+2 options are valid for this attribute
+1. strict - abort the operation before it starts
+2. warn - Just issue a warnning `,
 				DefaultFunc:  schema.EnvDefaultFunc("VERSION_VALIDATION_MODE", "warn"),
 				ValidateFunc: validation.StringInSlice([]string{"warn", "strict"}, true),
 			},
