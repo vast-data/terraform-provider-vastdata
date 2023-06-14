@@ -1,0 +1,14 @@
+func dataSource{{ .ResourceName }} {
+     return  &schema.Resource{
+     Readcontext: dataSource{{ .ResourceName }}Read,
+     Schema: map[string]*]*schema.Schema{
+     {{range .Fields}}
+	    "{{ .name }}": &schema.Schema{
+	    	Type: 	  schema.TypeString,
+		Required: true,
+	    }
+     {{end}}
+     
+     }
+
+}

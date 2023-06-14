@@ -1,0 +1,1 @@
+terrafrom import vastdata_protection_policy.protection_policy <guid>
