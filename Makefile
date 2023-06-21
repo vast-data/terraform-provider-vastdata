@@ -161,3 +161,8 @@ pack-archs: clean-releases is-tag
 
 
 pack-all-archs: build-all-archs pack-archs
+
+
+github-release: is-tag
+	tag=$$(git describe --tags); \
+	gh release create $${tag} ./build/*.tar.gz  ./build/*_SHA256SUMS
