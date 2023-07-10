@@ -18,6 +18,7 @@ GINKGO_FLAGS=""
 TFPLUGIN_DOCS_OPTIONS = ""
 RESOURCES = $(wildcard examples/resources/*)
 FORCE_TAG_MATCH = 1
+GOFLAGS = ""
 
 
 document_import:
@@ -77,7 +78,7 @@ build-formatter: build-provider
 	go fmt ./vast_versions/ 
 
 $(BUILD_DEST)/terraform-provider-vastdata:
-	go build -o $(BUILD_DEST)/terraform-provider-vastdata
+	go build $${GOFLAGS} -o $(BUILD_DEST)/terraform-provider-vastdata
 
 build: $(BUILD_DEST)/terraform-provider-vastdata
 
@@ -90,7 +91,7 @@ $(BUILD_DEST)/linux_amd64/terraform-provider-vastdata:
 	export GOOS="linux" ;\
 	export GOARCH="amd64" ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
-	go build -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
+	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
 build-linux-amd64:   $(BUILD_DEST)/linux_amd64/terraform-provider-vastdata
 
@@ -98,7 +99,7 @@ $(BUILD_DEST)/linux_arm64/terraform-provider-vastdata:
 	export GOOS="linux" ;\
 	export GOARCH="arm64" ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
-	go build -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
+	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
 build-linux-arm64:   $(BUILD_DEST)/linux_arm64/terraform-provider-vastdata
 
@@ -107,7 +108,7 @@ $(BUILD_DEST)/darwin_amd64/terraform-provider-vastdata:
 	export GOOS="darwin" ;\
 	export GOARCH="amd64" ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
-	go build -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
+	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
 build-darwin-amd64: $(BUILD_DEST)/darwin_amd64/terraform-provider-vastdata
 
@@ -116,7 +117,7 @@ $(BUILD_DEST)/darwin_arm64/terraform-provider-vastdata:
 	export GOOS="darwin" ;\
 	export GOARCH="arm64" ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
-	go build -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
+	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
 build-darwin-arm64: $(BUILD_DEST)/darwin_arm64/terraform-provider-vastdata
 
@@ -133,7 +134,7 @@ $(BUILD_DEST)/windows_arm64/terraform-provider-vastdata:
 	export GOOS="windows" ;\
 	export GOARCH="arm64" ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
-	go build -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
+	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
 build-windows-arm64: $(BUILD_DEST)/windows_arm64/terraform-provider-vastdata
 
