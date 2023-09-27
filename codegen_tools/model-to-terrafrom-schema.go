@@ -184,9 +184,13 @@ type ResourceTemplateV2 struct {
 	ResourceDocumantation    string
 	BeforePostFunc           utils.ResponseConversionFunc
 	BeforePatchFunc          utils.ResponseConversionFunc
+	AfterPostFunc            utils.ResponseConversionFunc
+	AfterPatchFunc           utils.ResponseConversionFunc
+	AfterReadFunc            utils.SchemaManipulationFunc
 	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
 	SensitiveFields          *StringSet
 	IsDataSource             bool
+	BeforeCreateFunc         utils.ResponseConversionFunc
 }
 
 func (r *ResourceTemplateV2) HasProperty(property string) bool {

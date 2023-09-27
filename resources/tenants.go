@@ -371,6 +371,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	}
 	diags = ResourceTenantReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -469,6 +470,7 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceTenantRead(ctx, d, m)
+
 	return diags
 }
 
@@ -530,6 +532,7 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 	resourceTenantRead(ctx, d, m)
+
 	return diags
 
 }

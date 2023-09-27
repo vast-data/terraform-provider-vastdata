@@ -189,6 +189,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	}
 	diags = ResourceGroupReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -287,6 +288,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceGroupRead(ctx, d, m)
+
 	return diags
 }
 
@@ -348,6 +350,7 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	resourceGroupRead(ctx, d, m)
+
 	return diags
 
 }

@@ -226,7 +226,11 @@ var resources_templates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_view",
-		IgnoreUpdates:            NewStringSet("create_dir"),
+		//		IgnoreUpdates:            NewStringSet("create_dir"),
+		BeforePatchFunc:  utils.AlwaysSendCreateDir,
+		BeforeCreateFunc: utils.AlwaysStoreCreateDir,
+		AfterPatchFunc:   utils.AlwaysStoreCreateDir,
+		AfterReadFunc:    utils.KeepCreateDirState,
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ViewShareAcl",

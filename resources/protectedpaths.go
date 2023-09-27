@@ -248,6 +248,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 
 	}
 	diags = ResourceProtectedPathReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -346,6 +347,7 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceProtectedPathRead(ctx, d, m)
+
 	return diags
 }
 
@@ -407,6 +409,7 @@ func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m 
 		return diags
 	}
 	resourceProtectedPathRead(ctx, d, m)
+
 	return diags
 
 }

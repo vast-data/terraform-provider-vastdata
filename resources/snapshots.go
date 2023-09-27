@@ -209,6 +209,7 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 	}
 	diags = ResourceSnapshotReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -307,6 +308,7 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceSnapshotRead(ctx, d, m)
+
 	return diags
 }
 
@@ -368,6 +370,7 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	resourceSnapshotRead(ctx, d, m)
+
 	return diags
 
 }

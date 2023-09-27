@@ -59,14 +59,11 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"create_dir": &schema.Schema{
-			Type: schema.TypeBool,
-
-			DiffSuppressOnRefresh: false,
-			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             false,
-			Description:           `Creates the directory specified by the path`,
+			Type:        schema.TypeBool,
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Creates the directory specified by the path`,
 		},
 
 		"alias": &schema.Schema{
@@ -755,6 +752,13 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	}
 	diags = ResourceViewReadStructIntoSchema(ctx, resource, d)
+
+	var after_read_error error
+	after_read_error = utils.KeepCreateDirState(client, ctx, d)
+	if after_read_error != nil {
+		return diag.FromErr(after_read_error)
+	}
+
 	return diags
 }
 
@@ -853,6 +857,13 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceViewRead(ctx, d, m)
+
+	var before_create_error error
+	_, before_create_error = utils.AlwaysStoreCreateDir(data, client, ctx, d)
+	if before_create_error != nil {
+		return diag.FromErr(before_create_error)
+	}
+
 	return diags
 }
 
@@ -891,6 +902,12 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	reflect_View := reflect.TypeOf((*api_latest.View)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_View.Elem(), d, &data, "", false)
 
+	var before_patch_error error
+	data, before_patch_error = utils.AlwaysSendCreateDir(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {
@@ -914,6 +931,13 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	resourceViewRead(ctx, d, m)
+
+	var after_patch_error error
+	data, after_patch_error = utils.AlwaysStoreCreateDir(data, client, ctx, d)
+	if after_patch_error != nil {
+		return diag.FromErr(after_patch_error)
+	}
+
 	return diags
 
 }

@@ -318,6 +318,7 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 
 	}
 	diags = ResourceS3replicationPeersReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -416,6 +417,7 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceS3replicationPeersRead(ctx, d, m)
+
 	return diags
 }
 
@@ -477,6 +479,7 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 		return diags
 	}
 	resourceS3replicationPeersRead(ctx, d, m)
+
 	return diags
 
 }

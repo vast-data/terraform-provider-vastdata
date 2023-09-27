@@ -1392,6 +1392,7 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 
 	}
 	diags = ResourceViewPolicyReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -1490,6 +1491,7 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceViewPolicyRead(ctx, d, m)
+
 	return diags
 }
 
@@ -1551,6 +1553,7 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 		return diags
 	}
 	resourceViewPolicyRead(ctx, d, m)
+
 	return diags
 
 }

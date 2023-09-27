@@ -303,6 +303,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 
 	}
 	diags = ResourceProtectionPolicyReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -401,6 +402,7 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceProtectionPolicyRead(ctx, d, m)
+
 	return diags
 }
 
@@ -462,6 +464,7 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	resourceProtectionPolicyRead(ctx, d, m)
+
 	return diags
 
 }

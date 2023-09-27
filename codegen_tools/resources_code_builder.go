@@ -192,6 +192,13 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 
      }
  diags = Resource{{ .ResourceName }}ReadStructIntoSchema(ctx, resource ,d )
+ {{ if .AfterReadFunc }}
+ var after_read_error error
+ after_read_error={{ funcName .AfterReadFunc}}(client,ctx,d)
+ if after_read_error!=nil {
+    return diag.FromErr(after_read_error)
+ }
+ {{end}}
  return diags 
 }
 
@@ -229,7 +236,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if  .BeforePostFunc  }}
     var before_post_error error
-    data,before_post_error={{ funcName .BeforePostFunc}}(data,client,ctx)
+    data,before_post_error={{ funcName .BeforePostFunc}}(data,client,ctx,d)
     if before_post_error!=nil {
        return diag.FromErr(before_post_error)
     }
@@ -296,6 +303,14 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
    
    d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
    resource{{ .ResourceName }}Read(ctx,d,m)
+    {{ if .BeforeCreateFunc }}
+    var before_create_error error
+    _,before_create_error={{ funcName .BeforeCreateFunc}}(data,client,ctx,d)
+    if before_create_error!=nil {
+       return diag.FromErr(before_create_error)
+    }
+
+    {{end}}
    return diags
 }
 
@@ -335,7 +350,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if .BeforePatchFunc }}
     var before_patch_error error
-    data,before_patch_error={{ funcName .BeforePatchFunc}}(data,client,ctx)
+    data,before_patch_error={{ funcName .BeforePatchFunc}}(data,client,ctx,d)
     if before_patch_error!=nil {
        return diag.FromErr(before_patch_error)
     }
@@ -364,6 +379,14 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
         return diags
      }
    resource{{ .ResourceName }}Read(ctx,d,m)
+   {{ if .AfterPatchFunc }}
+   var after_patch_error error
+   data,after_patch_error={{ funcName .AfterPatchFunc}}(data,client,ctx,d)
+   if after_patch_error!=nil {
+      return diag.FromErr(after_patch_error)
+   }
+   {{end}}
+
    return diags
 
 

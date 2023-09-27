@@ -1167,6 +1167,7 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	}
 	diags = ResourceQuotaReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -1204,7 +1205,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = utils.EntityMergeToUserQuotas(data, client, ctx)
+	data, before_post_error = utils.EntityMergeToUserQuotas(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
@@ -1271,6 +1272,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceQuotaRead(ctx, d, m)
+
 	return diags
 }
 
@@ -1310,7 +1312,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
 
 	var before_patch_error error
-	data, before_patch_error = utils.EntityMergeToUserQuotas(data, client, ctx)
+	data, before_patch_error = utils.EntityMergeToUserQuotas(data, client, ctx, d)
 	if before_patch_error != nil {
 		return diag.FromErr(before_patch_error)
 	}
@@ -1338,6 +1340,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	resourceQuotaRead(ctx, d, m)
+
 	return diags
 
 }

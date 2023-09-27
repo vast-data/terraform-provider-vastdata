@@ -485,6 +485,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	}
 	diags = ResourceUserReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -583,6 +584,7 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceUserRead(ctx, d, m)
+
 	return diags
 }
 
@@ -644,6 +646,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	resourceUserRead(ctx, d, m)
+
 	return diags
 
 }

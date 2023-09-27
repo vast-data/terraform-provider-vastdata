@@ -524,6 +524,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	}
 	diags = ResourceVipPoolReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -622,6 +623,7 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceVipPoolRead(ctx, d, m)
+
 	return diags
 }
 
@@ -683,6 +685,7 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	resourceVipPoolRead(ctx, d, m)
+
 	return diags
 
 }

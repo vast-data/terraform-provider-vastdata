@@ -317,6 +317,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 
 	}
 	diags = ResourceQosPolicyReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -415,6 +416,7 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceQosPolicyRead(ctx, d, m)
+
 	return diags
 }
 
@@ -476,6 +478,7 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 	resourceQosPolicyRead(ctx, d, m)
+
 	return diags
 
 }

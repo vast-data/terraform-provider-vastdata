@@ -594,6 +594,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 
 	}
 	diags = ResourceActiveDirectoryReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -692,6 +693,7 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceActiveDirectoryRead(ctx, d, m)
+
 	return diags
 }
 
@@ -753,6 +755,7 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	resourceActiveDirectoryRead(ctx, d, m)
+
 	return diags
 
 }

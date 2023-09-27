@@ -365,6 +365,7 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 
 	}
 	diags = ResourceS3LifeCycleRuleReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -402,7 +403,7 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = utils.EnabledMustBeSet(data, client, ctx)
+	data, before_post_error = utils.EnabledMustBeSet(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
@@ -469,6 +470,7 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceS3LifeCycleRuleRead(ctx, d, m)
+
 	return diags
 }
 
@@ -508,7 +510,7 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
 
 	var before_patch_error error
-	data, before_patch_error = utils.EnabledMustBeSet(data, client, ctx)
+	data, before_patch_error = utils.EnabledMustBeSet(data, client, ctx, d)
 	if before_patch_error != nil {
 		return diag.FromErr(before_patch_error)
 	}
@@ -536,6 +538,7 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	resourceS3LifeCycleRuleRead(ctx, d, m)
+
 	return diags
 
 }

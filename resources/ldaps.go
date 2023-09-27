@@ -775,6 +775,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	}
 	diags = ResourceLdapReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -873,6 +874,7 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceLdapRead(ctx, d, m)
+
 	return diags
 }
 
@@ -934,6 +936,7 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	resourceLdapRead(ctx, d, m)
+
 	return diags
 
 }

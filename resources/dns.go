@@ -332,6 +332,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	}
 	diags = ResourceDnsReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -430,6 +431,7 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceDnsRead(ctx, d, m)
+
 	return diags
 }
 
@@ -491,6 +493,7 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	resourceDnsRead(ctx, d, m)
+
 	return diags
 
 }

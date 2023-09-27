@@ -10,12 +10,13 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
-type ResponseConversionFunc func(map[string]interface{}, interface{}, context.Context) (map[string]interface{}, error)
+type ResponseConversionFunc func(map[string]interface{}, interface{}, context.Context, *schema.ResourceData) (map[string]interface{}, error)
 
-func EntityMergeToUserQuotas(m map[string]interface{}, i interface{}, ctx context.Context) (map[string]interface{}, error) {
+func EntityMergeToUserQuotas(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	/*This function should handle the case of the Quota object where sending is defferant than reading sturctue
 	  to move the fields from the entity object into the user quotas
 	*/
@@ -48,7 +49,7 @@ func EntityMergeToUserQuotas(m map[string]interface{}, i interface{}, ctx contex
 	return m, nil
 }
 
-func EnabledMustBeSet(m map[string]interface{}, i interface{}, ctx context.Context) (map[string]interface{}, error) {
+func EnabledMustBeSet(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	_, exists := m["enabled"]
 
 	if !exists {
@@ -153,7 +154,7 @@ func get_snapshot_clone_id(handle, remote_target_guid, snapshot_name string, cli
 	return uint64(0), errors.New(fmt.Sprintf("Could not find a snapshot with the name %s for the handle %s", snapshot_name, handle))
 }
 
-func AddStreamInfo(m map[string]interface{}, i interface{}, ctx context.Context) (map[string]interface{}, error) {
+func AddStreamInfo(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	tflog.Debug(ctx, fmt.Sprintf("Data Before Processing: %v ", m))
 	remote_tenant_guid := m["owner_tenant"].(map[string]interface{})["guid"].(string)
 	remote_target_guid := m["remote_target_guid"].(string)
@@ -177,7 +178,7 @@ func AddStreamInfo(m map[string]interface{}, i interface{}, ctx context.Context)
 	return m, nil
 }
 
-func UpdateStreamInfo(m map[string]interface{}, i interface{}, ctx context.Context) (map[string]interface{}, error) {
+func UpdateStreamInfo(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	//The only update possiable is enable/disable
 	v, exists := m["enabled"]
 	if exists {
@@ -185,4 +186,40 @@ func UpdateStreamInfo(m map[string]interface{}, i interface{}, ctx context.Conte
 	}
 	return map[string]interface{}{"enabled": false}, nil
 
+}
+
+func AlwaysSendCreateDir(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	create_dir := d.Get("create_dir")
+	m["create_dir"] = create_dir
+	return m, nil
+}
+
+func AlwaysStoreCreateDir(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	_create_dir, exists := d.GetOkExists("create_dir")
+	o, n := d.GetChange("create_dir")
+	tflog.Debug(ctx, fmt.Sprintf("The Value of Create Dir Obtained:  Exists(%v),Value(%v),Changed(%v),Old(%v),New(%v)", exists, _create_dir, d.HasChange("create_dir"), o, n))
+	if !exists {
+		d.Set("create_dir", false)
+		tflog.Debug(ctx, fmt.Sprintf("CREATE DIR: Was not found and set to false"))
+	}
+
+	d.Set("create_dir", n)
+	tflog.Debug(ctx, fmt.Sprintf("CREATE DIR: Value Found %v", _create_dir))
+
+	return m, nil
+}
+
+type SchemaManipulationFunc func(interface{}, context.Context, *schema.ResourceData) error
+
+func KeepCreateDirState(i interface{}, ctx context.Context, d *schema.ResourceData) error {
+	_, exists := d.GetOkExists("create_dir")
+	o, n := d.GetChange("create_dir")
+	tflog.Debug(ctx, fmt.Sprintf("OLD: %v, NEW: %v", o, n))
+	if !exists {
+		return nil
+	}
+	if !d.HasChange("create_dir") {
+		d.Set("create_dir", n)
+	}
+	return nil
 }

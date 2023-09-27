@@ -165,6 +165,7 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 	}
 	diags = ResourceS3PolicyReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -202,7 +203,7 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = utils.EnabledMustBeSet(data, client, ctx)
+	data, before_post_error = utils.EnabledMustBeSet(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
@@ -269,6 +270,7 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceS3PolicyRead(ctx, d, m)
+
 	return diags
 }
 
@@ -308,7 +310,7 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
 
 	var before_patch_error error
-	data, before_patch_error = utils.EnabledMustBeSet(data, client, ctx)
+	data, before_patch_error = utils.EnabledMustBeSet(data, client, ctx, d)
 	if before_patch_error != nil {
 		return diag.FromErr(before_patch_error)
 	}
@@ -336,6 +338,7 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	resourceS3PolicyRead(ctx, d, m)
+
 	return diags
 
 }

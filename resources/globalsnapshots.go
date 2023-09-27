@@ -313,6 +313,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 
 	}
 	diags = ResourceGlobalSnapshotReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -350,7 +351,7 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = utils.AddStreamInfo(data, client, ctx)
+	data, before_post_error = utils.AddStreamInfo(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
@@ -417,6 +418,7 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceGlobalSnapshotRead(ctx, d, m)
+
 	return diags
 }
 
@@ -456,7 +458,7 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
 
 	var before_patch_error error
-	data, before_patch_error = utils.UpdateStreamInfo(data, client, ctx)
+	data, before_patch_error = utils.UpdateStreamInfo(data, client, ctx, d)
 	if before_patch_error != nil {
 		return diag.FromErr(before_patch_error)
 	}
@@ -484,6 +486,7 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	resourceGlobalSnapshotRead(ctx, d, m)
+
 	return diags
 
 }

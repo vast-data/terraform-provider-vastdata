@@ -152,6 +152,7 @@ func resourceNisRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	}
 	diags = ResourceNisReadStructIntoSchema(ctx, resource, d)
+
 	return diags
 }
 
@@ -250,6 +251,7 @@ func resourceNisCreate(ctx context.Context, d *schema.ResourceData, m interface{
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 	resourceNisRead(ctx, d, m)
+
 	return diags
 }
 
@@ -311,6 +313,7 @@ func resourceNisUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	resourceNisRead(ctx, d, m)
+
 	return diags
 
 }
