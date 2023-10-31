@@ -205,9 +205,17 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
      var diags diag.Diagnostics
      client:=m.(vast_client.JwtSession)
+     {{ .ResourceName }}Id := d.Id()
+     {{ if .BeforeDeleteFunc  }}
+     data,before_delete_error:={{ funcName .BeforeDeleteFunc}}(ctx,d,m)
+     if before_delete_error!=nil {
+        return diag.FromErr(before_delete_error)
+     }
+     response,err:=client.Delete(ctx,fmt.Sprintf("{{.Path}}%v/",{{ .ResourceName }}Id),"",data , map[string]string{})
+     {{else}}
 
-     {{ .ResourceName }}Id := d.Id()     
-     response,err:=client.Delete(ctx,fmt.Sprintf("{{.Path}}%v/",{{ .ResourceName }}Id),"", map[string]string{})
+     response,err:=client.Delete(ctx,fmt.Sprintf("{{.Path}}%v/",{{ .ResourceName }}Id),"",nil , map[string]string{})
+     {{end}}
      tflog.Info(ctx,fmt.Sprintf("Removing Resource"))
      tflog.Info(ctx,response.Request.URL.String())
      tflog.Info(ctx,utils.GetResponseBodyAsStr(response))
@@ -491,12 +499,18 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	     {{indent $I " "}}   Sensitive: {{.Attributes.sensitive}},             
              {{-  if  .Attributes.validator_func  }}
              {{indent $I " "}}  ValidateDiagFunc: {{.Attributes.validator_func}},
+             {{ else }}
+             {{indent $I " "}} 
              {{- end }}
              {{-  if  .Attributes.enum }}
              {{indent $I " "}}  ValidateDiagFunc: utils.OneOf({{.Attributes.enum}}),
-             {{- end }}
+             {{ end -}}
              {{indent $I " "}}   Description: {{getBT}}{{ GetSchemaProperyDocument .Attributes.name }}{{getBT}},
 	     {{ end -}}
+             {{- $default_value:=GetSchemaProperyDefault .Attributes.name -}}
+             {{  if  ne $default_value "" }}
+             {{indent $I " "}}  Default: {{ GetSchemaProperyDefault .Attributes.name }},
+             {{ end -}}
              {{ if and (eq .Attributes.length "1") (eq .Attributes.list_type "simple") (eq .Attributes.type "TypeList")}}
                 {{indent $I " "}}Elem: &schema.Schema{
                 {{indent $I " "}}            Type: schema.Type{{.Attributes.set_type}},                               
@@ -534,6 +548,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	}
 	localFuncMap["GetFakeFieldDescription"] = r.Parent.GetFakeFieldDescription
 	localFuncMap["GetSchemaProperyDocument"] = r.Parent.GetSchemaProperyDocument
+	localFuncMap["GetSchemaProperyDefault"] = r.Parent.GetSchemaProperyDefault
 	localFuncMap["HasValidatorFunc"] = r.Parent.HasValidatorFunc
 	localFuncMap["GetValidatorFunc"] = r.Parent.GetValidatorFunc
 	t := template.Must(template.New("tf").Funcs(localFuncMap).Parse(tmpl))

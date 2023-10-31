@@ -36,20 +36,12 @@ func DataSourceLdap() *schema.Resource {
 				Description: ``,
 			},
 
-			"url": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
-			},
-
 			"urls": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
+				Description: `List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -58,9 +50,9 @@ func DataSourceLdap() *schema.Resource {
 
 			"port": &schema.Schema{
 				Type:        schema.TypeInt,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `LDAP server port. 389 (LDAP)  636 (LDAPS)`,
 			},
 
@@ -101,95 +93,71 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Bind Authentication Method`,
-			},
-
-			"state": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: ``,
-			},
-
-			"tenant_id": &schema.Schema{
-				Type:        schema.TypeInt,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `Tenant ID`,
+				Description: `Bind Authentication Method Allowed Values are [simple sasl anonymous]`,
 			},
 
 			"gid_number": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
-				Description: ``,
+				Optional:    true,
+				Description: `Attrirbute mapping for gid number`,
 			},
 
 			"uid": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
-				Description: ``,
+				Optional:    true,
+				Description: `Attrirbute mapping for uid`,
 			},
 
 			"uid_number": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
-				Description: ``,
+				Optional:    true,
+				Description: `Attrirbute mapping for uid number`,
 			},
 
 			"match_user": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
-				Description: ``,
+				Optional:    true,
+				Description: `Attribute mapping for user matching`,
 			},
 
 			"uid_member": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
-				Description: ``,
+				Optional:    true,
+				Description: `Attrirbute mapping for uid member`,
 			},
 
 			"posix_account": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
-				Description: ``,
+				Optional:    true,
+				Description: `Attrirbute mapping for posix account`,
 			},
 
 			"posix_group": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
-				Description: ``,
+				Optional:    true,
+				Description: `Attrirbute mapping for posix account`,
 			},
 
 			"use_tls": &schema.Schema{
 				Type:        schema.TypeBool,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `configure LDAP with TLS`,
-			},
-
-			"use_posix": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `POSIX support`,
 			},
 
 			"posix_primary_provider": &schema.Schema{
@@ -198,6 +166,22 @@ func DataSourceLdap() *schema.Resource {
 				Required:    false,
 				Optional:    false,
 				Description: `POSIX primary provider`,
+			},
+
+			"posix_attributes_source": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    false,
+				Optional:    true,
+				Description: ``,
+			},
+
+			"reverse_lookup": &schema.Schema{
+				Type:        schema.TypeBool,
+				Computed:    false,
+				Required:    false,
+				Optional:    true,
+				Description: ``,
 			},
 
 			"tls_certificate": &schema.Schema{
@@ -221,14 +205,14 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Query group mode`,
+				Description: `Query group mode Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]`,
 			},
 
 			"username_property_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Username property name`,
 			},
 
@@ -242,33 +226,33 @@ func DataSourceLdap() *schema.Resource {
 
 			"user_login_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 			},
 
 			"group_login_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 			},
 
 			"mail_property_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
 			"uid_member_value_property_name": &schema.Schema{
 				Type:        schema.TypeString,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: ``,
 			},
 
@@ -290,17 +274,17 @@ func DataSourceLdap() *schema.Resource {
 
 			"is_vms_auth_provider": &schema.Schema{
 				Type:        schema.TypeBool,
-				Computed:    true,
+				Computed:    false,
 				Required:    false,
-				Optional:    false,
+				Optional:    true,
 				Description: `Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.`,
 			},
 
 			"query_posix_attributes_from_gc": &schema.Schema{
 				Type:     schema.TypeBool,
-				Computed: true,
+				Computed: false,
 				Required: false,
-				Optional: false,
+				Optional: true,
 				Description: `When set to True - users/groups from non-joined domain POSIX attributes are supported,
 when set to False - Posix attributes of users/groups from non-joined domain are not supported.
 As a condition Global catalog needs to be configured to support Posix attributes.
@@ -397,18 +381,6 @@ func dataSourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Url", resource.Url))
-
-	err = d.Set("url", resource.Url)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Urls", resource.Urls))
 
 	err = d.Set("urls", utils.FlattenListOfPrimitives(&resource.Urls))
@@ -489,30 +461,6 @@ func dataSourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"method\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "State", resource.State))
-
-	err = d.Set("state", resource.State)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"state\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
-
-	err = d.Set("tenant_id", resource.TenantId)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -613,18 +561,6 @@ func dataSourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UsePosix", resource.UsePosix))
-
-	err = d.Set("use_posix", resource.UsePosix)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_posix\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PosixPrimaryProvider", resource.PosixPrimaryProvider))
 
 	err = d.Set("posix_primary_provider", resource.PosixPrimaryProvider)
@@ -633,6 +569,30 @@ func dataSourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"posix_primary_provider\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PosixAttributesSource", resource.PosixAttributesSource))
+
+	err = d.Set("posix_attributes_source", resource.PosixAttributesSource)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"posix_attributes_source\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ReverseLookup", resource.ReverseLookup))
+
+	err = d.Set("reverse_lookup", resource.ReverseLookup)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"reverse_lookup\"",
 			Detail:   err.Error(),
 		})
 	}

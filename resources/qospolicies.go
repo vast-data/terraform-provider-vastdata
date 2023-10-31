@@ -51,10 +51,11 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"mode": &schema.Schema{
-			Type:             schema.TypeString,
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Type:      schema.TypeString,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.OneOf([]string{"STATIC", "USED_CAPACITY", "PROVISIONED_CAPACITY"}),
 			Description:      `QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 		},
@@ -324,9 +325,10 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 func resourceQosPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	QosPolicyId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/qospolicies/%v/", QosPolicyId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/qospolicies/%v/", QosPolicyId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

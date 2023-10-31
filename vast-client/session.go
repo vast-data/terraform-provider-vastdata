@@ -244,10 +244,10 @@ func (s *JwtSession) Patch(ctx context.Context, path, contentType string, body i
 	return validateResponse(response, response_error, 200, 201, 204)
 }
 
-func (s *JwtSession) Delete(ctx context.Context, path, query string, headers map[string]string) (response *http.Response, err error) {
+func (s *JwtSession) Delete(ctx context.Context, path, query string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
 	_url := buildUrl(s, path, query)
 	url := fmt.Sprintf("%s/", _url.String())
-	req, err := http.NewRequest("DELETE", url, nil)
+	req, err := http.NewRequest("DELETE", url, body)
 	e := setupHeaders(s, req, headers)
 	if e != nil {
 		return nil, e

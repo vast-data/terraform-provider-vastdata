@@ -244,10 +244,11 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"nfs_interop_flags": &schema.Schema{
-			Type:             schema.TypeString,
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Type:      schema.TypeString,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.OneOf([]string{"BOTH_NFS3_AND_NFS4_INTEROP_DISABLED", "ONLY_NFS3_INTEROP_ENABLED", "ONLY_NFS4_INTEROP_ENABLED", "BOTH_NFS3_AND_NFS4_INTEROP_ENABLED"}),
 			Description:      `Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]`,
 		},
@@ -289,19 +290,21 @@ func getResourceViewSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"grantee": &schema.Schema{
-									Type:             schema.TypeString,
-									Computed:         true,
-									Optional:         true,
-									Sensitive:        false,
+									Type:      schema.TypeString,
+									Computed:  true,
+									Optional:  true,
+									Sensitive: false,
+
 									ValidateDiagFunc: utils.OneOf([]string{"users", "groups"}),
 									Description:      ` Allowed Values are [users groups]`,
 								},
 
 								"permissions": &schema.Schema{
-									Type:             schema.TypeString,
-									Computed:         true,
-									Optional:         true,
-									Sensitive:        false,
+									Type:      schema.TypeString,
+									Computed:  true,
+									Optional:  true,
+									Sensitive: false,
+
 									ValidateDiagFunc: utils.OneOf([]string{"FULL"}),
 									Description:      ` Allowed Values are [FULL]`,
 								},
@@ -765,9 +768,10 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	ViewId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/views/%v/", ViewId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/views/%v/", ViewId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

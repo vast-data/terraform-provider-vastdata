@@ -315,9 +315,10 @@ func resourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData, m
 func resourceReplicationPeersDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	ReplicationPeersId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/nativereplicationremotetargets/%v/", ReplicationPeersId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/nativereplicationremotetargets/%v/", ReplicationPeersId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

@@ -42,15 +42,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `GUID`,
-		},
-
-		"domain_name": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The domain name of the AD`,
+			Description: ``,
 		},
 
 		"machine_account_name": &schema.Schema{
@@ -58,28 +50,8 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Required: true,
 		},
 
-		"preferred_dc_list": &schema.Schema{
-			Type:        schema.TypeList,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `List of Domain Controllers to prefer for authentication. DCs listed here will be queried exclusively unless they fail or do not respond. In such a case, other DCs will be consulted. Specify as a comma-separated list. Each entry can be a fully-qualified hostname or an IP address.`,
-
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-
 		"organizational_unit": &schema.Schema{
 			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `Organizational Unit within AD where the Cluster Machine account will be created. If left empty, it will go into default Computers OU`,
-		},
-
-		"is_vms_auth_provider": &schema.Schema{
-			Type:        schema.TypeBool,
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -87,157 +59,8 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"ldap_id": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `the id of the attached LDAP object`,
-		},
-
-		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `enabled/disabled`,
-		},
-
-		"match_user": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"method": &schema.Schema{
-			Type:             schema.TypeString,
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
-			ValidateDiagFunc: utils.OneOf([]string{"SIMPLE", "ANONYMOUS"}),
-			Description:      ` Allowed Values are [SIMPLE ANONYMOUS]`,
-		},
-
-		"port": &schema.Schema{
-			Type:        schema.TypeInt,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"posix_account": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"posix_group": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"query_groups_mode": &schema.Schema{
-			Type:             schema.TypeString,
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
-			ValidateDiagFunc: utils.OneOf([]string{"COMPATIBLE", "RFC2307BIS_ONLY", "RFC2307_ONLY", "NONE"}),
-			Description:      ` Allowed Values are [COMPATIBLE RFC2307BIS_ONLY RFC2307_ONLY NONE]`,
-		},
-
-		"query_posix_attributes_from_gc": &schema.Schema{
-			Type:        schema.TypeBool,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"smb_allowed": &schema.Schema{
-			Type:        schema.TypeBool,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"uid": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"uid_member": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"uid_member_value_property_name": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"use_auto_discovery": &schema.Schema{
-			Type:        schema.TypeBool,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `Use auto dicovery with to obtain AD details`,
-		},
-
-		"use_ldaps": &schema.Schema{
-			Type:        schema.TypeBool,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"use_tls": &schema.Schema{
-			Type:        schema.TypeBool,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"user_login_name": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"username_property_name": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: ``,
-		},
-
-		"state": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `Active Directory state`,
+			Type:     schema.TypeInt,
+			Required: true,
 		},
 	}
 }
@@ -260,18 +83,6 @@ func ResourceActiveDirectoryReadStructIntoSchema(ctx context.Context, resource a
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "DomainName", resource.DomainName))
-
-	err = d.Set("domain_name", resource.DomainName)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"domain_name\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "MachineAccountName", resource.MachineAccountName))
 
 	err = d.Set("machine_account_name", resource.MachineAccountName)
@@ -280,18 +91,6 @@ func ResourceActiveDirectoryReadStructIntoSchema(ctx context.Context, resource a
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"machine_account_name\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PreferredDcList", resource.PreferredDcList))
-
-	err = d.Set("preferred_dc_list", utils.FlattenListOfPrimitives(&resource.PreferredDcList))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"preferred_dc_list\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -308,18 +107,6 @@ func ResourceActiveDirectoryReadStructIntoSchema(ctx context.Context, resource a
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsVmsAuthProvider", resource.IsVmsAuthProvider))
-
-	err = d.Set("is_vms_auth_provider", resource.IsVmsAuthProvider)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_vms_auth_provider\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LdapId", resource.LdapId))
 
 	err = d.Set("ldap_id", resource.LdapId)
@@ -328,222 +115,6 @@ func ResourceActiveDirectoryReadStructIntoSchema(ctx context.Context, resource a
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"ldap_id\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Enabled", resource.Enabled))
-
-	err = d.Set("enabled", resource.Enabled)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "MatchUser", resource.MatchUser))
-
-	err = d.Set("match_user", resource.MatchUser)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"match_user\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Method", resource.Method))
-
-	err = d.Set("method", resource.Method)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"method\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Port", resource.Port))
-
-	err = d.Set("port", resource.Port)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"port\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PosixAccount", resource.PosixAccount))
-
-	err = d.Set("posix_account", resource.PosixAccount)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_account\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PosixGroup", resource.PosixGroup))
-
-	err = d.Set("posix_group", resource.PosixGroup)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_group\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "QueryGroupsMode", resource.QueryGroupsMode))
-
-	err = d.Set("query_groups_mode", resource.QueryGroupsMode)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"query_groups_mode\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "QueryPosixAttributesFromGc", resource.QueryPosixAttributesFromGc))
-
-	err = d.Set("query_posix_attributes_from_gc", resource.QueryPosixAttributesFromGc)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"query_posix_attributes_from_gc\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SmbAllowed", resource.SmbAllowed))
-
-	err = d.Set("smb_allowed", resource.SmbAllowed)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"smb_allowed\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Uid", resource.Uid))
-
-	err = d.Set("uid", resource.Uid)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UidMember", resource.UidMember))
-
-	err = d.Set("uid_member", resource.UidMember)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UidMemberValuePropertyName", resource.UidMemberValuePropertyName))
-
-	err = d.Set("uid_member_value_property_name", resource.UidMemberValuePropertyName)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member_value_property_name\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UseAutoDiscovery", resource.UseAutoDiscovery))
-
-	err = d.Set("use_auto_discovery", resource.UseAutoDiscovery)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_auto_discovery\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UseLdaps", resource.UseLdaps))
-
-	err = d.Set("use_ldaps", resource.UseLdaps)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_ldaps\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UseTls", resource.UseTls))
-
-	err = d.Set("use_tls", resource.UseTls)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_tls\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UserLoginName", resource.UserLoginName))
-
-	err = d.Set("user_login_name", resource.UserLoginName)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"user_login_name\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UsernamePropertyName", resource.UsernamePropertyName))
-
-	err = d.Set("username_property_name", resource.UsernamePropertyName)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"username_property_name\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "State", resource.State))
-
-	err = d.Set("state", resource.State)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -601,9 +172,14 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 func resourceActiveDirectoryDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	ActiveDirectoryId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/activedirectory/%v/", ActiveDirectoryId), "", map[string]string{})
+
+	data, before_delete_error := utils.AlwaysSkipDeleteLdap(ctx, d, m)
+	if before_delete_error != nil {
+		return diag.FromErr(before_delete_error)
+	}
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/activedirectory/%v/", ActiveDirectoryId), "", data, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

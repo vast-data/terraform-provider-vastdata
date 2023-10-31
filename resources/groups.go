@@ -196,9 +196,10 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceGroupDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	GroupId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/groups/%v/", GroupId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/groups/%v/", GroupId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

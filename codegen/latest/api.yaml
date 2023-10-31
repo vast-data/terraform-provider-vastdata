@@ -968,18 +968,15 @@ components:
         guid:
           type: "string"
           description: ""
-        url:
-          type: "string"
-          description: "Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2"
         urls:
           type: "array"
           items:
             type: "string"
-          description: "Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2"
-          x-cli-header: "URLs"
+          description: "List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2"
         port:
           type: "integer"
           description: "LDAP server port. 389 (LDAP)  636 (LDAPS)"
+          default: 389
         binddn:
           type: "string"
           description: "Distinguished name of LDAP superuser"
@@ -995,44 +992,50 @@ components:
         method:
           type: "string"
           description: "Bind Authentication Method"
-        state:
-          type: "string"
-          description: ""
-        tenant_id:
-          type: "integer"
-          description: "Tenant ID"
+          enum: [simple,sasl,anonymous]
         gid_number:
           type: "string"
-          description: ""
-          x-cli-header: "gidNumber"
+          description: "Attrirbute mapping for gid number"
+          default: "gidNumber"
         uid:
           type: "string"
-          description: ""
+          description: "Attrirbute mapping for uid"
+          default: "uid"
         uid_number:
           type: "string"
-          description: ""
+          description: "Attrirbute mapping for uid number"
+          default: "uidNumber"
         match_user:
           type: "string"
-          description: ""
+          description: "Attribute mapping for user matching"
+          default: "uid"
         uid_member:
           type: "string"
-          description: ""
+          description: "Attrirbute mapping for uid member"
+          default: "memberUID"
         posix_account:
           type: "string"
-          description: ""
+          description: "Attrirbute mapping for posix account"
+          default: "posixAccount"
         posix_group:
           type: "string"
-          description: ""
+          description: "Attrirbute mapping for posix account"
+          default: "posixGroup"
         use_tls:
           type: "boolean"
           description: "configure LDAP with TLS"
-        use_posix:
-          type: "boolean"
-          description: "POSIX support"
-          x-cli-header: "POSIX support"
+          default: false
         posix_primary_provider:
           type: "boolean"
           description: "POSIX primary provider"
+        posix_attributes_source:
+          type: "string"
+          description: ""
+          default: "JOINED_DOMAIN"
+        reverse_lookup:
+          type: "boolean"
+          description: ""
+          default: false
         tls_certificate:
           type: "string"
           description: ""
@@ -1042,22 +1045,28 @@ components:
         query_groups_mode:
           type: "string"
           description: "Query group mode"
+          enum: [COMPATIBLE,RFC2307BIS,RFC2307,NONE]
         username_property_name:
           type: "string"
           description: "Username property name"
+          default: "cn"
         domain_name:
           type: "string"
           description: "FQDN of the domain."
         user_login_name:
           type: "string"
           description: "The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1."
+          default: "uid"
         group_login_name:
           type: "string"
           description: "The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1."
+          default: "cn"
         mail_property_name:
           type: "string"
+          default: "mail"
         uid_member_value_property_name:
           type: "string"
+          default: "uid"
         use_auto_discovery:
           type: "boolean"
           description: "When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field."
@@ -1132,81 +1141,16 @@ components:
           description: ""
         guid:
           type: "string"
-          description: "GUID"
-        domain_name:
-          type: "string"
-          description: "The domain name of the AD"
+          description: ""          
         machine_account_name:
           type: "string"
-          description: "Name of the computer object/machine account to add. Recommended to be the name of the cluster."
-        preferred_dc_list:
-          type: "list"
-          items:
-            type: "string"
-          description: "List of Domain Controllers to prefer for authentication. DCs listed here will be queried exclusively unless they fail or do not respond. In such a case, other DCs will be consulted. Specify as a comma-separated list. Each entry can be a fully-qualified hostname or an IP address."
+          description: ""
         organizational_unit:
           type: "string"
-          description: "Organizational Unit within AD where the Cluster Machine account will be created. If left empty, it will go into default Computers OU"
-        is_vms_auth_provider:
-          type: "boolean"
           description: ""
         ldap_id:
-          type: "string"
-          description: "the id of the attached LDAP object"
-        enabled:
-          type: "boolean"
-          description: "enabled/disabled"
-        match_user:
-          type: "string"
-        method:
-          type: "string"
-          enum: [SIMPLE,ANONYMOUS]
-        port:
-          type: "int"
-          description: ""
-        posix_account:
-          type: "string"
-          description: ""
-        posix_group:
-          type: "string"
-          description: ""
-        query_groups_mode:
-          type: "string"
-          description: ""
-          enum: [COMPATIBLE,RFC2307BIS_ONLY,RFC2307_ONLY,NONE]
-        query_posix_attributes_from_gc:
-          type: "boolean"
-          description: ""
-        smb_allowed:
-          type: "boolean"
-          description: ""
-        uid:
-          type: "string"
-          description: ""
-        uid_member:
-          type: "string"
-          description: ""
-        uid_member_value_property_name:
-          type: "string"
-          description: ""
-        use_auto_discovery:
-          type: "boolean"
-          description: "Use auto dicovery with to obtain AD details"
-        use_ldaps:
-          type: "boolean"
-          description: ""
-        use_tls:
-          type: "boolean"
-          description: ""
-        user_login_name:
-          type: "string"
-          description: ""
-        username_property_name:
-          type: "string"
-          description: ""
-        state:
-          type: "string"
-          description: "Active Directory state"
+          type: integer
+          format: "int64" 
     QOSPolicy:
       type: object
       properties:

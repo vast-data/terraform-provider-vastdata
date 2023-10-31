@@ -281,7 +281,9 @@ var resources_templates = []ResourceTemplateV2{
 		RequiredIdentifierFields: NewStringSet("domain_name"),
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{"urls": []string{"url"}},
+		SensitiveFields:          NewStringSet("bindpw"),
 		Generate:                 true,
+		IgnoreUpdates:            NewStringSet("bindpw"),
 		DataSourceName:           "vastdata_ldap",
 	},
 	ResourceTemplateV2{
@@ -305,10 +307,11 @@ var resources_templates = []ResourceTemplateV2{
 		Model:                    api_latest.ActiveDirectory{},
 		DestFile:                 ToStringPointer("activedirectory.go"),
 		IgnoreFields:             NewStringSet("Id"),
-		RequiredIdentifierFields: NewStringSet("machine_account_name"),
+		RequiredIdentifierFields: NewStringSet("machine_account_name", "ldap_id"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"preferred_dc_list": []string{"dc"}},
+		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
+		BeforeDeleteFunc:         utils.AlwaysSkipDeleteLdap,
 		DataSourceName:           "vastdata_active_directory",
 	},
 	ResourceTemplateV2{

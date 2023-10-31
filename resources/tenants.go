@@ -75,10 +75,11 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
-			Type:             schema.TypeString,
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Type:      schema.TypeString,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.OneOf([]string{"READ", "CHANGE", "FULL"}),
 			Description:      `Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]`,
 		},
@@ -119,10 +120,11 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type:             schema.TypeString,
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Type:      schema.TypeString,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.OneOf([]string{"NONE", "LDAP", "NIS", "AD", "LOCAL"}),
 			Description:      `POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]`,
 		},
@@ -378,9 +380,10 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	TenantId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/tenants/%v/", TenantId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/tenants/%v/", TenantId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

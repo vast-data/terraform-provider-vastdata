@@ -187,6 +187,7 @@ type ResourceTemplateV2 struct {
 	AfterPostFunc            utils.ResponseConversionFunc
 	AfterPatchFunc           utils.ResponseConversionFunc
 	AfterReadFunc            utils.SchemaManipulationFunc
+	BeforeDeleteFunc         utils.PreDeleteFunc
 	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
 	SensitiveFields          *StringSet
 	IsDataSource             bool
@@ -249,6 +250,26 @@ func (r *ResourceTemplateV2) GetSchemaProperyDocument(property string) string {
 			out += fmt.Sprintf(" Allowed Values are %v", ListAsStringsList(enum))
 		}
 		return out
+	}
+
+	return ""
+}
+
+func (r *ResourceTemplateV2) GetSchemaProperyDefault(property string) string {
+	if r.ApiSchema != nil {
+		schema := r.ApiSchema.Schema()
+		property_schema, exists := schema.Properties[property]
+		if !exists {
+			return ""
+		}
+		_default := property_schema.Schema().Default
+		if _default != nil {
+			if reflect.TypeOf(_default).String() == "string" {
+				return fmt.Sprintf("\"%v\"", _default)
+
+			}
+			return fmt.Sprintf("%v", _default)
+		}
 	}
 
 	return ""
@@ -418,6 +439,10 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 			m["computed"] = "true"
 			m["required"] = "false"
 			m["optional"] = "false"
+		} else if R.GetSchemaProperyDefault(m["name"]) != "" {
+			m["required"] = "false"
+			m["computed"] = "false"
+			m["optional"] = "true"
 		} else if !R.IsDataSource {
 			m["computed"] = "true"
 			m["required"] = "false"

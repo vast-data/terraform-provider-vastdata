@@ -11,9 +11,7 @@ package swagger
 type Ldap struct {
 	Id int32 `json:"id,omitempty"`
 	Guid string `json:"guid,omitempty"`
-	// Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
-	Url string `json:"url,omitempty"`
-	// Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
+	// List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
 	Urls []string `json:"urls,omitempty"`
 	// LDAP server port. 389 (LDAP)  636 (LDAPS)
 	Port int32 `json:"port,omitempty"`
@@ -27,22 +25,26 @@ type Ldap struct {
 	GroupSearchbase string `json:"group_searchbase,omitempty"`
 	// Bind Authentication Method
 	Method string `json:"method,omitempty"`
-	State string `json:"state,omitempty"`
-	// Tenant ID
-	TenantId int32 `json:"tenant_id,omitempty"`
+	// Attrirbute mapping for gid number
 	GidNumber string `json:"gid_number,omitempty"`
+	// Attrirbute mapping for uid
 	Uid string `json:"uid,omitempty"`
+	// Attrirbute mapping for uid number
 	UidNumber string `json:"uid_number,omitempty"`
+	// Attribute mapping for user matching
 	MatchUser string `json:"match_user,omitempty"`
+	// Attrirbute mapping for uid member
 	UidMember string `json:"uid_member,omitempty"`
+	// Attrirbute mapping for posix account
 	PosixAccount string `json:"posix_account,omitempty"`
+	// Attrirbute mapping for posix account
 	PosixGroup string `json:"posix_group,omitempty"`
 	// configure LDAP with TLS
 	UseTls bool `json:"use_tls,omitempty"`
-	// POSIX support
-	UsePosix bool `json:"use_posix,omitempty"`
 	// POSIX primary provider
 	PosixPrimaryProvider bool `json:"posix_primary_provider,omitempty"`
+	PosixAttributesSource string `json:"posix_attributes_source,omitempty"`
+	ReverseLookup bool `json:"reverse_lookup,omitempty"`
 	TlsCertificate string `json:"tls_certificate,omitempty"`
 	ActiveDirectory string `json:"active_directory,omitempty"`
 	// Query group mode

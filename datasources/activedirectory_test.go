@@ -27,31 +27,11 @@ var _ = Describe(" ActiveDirectory", func() {
 	var ActiveDirectoryDataSourceData *schema.ResourceData
 	var model_json = `
                          {
-   "domain_name": "string",
    "guid": "string",
    "id": 100,
-   "ldap_id": "string",
+   "ldap_id": 100,
    "machine_account_name": "string",
-   "match_user": "string",
-   "method": "string",
-   "organizational_unit": "string",
-   "port": 100,
-   "posix_account": "string",
-   "posix_group": "string",
-   "preferred_dc_list": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "query_groups_mode": "string",
-   "state": "string",
-   "uid": "string",
-   "uid_member": "string",
-   "uid_member_value_property_name": "string",
-   "user_login_name": "string",
-   "username_property_name": "string"
+   "organizational_unit": "string"
 }
                          `
 	var server *ghttp.Server

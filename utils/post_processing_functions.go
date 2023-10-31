@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -222,4 +223,15 @@ func KeepCreateDirState(i interface{}, ctx context.Context, d *schema.ResourceDa
 		d.Set("create_dir", n)
 	}
 	return nil
+}
+
+type PreDeleteFunc func(context.Context, *schema.ResourceData, interface{}) (io.Reader, error)
+
+func AlwaysSkipDeleteLdap(ctx context.Context, d *schema.ResourceData, m interface{}) (io.Reader, error) {
+	data := map[string]interface{}{"skip_ldap": true}
+	b, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewReader(b), nil
 }

@@ -255,9 +255,10 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 func resourceProtectedPathDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	ProtectedPathId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/protectedpaths/%v/", ProtectedPathId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/protectedpaths/%v/", ProtectedPathId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

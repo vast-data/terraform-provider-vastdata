@@ -492,9 +492,10 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	UserId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/users/%v/", UserId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/users/%v/", UserId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))

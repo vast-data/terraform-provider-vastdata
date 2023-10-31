@@ -372,9 +372,10 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-
 	S3LifeCycleRuleId := d.Id()
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/s3lifecyclerules/%v/", S3LifeCycleRuleId), "", map[string]string{})
+
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/s3lifecyclerules/%v/", S3LifeCycleRuleId), "", nil, map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))
