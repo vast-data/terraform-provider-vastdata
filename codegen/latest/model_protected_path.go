@@ -14,7 +14,7 @@ type ProtectedPath struct {
 	// guid
 	Guid string `json:"guid,omitempty"`
 	// protection policy id
-	ProtectionPolicyId string `json:"protection_policy_id,omitempty"`
+	ProtectionPolicyId int32 `json:"protection_policy_id,omitempty"`
 	// path to replicate
 	SourceDir string `json:"source_dir,omitempty"`
 	// where to replicate on the remote

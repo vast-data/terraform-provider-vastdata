@@ -51,7 +51,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"protection_policy_id": &schema.Schema{
-			Type:        schema.TypeString,
+			Type:        schema.TypeInt,
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

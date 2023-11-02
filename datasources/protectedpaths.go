@@ -45,7 +45,7 @@ func DataSourceProtectedPath() *schema.Resource {
 			},
 
 			"protection_policy_id": &schema.Schema{
-				Type:        schema.TypeString,
+				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,

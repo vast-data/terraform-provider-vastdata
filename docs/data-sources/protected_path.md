@@ -29,7 +29,7 @@ data vastdata_protected_path protected_path1 {
 
 - `guid` (String) guid
 - `id` (Number) The ID of this resource.
-- `protection_policy_id` (String) protection policy id
+- `protection_policy_id` (Number) protection policy id
 - `remote_tenant_guid` (String) The Remote tenant guid
 - `source_dir` (String) path to replicate
 - `target_exported_dir` (String) where to replicate on the remote

@@ -1366,7 +1366,7 @@ components:
           type: "string"
           description: "guid"
         protection_policy_id:
-          type: "string"
+          type: "integer"
           description: "protection policy id"
         source_dir:
           type: "string"
