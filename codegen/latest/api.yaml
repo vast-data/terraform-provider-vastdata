@@ -1407,6 +1407,34 @@ components:
         indestructible:
           type: "boolean"
           description: "Is it indestructable"
+    GlobalLocalSnapshot:
+      type: "object"
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the global snapshot"
+        guid:
+          type: "string"
+          description: "A unique guid given to the global snapshot"
+        name:
+          type: "string"
+          description: "The name of the snapshot"
+        loanee_tenant_id:
+          type: "int"
+          description: "The tenant ID of the target"
+        loanee_root_path:
+          type: "string"
+          description: "The path where to store the snapshot on a Target"
+        loanee_snapshot_id:
+          type: "int"
+          description: "The id of the local snapshot"
+        enabled:
+          type: "boolean"
+          description: "Is the snapshot enabled"
+          default: true
+        owner_tenant:
+          type: "object"
+          $ref: "#/components/schemas/GlobalSnapshotOwnerTenant"          
     GlobalSnapshot:
       type: "object"
       properties:

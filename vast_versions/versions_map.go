@@ -46,6 +46,7 @@ var vast_versions map[string]map[string]reflect.Type = map[string]map[string]ref
 		"Cnode":                           reflect.TypeOf((*version_4_7_0.Cnode)(nil)).Elem(),
 		"DefaultQuota":                    reflect.TypeOf((*version_4_7_0.DefaultQuota)(nil)).Elem(),
 		"Dns":                             reflect.TypeOf((*version_4_7_0.Dns)(nil)).Elem(),
+		"GlobalLocalSnapshot":             reflect.TypeOf((*version_4_7_0.GlobalLocalSnapshot)(nil)).Elem(),
 		"GlobalSnapshot":                  reflect.TypeOf((*version_4_7_0.GlobalSnapshot)(nil)).Elem(),
 		"GlobalSnapshotOwnerRootSnapshot": reflect.TypeOf((*version_4_7_0.GlobalSnapshotOwnerRootSnapshot)(nil)).Elem(),
 		"GlobalSnapshotOwnerTenant":       reflect.TypeOf((*version_4_7_0.GlobalSnapshotOwnerTenant)(nil)).Elem(),

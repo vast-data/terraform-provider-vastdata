@@ -371,6 +371,19 @@ var resources_templates = []ResourceTemplateV2{
 		IgnoreUpdates:            NewStringSet("loanee_tenant_id"),
 	},
 	ResourceTemplateV2{
+		ResourceName:             "GlobalLocalSnapshot",
+		Path:                     ToStringPointer("/api/globalsnapstreams/"),
+		Model:                    api_latest.GlobalLocalSnapshot{},
+		DestFile:                 ToStringPointer("globallocalsnapshots.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("name", "loanee_root_path", "owner_tenant", "loanee_snapshot_id", "loanee_tenant_id"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		DataSourceName:           "vastdata_global_local_snapshot",
+	},
+
+	ResourceTemplateV2{
 		ResourceName:             "GlobalSnapshotOwnerRootSnapshot",
 		Path:                     ToStringPointer("/api/globalsnapstreams/"),
 		Model:                    api_latest.GlobalSnapshotOwnerRootSnapshot{},
