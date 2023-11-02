@@ -323,7 +323,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: ``,
+							Description: `Quota enforcement grace period at the format of HH:MM:SS`,
 						},
 					},
 				},
@@ -384,7 +384,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: ``,
+							Description: `Quota enforcement grace period at the format of HH:MM:SS`,
 						},
 					},
 				},
@@ -405,7 +405,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+							Description: `Quota enforcement grace period at the format of HH:MM:SS`,
 						},
 
 						"time_to_block": &schema.Schema{
@@ -559,7 +559,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+							Description: `Quota enforcement grace period at the format of HH:MM:SS`,
 						},
 
 						"time_to_block": &schema.Schema{

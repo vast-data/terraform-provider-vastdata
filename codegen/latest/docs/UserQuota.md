@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**GracePeriod** | **string** | Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m | [optional] [default to null]
+**GracePeriod** | **string** | Quota enforcement grace period at the format of HH:MM:SS | [optional] [default to null]
 **TimeToBlock** | **string** | Grace period expiration time | [optional] [default to null]
 **SoftLimit** | **int64** | Soft quota limit | [optional] [default to null]
 **HardLimit** | **int64** | Hard quota limit | [optional] [default to null]

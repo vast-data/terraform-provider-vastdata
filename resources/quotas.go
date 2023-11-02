@@ -331,7 +331,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Optional:         true,
 						Sensitive:        false,
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      ``,
+						Description:      `Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 				},
 			},
@@ -393,7 +393,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Optional:         true,
 						Sensitive:        false,
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      ``,
+						Description:      `Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 				},
 			},
@@ -415,7 +415,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Optional:         true,
 						Sensitive:        false,
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+						Description:      `Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 
 					"time_to_block": &schema.Schema{
@@ -567,7 +567,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Optional:         true,
 						Sensitive:        false,
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+						Description:      `Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 
 					"time_to_block": &schema.Schema{
