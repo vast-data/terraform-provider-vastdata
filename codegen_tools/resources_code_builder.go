@@ -496,7 +496,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 	     {{ else -}}
 	     {{indent $I " "}}   Computed: {{.Attributes.computed}},
 	     {{indent $I " "}}   Optional: {{.Attributes.optional}},
-	     {{indent $I " "}}   Sensitive: {{.Attributes.sensitive}},             
+	     {{indent $I " "}}   Sensitive: {{.Attributes.sensitive}},
              {{-  if  .Attributes.validator_func  }}
              {{indent $I " "}}  ValidateDiagFunc: {{.Attributes.validator_func}},
              {{ else }}
@@ -510,6 +510,9 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
              {{- $default_value:=GetSchemaProperyDefault .Attributes.name -}}
              {{  if  ne $default_value "" }}
              {{indent $I " "}}  Default: {{ GetSchemaProperyDefault .Attributes.name }},
+             {{ end -}}
+             {{- if eq  .Attributes.force_new "true" }}
+	     {{- indent $I " "}}   ForceNew: {{.Attributes.force_new}},                          
              {{ end -}}
              {{ if and (eq .Attributes.length "1") (eq .Attributes.list_type "simple") (eq .Attributes.type "TypeList")}}
                 {{indent $I " "}}Elem: &schema.Schema{

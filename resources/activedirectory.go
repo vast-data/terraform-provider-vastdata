@@ -48,6 +48,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		"machine_account_name": &schema.Schema{
 			Type:     schema.TypeString,
 			Required: true,
+			ForceNew: true,
 		},
 
 		"organizational_unit": &schema.Schema{
@@ -56,11 +57,13 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Optional:    true,
 			Sensitive:   false,
 			Description: ``,
+			ForceNew:    true,
 		},
 
 		"ldap_id": &schema.Schema{
 			Type:     schema.TypeInt,
 			Required: true,
+			ForceNew: true,
 		},
 	}
 }

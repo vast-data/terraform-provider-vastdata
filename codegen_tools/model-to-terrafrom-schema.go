@@ -172,6 +172,7 @@ type ResourceTemplateV2 struct {
 	RequiredIdentifierFields *StringSet
 	OptionalIdentifierFields *StringSet
 	ComputedFields           *StringSet
+	ForceNewFields           *StringSet
 	ListsNamesMap            map[string][]string
 	Generate                 bool
 	DataSourceName           string
@@ -410,8 +411,16 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 		if R.IgnoreUpdates == nil {
 			R.IgnoreUpdates = NewStringSet()
 		}
+		if R.ForceNewFields == nil {
+			R.ForceNewFields = NewStringSet()
+		}
 		if R.ComputedFields == nil {
 			R.ComputedFields = NewStringSet()
+		}
+		if R.ForceNewFields.In(m["name"]) {
+			m["force_new"] = "true"
+		} else {
+			m["force_new"] = "false"
 		}
 		if R.IgnoreUpdates.In(m["name"]) {
 			m["ignore_update"] = "true"
