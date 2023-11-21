@@ -63,7 +63,6 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		"ldap_id": &schema.Schema{
 			Type:     schema.TypeInt,
 			Required: true,
-			ForceNew: true,
 		},
 	}
 }

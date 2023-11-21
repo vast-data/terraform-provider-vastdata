@@ -313,7 +313,7 @@ var resources_templates = []ResourceTemplateV2{
 		Generate:                 true,
 		BeforeDeleteFunc:         utils.AlwaysSkipDeleteLdap,
 		DataSourceName:           "vastdata_active_directory",
-		ForceNewFields:           NewStringSet("machine_account_name", "organizational_unit", "ldap_id"),
+		ForceNewFields:           NewStringSet("machine_account_name", "organizational_unit"),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3Policy",
