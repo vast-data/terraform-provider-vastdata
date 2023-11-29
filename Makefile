@@ -19,7 +19,7 @@ TFPLUGIN_DOCS_OPTIONS = ""
 RESOURCES = $(wildcard examples/resources/*)
 FORCE_TAG_MATCH = 1
 GOFLAGS = ""
-
+TF_GPG_SIG = ""
 
 document_import:
 	for r in $(RESOURCES) ; do\
@@ -38,6 +38,7 @@ clean-releases:
 clean:
 	rm -rf $(BUILD_DEST)/terraform-provider-vastdata
 	rm -rf $(BUILD_DEST)/*_*/
+	rm -rf $(BUILD_DEST)/{*.zip,*.tar,*.tar.gz,*.json,*.sig}
 	rm -rf docs
 
 $(BUILD_DIR)/swagger-codegen-cli.jar:
@@ -150,15 +151,23 @@ is-tag:
 
 pack-archs: clean-releases is-tag
 	tag=$$(git describe --tags); \
+	tf_tag=$$(git describe --tags|sed -r s/'v(.*)'/'\1'/g ); \
 	for arch in $(BUILD_DEST)/*_*/terraform-provider-vastdata ; do \
+		mv -v $${arch} $${arch}_$${tag} ; \
 		arch_build=$$(echo $${arch}|awk -F '$(BUILD_DEST)' '{print $$2}'|tr "/" " "|awk -F " " '{print $$1}'); \
-		tar_file=$(BUILD_DEST)/terraform-provider-vastdata-$${arch_build}_$${tag}_$${arch_build}.tar.gz; \
-		echo "Creating Tar File $${tar_file}"; \
-		tar czvf $${tar_file} -C $(BUILD_DEST)/$${arch_build} terraform-provider-vastdata; \
-		echo "Calculating Sha256Sum" ;\
-		sum=$$(sha256sum $${tar_file}) ;\
-		echo "$${sum}   $${tar_file}" >> $(BUILD_DEST)/terraform-provider-vastdata_$${tag}_SHA256SUMS; \
-	done
+		zip_file=$(BUILD_DEST)/terraform-provider-vastdata_$${tf_tag}_$${arch_build}.zip; \
+		echo "Creating Zip File $${zip_file}"; \
+		zip -j $${zip_file} $${arch}_$${tag}; \
+	done; \
+	echo "Generating SHA256SUMS file";\
+	pushd $${PWD};\
+	cd $(BUILD_DEST);\
+	shasum -a 256 *.zip > terraform-provider-vastdata_$${tf_tag}_SHA256SUMS;\
+	popd;\
+	cp terraform-registry-manifest.json build/terraform-provider-vastdata_$${tf_tag}_manifest.json;\
+	gpg --detach-sign --local-user $${TF_GPG_SIG} build/terraform-provider-vastdata_1.0.0_SHA256SUMS
+
+
 
 
 pack-all-archs: build-all-archs pack-archs
@@ -166,8 +175,8 @@ pack-all-archs: build-all-archs pack-archs
 
 github-pre-release: is-tag pack-all-archs
 	tag=$$(git describe --tags); \
-	gh release create $${tag} ./build/*.tar.gz  ./build/*_SHA256SUMS --prerelease --title "Release $${tag}" --generate-notes
+	gh release create $${tag}   ./build/*.zip ./build/*.json ./build/*.sig  ./build/*_SHA256SUMS --prerelease --title "Release $${tag}" --generate-notes
 
 github-release: is-tag pack-all-archs
 	tag=$$(git describe --tags); \
-	gh release create $${tag} ./build/*.tar.gz  ./build/*_SHA256SUMS --title "Release $${tag}" --generate-notes
+	gh release create $${tag} ./build/*.zip ./build/*.json ./build/*.sig  ./build/*_SHA256SUMS --title "Release $${tag}" --generate-notes
