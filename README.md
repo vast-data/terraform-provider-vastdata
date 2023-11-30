@@ -3,6 +3,19 @@
 
 The VastData Terrafrom provider is a provider to manage VastData clusters [resources](./resources).
 
+## Configuring Provider to be downloaded from [Terraform Registry](https://registry.terraform.io/providers/vast-data/vastdata/latest)
+In order to configure the provider to be used directly from Terraform registry, use the following provider defenition. 
+```hcl
+terraform {
+  required_providers {
+    vastdata = {
+      source = "vast-data/vastdata"
+    }
+  }
+}
+```
+Now when running `terraform init` it will download the VastData provider from the [Terraform Registry](https://registry.terraform.io/providers/vast-data/vastdata/latest)
+
 ## Building The Provider Directly From Github
 
 In order to build the provider you can simpy use go install 
