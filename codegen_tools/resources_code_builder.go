@@ -219,6 +219,12 @@ func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceDa
      tflog.Info(ctx,fmt.Sprintf("Removing Resource"))
      tflog.Info(ctx,response.Request.URL.String())
      tflog.Info(ctx,utils.GetResponseBodyAsStr(response))
+     {{ if .PostDeleteFunc  }}
+     post_delete_error:={{ funcName .PostDeleteFunc}}(ctx,d,m,fmt.Sprintf("{{.Path}}%v/",{{ .ResourceName }}Id))
+     if post_delete_error!=nil {
+        return diag.FromErr(post_delete_error)
+     }
+     {{end}}
 
      if err!=nil {
         diags = append(diags, diag.Diagnostic {

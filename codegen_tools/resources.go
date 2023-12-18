@@ -337,6 +337,7 @@ var resources_templates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet("Id"),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
+		PostDeleteFunc:           utils.WaitForResourceDeletion,
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_protected_path",

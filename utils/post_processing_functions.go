@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -234,4 +236,26 @@ func AlwaysSkipDeleteLdap(ctx context.Context, d *schema.ResourceData, m interfa
 		return nil, err
 	}
 	return bytes.NewReader(b), nil
+}
+
+type PostDeleteFunc func(context.Context, *schema.ResourceData, interface{}, string) error
+
+func WaitForResourceDeletion(ctx context.Context, d *schema.ResourceData, m interface{}, path string) error {
+	client := m.(vast_client.JwtSession)
+	//We will wait for up to 15 min until the resource has been deleted and we check status every 10 sec
+
+	for counter := 0; counter <= 900; counter += 5 {
+		rsp, err := client.Get(ctx, path, "", map[string]string{})
+		// we should run until we either found that the resource does not exists or re reached timeout or somthing else occured.
+		if err != nil && rsp.StatusCode == http.StatusNotFound {
+			//This means the resource does not exists anymore
+			return nil
+		} else if err != nil {
+			return errors.New(fmt.Sprintf("Waiting for object (%s) deletion returned error: %v : %v", path, rsp.Status, err))
+		}
+		time.Sleep(5)
+
+	}
+	return errors.New(fmt.Sprintf("Timeout reached wating for resource with path %s to be deleted", path))
+
 }

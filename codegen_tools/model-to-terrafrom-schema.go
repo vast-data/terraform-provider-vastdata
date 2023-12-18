@@ -189,6 +189,7 @@ type ResourceTemplateV2 struct {
 	AfterPatchFunc           utils.ResponseConversionFunc
 	AfterReadFunc            utils.SchemaManipulationFunc
 	BeforeDeleteFunc         utils.PreDeleteFunc
+	PostDeleteFunc           utils.PostDeleteFunc
 	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
 	SensitiveFields          *StringSet
 	IsDataSource             bool

@@ -263,6 +263,11 @@ func resourceProtectedPathDelete(ctx context.Context, d *schema.ResourceData, m 
 	tflog.Info(ctx, response.Request.URL.String())
 	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))
 
+	post_delete_error := utils.WaitForResourceDeletion(ctx, d, m, fmt.Sprintf("/api/protectedpaths/%v/", ProtectedPathId))
+	if post_delete_error != nil {
+		return diag.FromErr(post_delete_error)
+	}
+
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
