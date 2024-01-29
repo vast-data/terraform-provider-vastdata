@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceS3replicationPeers() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceS3replicationPeers() *schema.Resource {
 		DeleteContext: resourceS3replicationPeersDelete,
 		CreateContext: resourceS3replicationPeersCreate,
 		UpdateContext: resourceS3replicationPeersUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceS3replicationPeersImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceS3replicationPeersSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"bucket_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"http_protocol": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"type_": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,7 +95,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"proxies": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -95,7 +108,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"aws_region": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -107,10 +121,11 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             true,
-			Description:           `The S3 access key`,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   true,
+			Description: `The S3 access key`,
 		},
 
 		"secret_key": &schema.Schema{
@@ -118,14 +133,16 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             true,
-			Description:           `The S3 secret key`,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   true,
+			Description: `The S3 secret key`,
 		},
 
 		"custom_bucket_url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -279,7 +296,6 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	S3replicationPeersId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/replicationtargets/%v", S3replicationPeersId), "", map[string]string{})
 
@@ -296,8 +312,9 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 
 	}
 	resource := api_latest.S3replicationPeers{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body S3replicationPeers returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -307,6 +324,7 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -324,6 +342,7 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 
 func resourceS3replicationPeersDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	S3replicationPeersId := d.Id()
 
@@ -362,6 +381,7 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3replicationPeers")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -404,8 +424,9 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type S3replicationPeers created , server response %v", string(response_body)))
 	resource := api_latest.S3replicationPeers{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -417,6 +438,7 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceS3replicationPeersRead(ctx, d, m)
 
 	return diags
@@ -453,6 +475,7 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 
 	client := m.(vast_client.JwtSession)
 	S3replicationPeersId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3replicationPeers"))
 	reflect_S3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3replicationPeers.Elem(), d, &data, "", false)
@@ -468,7 +491,9 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/replicationtargets//%v", S3replicationPeersId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3replicationPeers %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

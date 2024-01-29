@@ -40,14 +40,18 @@ func BuildResourceTemplateHeader(r ResourceTemplateV2) string {
 
 import (
         "io"
+        {{ if not .IdIsNotNumber }}
         "strconv"
+        {{ end }}
         "bytes"
         "reflect"
         "encoding/json"
         "fmt"
         "context"
+        {{ if not .DoesNotSupportImport }}
         "net/url"
         "errors"
+        {{ end }}
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
         "github.com/hashicorp/terraform-plugin-sdk/v2/diag"
         vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
@@ -66,9 +70,11 @@ func Resource{{ .ResourceName }}() *schema.Resource {
      DeleteContext: resource{{ .ResourceName }}Delete,
      CreateContext: resource{{ .ResourceName }}Create,
      UpdateContext: resource{{ .ResourceName }}Update,
+    {{ if not .DoesNotSupportImport }}
      Importer: &schema.ResourceImporter{
                       StateContext: resource{{ .ResourceName }}Importer,
      },
+     {{ end }}
      Description: {{getBT}}{{ .ResourceDocumantation }}{{getBT}},
      Schema: getResource{{ .ResourceName }}Schema(),
    }
@@ -152,11 +158,14 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      var diags diag.Diagnostics
      {{ $cbr:="}" }}
      {{ $cbl:="{" }}
+
+     {{ if .HttpReadFunc }}
+     response,err:={{ funcName .HttpReadFunc}}(ctx,m,"{{.Path}}","",map[string]string{},d)     
+     {{ else }}
      client:=m.(vast_client.JwtSession)
-
-     {{ .ResourceName }}Id := d.Id()     
+     {{ .ResourceName }}Id := d.Id()
      response,err:=client.Get(ctx,fmt.Sprintf("{{.Path}}%v",{{ .ResourceName }}Id),"", map[string]string{})
-
+     {{ end }}
      utils.VastVersionsWarn(ctx)
 
      tflog.Info(ctx,response.Request.URL.String())
@@ -170,17 +179,25 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 
      }
      resource:=api_latest.{{.ResourceName}}{}
+     {{ if .ReadBeforeUnmarshallFunc }}
+     body,read_before_unmarshall_err:={{ funcName .ReadBeforeUnmarshallFunc}}(ctx,response)
+     tflog.Debug(ctx,fmt.Sprintf("Body {{.ResourceName}} returned after processing response %v",string(body)))
+     if read_before_unmarshall_err!=nil {
+         return diag.FromErr(read_before_unmarshall_err)
+      }
+     {{ else }}
      body,err:=utils.DefaultProcessingFunc(ctx,response)
-     
+     tflog.Debug(ctx,fmt.Sprintf("Body {{.ResourceName}} returned after processing response %v",string(body)))
      if err!=nil {
          diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
 		Summary:  "Error occured reading data recived from VastData cluster",
-		Detail:   err.Error(),
+ 		Detail:   err.Error(),
 		})
        return diags
 
      }
+     {{ end }}
      err=json.Unmarshal(body,&resource)
      if err!=nil {
                 diags = append(diags, diag.Diagnostic {
@@ -194,7 +211,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
  diags = Resource{{ .ResourceName }}ReadStructIntoSchema(ctx, resource ,d )
  {{ if .AfterReadFunc }}
  var after_read_error error
- after_read_error={{ funcName .AfterReadFunc}}(client,ctx,d)
+ after_read_error={{ funcName .AfterReadFunc}}(resource,ctx,d)
  if after_read_error!=nil {
     return diag.FromErr(after_read_error)
  }
@@ -204,6 +221,10 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 
 func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
      var diags diag.Diagnostics
+ 
+     {{ if .HttpDeleteFunc }}
+     response,err:={{ funcName .HttpDeleteFunc}}(ctx,m,"{{.Path}}","",map[string]string{},d)
+     {{ else }}
      client:=m.(vast_client.JwtSession)
      {{ .ResourceName }}Id := d.Id()
      {{ if .BeforeDeleteFunc  }}
@@ -216,6 +237,7 @@ func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceDa
 
      response,err:=client.Delete(ctx,fmt.Sprintf("{{.Path}}%v/",{{ .ResourceName }}Id),"",nil , map[string]string{})
      {{end}}
+     {{ end }}
      tflog.Info(ctx,fmt.Sprintf("Removing Resource"))
      tflog.Info(ctx,response.Request.URL.String())
      tflog.Info(ctx,utils.GetResponseBodyAsStr(response))
@@ -261,6 +283,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
           cluster_version:=metadata.ClusterVersionString()
           t,t_exists:=vast_versions.GetVersionedType(cluster_version,"{{.ResourceName}}")
           if t_exists {
+
           versions_error:=utils.VersionMatch(t,data) 
           if versions_error!=nil {
                tflog.Warn(ctx,versions_error.Error())
@@ -303,8 +326,19 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
         return diags
      }
    response_body,_:=io.ReadAll(response.Body)
-   tflog.Debug(ctx,fmt.Sprintf("Object created , server response %v", string(response_body)))
+   tflog.Debug(ctx,fmt.Sprintf("Object type {{.ResourceName}} created , server response %v", string(response_body)))
    resource:=api_latest.{{.ResourceName}}{}
+   {{ if .BeforeCreateUnmarshalFunc }}
+   response_body,err={{ funcName .BeforeCreateUnmarshalFunc}}(ctx,response_body,d)
+   if err!=nil {
+        diags = append(diags, diag.Diagnostic {
+		Severity: diag.Error,
+		Summary:  "Failed before unmarshl func for {{.ResourceName}}",
+		Detail:   err.Error(),
+		})
+        return diags
+    }
+   {{ end }}
    err=json.Unmarshal(response_body,&resource)
    if err!=nil {
         diags = append(diags, diag.Diagnostic {
@@ -314,8 +348,11 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
 		})
         return diags
     }
-   
+   {{ if .IdIsNotNumber }}
+   d.SetId(resource.Id)
+   {{ else }}
    d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+   {{ end }}
    resource{{ .ResourceName }}Read(ctx,d,m)
     {{ if .BeforeCreateFunc }}
     var before_create_error error
@@ -356,9 +393,10 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
              tflog.Warn(ctx,fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly","{{ .ResourceName }}",cluster_version))
           }
     }     
-
+    {{ if not .HttpUpdateFunc }}
     client:=m.(vast_client.JwtSession)
     {{ .ResourceName }}Id := d.Id()     
+    {{ end }}
     tflog.Info(ctx,fmt.Sprintf("Updating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
@@ -381,7 +419,11 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-    response ,patch_err:=client.Patch(ctx,fmt.Sprintf("{{.Path}}/%v",{{ .ResourceName }}Id),"application/json",bytes.NewReader(b),map[string]string{});
+    {{ if .HttpUpdateFunc }}
+    response ,patch_err:={{ funcName .HttpUpdateFunc}}(ctx,m,"{{.Path}}","application/json",map[string]string{},d)
+    {{ else }}
+    response ,patch_err:=client.Patch(ctx,fmt.Sprintf("{{.Path}}/%v",{{ .ResourceName }}Id),"application/json",bytes.NewReader(b),map[string]string{})
+    {{ end }}
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , patch_err))
     if patch_err != nil {
             error_message:=patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response) 
@@ -406,7 +448,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
 
 
 }
-
+{{ if not .DoesNotSupportImport }}
 func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.ResourceData, m interface{})  ([]*schema.ResourceData, error) {
 
     result := []*schema.ResourceData{}
@@ -464,6 +506,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
      return result, err
 
 }
+{{ end }}
 `
 	_, exists := funcMap["BuildTemplateFromModelName"]
 	if !exists {
@@ -495,6 +538,10 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
              {{if eq .Attributes.ignore_update "true" }}
              {{indent $I " "}}   DiffSuppressOnRefresh: false,
              DiffSuppressFunc: utils.DoNothingOnUpdate(),
+             {{ end }}
+             {{if ne .Attributes.diff_func "" }}
+             {{indent $I " "}}   DiffSuppressOnRefresh: true,
+             DiffSuppressFunc: utils.{{.Attributes.diff_func}},
              {{ end }}
 
 	     {{- if eq .Attributes.required "true" -}}

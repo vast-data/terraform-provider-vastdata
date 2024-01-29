@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"net/url"
 
-	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
 type WithURL struct {

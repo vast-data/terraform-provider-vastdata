@@ -26,4 +26,7 @@ var Resources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_global_local_snapshot": ResourceGlobalLocalSnapshot(),
 	"vastdata_replication_peers":     ResourceReplicationPeers(),
 	"vastdata_s3_replication_peers":  ResourceS3replicationPeers(),
+	"vastdata_database":              ResourceVastDatabase(),
+	"vastdata_database_schema":       ResourceVastDatabaseSchema(),
+	"vastdata_database_table":        ResourceVastDatabaseTable(),
 }

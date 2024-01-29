@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceDns() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceDns() *schema.Resource {
 		DeleteContext: resourceDnsDelete,
 		CreateContext: resourceDnsCreate,
 		UpdateContext: resourceDnsUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceDnsImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceDnsSchema(),
 	}
@@ -38,12 +44,14 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"vip": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -51,7 +59,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"domain_suffix": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_gateway": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -83,7 +95,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_subnet_cidr": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -91,7 +104,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_vlan": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -99,7 +113,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"cnode_ids": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -111,7 +126,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_ipv6": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -119,7 +135,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_ipv6_subnet_cidr": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -127,7 +144,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_ipv6_gateway": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -293,7 +311,6 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	DnsId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/latest/dns/%v", DnsId), "", map[string]string{})
 
@@ -310,8 +327,9 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	}
 	resource := api_latest.Dns{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body Dns returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -321,6 +339,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -338,6 +357,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	DnsId := d.Id()
 
@@ -376,6 +396,7 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Dns")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -418,8 +439,9 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type Dns created , server response %v", string(response_body)))
 	resource := api_latest.Dns{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -431,6 +453,7 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceDnsRead(ctx, d, m)
 
 	return diags
@@ -467,6 +490,7 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 
 	client := m.(vast_client.JwtSession)
 	DnsId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Dns"))
 	reflect_Dns := reflect.TypeOf((*api_latest.Dns)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Dns.Elem(), d, &data, "", false)
@@ -482,7 +506,9 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/latest/dns//%v", DnsId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

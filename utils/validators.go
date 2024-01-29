@@ -3,6 +3,7 @@ package utils
 import (
 	//	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
@@ -66,5 +67,15 @@ func ProtectionPolicyTimeIntervalValidation(i interface{}, c cty.Path) diag.Diag
 	if !matched {
 		return diag.FromErr(errors.New(fmt.Sprintf("The value given does not match the format <integer><time period>  time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day")))
 	}
+	return diags
+}
+
+func IsValidFieldsJson(i interface{}, c cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+	_, err := json.Marshal(i)
+	if err != nil {
+		return diag.FromErr(errors.New(fmt.Sprintf("Error occured converting fields to json: %v", err)))
+	}
+
 	return diags
 }

@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceProtectionPolicy() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceProtectionPolicy() *schema.Resource {
 		DeleteContext: resourceProtectionPolicyDelete,
 		CreateContext: resourceProtectionPolicyCreate,
 		UpdateContext: resourceProtectionPolicyUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceProtectionPolicyImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceProtectionPolicySchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"target_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"target_object_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,17 +86,20 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"prefix": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"clone_type": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"frames": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -95,7 +109,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"every": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -104,7 +119,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"start_at": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -113,7 +129,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"keep_local": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -122,7 +139,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"keep_remote": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -134,7 +152,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"indestructible": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -264,7 +283,6 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	ProtectionPolicyId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/protectionpolicies/%v", ProtectionPolicyId), "", map[string]string{})
 
@@ -281,8 +299,9 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 
 	}
 	resource := api_latest.ProtectionPolicy{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body ProtectionPolicy returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -292,6 +311,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -309,6 +329,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 
 func resourceProtectionPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	ProtectionPolicyId := d.Id()
 
@@ -347,6 +368,7 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ProtectionPolicy")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -389,8 +411,9 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type ProtectionPolicy created , server response %v", string(response_body)))
 	resource := api_latest.ProtectionPolicy{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -402,6 +425,7 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceProtectionPolicyRead(ctx, d, m)
 
 	return diags
@@ -438,6 +462,7 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 
 	client := m.(vast_client.JwtSession)
 	ProtectionPolicyId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ProtectionPolicy"))
 	reflect_ProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectionPolicy.Elem(), d, &data, "", false)
@@ -453,7 +478,9 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/protectionpolicies//%v", ProtectionPolicyId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectionPolicy %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

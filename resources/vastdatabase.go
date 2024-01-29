@@ -24,23 +24,23 @@ import (
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
 )
 
-func ResourceSnapshot() *schema.Resource {
+func ResourceVastDatabase() *schema.Resource {
 	return &schema.Resource{
-		ReadContext:   resourceSnapshotRead,
-		DeleteContext: resourceSnapshotDelete,
-		CreateContext: resourceSnapshotCreate,
-		UpdateContext: resourceSnapshotUpdate,
+		ReadContext:   resourceVastDatabaseRead,
+		DeleteContext: resourceVastDatabaseDelete,
+		CreateContext: resourceVastDatabaseCreate,
+		UpdateContext: resourceVastDatabaseUpdate,
 
 		Importer: &schema.ResourceImporter{
-			StateContext: resourceSnapshotImporter,
+			StateContext: resourceVastDatabaseImporter,
 		},
 
 		Description: ``,
-		Schema:      getResourceSnapshotSchema(),
+		Schema:      getResourceVastDatabaseSchema(),
 	}
 }
 
-func getResourceSnapshotSchema() map[string]*schema.Schema {
+func getResourceVastDatabaseSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
@@ -49,32 +49,37 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `A unique guid given to the snapshot`,
+			Description: `A unique guid given to the databse`,
 		},
 
-		"expiration_time": &schema.Schema{
-			Type: schema.TypeString,
-
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
-			ValidateDiagFunc: utils.SnapshotExpirationFormatValidation,
-			Description:      `When will this sanpshot expire`,
-		},
-
-		"name": &schema.Schema{
+		"bucket": &schema.Schema{
 			Type: schema.TypeString,
 
 			Required: true,
 		},
 
-		"path": &schema.Schema{
+		"bucket_owner": &schema.Schema{
 			Type: schema.TypeString,
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The path to make snapshot from`,
+			Description: `The user name who should own this bucket`,
+		},
+
+		"path": &schema.Schema{
+			Type: schema.TypeString,
+
+			Required: true,
+		},
+
+		"policy_id": &schema.Schema{
+			Type: schema.TypeInt,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `The ID of the view policy to associate with this database (the policy must contains the S3 protocol)`,
 		},
 
 		"tenant_id": &schema.Schema{
@@ -83,23 +88,14 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The tenant id to use`,
-		},
-
-		"indestructible": &schema.Schema{
-			Type: schema.TypeBool,
-
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `Is it indestructable`,
+			Description: `The tenant ID of the view policy which is associated with this database`,
 		},
 	}
 }
 
-var Snapshot_names_mapping map[string][]string = map[string][]string{}
+var VastDatabase_names_mapping map[string][]string = map[string][]string{}
 
-func ResourceSnapshotReadStructIntoSchema(ctx context.Context, resource api_latest.Snapshot, d *schema.ResourceData) diag.Diagnostics {
+func ResourceVastDatabaseReadStructIntoSchema(ctx context.Context, resource api_latest.VastDatabase, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
 
@@ -115,26 +111,26 @@ func ResourceSnapshotReadStructIntoSchema(ctx context.Context, resource api_late
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ExpirationTime", resource.ExpirationTime))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Bucket", resource.Bucket))
 
-	err = d.Set("expiration_time", resource.ExpirationTime)
+	err = d.Set("bucket", resource.Bucket)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"expiration_time\"",
+			Summary:  "Error occured setting value to \"bucket\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "BucketOwner", resource.BucketOwner))
 
-	err = d.Set("name", resource.Name)
+	err = d.Set("bucket_owner", resource.BucketOwner)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occured setting value to \"bucket_owner\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -151,6 +147,18 @@ func ResourceSnapshotReadStructIntoSchema(ctx context.Context, resource api_late
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PolicyId", resource.PolicyId))
+
+	err = d.Set("policy_id", resource.PolicyId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"policy_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
 
 	err = d.Set("tenant_id", resource.TenantId)
@@ -163,27 +171,15 @@ func ResourceSnapshotReadStructIntoSchema(ctx context.Context, resource api_late
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Indestructible", resource.Indestructible))
-
-	err = d.Set("indestructible", resource.Indestructible)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"indestructible\"",
-			Detail:   err.Error(),
-		})
-	}
-
 	return diags
 
 }
-func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-	SnapshotId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/snapshots/%v", SnapshotId), "", map[string]string{})
+	VastDatabaseId := d.Id()
+	response, err := client.Get(ctx, fmt.Sprintf("/api/views/%v", VastDatabaseId), "", map[string]string{})
 
 	utils.VastVersionsWarn(ctx)
 
@@ -197,10 +193,10 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 
 	}
-	resource := api_latest.Snapshot{}
+	resource := api_latest.VastDatabase{}
 
 	body, err := utils.DefaultProcessingFunc(ctx, response)
-	tflog.Debug(ctx, fmt.Sprintf("Body Snapshot returned after processing response %v", string(body)))
+	tflog.Debug(ctx, fmt.Sprintf("Body VastDatabase returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -221,18 +217,18 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 
 	}
-	diags = ResourceSnapshotReadStructIntoSchema(ctx, resource, d)
+	diags = ResourceVastDatabaseReadStructIntoSchema(ctx, resource, d)
 
 	return diags
 }
 
-func resourceSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-	SnapshotId := d.Id()
+	VastDatabaseId := d.Id()
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/snapshots/%v/", SnapshotId), "", nil, map[string]string{})
+	response, err := client.Delete(ctx, fmt.Sprintf("/api/views/%v/", VastDatabaseId), "", nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -251,21 +247,27 @@ func resourceSnapshotDelete(ctx context.Context, d *schema.ResourceData, m inter
 
 }
 
-func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Snapshot_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, VastDatabase_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
-	tflog.Info(ctx, fmt.Sprintf("Creating Resource Snapshot"))
-	reflect_Snapshot := reflect.TypeOf((*api_latest.Snapshot)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Snapshot.Elem(), d, &data, "", false)
+	tflog.Info(ctx, fmt.Sprintf("Creating Resource VastDatabase"))
+	reflect_VastDatabase := reflect.TypeOf((*api_latest.VastDatabase)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_VastDatabase.Elem(), d, &data, "", false)
+
+	var before_post_error error
+	data, before_post_error = utils.AddDatabaseCreationFields(data, client, ctx, d)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Snapshot")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "VastDatabase")
 		if t_exists {
 
 			versions_error := utils.VersionMatch(t, data)
@@ -283,7 +285,7 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Snapshot", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VastDatabase", cluster_version))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -297,8 +299,8 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/snapshots/", bytes.NewReader(b), map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Snapshot %v", create_err))
+	response, create_err := client.Post(ctx, "/api/views/", bytes.NewReader(b), map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  VastDatabase %v", create_err))
 
 	if create_err != nil {
 		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -310,14 +312,14 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object type Snapshot created , server response %v", string(response_body)))
-	resource := api_latest.Snapshot{}
+	tflog.Debug(ctx, fmt.Sprintf("Object type VastDatabase created , server response %v", string(response_body)))
+	resource := api_latest.VastDatabase{}
 
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Failed to convert response body into Snapshot",
+			Summary:  "Failed to convert response body into VastDatabase",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -325,20 +327,20 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
 
-	resourceSnapshotRead(ctx, d, m)
+	resourceVastDatabaseRead(ctx, d, m)
 
 	return diags
 }
 
-func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Snapshot_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, VastDatabase_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Snapshot")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "VastDatabase")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -355,16 +357,16 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Snapshot", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VastDatabase", cluster_version))
 		}
 	}
 
 	client := m.(vast_client.JwtSession)
-	SnapshotId := d.Id()
+	VastDatabaseId := d.Id()
 
-	tflog.Info(ctx, fmt.Sprintf("Updating Resource Snapshot"))
-	reflect_Snapshot := reflect.TypeOf((*api_latest.Snapshot)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Snapshot.Elem(), d, &data, "", false)
+	tflog.Info(ctx, fmt.Sprintf("Updating Resource VastDatabase"))
+	reflect_VastDatabase := reflect.TypeOf((*api_latest.VastDatabase)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_VastDatabase.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -378,9 +380,9 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/snapshots//%v", SnapshotId), "application/json", bytes.NewReader(b), map[string]string{})
+	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/views//%v", VastDatabaseId), "application/json", bytes.NewReader(b), map[string]string{})
 
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Snapshot %v", patch_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  VastDatabase %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
@@ -390,13 +392,13 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		})
 		return diags
 	}
-	resourceSnapshotRead(ctx, d, m)
+	resourceVastDatabaseRead(ctx, d, m)
 
 	return diags
 
 }
 
-func resourceSnapshotImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+func resourceVastDatabaseImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
 	client := m.(vast_client.JwtSession)
@@ -404,13 +406,13 @@ func resourceSnapshotImporter(ctx context.Context, d *schema.ResourceData, m int
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
 
-	response, err := client.Get(ctx, "/api/snapshots/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, "/api/views/", values.Encode(), map[string]string{})
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.Snapshot{}
+	resource_l := []api_latest.VastDatabase{}
 
 	body, err := utils.DefaultProcessingFunc(ctx, response)
 	if err != nil {
@@ -429,7 +431,7 @@ func resourceSnapshotImporter(ctx context.Context, d *schema.ResourceData, m int
 
 	Id := (int64)(resource.Id)
 	d.SetId(strconv.FormatInt(Id, 10))
-	diags := ResourceSnapshotReadStructIntoSchema(ctx, resource, d)
+	diags := ResourceVastDatabaseReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
 		all_errors := "Errors occured while importing:\n"
 		for _, dig := range diags {

@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceS3LifeCycleRule() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceS3LifeCycleRule() *schema.Resource {
 		DeleteContext: resourceS3LifeCycleRuleDelete,
 		CreateContext: resourceS3LifeCycleRuleCreate,
 		UpdateContext: resourceS3LifeCycleRuleUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceS3LifeCycleRuleImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceS3LifeCycleRuleSchema(),
 	}
@@ -38,12 +44,14 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -51,7 +59,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,12 +68,14 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"prefix": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"min_size": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -72,7 +83,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"max_size": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -80,7 +92,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_days": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -88,7 +101,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_date": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -96,7 +110,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expired_obj_delete_marker": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -104,7 +119,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"noncurrent_days": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -112,7 +128,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"newer_noncurrent_versions": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -120,7 +137,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"abort_mpu_days_after_initiation": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -128,7 +146,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"view_path": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -136,7 +155,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"view_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -326,7 +346,6 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	S3LifeCycleRuleId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/s3lifecyclerules/%v", S3LifeCycleRuleId), "", map[string]string{})
 
@@ -343,8 +362,9 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 
 	}
 	resource := api_latest.S3LifeCycleRule{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body S3LifeCycleRule returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -354,6 +374,7 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -371,6 +392,7 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 
 func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	S3LifeCycleRuleId := d.Id()
 
@@ -415,6 +437,7 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3LifeCycleRule")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -457,8 +480,9 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type S3LifeCycleRule created , server response %v", string(response_body)))
 	resource := api_latest.S3LifeCycleRule{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -470,6 +494,7 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceS3LifeCycleRuleRead(ctx, d, m)
 
 	return diags
@@ -506,6 +531,7 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 
 	client := m.(vast_client.JwtSession)
 	S3LifeCycleRuleId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3LifeCycleRule"))
 	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
@@ -527,7 +553,9 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/s3lifecyclerules//%v", S3LifeCycleRuleId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

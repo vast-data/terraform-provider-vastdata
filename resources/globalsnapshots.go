@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceGlobalSnapshot() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceGlobalSnapshot() *schema.Resource {
 		DeleteContext: resourceGlobalSnapshotDelete,
 		CreateContext: resourceGlobalSnapshotCreate,
 		UpdateContext: resourceGlobalSnapshotUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceGlobalSnapshotImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceGlobalSnapshotSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,7 +53,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
@@ -55,31 +63,37 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Required:              true,
+
+			Required: true,
 		},
 
 		"loanee_root_path": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"remote_target_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"remote_target_guid": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"remote_target_path": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -87,14 +101,16 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"owner_root_snapshot": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
 					"clone_id": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
@@ -102,12 +118,14 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 					},
 
 					"name": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 
 					"parent_handle_ehandle": &schema.Schema{
-						Type:        schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
@@ -118,19 +136,22 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"owner_tenant": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
 					"name": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 
 					"guid": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 				},
@@ -274,7 +295,6 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	GlobalSnapshotId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/globalsnapstreams/%v", GlobalSnapshotId), "", map[string]string{})
 
@@ -291,8 +311,9 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 
 	}
 	resource := api_latest.GlobalSnapshot{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body GlobalSnapshot returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -302,6 +323,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -319,6 +341,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 
 func resourceGlobalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	GlobalSnapshotId := d.Id()
 
@@ -363,6 +386,7 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "GlobalSnapshot")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -405,8 +429,9 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type GlobalSnapshot created , server response %v", string(response_body)))
 	resource := api_latest.GlobalSnapshot{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -418,6 +443,7 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceGlobalSnapshotRead(ctx, d, m)
 
 	return diags
@@ -454,6 +480,7 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 
 	client := m.(vast_client.JwtSession)
 	GlobalSnapshotId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource GlobalSnapshot"))
 	reflect_GlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
@@ -475,7 +502,9 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/globalsnapstreams//%v", GlobalSnapshotId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

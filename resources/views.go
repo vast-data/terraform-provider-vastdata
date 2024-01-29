@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceView() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceView() *schema.Resource {
 		DeleteContext: resourceViewDelete,
 		CreateContext: resourceViewCreate,
 		UpdateContext: resourceViewUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceViewImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceViewSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,7 +53,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -54,12 +62,14 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"path": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"create_dir": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"alias": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"bucket": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,12 +95,14 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"policy_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"cluster": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -96,7 +110,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"cluster_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -104,7 +119,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -112,7 +128,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"directory": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -120,7 +137,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"s3_versioning": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -128,7 +146,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"s3_unverified_lookup": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -136,7 +155,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"allow_anonymous_access": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -144,7 +164,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"allow_s3_anonymous_access": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -152,7 +173,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"protocols": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -164,7 +186,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"share": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -172,7 +195,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"bucket_owner": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -180,7 +204,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"bucket_creators": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -192,7 +217,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"bucket_creators_groups": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -204,7 +230,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"s3_locks": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -212,7 +239,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"s3_locks_retention_mode": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -220,7 +248,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"s3_locks_retention_period": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -228,7 +257,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"physical_capacity": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -236,7 +266,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"logical_capacity": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -244,7 +275,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"nfs_interop_flags": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -254,7 +286,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"is_remote": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -262,7 +295,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"share_acl": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -272,7 +306,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"enabled": &schema.Schema{
-						Type:        schema.TypeBool,
+						Type: schema.TypeBool,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -280,7 +315,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 					},
 
 					"acl": &schema.Schema{
-						Type:        schema.TypeList,
+						Type: schema.TypeList,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -290,7 +326,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"grantee": &schema.Schema{
-									Type:      schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:  true,
 									Optional:  true,
 									Sensitive: false,
@@ -300,7 +337,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 								},
 
 								"permissions": &schema.Schema{
-									Type:      schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:  true,
 									Optional:  true,
 									Sensitive: false,
@@ -310,7 +348,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 								},
 
 								"sid_str": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -318,7 +357,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 								},
 
 								"uid_or_gid": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -326,12 +366,14 @@ func getResourceViewSchema() map[string]*schema.Schema {
 								},
 
 								"name": &schema.Schema{
-									Type:     schema.TypeString,
+									Type: schema.TypeString,
+
 									Required: true,
 								},
 
 								"fqdn": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -345,7 +387,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 		},
 
 		"qos_policy_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -716,7 +759,6 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	ViewId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/views/%v", ViewId), "", map[string]string{})
 
@@ -733,8 +775,9 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	}
 	resource := api_latest.View{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body View returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -744,6 +787,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -757,7 +801,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	diags = ResourceViewReadStructIntoSchema(ctx, resource, d)
 
 	var after_read_error error
-	after_read_error = utils.KeepCreateDirState(client, ctx, d)
+	after_read_error = utils.KeepCreateDirState(resource, ctx, d)
 	if after_read_error != nil {
 		return diag.FromErr(after_read_error)
 	}
@@ -767,6 +811,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	ViewId := d.Id()
 
@@ -805,6 +850,7 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "View")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -847,8 +893,9 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type View created , server response %v", string(response_body)))
 	resource := api_latest.View{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -860,6 +907,7 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceViewRead(ctx, d, m)
 
 	var before_create_error error
@@ -902,6 +950,7 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 
 	client := m.(vast_client.JwtSession)
 	ViewId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource View"))
 	reflect_View := reflect.TypeOf((*api_latest.View)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_View.Elem(), d, &data, "", false)
@@ -923,7 +972,9 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/views//%v", ViewId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

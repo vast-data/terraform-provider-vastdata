@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceQuota() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceQuota() *schema.Resource {
 		DeleteContext: resourceQuotaDelete,
 		CreateContext: resourceQuotaCreate,
 		UpdateContext: resourceQuotaUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceQuotaImporter,
 		},
+
 		Description: `This is a quota`,
 		Schema:      getResourceQuotaSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"state": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"pretty_state": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"path": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"pretty_grace_period": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,7 +95,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"grace_period": &schema.Schema{
-			Type:             schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:         true,
 			Optional:         true,
 			Sensitive:        false,
@@ -92,7 +105,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"time_to_block": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -100,7 +114,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"soft_limit": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -108,7 +123,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"hard_limit": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -116,7 +132,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"hard_limit_inodes": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -124,7 +141,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"soft_limit_inodes": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -132,7 +150,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_inodes": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -140,7 +159,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_capacity": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -148,7 +168,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_capacity_tb": &schema.Schema{
-			Type:        schema.TypeFloat,
+			Type: schema.TypeFloat,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -156,7 +177,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_effective_capacity": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -164,7 +186,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_effective_capacity_tb": &schema.Schema{
-			Type:        schema.TypeFloat,
+			Type: schema.TypeFloat,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -172,7 +195,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -180,7 +204,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -188,7 +213,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -196,7 +222,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"cluster_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -204,7 +231,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"system_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -212,7 +240,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"is_user_quota": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -220,7 +249,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"enable_email_providers": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -228,7 +258,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"num_exceeded_users": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -236,7 +267,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"num_blocked_users": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -244,7 +276,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"enable_alarms": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -252,7 +285,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"default_email": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -260,7 +294,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"percent_inodes": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -268,7 +303,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"percent_capacity": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -276,7 +312,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"default_user_quota": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -286,7 +323,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"quota_system_id": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -294,7 +332,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -302,7 +341,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -310,7 +350,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"sof_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -318,7 +359,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -326,7 +368,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"grace_period": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -338,7 +381,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"default_group_quota": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -348,7 +392,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"quota_system_id": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -356,7 +401,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -364,7 +410,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -372,7 +419,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"sof_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -380,7 +428,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -388,7 +437,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"grace_period": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -400,7 +450,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"user_quotas": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -410,7 +461,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"grace_period": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -419,7 +471,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"time_to_block": &schema.Schema{
-						Type:        schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -427,7 +480,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -435,7 +489,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -443,7 +498,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -451,7 +507,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -459,7 +516,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -467,7 +525,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -475,7 +534,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"is_accountable": &schema.Schema{
-						Type:        schema.TypeBool,
+						Type: schema.TypeBool,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -483,7 +543,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"quota_system_id": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -491,7 +552,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"entity": &schema.Schema{
-						Type:        schema.TypeList,
+						Type: schema.TypeList,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -501,7 +563,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"name": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -509,7 +572,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"vast_id": &schema.Schema{
-									Type:        schema.TypeInt,
+									Type: schema.TypeInt,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -517,7 +581,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"email": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -525,7 +590,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"is_group": &schema.Schema{
-									Type:        schema.TypeBool,
+									Type: schema.TypeBool,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -533,12 +599,14 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"identifier": &schema.Schema{
-									Type:     schema.TypeString,
+									Type: schema.TypeString,
+
 									Required: true,
 								},
 
 								"identifier_type": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -552,7 +620,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"group_quotas": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -562,7 +631,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"grace_period": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -571,7 +641,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"time_to_block": &schema.Schema{
-						Type:        schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -579,7 +650,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -587,7 +659,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -595,7 +668,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -603,7 +677,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -611,7 +686,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_inodes": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -619,7 +695,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -627,7 +704,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"is_accountable": &schema.Schema{
-						Type:        schema.TypeBool,
+						Type: schema.TypeBool,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -635,7 +713,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"quota_system_id": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -643,7 +722,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"entity": &schema.Schema{
-						Type:        schema.TypeList,
+						Type: schema.TypeList,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -653,7 +733,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"name": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -661,7 +742,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"vast_id": &schema.Schema{
-									Type:        schema.TypeInt,
+									Type: schema.TypeInt,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -669,7 +751,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"email": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -677,7 +760,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"is_group": &schema.Schema{
-									Type:        schema.TypeBool,
+									Type: schema.TypeBool,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -685,12 +769,14 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"identifier": &schema.Schema{
-									Type:     schema.TypeString,
+									Type: schema.TypeString,
+
 									Required: true,
 								},
 
 								"identifier_type": &schema.Schema{
-									Type:        schema.TypeString,
+									Type: schema.TypeString,
+
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
@@ -1128,7 +1214,6 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	QuotaId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/latest/quotas/%v", QuotaId), "", map[string]string{})
 
@@ -1145,8 +1230,9 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	}
 	resource := api_latest.Quota{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body Quota returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1156,6 +1242,7 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -1173,6 +1260,7 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	QuotaId := d.Id()
 
@@ -1217,6 +1305,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Quota")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -1259,8 +1348,9 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type Quota created , server response %v", string(response_body)))
 	resource := api_latest.Quota{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -1272,6 +1362,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceQuotaRead(ctx, d, m)
 
 	return diags
@@ -1308,6 +1399,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 
 	client := m.(vast_client.JwtSession)
 	QuotaId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Quota"))
 	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
@@ -1329,7 +1421,9 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/latest/quotas//%v", QuotaId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

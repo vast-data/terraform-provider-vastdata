@@ -3,16 +3,11 @@ package resources
 import (
 	"io"
 
-	"strconv"
-
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"reflect"
-
-	"errors"
-	"net/url"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -24,23 +19,19 @@ import (
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
 )
 
-func ResourceS3Policy() *schema.Resource {
+func ResourceVastDatabaseSchema() *schema.Resource {
 	return &schema.Resource{
-		ReadContext:   resourceS3PolicyRead,
-		DeleteContext: resourceS3PolicyDelete,
-		CreateContext: resourceS3PolicyCreate,
-		UpdateContext: resourceS3PolicyUpdate,
-
-		Importer: &schema.ResourceImporter{
-			StateContext: resourceS3PolicyImporter,
-		},
+		ReadContext:   resourceVastDatabaseSchemaRead,
+		DeleteContext: resourceVastDatabaseSchemaDelete,
+		CreateContext: resourceVastDatabaseSchemaCreate,
+		UpdateContext: resourceVastDatabaseSchemaUpdate,
 
 		Description: ``,
-		Schema:      getResourceS3PolicySchema(),
+		Schema:      getResourceVastDatabaseSchemaSchema(),
 	}
 }
 
-func getResourceS3PolicySchema() map[string]*schema.Schema {
+func getResourceVastDatabaseSchemaSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
@@ -49,7 +40,13 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `GUID`,
+			Description: `A unique guid given to the databse`,
+		},
+
+		"database_name": &schema.Schema{
+			Type: schema.TypeString,
+
+			Required: true,
 		},
 
 		"name": &schema.Schema{
@@ -58,26 +55,20 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Required: true,
 		},
 
-		"policy": &schema.Schema{
+		"identifier": &schema.Schema{
 			Type: schema.TypeString,
 
-			Required: true,
-		},
-
-		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
-
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
-			Description: ``,
+			Description: `A computed identifier of the table`,
 		},
 	}
 }
 
-var S3Policy_names_mapping map[string][]string = map[string][]string{}
+var VastDatabaseSchema_names_mapping map[string][]string = map[string][]string{}
 
-func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_latest.S3Policy, d *schema.ResourceData) diag.Diagnostics {
+func ResourceVastDatabaseSchemaReadStructIntoSchema(ctx context.Context, resource api_latest.VastDatabaseSchema, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
 
@@ -89,6 +80,18 @@ func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_late
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"guid\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "DatabaseName", resource.DatabaseName))
+
+	err = d.Set("database_name", resource.DatabaseName)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"database_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -105,26 +108,14 @@ func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_late
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Policy", resource.Policy))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Identifier", resource.Identifier))
 
-	err = d.Set("policy", resource.Policy)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"policy\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Enabled", resource.Enabled))
-
-	err = d.Set("enabled", resource.Enabled)
+	err = d.Set("identifier", resource.Identifier)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occured setting value to \"identifier\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -132,12 +123,10 @@ func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_late
 	return diags
 
 }
-func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseSchemaRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
-	S3PolicyId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/s3policies/%v", S3PolicyId), "", map[string]string{})
+	response, err := utils.ReadVastDataDatabseSchema(ctx, m, "/api/latest/schemas/", "", map[string]string{}, d)
 
 	utils.VastVersionsWarn(ctx)
 
@@ -151,18 +140,12 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 
 	}
-	resource := api_latest.S3Policy{}
+	resource := api_latest.VastDatabaseSchema{}
 
-	body, err := utils.DefaultProcessingFunc(ctx, response)
-	tflog.Debug(ctx, fmt.Sprintf("Body S3Policy returned after processing response %v", string(body)))
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	body, read_before_unmarshall_err := utils.ReadResultField(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body VastDatabaseSchema returned after processing response %v", string(body)))
+	if read_before_unmarshall_err != nil {
+		return diag.FromErr(read_before_unmarshall_err)
 	}
 
 	err = json.Unmarshal(body, &resource)
@@ -175,18 +158,21 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 
 	}
-	diags = ResourceS3PolicyReadStructIntoSchema(ctx, resource, d)
+	diags = ResourceVastDatabaseSchemaReadStructIntoSchema(ctx, resource, d)
+
+	var after_read_error error
+	after_read_error = utils.AddVastdDatabaseSchemaIdentifierFieled(resource, ctx, d)
+	if after_read_error != nil {
+		return diag.FromErr(after_read_error)
+	}
 
 	return diags
 }
 
-func resourceS3PolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseSchemaDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
-	S3PolicyId := d.Id()
-
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/s3policies/%v/", S3PolicyId), "", nil, map[string]string{})
+	response, err := utils.DeleteVastDatabaseSchema(ctx, m, "/api/latest/schemas/", "", map[string]string{}, d)
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -205,27 +191,21 @@ func resourceS3PolicyDelete(ctx context.Context, d *schema.ResourceData, m inter
 
 }
 
-func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseSchemaCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, S3Policy_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, VastDatabaseSchema_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
-	tflog.Info(ctx, fmt.Sprintf("Creating Resource S3Policy"))
-	reflect_S3Policy := reflect.TypeOf((*api_latest.S3Policy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
-
-	var before_post_error error
-	data, before_post_error = utils.EnabledMustBeSet(data, client, ctx, d)
-	if before_post_error != nil {
-		return diag.FromErr(before_post_error)
-	}
+	tflog.Info(ctx, fmt.Sprintf("Creating Resource VastDatabaseSchema"))
+	reflect_VastDatabaseSchema := reflect.TypeOf((*api_latest.VastDatabaseSchema)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_VastDatabaseSchema.Elem(), d, &data, "", false)
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3Policy")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "VastDatabaseSchema")
 		if t_exists {
 
 			versions_error := utils.VersionMatch(t, data)
@@ -243,7 +223,7 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3Policy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VastDatabaseSchema", cluster_version))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -257,8 +237,8 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/s3policies/", bytes.NewReader(b), map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3Policy %v", create_err))
+	response, create_err := client.Post(ctx, "/api/latest/schemas/", bytes.NewReader(b), map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  VastDatabaseSchema %v", create_err))
 
 	if create_err != nil {
 		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -270,35 +250,45 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object type S3Policy created , server response %v", string(response_body)))
-	resource := api_latest.S3Policy{}
+	tflog.Debug(ctx, fmt.Sprintf("Object type VastDatabaseSchema created , server response %v", string(response_body)))
+	resource := api_latest.VastDatabaseSchema{}
 
-	err = json.Unmarshal(response_body, &resource)
+	response_body, err = utils.VastDatabaseSchemaBeforeCreateUnmarshel(ctx, response_body, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Failed to convert response body into S3Policy",
+			Summary:  "Failed before unmarshl func for VastDatabaseSchema",
 			Detail:   err.Error(),
 		})
 		return diags
 	}
 
-	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+	err = json.Unmarshal(response_body, &resource)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to convert response body into VastDatabaseSchema",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 
-	resourceS3PolicyRead(ctx, d, m)
+	d.SetId(resource.Id)
+
+	resourceVastDatabaseSchemaRead(ctx, d, m)
 
 	return diags
 }
 
-func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceVastDatabaseSchemaUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, S3Policy_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, VastDatabaseSchema_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3Policy")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "VastDatabaseSchema")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -315,22 +305,13 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3Policy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VastDatabaseSchema", cluster_version))
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
-	S3PolicyId := d.Id()
-
-	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3Policy"))
-	reflect_S3Policy := reflect.TypeOf((*api_latest.S3Policy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
-
-	var before_patch_error error
-	data, before_patch_error = utils.EnabledMustBeSet(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
-	}
+	tflog.Info(ctx, fmt.Sprintf("Updating Resource VastDatabaseSchema"))
+	reflect_VastDatabaseSchema := reflect.TypeOf((*api_latest.VastDatabaseSchema)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_VastDatabaseSchema.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -344,9 +325,9 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/s3policies//%v", S3PolicyId), "application/json", bytes.NewReader(b), map[string]string{})
+	response, patch_err := utils.UpdateVastDatabaseSchemaName(ctx, m, "/api/latest/schemas/", "application/json", map[string]string{}, d)
 
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3Policy %v", patch_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  VastDatabaseSchema %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
@@ -356,55 +337,8 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		})
 		return diags
 	}
-	resourceS3PolicyRead(ctx, d, m)
+	resourceVastDatabaseSchemaRead(ctx, d, m)
 
 	return diags
-
-}
-
-func resourceS3PolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-
-	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
-	guid := d.Id()
-	values := url.Values{}
-	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/s3policies/", values.Encode(), map[string]string{})
-
-	if err != nil {
-		return result, err
-	}
-
-	resource_l := []api_latest.S3Policy{}
-
-	body, err := utils.DefaultProcessingFunc(ctx, response)
-	if err != nil {
-		return result, err
-	}
-	err = json.Unmarshal(body, &resource_l)
-	if err != nil {
-		return result, err
-	}
-
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
-	}
-
-	resource := resource_l[0]
-
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
-	diags := ResourceS3PolicyReadStructIntoSchema(ctx, resource, d)
-	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
-		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
-		}
-		return result, errors.New(all_errors)
-	}
-	result = append(result, d)
-
-	return result, err
 
 }

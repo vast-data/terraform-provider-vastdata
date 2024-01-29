@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceUser() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceUser() *schema.Resource {
 		DeleteContext: resourceUserDelete,
 		CreateContext: resourceUserCreate,
 		UpdateContext: resourceUserUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceUserImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceUserSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"uid": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"leading_gid": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"gids": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -79,7 +90,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"groups": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -91,7 +103,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"group_count": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -99,7 +112,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"leading_group_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -107,7 +121,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"leading_group_gid": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -115,7 +130,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"sid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -123,7 +139,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"primary_group_sid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -131,7 +148,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"sids": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -143,7 +161,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"local": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -151,7 +170,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"access_keys": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -178,7 +198,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"allow_create_bucket": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -186,7 +207,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"allow_delete_bucket": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -194,7 +216,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"s3_superuser": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -202,7 +225,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"s3_policies_ids": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -446,7 +470,6 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	UserId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/users/%v", UserId), "", map[string]string{})
 
@@ -463,8 +486,9 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	}
 	resource := api_latest.User{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body User returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -474,6 +498,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -491,6 +516,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	UserId := d.Id()
 
@@ -529,6 +555,7 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "User")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -571,8 +598,9 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type User created , server response %v", string(response_body)))
 	resource := api_latest.User{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -584,6 +612,7 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceUserRead(ctx, d, m)
 
 	return diags
@@ -620,6 +649,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 
 	client := m.(vast_client.JwtSession)
 	UserId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource User"))
 	reflect_User := reflect.TypeOf((*api_latest.User)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_User.Elem(), d, &data, "", false)
@@ -635,7 +665,9 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/users//%v", UserId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  User %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

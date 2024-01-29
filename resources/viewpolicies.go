@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceViewPolicy() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceViewPolicy() *schema.Resource {
 		DeleteContext: resourceViewPolicyDelete,
 		CreateContext: resourceViewPolicyCreate,
 		UpdateContext: resourceViewPolicyUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceViewPolicyImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceViewPolicySchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"gid_inheritance": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"flavor": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"access_flavor": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"path_length": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,7 +95,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"allowed_characters": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -91,7 +104,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"use32bit_fileid": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -99,7 +113,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"expose_id_in_fsid": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -107,7 +122,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"use_auth_provider": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -115,7 +131,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"auth_source": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -123,7 +140,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"read_write": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -135,7 +153,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"read_only": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -147,7 +166,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_read_write": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -159,7 +179,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_read_only": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -171,7 +192,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_read_write": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -183,7 +205,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_read_only": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -195,7 +218,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_read_write": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -207,7 +231,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_read_only": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -219,7 +244,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"trash_access": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -231,7 +257,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_posix_acl": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -239,7 +266,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_return_open_permissions": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -247,7 +275,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_no_squash": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -259,7 +288,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_root_squash": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -271,7 +301,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_all_squash": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -283,7 +314,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_full_control": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -291,7 +323,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_listing": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -299,7 +332,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_read": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -307,7 +341,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_read_acp": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -315,7 +350,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_write": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -323,7 +359,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_write_acp": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -331,7 +368,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_full_control": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -339,7 +377,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_read": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -347,7 +386,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_read_acp": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -355,7 +395,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_write": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -363,7 +404,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_write_acp": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -371,7 +413,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_file_mode": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -379,7 +422,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_directory_mode": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -387,7 +431,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_file_mode_padded": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -395,7 +440,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_directory_mode_padded": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -403,7 +449,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -411,7 +458,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"cluster_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -419,7 +467,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -427,7 +476,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"tenant_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -435,7 +485,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -443,7 +494,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"atime_frequency": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -451,7 +503,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"vip_pools": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -463,7 +516,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_minimal_protection_level": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -471,7 +525,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_visibility": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -483,7 +538,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_visibility_groups": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -495,7 +551,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"apple_sid": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -503,7 +560,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"protocols": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -515,7 +573,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"data_create_delete": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -523,7 +582,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"data_modify": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -531,7 +591,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"data_read": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -539,7 +600,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_full_path": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -547,7 +609,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_hostname": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -555,7 +618,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_username": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -563,7 +627,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_deleted": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -571,7 +636,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"count_views": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -579,7 +645,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"enable_snapshot_lookup": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -587,7 +654,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"enable_listing_of_snapshot_dir": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -1353,7 +1421,6 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	ViewPolicyId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/viewpolicies/%v", ViewPolicyId), "", map[string]string{})
 
@@ -1370,8 +1437,9 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 
 	}
 	resource := api_latest.ViewPolicy{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body ViewPolicy returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1381,6 +1449,7 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -1398,6 +1467,7 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 
 func resourceViewPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	ViewPolicyId := d.Id()
 
@@ -1436,6 +1506,7 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ViewPolicy")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -1478,8 +1549,9 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type ViewPolicy created , server response %v", string(response_body)))
 	resource := api_latest.ViewPolicy{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -1491,6 +1563,7 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceViewPolicyRead(ctx, d, m)
 
 	return diags
@@ -1527,6 +1600,7 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 
 	client := m.(vast_client.JwtSession)
 	ViewPolicyId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ViewPolicy"))
 	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ViewPolicy.Elem(), d, &data, "", false)
@@ -1542,7 +1616,9 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/viewpolicies//%v", ViewPolicyId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ViewPolicy %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

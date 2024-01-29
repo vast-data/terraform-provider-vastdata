@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceTenant() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceTenant() *schema.Resource {
 		DeleteContext: resourceTenantDelete,
 		CreateContext: resourceTenantCreate,
 		UpdateContext: resourceTenantUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceTenantImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceTenantSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"smb_privileged_user_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_privileged_group_sid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_administrators_group_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -85,7 +97,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"trash_gid": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -93,7 +106,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"client_ip_ranges": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -120,7 +134,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -130,7 +145,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"ad_provider_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -138,7 +154,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"ldap_provider_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -146,7 +163,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"nis_provider_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -154,7 +172,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"encryption_crn": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -334,7 +353,6 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	TenantId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/tenants/%v", TenantId), "", map[string]string{})
 
@@ -351,8 +369,9 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	}
 	resource := api_latest.Tenant{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body Tenant returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -362,6 +381,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -379,6 +399,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 
 func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	TenantId := d.Id()
 
@@ -417,6 +438,7 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Tenant")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -459,8 +481,9 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type Tenant created , server response %v", string(response_body)))
 	resource := api_latest.Tenant{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -472,6 +495,7 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceTenantRead(ctx, d, m)
 
 	return diags
@@ -508,6 +532,7 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 
 	client := m.(vast_client.JwtSession)
 	TenantId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Tenant"))
 	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Tenant.Elem(), d, &data, "", false)
@@ -523,7 +548,9 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/tenants//%v", TenantId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Tenant %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

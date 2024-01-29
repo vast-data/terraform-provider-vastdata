@@ -1629,5 +1629,63 @@ components:
         custom_bucket_url:
           type: "string"
           description: "The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3"
-      
-      
+    VastDatabase:
+      type: "object"
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the database"
+        guid:
+          type: "string"
+          description: "A unique guid given to the databse"
+        bucket:
+          type: "string"
+          description: "The bucket name that will hold the database"
+        bucket_owner:
+          type: "string"
+          description: "The user name who should own this bucket"
+        path:
+          type: "string"
+          description: "The view path which be used for this database"
+        policy_id:
+          type: "int64"
+          description: "The ID of the view policy to associate with this database (the policy must contains the S3 protocol)"  
+        tenant_id:
+          type: "int64"
+          description: "The tenant ID of the view policy which is associated with this database"
+    VastDatabaseSchema:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "A unique id given to the database"
+        guid:
+          type: "string"
+          description: "A unique guid given to the databse"
+        database_name:
+          type: "string"
+          description: "The name of the database schema"
+        name:
+          type: "string"
+          description: "The databse schema name"
+        identifier:
+          type: "string"
+          description: "A computed identifier of the table"
+    VastDatabaseTable:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "A unique id given to the database"
+        guid:
+          type: "string"
+          description: "A unique guid given to the databse"
+        name:
+          type: "string"
+          description: "The Table name"        
+        schema_identifier:
+          type: "string"
+          description: "The database+schema identification"
+        fields:
+          type: "string"
+          description: "The table fields at json format"

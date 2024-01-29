@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceVipPool() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceVipPool() *schema.Resource {
 		DeleteContext: resourceVipPoolDelete,
 		CreateContext: resourceVipPoolCreate,
 		UpdateContext: resourceVipPoolUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceVipPoolImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceVipPoolSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,17 +53,20 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"subnet_cidr": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"subnet_cidr_ipv6": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -64,7 +74,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"gw_ip": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -72,7 +83,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"gw_ipv6": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -80,7 +92,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vlan": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -88,7 +101,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"state": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -96,7 +110,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"cnode_ids": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -108,7 +123,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -116,7 +132,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -124,7 +141,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -132,12 +150,14 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"role": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"ip_ranges": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
@@ -161,7 +181,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vms_preferred": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -169,7 +190,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -177,7 +199,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"port_membership": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -185,7 +208,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"active_interfaces": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -193,7 +217,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"enable_l3": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -201,7 +226,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vast_asn": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -209,7 +235,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"peer_asn": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -485,7 +512,6 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	VipPoolId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/vippools/%v", VipPoolId), "", map[string]string{})
 
@@ -502,8 +528,9 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	}
 	resource := api_latest.VipPool{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body VipPool returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -513,6 +540,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -530,6 +558,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 func resourceVipPoolDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	VipPoolId := d.Id()
 
@@ -568,6 +597,7 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "VipPool")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -610,8 +640,9 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type VipPool created , server response %v", string(response_body)))
 	resource := api_latest.VipPool{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -623,6 +654,7 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceVipPoolRead(ctx, d, m)
 
 	return diags
@@ -659,6 +691,7 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 
 	client := m.(vast_client.JwtSession)
 	VipPoolId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource VipPool"))
 	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_VipPool.Elem(), d, &data, "", false)
@@ -674,7 +707,9 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/vippools//%v", VipPoolId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

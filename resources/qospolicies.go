@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceQosPolicy() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceQosPolicy() *schema.Resource {
 		DeleteContext: resourceQosPolicyDelete,
 		CreateContext: resourceQosPolicyCreate,
 		UpdateContext: resourceQosPolicyUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceQosPolicyImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceQosPolicySchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"mode": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -61,7 +70,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"io_size_bytes": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -69,7 +79,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"static_limits": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -79,7 +90,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"min_reads_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -87,7 +99,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -95,7 +108,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_writes_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -103,7 +117,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -111,7 +126,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_reads_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -119,7 +135,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -127,7 +144,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_writes_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -135,7 +153,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -146,7 +165,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"capacity_limits": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -156,7 +176,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"max_reads_bw_mbps_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -164,7 +185,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_bw_mbps_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -172,7 +194,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_iops_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -180,7 +203,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_iops_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -279,7 +303,6 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	QosPolicyId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/qospolicies/%v", QosPolicyId), "", map[string]string{})
 
@@ -296,8 +319,9 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 
 	}
 	resource := api_latest.QosPolicy{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body QosPolicy returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -307,6 +331,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -324,6 +349,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 
 func resourceQosPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	QosPolicyId := d.Id()
 
@@ -362,6 +388,7 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "QosPolicy")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -404,8 +431,9 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type QosPolicy created , server response %v", string(response_body)))
 	resource := api_latest.QosPolicy{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -417,6 +445,7 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceQosPolicyRead(ctx, d, m)
 
 	return diags
@@ -453,6 +482,7 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 
 	client := m.(vast_client.JwtSession)
 	QosPolicyId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource QosPolicy"))
 	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_QosPolicy.Elem(), d, &data, "", false)
@@ -468,7 +498,9 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/qospolicies//%v", QosPolicyId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

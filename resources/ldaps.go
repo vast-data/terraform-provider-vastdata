@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceLdap() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceLdap() *schema.Resource {
 		DeleteContext: resourceLdapDelete,
 		CreateContext: resourceLdapCreate,
 		UpdateContext: resourceLdapUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceLdapImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceLdapSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,7 +53,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"urls": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -58,7 +66,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"port": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -68,7 +77,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"binddn": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -80,14 +90,16 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             true,
-			Description:           `Password for the LDAP superuser`,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   true,
+			Description: `Password for the LDAP superuser`,
 		},
 
 		"searchbase": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -95,7 +107,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"group_searchbase": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -103,7 +116,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"method": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -113,7 +127,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"gid_number": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -123,7 +138,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -133,7 +149,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid_number": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -143,7 +160,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"match_user": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -153,7 +171,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid_member": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -163,7 +182,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_account": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -173,7 +193,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_group": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -183,7 +204,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"use_tls": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -193,7 +215,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -201,7 +224,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_attributes_source": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -211,7 +235,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"reverse_lookup": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -221,7 +246,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"tls_certificate": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -229,7 +255,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"active_directory": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -237,7 +264,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"query_groups_mode": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -247,7 +275,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"username_property_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -257,12 +286,14 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"user_login_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -272,7 +303,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"group_login_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -282,7 +314,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"mail_property_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -292,7 +325,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid_member_value_property_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -302,7 +336,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"use_auto_discovery": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -310,7 +345,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"use_ldaps": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -318,7 +354,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"is_vms_auth_provider": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -328,7 +365,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"query_posix_attributes_from_gc": &schema.Schema{
-			Type:      schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:  false,
 			Optional:  true,
 			Sensitive: false,
@@ -739,7 +777,6 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	LdapId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/ldaps/%v", LdapId), "", map[string]string{})
 
@@ -756,8 +793,9 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	}
 	resource := api_latest.Ldap{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body Ldap returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -767,6 +805,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -784,6 +823,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceLdapDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	LdapId := d.Id()
 
@@ -822,6 +862,7 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Ldap")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -864,8 +905,9 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type Ldap created , server response %v", string(response_body)))
 	resource := api_latest.Ldap{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -877,6 +919,7 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceLdapRead(ctx, d, m)
 
 	return diags
@@ -913,6 +956,7 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 
 	client := m.(vast_client.JwtSession)
 	LdapId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Ldap"))
 	reflect_Ldap := reflect.TypeOf((*api_latest.Ldap)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Ldap.Elem(), d, &data, "", false)
@@ -928,7 +972,9 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/ldaps//%v", LdapId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Ldap %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceGlobalLocalSnapshot() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceGlobalLocalSnapshot() *schema.Resource {
 		DeleteContext: resourceGlobalLocalSnapshotDelete,
 		CreateContext: resourceGlobalLocalSnapshotCreate,
 		UpdateContext: resourceGlobalLocalSnapshotUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceGlobalLocalSnapshotImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceGlobalLocalSnapshotSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,27 +53,32 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"loanee_tenant_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"loanee_root_path": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"loanee_snapshot_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -76,19 +88,22 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"owner_tenant": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
 					"name": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 
 					"guid": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 				},
@@ -195,7 +210,6 @@ func resourceGlobalLocalSnapshotRead(ctx context.Context, d *schema.ResourceData
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	GlobalLocalSnapshotId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/globalsnapstreams/%v", GlobalLocalSnapshotId), "", map[string]string{})
 
@@ -212,8 +226,9 @@ func resourceGlobalLocalSnapshotRead(ctx context.Context, d *schema.ResourceData
 
 	}
 	resource := api_latest.GlobalLocalSnapshot{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body GlobalLocalSnapshot returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -223,6 +238,7 @@ func resourceGlobalLocalSnapshotRead(ctx context.Context, d *schema.ResourceData
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -240,6 +256,7 @@ func resourceGlobalLocalSnapshotRead(ctx context.Context, d *schema.ResourceData
 
 func resourceGlobalLocalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	GlobalLocalSnapshotId := d.Id()
 
@@ -278,6 +295,7 @@ func resourceGlobalLocalSnapshotCreate(ctx context.Context, d *schema.ResourceDa
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "GlobalLocalSnapshot")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -320,8 +338,9 @@ func resourceGlobalLocalSnapshotCreate(ctx context.Context, d *schema.ResourceDa
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type GlobalLocalSnapshot created , server response %v", string(response_body)))
 	resource := api_latest.GlobalLocalSnapshot{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -333,6 +352,7 @@ func resourceGlobalLocalSnapshotCreate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceGlobalLocalSnapshotRead(ctx, d, m)
 
 	return diags
@@ -369,6 +389,7 @@ func resourceGlobalLocalSnapshotUpdate(ctx context.Context, d *schema.ResourceDa
 
 	client := m.(vast_client.JwtSession)
 	GlobalLocalSnapshotId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource GlobalLocalSnapshot"))
 	reflect_GlobalLocalSnapshot := reflect.TypeOf((*api_latest.GlobalLocalSnapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalLocalSnapshot.Elem(), d, &data, "", false)
@@ -384,7 +405,9 @@ func resourceGlobalLocalSnapshotUpdate(ctx context.Context, d *schema.ResourceDa
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/globalsnapstreams//%v", GlobalLocalSnapshotId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalLocalSnapshot %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

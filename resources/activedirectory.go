@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceActiveDirectory() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceActiveDirectory() *schema.Resource {
 		DeleteContext: resourceActiveDirectoryDelete,
 		CreateContext: resourceActiveDirectoryCreate,
 		UpdateContext: resourceActiveDirectoryUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceActiveDirectoryImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceActiveDirectorySchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,13 +53,15 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"machine_account_name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 			ForceNew: true,
 		},
 
 		"organizational_unit": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -61,7 +70,8 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"ldap_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 	}
@@ -128,7 +138,6 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	ActiveDirectoryId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/activedirectory/%v", ActiveDirectoryId), "", map[string]string{})
 
@@ -145,8 +154,9 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 
 	}
 	resource := api_latest.ActiveDirectory{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body ActiveDirectory returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -156,6 +166,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -173,6 +184,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 
 func resourceActiveDirectoryDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	ActiveDirectoryId := d.Id()
 
@@ -215,6 +227,7 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ActiveDirectory")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -257,8 +270,9 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type ActiveDirectory created , server response %v", string(response_body)))
 	resource := api_latest.ActiveDirectory{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -270,6 +284,7 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceActiveDirectoryRead(ctx, d, m)
 
 	return diags
@@ -306,6 +321,7 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 
 	client := m.(vast_client.JwtSession)
 	ActiveDirectoryId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ActiveDirectory"))
 	reflect_ActiveDirectory := reflect.TypeOf((*api_latest.ActiveDirectory)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ActiveDirectory.Elem(), d, &data, "", false)
@@ -321,7 +337,9 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/activedirectory//%v", ActiveDirectoryId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

@@ -163,37 +163,54 @@ type FakeField struct {
 }
 
 type ResourceTemplateV2 struct {
-	ResourceName             string
-	Fields                   []ResourceElem
-	Path                     *string
-	Model                    interface{}
-	DestFile                 *string
-	IgnoreFields             *StringSet
-	RequiredIdentifierFields *StringSet
-	OptionalIdentifierFields *StringSet
-	ComputedFields           *StringSet
-	ForceNewFields           *StringSet
-	ListsNamesMap            map[string][]string
-	Generate                 bool
-	DataSourceName           string
-	ResponseProcessingFunc   string
-	ResponseGetByURL         bool
-	IgnoreUpdates            *StringSet
-	TfNameToModelName        map[string]string
-	ListFields               map[string][]FakeField
-	ApiSchema                *base.SchemaProxy
-	ResourceDocumantation    string
-	BeforePostFunc           utils.ResponseConversionFunc
-	BeforePatchFunc          utils.ResponseConversionFunc
-	AfterPostFunc            utils.ResponseConversionFunc
-	AfterPatchFunc           utils.ResponseConversionFunc
-	AfterReadFunc            utils.SchemaManipulationFunc
-	BeforeDeleteFunc         utils.PreDeleteFunc
-	PostDeleteFunc           utils.PostDeleteFunc
-	FieldsValidators         map[string]schema.SchemaValidateDiagFunc
-	SensitiveFields          *StringSet
-	IsDataSource             bool
-	BeforeCreateFunc         utils.ResponseConversionFunc
+	ResourceName              string
+	Fields                    []ResourceElem
+	Path                      *string
+	Model                     interface{}
+	DestFile                  *string
+	IgnoreFields              *StringSet
+	RequiredIdentifierFields  *StringSet
+	OptionalIdentifierFields  *StringSet
+	ComputedFields            *StringSet
+	ForceNewFields            *StringSet
+	ListsNamesMap             map[string][]string
+	Generate                  bool
+	DataSourceName            string
+	ResponseProcessingFunc    string
+	ResponseGetByURL          bool
+	IgnoreUpdates             *StringSet
+	TfNameToModelName         map[string]string
+	ListFields                map[string][]FakeField
+	ApiSchema                 *base.SchemaProxy
+	ResourceDocumantation     string
+	BeforePostFunc            utils.ResponseConversionFunc
+	BeforePatchFunc           utils.ResponseConversionFunc
+	BeforeCreateUnmarshalFunc utils.BeforeCreateUnmarshalFunc
+	ReadBeforeUnmarshallFunc  utils.ReadBeforeUnmarshallFunc
+	AfterPostFunc             utils.ResponseConversionFunc
+	AfterPatchFunc            utils.ResponseConversionFunc
+	AfterReadFunc             utils.SchemaManipulationFunc
+	BeforeDeleteFunc          utils.PreDeleteFunc
+	PostDeleteFunc            utils.PostDeleteFunc
+	FieldsValidators          map[string]schema.SchemaValidateDiagFunc
+	SensitiveFields           *StringSet
+	IsDataSource              bool
+	BeforeCreateFunc          utils.ResponseConversionFunc
+	IdIsNotNumber             bool
+	DoesNotSupportImport      bool
+	HttpReadFunc              utils.HttpReadFunc
+	HttpUpdateFunc            utils.HttpUpdateFunc
+	HttpDeleteFunc            utils.HttpDeleteFunc
+	DiffFunc                  map[string]schema.SchemaDiffSuppressFunc
+}
+
+func (r *ResourceTemplateV2) GetDiffFunc(s string) string {
+	f, e := r.DiffFunc[s]
+	if !e {
+		return ""
+	}
+	t := strings.Split(GetFuncRunTimeTypeName(f), ".")
+	return t[len(t)-1]
 }
 
 func (r *ResourceTemplateV2) HasProperty(property string) bool {
@@ -432,6 +449,7 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 		if R.SensitiveFields != nil && R.SensitiveFields.In(m["name"]) {
 			m["sensitive"] = "true"
 		}
+		m["diff_func"] = R.GetDiffFunc(m["name"])
 
 		if R.RequiredIdentifierFields.In(m["name"]) {
 			m["computed"] = "false"

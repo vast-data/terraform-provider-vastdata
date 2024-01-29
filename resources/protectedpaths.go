@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceProtectedPath() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceProtectedPath() *schema.Resource {
 		DeleteContext: resourceProtectedPathDelete,
 		CreateContext: resourceProtectedPathCreate,
 		UpdateContext: resourceProtectedPathUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceProtectedPathImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceProtectedPathSchema(),
 	}
@@ -38,12 +44,14 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -51,7 +59,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"protection_policy_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"source_dir": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"target_exported_dir": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,7 +95,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"remote_tenant_guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -91,7 +104,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"target_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -209,7 +223,6 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	ProtectedPathId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/protectedpaths/%v", ProtectedPathId), "", map[string]string{})
 
@@ -226,8 +239,9 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 
 	}
 	resource := api_latest.ProtectedPath{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body ProtectedPath returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -237,6 +251,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -254,6 +269,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 
 func resourceProtectedPathDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	ProtectedPathId := d.Id()
 
@@ -297,6 +313,7 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ProtectedPath")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -339,8 +356,9 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type ProtectedPath created , server response %v", string(response_body)))
 	resource := api_latest.ProtectedPath{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -352,6 +370,7 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceProtectedPathRead(ctx, d, m)
 
 	return diags
@@ -388,6 +407,7 @@ func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m 
 
 	client := m.(vast_client.JwtSession)
 	ProtectedPathId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ProtectedPath"))
 	reflect_ProtectedPath := reflect.TypeOf((*api_latest.ProtectedPath)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectedPath.Elem(), d, &data, "", false)
@@ -403,7 +423,9 @@ func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/protectedpaths//%v", ProtectedPathId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectedPath %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)

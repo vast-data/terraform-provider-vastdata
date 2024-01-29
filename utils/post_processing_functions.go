@@ -259,3 +259,55 @@ func WaitForResourceDeletion(ctx context.Context, d *schema.ResourceData, m inte
 	return errors.New(fmt.Sprintf("Timeout reached wating for resource with path %s to be deleted", path))
 
 }
+
+func AddDatabaseCreationFields(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	m["protocols"] = []string{"S3", "DATABASE"}
+	m["share_acl"] = map[string]interface{}{"acl": []string{}, "enabled": false}
+	m["create_dir"] = true
+	//	m["tenant_id"] = 1
+	return m, nil
+}
+
+func AddVastdDatabaseSchemaIdentifierFieled(c interface{}, ctx context.Context, d *schema.ResourceData) error {
+	d.Set("identifier", fmt.Sprintf("%v/%v", d.Get("database_name"), d.Get("name")))
+	return nil
+}
+
+func _helper_build_table_json(table_name string, identifier string, fields string) (map[string]interface{}, error) {
+	m := map[string]interface{}{}
+	f := []map[string]interface{}{}
+	i := strings.SplitN(identifier, "/", 2)
+	m["database_name"] = i[0]
+	m["schema_name"] = i[1]
+	m["name"] = table_name
+	err := json.Unmarshal([]byte(fields), &f)
+
+	if err != nil {
+		return nil, err
+	}
+
+	m["arrow_schema"] = f
+	return m, nil
+}
+
+func ConstructTableFields(m map[string]interface{}, client interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	if strings.Trim(fmt.Sprintf("%v", m["fields"]), " \n\t") == "" {
+		return m, errors.New("fields can not be empty when creating a table")
+	}
+	return _helper_build_table_json(fmt.Sprintf("%v", m["name"]), fmt.Sprintf("%v", m["schema_identifier"]), fmt.Sprintf("%v", m["fields"]))
+}
+
+func GenerateTableDeleteData(ctx context.Context, d *schema.ResourceData, m interface{}) (io.Reader, error) {
+	data := map[string]interface{}{}
+
+	s := strings.SplitN(fmt.Sprintf("%v", d.Get("schema_identifier")), "/", 2)
+	data["database_name"] = s[0]
+	data["schema_name"] = s[1]
+	data["name"] = d.Get("name")
+
+	b, err := json.MarshalIndent(data, "", " ")
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewReader(b), nil
+}

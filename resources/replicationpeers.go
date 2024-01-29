@@ -1,11 +1,19 @@
 package resources
 
 import (
+	"io"
+
+	"strconv"
+
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -14,10 +22,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceReplicationPeers() *schema.Resource {
@@ -26,9 +30,11 @@ func ResourceReplicationPeers() *schema.Resource {
 		DeleteContext: resourceReplicationPeersDelete,
 		CreateContext: resourceReplicationPeersCreate,
 		UpdateContext: resourceReplicationPeersUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceReplicationPeersImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceReplicationPeersSchema(),
 	}
@@ -38,7 +44,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -46,12 +53,14 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -59,7 +68,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"leading_vip": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +77,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"remote_vip_range": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +86,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"version": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,7 +95,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"remote_version": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -91,7 +104,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"is_local": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -99,7 +113,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"peer_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -107,7 +122,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"secure_mode": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -115,7 +131,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"pool_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -269,7 +286,6 @@ func resourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
 	ReplicationPeersId := d.Id()
 	response, err := client.Get(ctx, fmt.Sprintf("/api/nativereplicationremotetargets/%v", ReplicationPeersId), "", map[string]string{})
 
@@ -286,8 +302,9 @@ func resourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData, m
 
 	}
 	resource := api_latest.ReplicationPeers{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 
+	body, err := utils.DefaultProcessingFunc(ctx, response)
+	tflog.Debug(ctx, fmt.Sprintf("Body ReplicationPeers returned after processing response %v", string(body)))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -297,6 +314,7 @@ func resourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData, m
 		return diags
 
 	}
+
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -314,6 +332,7 @@ func resourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData, m
 
 func resourceReplicationPeersDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+
 	client := m.(vast_client.JwtSession)
 	ReplicationPeersId := d.Id()
 
@@ -352,6 +371,7 @@ func resourceReplicationPeersCreate(ctx context.Context, d *schema.ResourceData,
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ReplicationPeers")
 		if t_exists {
+
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
 				tflog.Warn(ctx, versions_error.Error())
@@ -394,8 +414,9 @@ func resourceReplicationPeersCreate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	tflog.Debug(ctx, fmt.Sprintf("Object type ReplicationPeers created , server response %v", string(response_body)))
 	resource := api_latest.ReplicationPeers{}
+
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -407,6 +428,7 @@ func resourceReplicationPeersCreate(ctx context.Context, d *schema.ResourceData,
 	}
 
 	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+
 	resourceReplicationPeersRead(ctx, d, m)
 
 	return diags
@@ -443,6 +465,7 @@ func resourceReplicationPeersUpdate(ctx context.Context, d *schema.ResourceData,
 
 	client := m.(vast_client.JwtSession)
 	ReplicationPeersId := d.Id()
+
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ReplicationPeers"))
 	reflect_ReplicationPeers := reflect.TypeOf((*api_latest.ReplicationPeers)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ReplicationPeers.Elem(), d, &data, "", false)
@@ -458,7 +481,9 @@ func resourceReplicationPeersUpdate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
+
 	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/nativereplicationremotetargets//%v", ReplicationPeersId), "application/json", bytes.NewReader(b), map[string]string{})
+
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ReplicationPeers %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
