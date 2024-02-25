@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -717,9 +716,8 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	client := m.(vast_client.JwtSession)
 
-	ViewId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/views/%v", ViewId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/views/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -768,9 +766,9 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	ViewId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/views/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/views/%v/", ViewId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -834,7 +832,8 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/views/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/views/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", create_err))
 
 	if create_err != nil {
@@ -901,7 +900,6 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 
 	client := m.(vast_client.JwtSession)
-	ViewId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource View"))
 	reflect_View := reflect.TypeOf((*api_latest.View)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_View.Elem(), d, &data, "", false)
@@ -923,7 +921,8 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/views//%v", ViewId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/views/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -953,8 +952,8 @@ func resourceViewImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/views/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/views/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

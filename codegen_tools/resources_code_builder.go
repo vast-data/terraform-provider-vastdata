@@ -41,7 +41,6 @@ func BuildResourceTemplateHeader(r ResourceTemplateV2) string {
 import (
         "io"
         "strconv"
-        "bytes"
         "reflect"
         "encoding/json"
         "fmt"
@@ -154,9 +153,8 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      {{ $cbl:="{" }}
      client:=m.(vast_client.JwtSession)
 
-     {{ .ResourceName }}Id := d.Id()     
-     response,err:=client.Get(ctx,fmt.Sprintf("{{.Path}}%v",{{ .ResourceName }}Id),"", map[string]string{})
-
+     attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}  
+     response,err:={{ funcName .GetFunc}}(ctx,client,attrs,map[string]string{})
      utils.VastVersionsWarn(ctx)
 
      tflog.Info(ctx,response.Request.URL.String())
@@ -205,16 +203,18 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
      var diags diag.Diagnostics
      client:=m.(vast_client.JwtSession)
-     {{ .ResourceName }}Id := d.Id()
+     attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}
      {{ if .BeforeDeleteFunc  }}
      data,before_delete_error:={{ funcName .BeforeDeleteFunc}}(ctx,d,m)
      if before_delete_error!=nil {
         return diag.FromErr(before_delete_error)
      }
-     response,err:=client.Delete(ctx,fmt.Sprintf("{{.Path}}%v/",{{ .ResourceName }}Id),"",data , map[string]string{})
+     unmarshaled_data := map[string]interface{}{}
+     _data,_:=io.ReadAll(data)
+     json.Unmarshal(_data, &unmarshaled_data)
+     response,err:={{ funcName .DeleteFunc}}(ctx,client,attrs,unmarshaled_data,map[string]string{});
      {{else}}
-
-     response,err:=client.Delete(ctx,fmt.Sprintf("{{.Path}}%v/",{{ .ResourceName }}Id),"",nil , map[string]string{})
+     response,err:={{ funcName .DeleteFunc}}(ctx,client,attrs,nil,map[string]string{});
      {{end}}
      tflog.Info(ctx,fmt.Sprintf("Removing Resource"))
      tflog.Info(ctx,response.Request.URL.String())
@@ -284,7 +284,8 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-    response ,create_err:=client.Post(ctx,"{{.Path}}",bytes.NewReader(b),map[string]string{});
+    attrs:=map[string]interface{}{"path":"{{.Path}}"}
+    response ,create_err:={{ funcName .CreateFunc}}(ctx,client,attrs,data,map[string]string{});
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , create_err))
     
     if create_err != nil {
@@ -352,7 +353,6 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     }     
 
     client:=m.(vast_client.JwtSession)
-    {{ .ResourceName }}Id := d.Id()     
     tflog.Info(ctx,fmt.Sprintf("Updating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
@@ -375,7 +375,8 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-    response ,patch_err:=client.Patch(ctx,fmt.Sprintf("{{.Path}}/%v",{{ .ResourceName }}Id),"application/json",bytes.NewReader(b),map[string]string{});
+    attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}
+    response ,patch_err := {{ funcName .UpdateFunc}}(ctx,client,attrs,data,map[string]string{})
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , patch_err))
     if patch_err != nil {
             error_message:=patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response) 
@@ -408,8 +409,8 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
     guid := d.Id()
     values := url.Values{}
     values.Add("guid", fmt.Sprintf("%v", guid))
-
-    response, err := client.Get(ctx,"{{.Path}}", values.Encode(), map[string]string{})
+    attrs:=map[string]interface{}{"path":"{{.Path}}","query":values.Encode()}
+    response,err:={{ funcName .GetFunc}}(ctx,client,attrs,map[string]string{})
 
     if err != nil {
 	    return result, err

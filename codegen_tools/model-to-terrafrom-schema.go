@@ -193,6 +193,25 @@ type ResourceTemplateV2 struct {
 	SensitiveFields          *StringSet
 	IsDataSource             bool
 	BeforeCreateFunc         utils.ResponseConversionFunc
+	CreateFunc               utils.CreateFuncType
+	UpdateFunc               utils.UpdateFuncType
+	DeleteFunc               utils.DeleteFuncType
+	GetFunc                  utils.GetFuncType
+}
+
+func (r *ResourceTemplateV2) SetFunctions() {
+	if r.CreateFunc == nil {
+		r.CreateFunc = utils.DefaultCreateFunc
+	}
+	if r.DeleteFunc == nil {
+		r.DeleteFunc = utils.DefaultDeleteFunc
+	}
+	if r.UpdateFunc == nil {
+		r.UpdateFunc = utils.DefaultUpdateFunc
+	}
+	if r.GetFunc == nil {
+		r.GetFunc = utils.DefaultGetFunc
+	}
 }
 
 func (r *ResourceTemplateV2) HasProperty(property string) bool {
@@ -501,6 +520,7 @@ func ProcessResourceTemplate(R *ResourceTemplateV2) {
 	R.TfNameToModelName = TfNameToModelName
 	R.ApiSchema = getSchemaProxy(strings.ToLower(R.ResourceName))
 	R.ResourceDocumantation = R.GetSchemaDocumentation()
+	R.SetFunctions()
 }
 
 type ResourceElem struct {

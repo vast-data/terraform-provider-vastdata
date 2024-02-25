@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -1129,9 +1128,8 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	client := m.(vast_client.JwtSession)
 
-	QuotaId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/latest/quotas/%v", QuotaId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -1174,9 +1172,9 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	QuotaId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/latest/quotas/%v/", QuotaId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -1246,7 +1244,8 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/latest/quotas/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/latest/quotas/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", create_err))
 
 	if create_err != nil {
@@ -1307,7 +1306,6 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	client := m.(vast_client.JwtSession)
-	QuotaId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Quota"))
 	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
@@ -1329,7 +1327,8 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/latest/quotas//%v", QuotaId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -1353,8 +1352,8 @@ func resourceQuotaImporter(ctx context.Context, d *schema.ResourceData, m interf
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/latest/quotas/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

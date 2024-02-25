@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -114,9 +113,8 @@ func resourceNisRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	client := m.(vast_client.JwtSession)
 
-	NisId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/nis/%v", NisId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/nis/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -159,9 +157,9 @@ func resourceNisRead(ctx context.Context, d *schema.ResourceData, m interface{})
 func resourceNisDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	NisId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/nis/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/nis/%v/", NisId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -225,7 +223,8 @@ func resourceNisCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/nis/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/nis/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Nis %v", create_err))
 
 	if create_err != nil {
@@ -286,7 +285,6 @@ func resourceNisUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	client := m.(vast_client.JwtSession)
-	NisId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Nis"))
 	reflect_Nis := reflect.TypeOf((*api_latest.Nis)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Nis.Elem(), d, &data, "", false)
@@ -302,7 +300,8 @@ func resourceNisUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/nis//%v", NisId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/nis/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Nis %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -326,8 +325,8 @@ func resourceNisImporter(ctx context.Context, d *schema.ResourceData, m interfac
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/nis/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/nis/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

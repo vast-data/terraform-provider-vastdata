@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -327,9 +326,8 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 
 	client := m.(vast_client.JwtSession)
 
-	S3LifeCycleRuleId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/s3lifecyclerules/%v", S3LifeCycleRuleId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/s3lifecyclerules/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -372,9 +370,9 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	S3LifeCycleRuleId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/s3lifecyclerules/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/s3lifecyclerules/%v/", S3LifeCycleRuleId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -444,7 +442,8 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/s3lifecyclerules/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/s3lifecyclerules/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", create_err))
 
 	if create_err != nil {
@@ -505,7 +504,6 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	client := m.(vast_client.JwtSession)
-	S3LifeCycleRuleId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3LifeCycleRule"))
 	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
@@ -527,7 +525,8 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/s3lifecyclerules//%v", S3LifeCycleRuleId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/s3lifecyclerules/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -551,8 +550,8 @@ func resourceS3LifeCycleRuleImporter(ctx context.Context, d *schema.ResourceData
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/s3lifecyclerules/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/s3lifecyclerules/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

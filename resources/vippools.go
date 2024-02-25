@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -486,9 +485,8 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	client := m.(vast_client.JwtSession)
 
-	VipPoolId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/vippools/%v", VipPoolId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/vippools/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -531,9 +529,9 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceVipPoolDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	VipPoolId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/vippools/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/vippools/%v/", VipPoolId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -597,7 +595,8 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/vippools/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/vippools/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", create_err))
 
 	if create_err != nil {
@@ -658,7 +657,6 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 
 	client := m.(vast_client.JwtSession)
-	VipPoolId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource VipPool"))
 	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_VipPool.Elem(), d, &data, "", false)
@@ -674,7 +672,8 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/vippools//%v", VipPoolId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/vippools/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -698,8 +697,8 @@ func resourceVipPoolImporter(ctx context.Context, d *schema.ResourceData, m inte
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/vippools/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/vippools/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -127,9 +126,8 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 	client := m.(vast_client.JwtSession)
 
-	S3PolicyId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/s3policies/%v", S3PolicyId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/s3policies/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -172,9 +170,9 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 func resourceS3PolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	S3PolicyId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/s3policies/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/s3policies/%v/", S3PolicyId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -244,7 +242,8 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/s3policies/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/s3policies/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3Policy %v", create_err))
 
 	if create_err != nil {
@@ -305,7 +304,6 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 
 	client := m.(vast_client.JwtSession)
-	S3PolicyId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3Policy"))
 	reflect_S3Policy := reflect.TypeOf((*api_latest.S3Policy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
@@ -327,7 +325,8 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/s3policies//%v", S3PolicyId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/s3policies/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3Policy %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -351,8 +350,8 @@ func resourceS3PolicyImporter(ctx context.Context, d *schema.ResourceData, m int
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/s3policies/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/s3policies/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

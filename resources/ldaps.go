@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -740,9 +739,8 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	client := m.(vast_client.JwtSession)
 
-	LdapId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/ldaps/%v", LdapId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/ldaps/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -785,9 +783,9 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 func resourceLdapDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	LdapId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/ldaps/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/ldaps/%v/", LdapId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -851,7 +849,8 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/ldaps/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/ldaps/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Ldap %v", create_err))
 
 	if create_err != nil {
@@ -912,7 +911,6 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 
 	client := m.(vast_client.JwtSession)
-	LdapId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Ldap"))
 	reflect_Ldap := reflect.TypeOf((*api_latest.Ldap)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Ldap.Elem(), d, &data, "", false)
@@ -928,7 +926,8 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/ldaps//%v", LdapId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/ldaps/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Ldap %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -952,8 +951,8 @@ func resourceLdapImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/ldaps/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/ldaps/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

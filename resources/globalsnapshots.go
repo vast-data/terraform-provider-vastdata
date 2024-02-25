@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -275,9 +274,8 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 
 	client := m.(vast_client.JwtSession)
 
-	GlobalSnapshotId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/globalsnapstreams/%v", GlobalSnapshotId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -320,9 +318,9 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 func resourceGlobalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	GlobalSnapshotId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/globalsnapstreams/%v/", GlobalSnapshotId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -392,7 +390,8 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/globalsnapstreams/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", create_err))
 
 	if create_err != nil {
@@ -453,7 +452,6 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	client := m.(vast_client.JwtSession)
-	GlobalSnapshotId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource GlobalSnapshot"))
 	reflect_GlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
@@ -475,7 +473,8 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/globalsnapstreams//%v", GlobalSnapshotId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -499,8 +498,8 @@ func resourceGlobalSnapshotImporter(ctx context.Context, d *schema.ResourceData,
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/globalsnapstreams/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err

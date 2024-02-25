@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -294,9 +293,8 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	client := m.(vast_client.JwtSession)
 
-	DnsId := d.Id()
-	response, err := client.Get(ctx, fmt.Sprintf("/api/latest/dns/%v", DnsId), "", map[string]string{})
-
+	attrs := map[string]interface{}{"path": "/api/latest/dns/", "id": d.Id()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -339,9 +337,9 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	DnsId := d.Id()
+	attrs := map[string]interface{}{"path": "/api/latest/dns/", "id": d.Id()}
 
-	response, err := client.Delete(ctx, fmt.Sprintf("/api/latest/dns/%v/", DnsId), "", nil, map[string]string{})
+	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -405,7 +403,8 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, create_err := client.Post(ctx, "/api/latest/dns/", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/latest/dns/"}
+	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", create_err))
 
 	if create_err != nil {
@@ -466,7 +465,6 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	client := m.(vast_client.JwtSession)
-	DnsId := d.Id()
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Dns"))
 	reflect_Dns := reflect.TypeOf((*api_latest.Dns)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Dns.Elem(), d, &data, "", false)
@@ -482,7 +480,8 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	response, patch_err := client.Patch(ctx, fmt.Sprintf("/api/latest/dns//%v", DnsId), "application/json", bytes.NewReader(b), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/latest/dns/", "id": d.Id()}
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -506,8 +505,8 @@ func resourceDnsImporter(ctx context.Context, d *schema.ResourceData, m interfac
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-
-	response, err := client.Get(ctx, "/api/latest/dns/", values.Encode(), map[string]string{})
+	attrs := map[string]interface{}{"path": "/api/latest/dns/", "query": values.Encode()}
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
 
 	if err != nil {
 		return result, err
