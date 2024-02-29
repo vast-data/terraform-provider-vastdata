@@ -10,6 +10,7 @@ import (
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
@@ -135,4 +136,11 @@ func DefaultGetFunc(ctx context.Context, _client interface{}, attr map[string]in
 
 	tflog.Debug(ctx, fmt.Sprintf("Calling GET to path \"%v\" , with Query %v", path, query))
 	return client.Get(ctx, path, query, headers)
+}
+
+type IdFuncType func(context.Context, interface{}, interface{}, *schema.ResourceData) error
+
+func DefaultIdFunc(ctx context.Context, _client interface{}, _id interface{}, d *schema.ResourceData) error {
+	d.SetId(fmt.Sprintf("%v", _id))
+	return nil
 }

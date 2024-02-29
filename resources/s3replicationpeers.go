@@ -415,7 +415,15 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 		return diags
 	}
 
-	d.SetId(strconv.FormatInt((int64)(resource.Id), 10))
+	id_err := utils.DefaultIdFunc(ctx, client, resource.Id, d)
+	if id_err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	resourceS3replicationPeersRead(ctx, d, m)
 
 	return diags
