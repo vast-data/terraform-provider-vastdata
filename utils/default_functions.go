@@ -71,15 +71,15 @@ func DefaultCreateFunc(ctx context.Context, _client interface{}, attr map[string
 	return client.Post(ctx, (*attributes)["path"], bytes.NewReader(b), map[string]string{})
 }
 
-type UpdateFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, map[string]string) (*http.Response, error)
+type UpdateFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
 
-func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
+func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	client := _client.(vast_client.JwtSession)
 	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
 	if err != nil {
 		return nil, err
 	}
-	update_path := fmt.Sprintf("%v/%v", (*attributes)["path"], (*attributes)["id"])
+	update_path := fmt.Sprintf("%v/%v", (*attributes)["uspath"], (*attributes)["id"])
 	b, marshal_error := json.Marshal(data)
 	if marshal_error != nil {
 		return nil, marshal_error
@@ -115,9 +115,9 @@ func DefaultDeleteFunc(ctx context.Context, _client interface{}, attr map[string
 	return client.Delete(ctx, delete_path, query, r, map[string]string{})
 }
 
-type GetFuncType func(context.Context, interface{}, map[string]interface{}, map[string]string) (*http.Response, error)
+type GetFuncType func(context.Context, interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
 
-func DefaultGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, headers map[string]string) (*http.Response, error) {
+func DefaultGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	client := _client.(vast_client.JwtSession)
 	attributes, err := getAttributesAsString([]string{"path"}, attr)
 	if err != nil {

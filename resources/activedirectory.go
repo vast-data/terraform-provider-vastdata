@@ -3,8 +3,13 @@ package resources
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io"
+	"reflect"
+
+	"errors"
+	"net/url"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -13,10 +18,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-	"io"
-	"net/url"
-	"reflect"
-	"strconv"
 )
 
 func ResourceActiveDirectory() *schema.Resource {
@@ -25,9 +26,11 @@ func ResourceActiveDirectory() *schema.Resource {
 		DeleteContext: resourceActiveDirectoryDelete,
 		CreateContext: resourceActiveDirectoryCreate,
 		UpdateContext: resourceActiveDirectoryUpdate,
+
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceActiveDirectoryImporter,
 		},
+
 		Description: ``,
 		Schema:      getResourceActiveDirectorySchema(),
 	}
@@ -129,7 +132,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 	client := m.(vast_client.JwtSession)
 
 	attrs := map[string]interface{}{"path": "/api/activedirectory/", "id": d.Id()}
-	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -280,7 +283,8 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
-	resourceActiveDirectoryRead(ctx, d, m)
+	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceActiveDirectoryRead(ctx_with_resource, d, m)
 
 	return diags
 }
@@ -331,7 +335,7 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": "/api/activedirectory/", "id": d.Id()}
-	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, map[string]string{})
+	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -356,7 +360,7 @@ func resourceActiveDirectoryImporter(ctx context.Context, d *schema.ResourceData
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
 	attrs := map[string]interface{}{"path": "/api/activedirectory/", "query": values.Encode()}
-	response, err := utils.DefaultGetFunc(ctx, client, attrs, map[string]string{})
+	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {
 		return result, err
@@ -378,9 +382,11 @@ func resourceActiveDirectoryImporter(ctx context.Context, d *schema.ResourceData
 	}
 
 	resource := resource_l[0]
+	id_err := utils.DefaultIdFunc(ctx, client, resource.Id, d)
+	if id_err != nil {
+		return result, id_err
+	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
 	diags := ResourceActiveDirectoryReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
 		all_errors := "Errors occured while importing:\n"

@@ -40,13 +40,14 @@ func BuildResourceTemplateHeader(r ResourceTemplateV2) string {
 
 import (
         "io"
-        "strconv"
         "reflect"
         "encoding/json"
         "fmt"
         "context"
+        {{ if not .DisableImport }}
         "net/url"
         "errors"
+        {{ end }}
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
         "github.com/hashicorp/terraform-plugin-sdk/v2/diag"
         vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
@@ -65,9 +66,11 @@ func Resource{{ .ResourceName }}() *schema.Resource {
      DeleteContext: resource{{ .ResourceName }}Delete,
      CreateContext: resource{{ .ResourceName }}Create,
      UpdateContext: resource{{ .ResourceName }}Update,
+     {{ if not .DisableImport }}
      Importer: &schema.ResourceImporter{
                       StateContext: resource{{ .ResourceName }}Importer,
      },
+     {{ end }}
      Description: {{getBT}}{{ .ResourceDocumantation }}{{getBT}},
      Schema: getResource{{ .ResourceName }}Schema(),
    }
@@ -154,7 +157,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      client:=m.(vast_client.JwtSession)
 
      attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}  
-     response,err:={{ funcName .GetFunc}}(ctx,client,attrs,map[string]string{})
+     response,err:={{ funcName .GetFunc}}(ctx,client,attrs,d,map[string]string{})
      utils.VastVersionsWarn(ctx)
 
      tflog.Info(ctx,response.Request.URL.String())
@@ -319,7 +322,8 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
 		})
         return diags
     }
-   resource{{ .ResourceName }}Read(ctx,d,m)
+   ctx_with_resource:=context.WithValue(ctx, utils.ContextKey("resource"), resource)
+   resource{{ .ResourceName }}Read(ctx_with_resource,d,m)
     {{ if .BeforeCreateFunc }}
     var before_create_error error
     _,before_create_error={{ funcName .BeforeCreateFunc}}(data,client,ctx,d)
@@ -384,7 +388,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
     attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}
-    response ,patch_err := {{ funcName .UpdateFunc}}(ctx,client,attrs,data,map[string]string{})
+    response ,patch_err := {{ funcName .UpdateFunc}}(ctx,client,attrs,data,d,map[string]string{})
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , patch_err))
     if patch_err != nil {
             error_message:=patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response) 
@@ -409,7 +413,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
 
 
 }
-
+{{ if not .DisableImport }}
 func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.ResourceData, m interface{})  ([]*schema.ResourceData, error) {
 
     result := []*schema.ResourceData{}
@@ -418,7 +422,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
     values := url.Values{}
     values.Add("guid", fmt.Sprintf("%v", guid))
     attrs:=map[string]interface{}{"path":"{{.Path}}","query":values.Encode()}
-    response,err:={{ funcName .GetFunc}}(ctx,client,attrs,map[string]string{})
+    response,err:={{ funcName .GetFunc}}(ctx,client,attrs,d,map[string]string{})
 
     if err != nil {
 	    return result, err
@@ -450,10 +454,12 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
         return result,errors.New("Cluster provided 0 elements matchin gthis guid")
      }
      
-     resource:=resource_l[0]
-  
-     Id:=(int64)(resource.Id)
-     d.SetId(strconv.FormatInt(Id,10))
+    resource:=resource_l[0]
+    id_err:={{ funcName .IdFunc}}(ctx,client,resource.Id,d)
+    if id_err!=nil {
+	 return result,id_err
+     }
+
      diags := Resource{{.ResourceName}}ReadStructIntoSchema(ctx, resource, d)
      if diags.HasError() {
          all_errors:="Errors occured while importing:\n"
@@ -467,6 +473,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
      return result, err
 
 }
+{{ end }}
 `
 	_, exists := funcMap["BuildTemplateFromModelName"]
 	if !exists {

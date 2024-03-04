@@ -105,6 +105,7 @@ var vast_versions map[string]map[string]reflect.Type = map[string]map[string]ref
 		"Snapshot":                        reflect.TypeOf((*version_5_0_0.Snapshot)(nil)).Elem(),
 		"Tenant":                          reflect.TypeOf((*version_5_0_0.Tenant)(nil)).Elem(),
 		"User":                            reflect.TypeOf((*version_5_0_0.User)(nil)).Elem(),
+		"UserKey":                         reflect.TypeOf((*version_5_0_0.UserKey)(nil)).Elem(),
 		"UserQuota":                       reflect.TypeOf((*version_5_0_0.UserQuota)(nil)).Elem(),
 		"View":                            reflect.TypeOf((*version_5_0_0.View)(nil)).Elem(),
 		"ViewCreate":                      reflect.TypeOf((*version_5_0_0.ViewCreate)(nil)).Elem(),

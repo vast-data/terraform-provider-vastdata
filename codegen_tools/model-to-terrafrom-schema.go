@@ -175,6 +175,7 @@ type ResourceTemplateV2 struct {
 	ForceNewFields           *StringSet
 	ListsNamesMap            map[string][]string
 	Generate                 bool
+	DisableImport            bool
 	DataSourceName           string
 	ResponseProcessingFunc   string
 	ResponseGetByURL         bool
