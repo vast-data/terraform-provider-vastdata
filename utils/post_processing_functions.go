@@ -192,9 +192,26 @@ func UpdateStreamInfo(m map[string]interface{}, i interface{}, ctx context.Conte
 func AlwaysSendCreateDir(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	create_dir := d.Get("create_dir")
 	m["create_dir"] = create_dir
+	//in the case of shared ACL set , but the acl is missing ,we must set it to an empty list
+	share_acl, share_acl_exists := m["share_acl"]
+	if share_acl_exists {
+		m["s3_object_ownership_rule"] = "BucketOwnerEnforced"
+
+		qos_policy_id, qos_policy_id_exists := d.GetOkExists("qos_policy_id")
+		if qos_policy_id_exists && qos_policy_id != 0 {
+			m["qos_policy_id"] = qos_policy_id
+		} else {
+			m["qos_policy_id"] = nil
+		}
+
+		_share_acl := share_acl.(map[string]interface{})
+		_, acl_exists := _share_acl["acl"]
+		if !acl_exists {
+			_share_acl["acl"] = []interface{}{}
+		}
+	}
 	return m, nil
 }
-
 func AlwaysStoreCreateDir(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	_create_dir, exists := d.GetOkExists("create_dir")
 	o, n := d.GetChange("create_dir")

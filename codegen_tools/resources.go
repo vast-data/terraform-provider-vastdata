@@ -216,7 +216,7 @@ var resources_templates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "View",
-		Path:                     ToStringPointer("/api/views/"),
+		Path:                     ToStringPointer("/api/latest/views/"),
 		Model:                    api_latest.View{},
 		DestFile:                 ToStringPointer("views.go"),
 		IgnoreFields:             NewStringSet("Id"),

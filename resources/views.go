@@ -719,7 +719,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/views/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": "/api/latest/views/", "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -769,7 +769,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/views/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": "/api/latest/views/", "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -835,7 +835,7 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/views/"}
+	attrs := map[string]interface{}{"path": "/api/latest/views/"}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", create_err))
 
@@ -933,7 +933,7 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/views/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": "/api/latest/views/", "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", patch_err))
 	if patch_err != nil {
@@ -964,7 +964,7 @@ func resourceViewImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/views/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": "/api/latest/views/", "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {
