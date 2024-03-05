@@ -79,7 +79,7 @@ func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string
 	if err != nil {
 		return nil, err
 	}
-	update_path := fmt.Sprintf("%v/%v", (*attributes)["uspath"], (*attributes)["id"])
+	update_path := fmt.Sprintf("%v/%v", (*attributes)["path"], (*attributes)["id"])
 	b, marshal_error := json.Marshal(data)
 	if marshal_error != nil {
 		return nil, marshal_error
