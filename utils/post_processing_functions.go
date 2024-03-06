@@ -195,8 +195,6 @@ func AlwaysSendCreateDir(m map[string]interface{}, i interface{}, ctx context.Co
 	//in the case of shared ACL set , but the acl is missing ,we must set it to an empty list
 	share_acl, share_acl_exists := m["share_acl"]
 	if share_acl_exists {
-		m["s3_object_ownership_rule"] = "BucketOwnerEnforced"
-
 		qos_policy_id, qos_policy_id_exists := d.GetOkExists("qos_policy_id")
 		if qos_policy_id_exists && qos_policy_id != 0 {
 			m["qos_policy_id"] = qos_policy_id
@@ -207,7 +205,12 @@ func AlwaysSendCreateDir(m map[string]interface{}, i interface{}, ctx context.Co
 		_share_acl := share_acl.(map[string]interface{})
 		_, acl_exists := _share_acl["acl"]
 		if !acl_exists {
+			o, n := d.GetChange("enabled")
+			tflog.Debug(ctx, fmt.Sprintf("VIEW: share_acl->acl doe not exists, creating empty acl with enabled value of: Old %v, New: %v", o, n))
 			_share_acl["acl"] = []interface{}{}
+			if d.Get("enabled") == nil {
+				_share_acl["enabled"] = false
+			}
 		}
 	}
 	return m, nil
