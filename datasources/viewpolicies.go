@@ -469,7 +469,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: ``,
+				Description: `A list of usernames for bucket listing permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -481,7 +481,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: ``,
+				Description: `A list of group names for bucket listing permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

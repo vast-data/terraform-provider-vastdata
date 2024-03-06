@@ -620,10 +620,12 @@ components:
           type: "array"
           items:
             type: "string"
+          description: "A list of usernames for bucket listing permissions"
         s3_visibility_groups:
           type: "array"
           items:
             type: "string"
+          description: "A list of group names for bucket listing permissions"
         apple_sid:
           type: "boolean"
           description: "Apple sid"

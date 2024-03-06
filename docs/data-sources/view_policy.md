@@ -74,8 +74,8 @@ data vastdata_view_policy view_policy1 {
 - `s3_object_write_acp` (String) Hosts with full permissions
 - `s3_read_only` (List of String) Hosts with S3 read only permissions
 - `s3_read_write` (List of String) Hosts with S3 read/write permissions
-- `s3_visibility` (List of String)
-- `s3_visibility_groups` (List of String)
+- `s3_visibility` (List of String) A list of usernames for bucket listing permissions
+- `s3_visibility_groups` (List of String) A list of group names for bucket listing permissions
 - `smb_directory_mode` (Number) Default unix type permissions on new folder
 - `smb_directory_mode_padded` (String) Default unix type permissions on new folder
 - `smb_file_mode` (Number) Default unix type permissions on new file

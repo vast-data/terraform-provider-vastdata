@@ -104,7 +104,9 @@ type ViewPolicy struct {
 	VipPools []int32 `json:"vip_pools,omitempty"`
 	// NFS 4.1 minimal protection level
 	NfsMinimalProtectionLevel string `json:"nfs_minimal_protection_level,omitempty"`
+	// A list of usernames for bucket listing permissions
 	S3Visibility []string `json:"s3_visibility,omitempty"`
+	// A list of group names for bucket listing permissions
 	S3VisibilityGroups []string `json:"s3_visibility_groups,omitempty"`
 	// Apple sid
 	AppleSid bool `json:"apple_sid,omitempty"`

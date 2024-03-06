@@ -477,7 +477,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `A list of usernames for bucket listing permissions`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -489,7 +489,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `A list of group names for bucket listing permissions`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
