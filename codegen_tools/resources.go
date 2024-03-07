@@ -457,4 +457,18 @@ var resources_templates = []ResourceTemplateV2{
 		SensitiveFields:          NewStringSet("secret_key"),
 		DisableImport:            true,
 	},
+	ResourceTemplateV2{
+		ResourceName:             "ActiveDirectory2",
+		Path:                     ToStringPointer("/api/activedirectory/"),
+		Model:                    api_latest.ActiveDirectory2{},
+		DestFile:                 ToStringPointer("activedirectory2.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("machine_account_name"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		BeforeDeleteFunc:         utils.SkipDeleteAsUserSelected,
+		DataSourceName:           "vastdata_active_directory2",
+		ForceNewFields:           NewStringSet("machine_account_name", "organizational_unit"),
+	},
 }

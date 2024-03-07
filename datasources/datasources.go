@@ -26,4 +26,5 @@ var DataSources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_replication_peers":    DataSourceReplicationPeers(),
 	"vastdata_protection_policy":    DataSourceProtectionPolicy(),
 	"vastdata_s3_replication_peers": DataSourceS3replicationPeers(),
+	"vastdata_active_directory2":    DataSourceActiveDirectory2(),
 }

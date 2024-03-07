@@ -1657,5 +1657,98 @@ components:
         custom_bucket_url:
           type: "string"
           description: "The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3"
-      
-      
+    ActiveDirectory2:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: ""
+        guid:
+          type: "string"
+          description: ""          
+        machine_account_name:
+          type: "string"
+          description: ""
+        organizational_unit:
+          type: "string"
+          description: ""
+        smb_allowed:
+          type: "boolean"
+          default: true
+        ntlm_enabled:
+          type: "boolean"
+          default: true
+        use_auto_discovery:
+          type: "boolean"
+          default: false
+        use_ldaps:
+          type: "boolean"
+          default: false
+        port:
+          type: "int"
+          default: 389
+        binddn:
+          type: "string"
+        searchbase:
+          type: "string"
+        domain_name:
+          type: "string"
+        method:
+          type: "string"
+          enum: [simple,anonymous,sasl]
+          default: "simple"
+        query_groups_mode:
+          type: "string"
+          enum: [COMPATIBLE,NONE,RFC2307BIS,RFC2307]
+          default: "COMPATIBLE"
+        posix_attributes_source:
+          type: "string"
+          default: "JOINED_DOMAIN"
+        use_tls:
+          type: "boolean"
+          default: false
+        reverse_lookup:
+          type: "boolean"
+          default: false
+        gid_number:
+          type: "string"
+        use_multi_forest:
+          type: "boolean"
+          default: false
+        uid:
+          type: "string"
+        uid_number:
+          type: "string"
+        match_user:
+          type: "string"
+        uid_member_value_property_name:
+          type: "string"
+        uid_member:
+          type: "string"
+        posix_account:
+          type: "string"
+        posix_group:
+          type: "string"
+        username_property_name:
+          type: "string"
+        user_login_name:
+          type: "string"
+        group_login_name:
+          type: "string"
+        mail_property_name:
+          type: "string"
+        is_vms_auth_provider:
+          type: "boolean"
+          default: false
+        bindpw:
+          type: "string"          
+        urls:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of LDAP servers urls , starting with ldap://"
+        skip_ldap:
+          type: "string"
+          default: false
+          description: "When creating an active directory using this resource an ldap configuration is also created if set to true than whed deleting this resource the ldap configuration will be kept otherwise it will also be deleted"
+
