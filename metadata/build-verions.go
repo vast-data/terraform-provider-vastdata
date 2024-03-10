@@ -4,7 +4,7 @@ import (
 	version "github.com/hashicorp/go-version"
 )
 
-var build_version, _ = version.NewVersion("5.0.0")
+var build_version, _ = version.NewVersion("5.1.0")
 
 const (
 	CLUSTER_VERSION_EQUALS int = 0
