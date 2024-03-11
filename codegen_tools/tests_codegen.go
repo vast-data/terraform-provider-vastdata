@@ -9,6 +9,7 @@ import (
 
 	"text/template"
 
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 	"github.com/vast-data/terraform-provider-vastdata/utils"
 )
 
@@ -48,7 +49,7 @@ func GenStringsList(size, sub_size int) [][]string {
 
 }
 
-func ShouldSkip(resource, field_name string, resources_map map[string]ResourceTemplateV2) bool {
+func ShouldSkip(resource, field_name string, resources_map map[string]codegen_configs.ResourceTemplateV2) bool {
 	r, exists := resources_map[resource]
 	if !exists {
 		return true
@@ -59,7 +60,7 @@ func ShouldSkip(resource, field_name string, resources_map map[string]ResourceTe
 	return false
 }
 
-func StructAsFilledMap(t reflect.Type, m *map[string]interface{}, resources_map map[string]ResourceTemplateV2) {
+func StructAsFilledMap(t reflect.Type, m *map[string]interface{}, resources_map map[string]codegen_configs.ResourceTemplateV2) {
 	for _, fld := range reflect.VisibleFields(t) {
 		if ShouldSkip(t.Name(), fld.Name, resources_map) {
 			continue
@@ -139,7 +140,7 @@ func StructAsFilledMap(t reflect.Type, m *map[string]interface{}, resources_map 
 	}
 }
 
-func getTestJson(resource_name string, mp map[string]ResourceTemplateV2) string {
+func getTestJson(resource_name string, mp map[string]codegen_configs.ResourceTemplateV2) string {
 	m := map[string]interface{}{}
 	u, _ := mp[resource_name]
 	StructAsFilledMap(reflect.TypeOf(u.Model), &m, mp)

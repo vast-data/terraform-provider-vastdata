@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"text/template"
+
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 )
 
-func BuildResourcesList(resources_templates []ResourceTemplateV2) string {
+func BuildResourcesList(resources_templates []codegen_configs.ResourceTemplateV2) string {
 	var b bytes.Buffer
 	resources :=
 		`package resources
@@ -33,7 +35,7 @@ var Resources map[string]*schema.Resource = map[string]*schema.Resource{
 
 }
 
-func BuildResourceTemplateHeader(r ResourceTemplateV2) string {
+func BuildResourceTemplateHeader(r codegen_configs.ResourceTemplateV2) string {
 	var b bytes.Buffer
 	header :=
 		`package resources
@@ -90,7 +92,7 @@ func getResource{{ .ResourceName }}Schema() map[string]*schema.Schema {
 	return b.String()
 }
 
-func BuildResourceTemplateReadFunction(r ResourceTemplateV2) string {
+func BuildResourceTemplateReadFunction(r codegen_configs.ResourceTemplateV2) string {
 	var b bytes.Buffer
 	read_function := `
 var {{ .ResourceName }}_names_mapping map[string][]string = map[string][]string{
@@ -494,7 +496,7 @@ func BuildResourceTemplateFromModelName(n string, indent int) string {
 	return BuildResourceTemplate(model, indent)
 }
 
-func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
+func ResourceBuildTemplateToTerrafromElem(r codegen_configs.ResourceElem, indent int) string {
 	var b bytes.Buffer
 	r.Indent = indent
 	tmpl := `     
@@ -579,7 +581,7 @@ func ResourceBuildTemplateToTerrafromElem(r ResourceElem, indent int) string {
 
 }
 
-func BuildResourceTemplate(r ResourceTemplateV2, indent int) string {
+func BuildResourceTemplate(r codegen_configs.ResourceTemplateV2, indent int) string {
 	out := ""
 	for _, f := range r.Fields {
 		out += ResourceBuildTemplateToTerrafromElem(f, indent)
@@ -587,7 +589,7 @@ func BuildResourceTemplate(r ResourceTemplateV2, indent int) string {
 	return out
 }
 
-func GenResourceTemplate(r ResourceTemplateV2) string {
+func GenResourceTemplate(r codegen_configs.ResourceTemplateV2) string {
 	func_footer := `     
    }
 }

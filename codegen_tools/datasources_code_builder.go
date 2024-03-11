@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"text/template"
+
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 )
 
-func BuildDataSourceTemplateHeader(r ResourceTemplateV2) string {
+func BuildDataSourceTemplateHeader(r codegen_configs.ResourceTemplateV2) string {
 	var b bytes.Buffer
 	header :=
 		`package datasources
@@ -42,7 +44,7 @@ func DataSource{{ .ResourceName }}() *schema.Resource {
 	return b.String()
 }
 
-func ResourceTemplateToTerrafromElem(r ResourceElem, indent int) string {
+func ResourceTemplateToTerrafromElem(r codegen_configs.ResourceElem, indent int) string {
 	var b bytes.Buffer
 	r.Indent = indent
 	tmpl := `     
@@ -100,7 +102,7 @@ func ResourceTemplateToTerrafromElem(r ResourceElem, indent int) string {
 
 }
 
-func BuildTemplate(r ResourceTemplateV2, indent int) string {
+func BuildTemplate(r codegen_configs.ResourceTemplateV2, indent int) string {
 	out := ""
 	for _, f := range r.Fields {
 		out += ResourceTemplateToTerrafromElem(f, indent)
@@ -113,7 +115,7 @@ func BuildTemplateFromModelName(n string, indent int) string {
 	return BuildTemplate(model, indent)
 }
 
-func BuildDataSourcesList(datasources_templates []ResourceTemplateV2) string {
+func BuildDataSourcesList(datasources_templates []codegen_configs.ResourceTemplateV2) string {
 	var b bytes.Buffer
 	datasources :=
 		`package datasources
@@ -140,7 +142,7 @@ var DataSources map[string]*schema.Resource = map[string]*schema.Resource{
 
 }
 
-func BuildDataSourceTemplateReadFunction(r ResourceTemplateV2) string {
+func BuildDataSourceTemplateReadFunction(r codegen_configs.ResourceTemplateV2) string {
 	var b bytes.Buffer
 	read_function := `
 func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -285,7 +287,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
 	return b.String()
 
 }
-func GenDataSourceTemplate(r ResourceTemplateV2) string {
+func GenDataSourceTemplate(r codegen_configs.ResourceTemplateV2) string {
 	func_footer := `     },
    }
 }
