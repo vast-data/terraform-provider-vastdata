@@ -153,15 +153,15 @@ var _ = Describe(" Quota", func() {
 				values.Add("name", fmt.Sprintf("%v", resource.Name))
 				QuotaDataSourceData.Set("name", resource.Name)
 
-				request_url := `[{"url":"https://` + server.Addr() + `/api/latest/quotas/100"}]`
+				request_url := `[{"url":"https://` + server.Addr() + `quotas100"}]`
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/", values.Encode()),
+					ghttp.VerifyRequest("GET", "quotas", values.Encode()),
 					ghttp.RespondWith(200, request_url),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/100"),
+					ghttp.VerifyRequest("GET", "quotas100"),
 					ghttp.RespondWith(200, string(b)),
 				),
 				)

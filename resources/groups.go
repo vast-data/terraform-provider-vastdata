@@ -153,7 +153,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/groups/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -197,7 +197,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceGroupDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/groups/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -263,7 +263,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/groups/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("groups")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Group %v", create_err))
 
@@ -349,7 +349,7 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/groups/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Group %v", patch_err))
 	if patch_err != nil {
@@ -374,7 +374,7 @@ func resourceGroupImporter(ctx context.Context, d *schema.ResourceData, m interf
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/groups/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

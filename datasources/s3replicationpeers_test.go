@@ -87,7 +87,7 @@ var _ = Describe(" S3replicationPeers", func() {
 				S3replicationPeersDataSourceData.Set("name", resource.Name)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/replicationtargets/", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "replicationtargets", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

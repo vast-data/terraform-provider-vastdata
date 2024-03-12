@@ -84,7 +84,7 @@ var _ = Describe(" S3replicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/replicationtargets/100"),
+					ghttp.VerifyRequest("GET", "replicationtargets100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -114,7 +114,7 @@ var _ = Describe(" S3replicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "/api/replicationtargets/100//"),
+					ghttp.VerifyRequest("DELETE", "replicationtargets100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
@@ -134,12 +134,12 @@ var _ = Describe(" S3replicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/replicationtargets/"),
+					ghttp.VerifyRequest("POST", "replicationtargets"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/replicationtargets/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "replicationtargets0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -166,18 +166,18 @@ var _ = Describe(" S3replicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/replicationtargets/"),
+					ghttp.VerifyRequest("POST", "replicationtargets"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/replicationtargets/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "replicationtargets0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "/api/replicationtargets//0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "replicationtargets/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -196,7 +196,7 @@ var _ = Describe(" S3replicationPeers", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/replicationtargets/0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "replicationtargets0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
@@ -224,7 +224,7 @@ var _ = Describe(" S3replicationPeers", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/replicationtargets/", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "replicationtargets", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

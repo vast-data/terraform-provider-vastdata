@@ -128,7 +128,7 @@ func dataSourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData,
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/nativereplicationremotetargets/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("nativereplicationremotetargets"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

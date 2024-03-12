@@ -77,7 +77,7 @@ var _ = Describe(" Nis", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nis/100"),
+					ghttp.VerifyRequest("GET", "nis100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -107,7 +107,7 @@ var _ = Describe(" Nis", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "/api/nis/100//"),
+					ghttp.VerifyRequest("DELETE", "nis100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
@@ -127,12 +127,12 @@ var _ = Describe(" Nis", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/nis/"),
+					ghttp.VerifyRequest("POST", "nis"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nis/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "nis0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -159,18 +159,18 @@ var _ = Describe(" Nis", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/nis/"),
+					ghttp.VerifyRequest("POST", "nis"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nis/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "nis0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "/api/nis//0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "nis/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -189,7 +189,7 @@ var _ = Describe(" Nis", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nis/0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "nis0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
@@ -217,7 +217,7 @@ var _ = Describe(" Nis", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nis/", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "nis", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

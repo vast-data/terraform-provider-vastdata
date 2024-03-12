@@ -128,6 +128,8 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 		tflog.Warn(ctx, "Cluster Version & Build Version are not matching ,some actions might fail")
 	}
 	metadata.SetClusterConfig("version_validation_mode", r.Get("version_validation_mode").(string))
-
+	v := metadata.FindVastVersion(cluster_version)
+	metadata.SetClusterConfig("vast_version", v)
+	tflog.Debug(ctx, fmt.Sprintf("API Version than will be used %v", v))
 	return client, diags
 }

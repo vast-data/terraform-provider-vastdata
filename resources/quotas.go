@@ -1131,7 +1131,7 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -1175,7 +1175,7 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -1247,7 +1247,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/latest/quotas/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("quotas")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", create_err))
 
@@ -1339,7 +1339,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", patch_err))
 	if patch_err != nil {
@@ -1364,7 +1364,7 @@ func resourceQuotaImporter(ctx context.Context, d *schema.ResourceData, m interf
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/latest/quotas/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

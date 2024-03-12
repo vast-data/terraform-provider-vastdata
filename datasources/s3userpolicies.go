@@ -104,7 +104,7 @@ func dataSourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/s3userpolicies/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("s3userpolicies"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

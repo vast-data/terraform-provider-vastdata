@@ -742,7 +742,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/ldaps/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("ldaps"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -786,7 +786,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 func resourceLdapDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/ldaps/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("ldaps"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -852,7 +852,7 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/ldaps/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("ldaps")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Ldap %v", create_err))
 
@@ -938,7 +938,7 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/ldaps/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("ldaps"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Ldap %v", patch_err))
 	if patch_err != nil {
@@ -963,7 +963,7 @@ func resourceLdapImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/ldaps/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("ldaps"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

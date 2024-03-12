@@ -73,7 +73,7 @@ var _ = Describe(" UserKey", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/users/100"),
+					ghttp.VerifyRequest("GET", "users100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -103,7 +103,7 @@ var _ = Describe(" UserKey", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "/api/users/100//"),
+					ghttp.VerifyRequest("DELETE", "users100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
@@ -123,12 +123,12 @@ var _ = Describe(" UserKey", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/users/"),
+					ghttp.VerifyRequest("POST", "users"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/users/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "users0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -155,18 +155,18 @@ var _ = Describe(" UserKey", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/users/"),
+					ghttp.VerifyRequest("POST", "users"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/users/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "users0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "/api/users//0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "users/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -185,7 +185,7 @@ var _ = Describe(" UserKey", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/users/0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "users0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
@@ -213,7 +213,7 @@ var _ = Describe(" UserKey", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/users/", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "users", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

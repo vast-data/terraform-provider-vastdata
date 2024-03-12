@@ -86,7 +86,7 @@ var _ = Describe(" ProtectionPolicy", func() {
 				ProtectionPolicyDataSourceData.Set("name", resource.Name)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/protectionpolicy/", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "protectionpolicy", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

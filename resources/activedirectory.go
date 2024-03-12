@@ -131,7 +131,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/activedirectory/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -175,7 +175,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 func resourceActiveDirectoryDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/activedirectory/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
 
 	data, before_delete_error := utils.AlwaysSkipDeleteLdap(ctx, d, m)
 	if before_delete_error != nil {
@@ -248,7 +248,7 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/activedirectory/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory %v", create_err))
 
@@ -334,7 +334,7 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/activedirectory/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory %v", patch_err))
 	if patch_err != nil {
@@ -359,7 +359,7 @@ func resourceActiveDirectoryImporter(ctx context.Context, d *schema.ResourceData
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/activedirectory/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

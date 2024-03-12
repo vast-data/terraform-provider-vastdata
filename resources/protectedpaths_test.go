@@ -76,7 +76,7 @@ var _ = Describe(" ProtectedPath", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/protectedpaths/100"),
+					ghttp.VerifyRequest("GET", "protectedpaths100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -106,7 +106,7 @@ var _ = Describe(" ProtectedPath", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "/api/protectedpaths/100//"),
+					ghttp.VerifyRequest("DELETE", "protectedpaths100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
@@ -126,12 +126,12 @@ var _ = Describe(" ProtectedPath", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/protectedpaths/"),
+					ghttp.VerifyRequest("POST", "protectedpaths"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/protectedpaths/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "protectedpaths0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -158,18 +158,18 @@ var _ = Describe(" ProtectedPath", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/protectedpaths/"),
+					ghttp.VerifyRequest("POST", "protectedpaths"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/protectedpaths/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "protectedpaths0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "/api/protectedpaths//0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "protectedpaths/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -188,7 +188,7 @@ var _ = Describe(" ProtectedPath", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/protectedpaths/0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "protectedpaths0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
@@ -216,7 +216,7 @@ var _ = Describe(" ProtectedPath", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/protectedpaths/", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "protectedpaths", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

@@ -72,7 +72,7 @@ func dataSourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, 
 	machine_account_name := d.Get("machine_account_name")
 	values.Add("machine_account_name", fmt.Sprintf("%v", machine_account_name))
 
-	response, err := client.Get(ctx, "/api/activedirectory/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("activedirectory"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

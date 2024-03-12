@@ -76,7 +76,7 @@ var _ = Describe(" Snapshot", func() {
 				SnapshotDataSourceData.Set("name", resource.Name)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/snapshots/", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "snapshots", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

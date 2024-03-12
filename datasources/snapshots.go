@@ -94,7 +94,7 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
 	}
 
-	response, err := client.Get(ctx, "/api/snapshots/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("snapshots"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

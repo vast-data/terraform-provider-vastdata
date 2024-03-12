@@ -7,7 +7,7 @@ import (
 var DatasourcesTemplates = []ResourceTemplateV2{
 	ResourceTemplateV2{
 		ResourceName:             "Cnode",
-		Path:                     ToStringPointer("/api/cnodes/"),
+		Path:                     ToStringPointer("cnodes"),
 		Model:                    api_latest.Cnode{},
 		DestFile:                 ToStringPointer("cnodes.go"),
 		IgnoreFields:             NewStringSet(),
@@ -19,7 +19,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "QosPolicy",
-		Path:                     ToStringPointer("/api/qospolicies/"),
+		Path:                     ToStringPointer("qospolicies"),
 		Model:                    api_latest.QosPolicy{},
 		DestFile:                 ToStringPointer("qospolicies.go"),
 		IgnoreFields:             NewStringSet("Created", "SyncTime"),
@@ -55,7 +55,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Quota",
-		Path:                     ToStringPointer("/api/latest/quotas/"),
+		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.Quota{},
 		DestFile:                 ToStringPointer("quotas.go"),
 		IgnoreFields:             NewStringSet("LastUserQuotasUpdate"),
@@ -68,7 +68,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "DefaultQuota",
-		Path:                     ToStringPointer("/api/latest/quotas/"),
+		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.DefaultQuota{},
 		DestFile:                 ToStringPointer("quotas.go"),
 		IgnoreFields:             NewStringSet("LastUserQuotasUpdate"),
@@ -81,7 +81,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "UserQuota",
-		Path:                     ToStringPointer("/api/latest/quotas/"),
+		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.UserQuota{},
 		DestFile:                 ToStringPointer("quotas.go"),
 		IgnoreFields:             NewStringSet("LastUserQuotasUpdate"),
@@ -94,7 +94,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "QuotaEntityInfo",
-		Path:                     ToStringPointer("/api/latest/quotas/"),
+		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.QuotaEntityInfo{},
 		DestFile:                 ToStringPointer("quotas.go"),
 		IgnoreFields:             NewStringSet("LastUserQuotasUpdate"),
@@ -107,7 +107,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Dns",
-		Path:                     ToStringPointer("/api/latest/dns/"),
+		Path:                     ToStringPointer("dns"),
 		Model:                    api_latest.Dns{},
 		DestFile:                 ToStringPointer("dns.go"),
 		IgnoreFields:             NewStringSet(),
@@ -120,7 +120,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "VipPool",
-		Path:                     ToStringPointer("/api/vippools/"),
+		Path:                     ToStringPointer("vippools"),
 		Model:                    api_latest.VipPool{},
 		DestFile:                 ToStringPointer("vippools.go"),
 		IgnoreFields:             NewStringSet(),
@@ -133,7 +133,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ViewPolicy",
-		Path:                     ToStringPointer("/api/viewpolicies/"),
+		Path:                     ToStringPointer("viewpolicies"),
 		Model:                    api_latest.ViewPolicy{},
 		DestFile:                 ToStringPointer("viewpolicies.go"),
 		IgnoreFields:             NewStringSet("RemoteMapping", "ProtocolsAudit", "Created"),
@@ -151,7 +151,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 
 	ResourceTemplateV2{
 		ResourceName:             "Group",
-		Path:                     ToStringPointer("/api/groups/"),
+		Path:                     ToStringPointer("groups"),
 		Model:                    api_latest.Group{},
 		DestFile:                 ToStringPointer("groups.go"),
 		IgnoreFields:             NewStringSet(),
@@ -164,7 +164,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "User",
-		Path:                     ToStringPointer("/api/users/"),
+		Path:                     ToStringPointer("users"),
 		Model:                    api_latest.User{},
 		DestFile:                 ToStringPointer("user.go"),
 		IgnoreFields:             NewStringSet(),
@@ -177,7 +177,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "View",
-		Path:                     ToStringPointer("/api/views/"),
+		Path:                     ToStringPointer("views"),
 		Model:                    api_latest.View{},
 		DestFile:                 ToStringPointer("views.go"),
 		IgnoreFields:             NewStringSet(),
@@ -190,7 +190,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ViewShareAcl",
-		Path:                     ToStringPointer("/api/views/"),
+		Path:                     ToStringPointer("views"),
 		Model:                    api_latest.ViewShareAcl{},
 		DestFile:                 ToStringPointer("views.go"),
 		IgnoreFields:             NewStringSet(),
@@ -203,7 +203,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ShareAcl",
-		Path:                     ToStringPointer("/api/views/"),
+		Path:                     ToStringPointer("views"),
 		Model:                    api_latest.ShareAcl{},
 		DestFile:                 ToStringPointer("views.go"),
 		IgnoreFields:             NewStringSet(),
@@ -217,7 +217,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 
 	ResourceTemplateV2{
 		ResourceName:             "Nis",
-		Path:                     ToStringPointer("/api/nis/"),
+		Path:                     ToStringPointer("nis"),
 		Model:                    api_latest.Nis{},
 		DestFile:                 ToStringPointer("nis.go"),
 		IgnoreFields:             NewStringSet(),
@@ -230,7 +230,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Tenant",
-		Path:                     ToStringPointer("/api/tenants/"),
+		Path:                     ToStringPointer("tenants"),
 		Model:                    api_latest.Tenant{},
 		DestFile:                 ToStringPointer("tenants.go"),
 		IgnoreFields:             NewStringSet("Created", "SyncTime"),
@@ -247,7 +247,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 
 	ResourceTemplateV2{
 		ResourceName:             "Ldap",
-		Path:                     ToStringPointer("/api/ldaps/"),
+		Path:                     ToStringPointer("ldaps"),
 		Model:                    api_latest.Ldap{},
 		DestFile:                 ToStringPointer("ldaps.go"),
 		IgnoreFields:             NewStringSet(),
@@ -259,7 +259,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3LifeCycleRule",
-		Path:                     ToStringPointer("/api/s3lifecyclerules/"),
+		Path:                     ToStringPointer("s3lifecyclerules"),
 		Model:                    api_latest.S3LifeCycleRule{},
 		DestFile:                 ToStringPointer("s3lifecyclerules.go"),
 		IgnoreFields:             NewStringSet(),
@@ -272,7 +272,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ActiveDirectory",
-		Path:                     ToStringPointer("/api/activedirectory/"),
+		Path:                     ToStringPointer("activedirectory"),
 		Model:                    api_latest.ActiveDirectory{},
 		DestFile:                 ToStringPointer("activedirectory.go"),
 		IgnoreFields:             NewStringSet(),
@@ -284,7 +284,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3Policy",
-		Path:                     ToStringPointer("/api/s3userpolicies/"),
+		Path:                     ToStringPointer("s3userpolicies"),
 		Model:                    api_latest.S3Policy{},
 		DestFile:                 ToStringPointer("s3userpolicies.go"),
 		IgnoreFields:             NewStringSet(),
@@ -296,7 +296,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ProtectedPath",
-		Path:                     ToStringPointer("/api/protectedpaths/"),
+		Path:                     ToStringPointer("protectedpaths"),
 		Model:                    api_latest.ProtectedPath{},
 		DestFile:                 ToStringPointer("protectedpaths.go"),
 		IgnoreFields:             NewStringSet(),
@@ -308,7 +308,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Snapshot",
-		Path:                     ToStringPointer("/api/snapshots/"),
+		Path:                     ToStringPointer("snapshots"),
 		Model:                    api_latest.Snapshot{},
 		DestFile:                 ToStringPointer("snapshots.go"),
 		IgnoreFields:             NewStringSet(),
@@ -320,7 +320,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "GlobalSnapshot",
-		Path:                     ToStringPointer("/api/globalsnapstreams/"),
+		Path:                     ToStringPointer("globalsnapstreams"),
 		Model:                    api_latest.GlobalSnapshot{},
 		DestFile:                 ToStringPointer("globalsnapshots.go"),
 		IgnoreFields:             NewStringSet(),
@@ -332,7 +332,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ReplicationPeers",
-		Path:                     ToStringPointer("/api/nativereplicationremotetargets/"),
+		Path:                     ToStringPointer("nativereplicationremotetargets"),
 		Model:                    api_latest.ReplicationPeers{},
 		DestFile:                 ToStringPointer("replicationpeers.go"),
 		IgnoreFields:             NewStringSet(),
@@ -344,7 +344,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ProtectionPolicy",
-		Path:                     ToStringPointer("/api/protectionpolicy/"),
+		Path:                     ToStringPointer("protectionpolicy"),
 		Model:                    api_latest.ProtectionPolicy{},
 		DestFile:                 ToStringPointer("protectionpolicy.go"),
 		IgnoreFields:             NewStringSet(),
@@ -368,7 +368,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3replicationPeers",
-		Path:                     ToStringPointer("/api/replicationtargets/"),
+		Path:                     ToStringPointer("replicationtargets"),
 		Model:                    api_latest.S3replicationPeers{},
 		DestFile:                 ToStringPointer("s3replicationpeers.go"),
 		IgnoreFields:             NewStringSet(),

@@ -212,7 +212,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/protectedpaths/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -256,7 +256,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 func resourceProtectedPathDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/protectedpaths/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -322,7 +322,7 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/protectedpaths/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectedPath %v", create_err))
 
@@ -408,7 +408,7 @@ func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m 
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/protectedpaths/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectedPath %v", patch_err))
 	if patch_err != nil {
@@ -433,7 +433,7 @@ func resourceProtectedPathImporter(ctx context.Context, d *schema.ResourceData, 
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/protectedpaths/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

@@ -75,7 +75,7 @@ var _ = Describe(" ActiveDirectory", func() {
 				ActiveDirectoryDataSourceData.Set("machine_account_name", resource.MachineAccountName)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/activedirectory/", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "activedirectory", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

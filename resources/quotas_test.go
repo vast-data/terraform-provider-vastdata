@@ -151,7 +151,7 @@ var _ = Describe(" Quota", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/100"),
+					ghttp.VerifyRequest("GET", "quotas100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -181,7 +181,7 @@ var _ = Describe(" Quota", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "/api/latest/quotas/100//"),
+					ghttp.VerifyRequest("DELETE", "quotas100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
@@ -201,12 +201,12 @@ var _ = Describe(" Quota", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/latest/quotas/"),
+					ghttp.VerifyRequest("POST", "quotas"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "quotas0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -233,18 +233,18 @@ var _ = Describe(" Quota", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/latest/quotas/"),
+					ghttp.VerifyRequest("POST", "quotas"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "quotas0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "/api/latest/quotas//0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "quotas/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -263,7 +263,7 @@ var _ = Describe(" Quota", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "quotas0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
@@ -290,15 +290,15 @@ var _ = Describe(" Quota", func() {
 				b, err := json.Marshal(&resource)
 				Expect(err).To(BeNil())
 
-				request_url := `[{"url":"https://` + server.Addr() + `/api/latest/quotas/100"}]`
+				request_url := `[{"url":"https://` + server.Addr() + `quotas100"}]`
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/", fmt.Sprintf("guid=%s", guid)),
+					ghttp.VerifyRequest("GET", "quotas", fmt.Sprintf("guid=%s", guid)),
 					ghttp.RespondWith(200, request_url),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/latest/quotas/100"),
+					ghttp.VerifyRequest("GET", "quotas100"),
 					ghttp.RespondWith(200, string(b)),
 				),
 				)

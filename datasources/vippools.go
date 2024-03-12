@@ -229,7 +229,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/vippools/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("vippools"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

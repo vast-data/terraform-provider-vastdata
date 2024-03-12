@@ -173,7 +173,7 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/snapshots/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -217,7 +217,7 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 func resourceSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/snapshots/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -283,7 +283,7 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/snapshots/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("snapshots")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Snapshot %v", create_err))
 
@@ -369,7 +369,7 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/snapshots/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Snapshot %v", patch_err))
 	if patch_err != nil {
@@ -394,7 +394,7 @@ func resourceSnapshotImporter(ctx context.Context, d *schema.ResourceData, m int
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/snapshots/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

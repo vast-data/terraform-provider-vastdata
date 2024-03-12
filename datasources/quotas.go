@@ -716,7 +716,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 		values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
 	}
 
-	response, err := client.Get(ctx, "/api/latest/quotas/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("quotas"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

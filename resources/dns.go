@@ -296,7 +296,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/latest/dns/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -340,7 +340,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/latest/dns/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -406,7 +406,7 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/latest/dns/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("dns")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", create_err))
 
@@ -492,7 +492,7 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/latest/dns/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", patch_err))
 	if patch_err != nil {
@@ -517,7 +517,7 @@ func resourceDnsImporter(ctx context.Context, d *schema.ResourceData, m interfac
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/latest/dns/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

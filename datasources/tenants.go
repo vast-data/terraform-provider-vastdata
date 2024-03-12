@@ -161,7 +161,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/tenants/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("tenants"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

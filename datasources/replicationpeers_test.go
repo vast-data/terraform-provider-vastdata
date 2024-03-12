@@ -81,7 +81,7 @@ var _ = Describe(" ReplicationPeers", func() {
 				ReplicationPeersDataSourceData.Set("name", resource.Name)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nativereplicationremotetargets/", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "nativereplicationremotetargets", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

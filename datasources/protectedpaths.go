@@ -104,7 +104,7 @@ func dataSourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m 
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/protectedpaths/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("protectedpaths"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

@@ -84,7 +84,7 @@ var _ = Describe(" GlobalSnapshot", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/globalsnapstreams/100"),
+					ghttp.VerifyRequest("GET", "globalsnapstreams100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -114,7 +114,7 @@ var _ = Describe(" GlobalSnapshot", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "/api/globalsnapstreams/100//"),
+					ghttp.VerifyRequest("DELETE", "globalsnapstreams100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
@@ -134,12 +134,12 @@ var _ = Describe(" GlobalSnapshot", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/globalsnapstreams/"),
+					ghttp.VerifyRequest("POST", "globalsnapstreams"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/globalsnapstreams/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "globalsnapstreams0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -166,18 +166,18 @@ var _ = Describe(" GlobalSnapshot", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/globalsnapstreams/"),
+					ghttp.VerifyRequest("POST", "globalsnapstreams"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/globalsnapstreams/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "globalsnapstreams0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "/api/globalsnapstreams//0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "globalsnapstreams/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -196,7 +196,7 @@ var _ = Describe(" GlobalSnapshot", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/globalsnapstreams/0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "globalsnapstreams0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
@@ -224,7 +224,7 @@ var _ = Describe(" GlobalSnapshot", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/globalsnapstreams/", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "globalsnapstreams", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

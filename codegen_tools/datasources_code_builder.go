@@ -162,7 +162,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
          values.Add("{{$v}}",fmt.Sprintf("%v",{{$v}}))
      }
      {{ end }}
-     response,err:=client.Get(ctx,"{{.Path}}",values.Encode(), map[string]string{})
+     response,err:=client.Get(ctx,utils.GenPath("{{.Path}}"),values.Encode(), map[string]string{})
      tflog.Info(ctx,response.Request.URL.String())
      if err!=nil {
         diags = append(diags, diag.Diagnostic {

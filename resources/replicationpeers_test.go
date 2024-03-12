@@ -78,7 +78,7 @@ var _ = Describe(" ReplicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nativereplicationremotetargets/100"),
+					ghttp.VerifyRequest("GET", "nativereplicationremotetargets100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -108,7 +108,7 @@ var _ = Describe(" ReplicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "/api/nativereplicationremotetargets/100//"),
+					ghttp.VerifyRequest("DELETE", "nativereplicationremotetargets100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
@@ -128,12 +128,12 @@ var _ = Describe(" ReplicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/nativereplicationremotetargets/"),
+					ghttp.VerifyRequest("POST", "nativereplicationremotetargets"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nativereplicationremotetargets/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "nativereplicationremotetargets0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -160,18 +160,18 @@ var _ = Describe(" ReplicationPeers", func() {
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "/api/nativereplicationremotetargets/"),
+					ghttp.VerifyRequest("POST", "nativereplicationremotetargets"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nativereplicationremotetargets/0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "nativereplicationremotetargets0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "/api/nativereplicationremotetargets//0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "nativereplicationremotetargets/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -190,7 +190,7 @@ var _ = Describe(" ReplicationPeers", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nativereplicationremotetargets/0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "nativereplicationremotetargets0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
@@ -218,7 +218,7 @@ var _ = Describe(" ReplicationPeers", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "/api/nativereplicationremotetargets/", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "nativereplicationremotetargets", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)

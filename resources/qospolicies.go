@@ -282,7 +282,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/qospolicies/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -326,7 +326,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 func resourceQosPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/qospolicies/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -392,7 +392,7 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/qospolicies/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", create_err))
 
@@ -478,7 +478,7 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/qospolicies/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", patch_err))
 	if patch_err != nil {
@@ -503,7 +503,7 @@ func resourceQosPolicyImporter(ctx context.Context, d *schema.ResourceData, m in
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/qospolicies/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

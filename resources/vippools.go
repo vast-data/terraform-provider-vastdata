@@ -488,7 +488,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/vippools/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -532,7 +532,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceVipPoolDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/vippools/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -598,7 +598,7 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/vippools/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("vippools")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", create_err))
 
@@ -684,7 +684,7 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/vippools/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", patch_err))
 	if patch_err != nil {
@@ -709,7 +709,7 @@ func resourceVipPoolImporter(ctx context.Context, d *schema.ResourceData, m inte
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/vippools/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

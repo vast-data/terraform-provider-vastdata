@@ -277,7 +277,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -321,7 +321,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 func resourceGlobalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
 
 	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -393,7 +393,7 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams")}
 	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", create_err))
 
@@ -485,7 +485,7 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", patch_err))
 	if patch_err != nil {
@@ -510,7 +510,7 @@ func resourceGlobalSnapshotImporter(ctx context.Context, d *schema.ResourceData,
 	guid := d.Id()
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": "/api/globalsnapstreams/", "query": values.Encode()}
+	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "query": values.Encode()}
 	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
 
 	if err != nil {

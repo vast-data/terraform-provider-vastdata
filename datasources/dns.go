@@ -140,7 +140,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/latest/dns/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("dns"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

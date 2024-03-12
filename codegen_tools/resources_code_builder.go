@@ -158,7 +158,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      {{ $cbl:="{" }}
      client:=m.(vast_client.JwtSession)
 
-     attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}  
+     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}  
      response,err:={{ funcName .GetFunc}}(ctx,client,attrs,d,map[string]string{})
      utils.VastVersionsWarn(ctx)
 
@@ -208,7 +208,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
      var diags diag.Diagnostics
      client:=m.(vast_client.JwtSession)
-     attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}
+     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
      {{ if .BeforeDeleteFunc  }}
      data,before_delete_error:={{ funcName .BeforeDeleteFunc}}(ctx,d,m)
      if before_delete_error!=nil {
@@ -289,7 +289,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-    attrs:=map[string]interface{}{"path":"{{.Path}}"}
+    attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}")}
     response ,create_err:={{ funcName .CreateFunc}}(ctx,client,attrs,data,map[string]string{});
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , create_err))
     
@@ -389,7 +389,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-    attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}
+    attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
     response ,patch_err := {{ funcName .UpdateFunc}}(ctx,client,attrs,data,d,map[string]string{})
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , patch_err))
     if patch_err != nil {
@@ -423,7 +423,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
     guid := d.Id()
     values := url.Values{}
     values.Add("guid", fmt.Sprintf("%v", guid))
-    attrs:=map[string]interface{}{"path":"{{.Path}}","query":values.Encode()}
+    attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"query":values.Encode()}
     response,err:={{ funcName .GetFunc}}(ctx,client,attrs,d,map[string]string{})
 
     if err != nil {

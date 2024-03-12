@@ -264,7 +264,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/cnodes/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("cnodes"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

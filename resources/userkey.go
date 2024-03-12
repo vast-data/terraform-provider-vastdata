@@ -169,7 +169,7 @@ func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	client := m.(vast_client.JwtSession)
 
-	attrs := map[string]interface{}{"path": "/api/users/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
 	response, err := utils.GetUserKeyFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -219,7 +219,7 @@ func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceUserKeyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	attrs := map[string]interface{}{"path": "/api/users/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
 
 	response, err := utils.DeleteUserKeyFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -285,7 +285,7 @@ func resourceUserKeyCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/users/"}
+	attrs := map[string]interface{}{"path": utils.GenPath("users")}
 	response, create_err := utils.CreateUserKeyFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  UserKey %v", create_err))
 
@@ -371,7 +371,7 @@ func resourceUserKeyUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "/api/users/", "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
 	response, patch_err := utils.UpdateUserKeyFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  UserKey %v", patch_err))
 	if patch_err != nil {

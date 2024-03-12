@@ -152,7 +152,7 @@ func dataSourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, 
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, "/api/s3lifecyclerules/", values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("s3lifecyclerules"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
