@@ -144,3 +144,9 @@ func DefaultIdFunc(ctx context.Context, _client interface{}, _id interface{}, d 
 	d.SetId(fmt.Sprintf("%v", _id))
 	return nil
 }
+
+type ImportFunc func(context.Context, interface{}, map[string]interface{}, *schema.ResourceData, GetFuncType) (*http.Response, error)
+
+func DefaultImportFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, g GetFuncType) (*http.Response, error) {
+	return g(ctx, _client, attr, d, map[string]string{})
+}

@@ -389,7 +389,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-    attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
+    attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}
     response ,patch_err := {{ funcName .UpdateFunc}}(ctx,client,attrs,data,d,map[string]string{})
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , patch_err))
     if patch_err != nil {
@@ -424,7 +424,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
     values := url.Values{}
     values.Add("guid", fmt.Sprintf("%v", guid))
     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"query":values.Encode()}
-    response,err:={{ funcName .GetFunc}}(ctx,client,attrs,d,map[string]string{})
+    response,err:={{ funcName .ImportFunc}}(ctx,client,attrs,d,{{ funcName .GetFunc}})
 
     if err != nil {
 	    return result, err

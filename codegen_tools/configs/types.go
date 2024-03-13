@@ -161,6 +161,7 @@ type ResourceTemplateV2 struct {
 	DeleteFunc               utils.DeleteFuncType
 	GetFunc                  utils.GetFuncType
 	IdFunc                   utils.IdFuncType
+	ImportFunc               utils.ImportFunc
 }
 
 func (r *ResourceTemplateV2) SetFunctions() {
@@ -178,6 +179,9 @@ func (r *ResourceTemplateV2) SetFunctions() {
 	}
 	if r.IdFunc == nil {
 		r.IdFunc = utils.DefaultIdFunc
+	}
+	if r.ImportFunc == nil {
+		r.ImportFunc = utils.DefaultImportFunc
 	}
 }
 

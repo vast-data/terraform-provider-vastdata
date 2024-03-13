@@ -645,7 +645,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
+	attrs := map[string]interface{}{"path": "users", "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  User %v", patch_err))
 	if patch_err != nil {
@@ -671,7 +671,7 @@ func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
 	attrs := map[string]interface{}{"path": utils.GenPath("users"), "query": values.Encode()}
-	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
+	response, err := utils.DefaultImportFunc(ctx, client, attrs, d, utils.DefaultGetFunc)
 
 	if err != nil {
 		return result, err

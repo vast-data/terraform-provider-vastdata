@@ -468,7 +468,7 @@ func resourceReplicationPeersUpdate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("nativereplicationremotetargets"), "id": d.Id()}
+	attrs := map[string]interface{}{"path": "nativereplicationremotetargets", "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  ReplicationPeers %v", patch_err))
 	if patch_err != nil {
@@ -494,7 +494,7 @@ func resourceReplicationPeersImporter(ctx context.Context, d *schema.ResourceDat
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
 	attrs := map[string]interface{}{"path": utils.GenPath("nativereplicationremotetargets"), "query": values.Encode()}
-	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
+	response, err := utils.DefaultImportFunc(ctx, client, attrs, d, utils.DefaultGetFunc)
 
 	if err != nil {
 		return result, err

@@ -337,7 +337,7 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("s3policies"), "id": d.Id()}
+	attrs := map[string]interface{}{"path": "s3policies", "id": d.Id()}
 	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3Policy %v", patch_err))
 	if patch_err != nil {
@@ -363,7 +363,7 @@ func resourceS3PolicyImporter(ctx context.Context, d *schema.ResourceData, m int
 	values := url.Values{}
 	values.Add("guid", fmt.Sprintf("%v", guid))
 	attrs := map[string]interface{}{"path": utils.GenPath("s3policies"), "query": values.Encode()}
-	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
+	response, err := utils.DefaultImportFunc(ctx, client, attrs, d, utils.DefaultGetFunc)
 
 	if err != nil {
 		return result, err

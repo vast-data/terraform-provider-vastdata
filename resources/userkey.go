@@ -371,7 +371,7 @@ func resourceUserKeyUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
+	attrs := map[string]interface{}{"path": "users", "id": d.Id()}
 	response, patch_err := utils.UpdateUserKeyFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  UserKey %v", patch_err))
 	if patch_err != nil {
