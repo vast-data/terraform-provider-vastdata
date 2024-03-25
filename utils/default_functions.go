@@ -148,5 +148,6 @@ func DefaultIdFunc(ctx context.Context, _client interface{}, _id interface{}, d 
 type ImportFunc func(context.Context, interface{}, map[string]interface{}, *schema.ResourceData, GetFuncType) (*http.Response, error)
 
 func DefaultImportFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, g GetFuncType) (*http.Response, error) {
+	tflog.Debug(ctx, fmt.Sprintf("Calling Import Func %v", g))
 	return g(ctx, _client, attr, d, map[string]string{})
 }

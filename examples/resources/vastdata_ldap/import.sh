@@ -1,1 +1,1 @@
-terrafrom import vastdata_ldap.ldap <guid>
+terraform import  vastdata_ldap.example <guid>

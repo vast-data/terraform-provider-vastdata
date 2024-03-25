@@ -51,5 +51,5 @@ resource vastdata_dns dns1 {
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_dns.dns <guid>
+terraform import  vastdata_dns.example <guid>
 ```

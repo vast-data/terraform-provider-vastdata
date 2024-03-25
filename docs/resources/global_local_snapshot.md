@@ -87,5 +87,5 @@ Required:
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_global_local_snapshot.global_local_snapshot <guid>
+terraform import  vastdata_global_local_snapshot.example <guid>
 ```

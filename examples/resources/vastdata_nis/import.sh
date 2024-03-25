@@ -1,1 +1,1 @@
-terrafrom import vastdata_nis.nis <guid>
+terraform import  vastdata_nis.example <guid>

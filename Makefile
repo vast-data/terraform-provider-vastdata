@@ -21,15 +21,7 @@ FORCE_TAG_MATCH = 1
 GOFLAGS = ""
 TF_GPG_SIG = ""
 
-document_import:
-	for r in $(RESOURCES) ; do\
-	     echo $${r} ;\
-	     n=$$(echo $$(basename $${r})) ;\
-	     t=$$(echo $${n} |awk -F 'vastdata_' '{print $$2}') ;\
-	     echo terrafrom import $${n}.$${t} "<guid>" >  examples/resources/$${n}/import.sh;\
-	done ;
-
-document: document_import
+document:
 	tfplugindocs $(TFPLUGIN_DOCS_OPTIONS) 
 
 clean-releases:

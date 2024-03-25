@@ -1,1 +1,1 @@
-terrafrom import vastdata_active_directory.active_directory <guid>
+terraform import  vastdata_active_directory.example <guid>

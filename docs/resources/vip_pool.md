@@ -84,5 +84,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_vip_pool.vip_pool <guid>
+terraform import  vastdata_vip_pool.example <guid>
 ```

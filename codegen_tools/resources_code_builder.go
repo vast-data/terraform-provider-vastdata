@@ -15,7 +15,7 @@ func BuildResourcesList(resources_templates []codegen_configs.ResourceTemplateV2
 
 import (
  	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-        
+       
 )
 
 var Resources map[string]*schema.Resource = map[string]*schema.Resource{
@@ -47,7 +47,8 @@ import (
         "fmt"
         "context"
         {{ if not .DisableImport }}
-        "net/url"
+//        "net/url"
+        codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
         "errors"
         {{ end }}
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -56,9 +57,8 @@ import (
         api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
         "github.com/hashicorp/terraform-plugin-log/tflog"
         utils "github.com/vast-data/terraform-provider-vastdata/utils"
-    	  metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
-          vast_versions  "github.com/vast-data/terraform-provider-vastdata/vast_versions"
-       
+    	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
+        vast_versions  "github.com/vast-data/terraform-provider-vastdata/vast_versions"
         
 )
 
@@ -420,11 +420,9 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
 
     result := []*schema.ResourceData{}
     client := m.(vast_client.JwtSession)
-    guid := d.Id()
-    values := url.Values{}
-    values.Add("guid", fmt.Sprintf("%v", guid))
-    attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"query":values.Encode()}
-    response,err:={{ funcName .ImportFunc}}(ctx,client,attrs,d,{{ funcName .GetFunc}})
+    resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
+    attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}")}
+    response,err:={{ funcName .ImportFunc}}(ctx,client,attrs,d,resource_config.Importer.GetFunc())
 
     if err != nil {
 	    return result, err

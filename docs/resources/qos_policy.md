@@ -76,5 +76,5 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_qos_policy.qos_policy <guid>
+terraform import  vastdata_qos_policy.example <guid>
 ```

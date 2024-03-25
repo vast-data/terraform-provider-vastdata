@@ -1,1 +1,2 @@
-terrafrom import vastdata_view.view <guid>
+terraform import  vastdata_view.example <guid>
+terraform import  vastdata_view.example <Path>|<Tenant Name>

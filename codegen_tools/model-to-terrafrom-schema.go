@@ -392,6 +392,20 @@ func build_datasources_tests() {
 
 }
 
+func gen_import_command(path string) {
+	for _, r := range resources_templates_map {
+		if r.DisableImport == false {
+			fmt.Printf("Creating import file for %v Doc %v\n", r.DataSourceName, r.Importer.GetDoc())
+			base_path := filepath.Join(path, r.DataSourceName)
+			import_string := ""
+			for _, d := range r.Importer.GetDoc() {
+				import_string += fmt.Sprintf("terraform import  %v.example %v\n", r.DataSourceName, d)
+			}
+			WriteStringToFile(base_path, "import.sh", import_string)
+		}
+	}
+}
+
 func main() {
 	doc, err := LoadApi("../codegen/latest/api.yaml")
 	if err != nil {
@@ -403,5 +417,6 @@ func main() {
 	BuildVersionsRefs()
 	build_resources_tests()
 	build_datasources_tests()
+	gen_import_command("../examples/resources/")
 
 }

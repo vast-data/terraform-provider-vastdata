@@ -1,1 +1,1 @@
-terrafrom import vastdata_quota.quota <guid>
+terraform import  vastdata_quota.example <guid>

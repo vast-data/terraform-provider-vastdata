@@ -1,1 +1,1 @@
-terrafrom import vastdata_tenant.tenant <guid>
+terraform import  vastdata_tenant.example <guid>

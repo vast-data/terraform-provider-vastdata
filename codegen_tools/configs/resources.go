@@ -6,6 +6,8 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 )
 
+var resources_map map[string]ResourceTemplateV2 = map[string]ResourceTemplateV2{}
+
 var ResourcesTemplates = []ResourceTemplateV2{
 	ResourceTemplateV2{
 		ResourceName:             "User",
@@ -226,11 +228,16 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_view",
-		//		IgnoreUpdates:            NewStringSet("create_dir"),
-		BeforePatchFunc:  utils.AlwaysSendCreateDir,
-		BeforeCreateFunc: utils.AlwaysStoreCreateDir,
-		AfterPatchFunc:   utils.AlwaysStoreCreateDir,
-		AfterReadFunc:    utils.KeepCreateDirState,
+		IgnoreUpdates:            NewStringSet("create_dir"),
+		BeforePatchFunc:          utils.AlwaysSendCreateDir,
+		BeforeCreateFunc:         utils.AlwaysStoreCreateDir,
+		AfterPatchFunc:           utils.AlwaysStoreCreateDir,
+		AfterReadFunc:            utils.KeepCreateDirState,
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Path", FieldName: "path"},
+				utils.HttpFieldTuple{DisplayName: "Tenant Name", FieldName: "tenant_name__icontains"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ViewShareAcl",
@@ -457,4 +464,19 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		SensitiveFields:          NewStringSet("secret_key"),
 		DisableImport:            true,
 	},
+}
+
+func init() {
+	for _, r := range ResourcesTemplates {
+		r.SetFunctions()
+		resources_map[r.ResourceName] = r
+	}
+}
+
+func GetResourceByName(name string) *ResourceTemplateV2 {
+	resource, exists := resources_map[name]
+	if exists {
+		return &resource
+	}
+	return nil
 }

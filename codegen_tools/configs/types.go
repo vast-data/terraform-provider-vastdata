@@ -162,6 +162,7 @@ type ResourceTemplateV2 struct {
 	GetFunc                  utils.GetFuncType
 	IdFunc                   utils.IdFuncType
 	ImportFunc               utils.ImportFunc
+	Importer                 utils.ImportInterface
 }
 
 func (r *ResourceTemplateV2) SetFunctions() {
@@ -182,6 +183,9 @@ func (r *ResourceTemplateV2) SetFunctions() {
 	}
 	if r.ImportFunc == nil {
 		r.ImportFunc = utils.DefaultImportFunc
+	}
+	if r.Importer == nil {
+		r.Importer = utils.GetDefaultImporter()
 	}
 }
 

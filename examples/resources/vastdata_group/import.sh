@@ -1,1 +1,1 @@
-terrafrom import vastdata_group.group <guid>
+terraform import  vastdata_group.example <guid>

@@ -1,1 +1,1 @@
-terrafrom import vastdata_snapshot.snapshot <guid>
+terraform import  vastdata_snapshot.example <guid>

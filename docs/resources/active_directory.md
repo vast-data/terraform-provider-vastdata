@@ -56,5 +56,5 @@ resource "vastdata_active_directory" "ad1" {
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_active_directory.active_directory <guid>
+terraform import  vastdata_active_directory.example <guid>
 ```

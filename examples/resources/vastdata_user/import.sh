@@ -1,1 +1,1 @@
-terrafrom import vastdata_user.user <guid>
+terraform import  vastdata_user.example <guid>

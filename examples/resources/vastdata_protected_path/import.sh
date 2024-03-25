@@ -1,1 +1,1 @@
-terrafrom import vastdata_protected_path.protected_path <guid>
+terraform import  vastdata_protected_path.example <guid>

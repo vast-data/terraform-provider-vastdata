@@ -7,8 +7,9 @@ import (
 	"io"
 	"reflect"
 
+	//        "net/url"
 	"errors"
-	"net/url"
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -359,11 +360,9 @@ func resourceS3PolicyImporter(ctx context.Context, d *schema.ResourceData, m int
 
 	result := []*schema.ResourceData{}
 	client := m.(vast_client.JwtSession)
-	guid := d.Id()
-	values := url.Values{}
-	values.Add("guid", fmt.Sprintf("%v", guid))
-	attrs := map[string]interface{}{"path": utils.GenPath("s3policies"), "query": values.Encode()}
-	response, err := utils.DefaultImportFunc(ctx, client, attrs, d, utils.DefaultGetFunc)
+	resource_config := codegen_configs.GetResourceByName("S3Policy")
+	attrs := map[string]interface{}{"path": utils.GenPath("s3policies")}
+	response, err := utils.DefaultImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
 
 	if err != nil {
 		return result, err

@@ -1,1 +1,1 @@
-terrafrom import vastdata_protection_policy.protection_policy <guid>
+terraform import  vastdata_protection_policy.example <guid>

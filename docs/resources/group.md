@@ -43,5 +43,5 @@ resource vastdata_group group1 {
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_group.group <guid>
+terraform import  vastdata_group.example <guid>
 ```

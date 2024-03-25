@@ -80,5 +80,5 @@ As a condition Global catalog needs to be configured to support Posix attributes
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_ldap.ldap <guid>
+terraform import  vastdata_ldap.example <guid>
 ```

@@ -1,1 +1,1 @@
-terrafrom import vastdata_s3_life_cycle_rule.s3_life_cycle_rule <guid>
+terraform import  vastdata_s3_life_cycle_rule.example <guid>

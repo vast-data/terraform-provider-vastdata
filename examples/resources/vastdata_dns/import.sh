@@ -1,1 +1,1 @@
-terrafrom import vastdata_dns.dns <guid>
+terraform import  vastdata_dns.example <guid>

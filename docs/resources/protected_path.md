@@ -105,5 +105,5 @@ resource vastdata_protected_path protected-path-view {
 Import is supported using the following syntax:
 
 ```shell
-terrafrom import vastdata_protected_path.protected_path <guid>
+terraform import  vastdata_protected_path.example <guid>
 ```
