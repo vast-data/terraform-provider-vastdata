@@ -211,5 +211,6 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import  vastdata_quota.example <guid>
+terraform import vastdata_quota.example <guid>
+terraform import vastdata_quota.example <Quota Name>
 ```

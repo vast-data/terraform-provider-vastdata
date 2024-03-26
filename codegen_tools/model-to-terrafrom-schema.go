@@ -393,13 +393,13 @@ func build_datasources_tests() {
 }
 
 func gen_import_command(path string) {
-	for _, r := range resources_templates_map {
-		if r.DisableImport == false {
-			fmt.Printf("Creating import file for %v Doc %v\n", r.DataSourceName, r.Importer.GetDoc())
+	for _, r := range codegen_configs.ResourcesTemplates {
+		if !r.DisableImport && r.Generate {
+			fmt.Printf("Creating import file for Resource: %v ,Resource Name:%v Doc:%v\n", r.ResourceName, r.DataSourceName, r.Importer.GetDoc())
 			base_path := filepath.Join(path, r.DataSourceName)
 			import_string := ""
 			for _, d := range r.Importer.GetDoc() {
-				import_string += fmt.Sprintf("terraform import  %v.example %v\n", r.DataSourceName, d)
+				import_string += fmt.Sprintf("terraform import %v.example %v\n", r.DataSourceName, d)
 			}
 			WriteStringToFile(base_path, "import.sh", import_string)
 		}

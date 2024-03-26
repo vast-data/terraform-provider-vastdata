@@ -81,5 +81,6 @@ resource vastdata_replication_peers clusterA-clusterB-peer {
 Import is supported using the following syntax:
 
 ```shell
-terraform import  vastdata_replication_peers.example <guid>
+terraform import vastdata_replication_peers.example <guid>
+terraform import vastdata_replication_peers.example <Name>
 ```

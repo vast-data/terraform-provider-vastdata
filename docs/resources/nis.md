@@ -41,5 +41,6 @@ resource vastdata_nis nis1{
 Import is supported using the following syntax:
 
 ```shell
-terraform import  vastdata_nis.example <guid>
+terraform import vastdata_nis.example <guid>
+terraform import vastdata_nis.example <Domain Name>
 ```

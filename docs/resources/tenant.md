@@ -62,5 +62,6 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import  vastdata_tenant.example <guid>
+terraform import vastdata_tenant.example <guid>
+terraform import vastdata_tenant.example <Name>
 ```

@@ -124,5 +124,6 @@ resource vastdata_view_policy vpolicy1{
 Import is supported using the following syntax:
 
 ```shell
-terraform import  vastdata_view_policy.example <guid>
+terraform import vastdata_view_policy.example <guid>
+terraform import vastdata_view_policy.example <Name>|<Tenant Name>
 ```

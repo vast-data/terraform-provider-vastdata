@@ -69,5 +69,6 @@ resource vastdata_s3_policy s3policy {
 Import is supported using the following syntax:
 
 ```shell
-terraform import  vastdata_s3_policy.example <guid>
+terraform import vastdata_s3_policy.example <guid>
+terraform import vastdata_s3_policy.example <Name>
 ```

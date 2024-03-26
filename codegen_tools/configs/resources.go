@@ -21,6 +21,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_user",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Group",
@@ -34,6 +38,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_group",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "VipPool",
@@ -47,6 +55,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_vip_pool",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Tenant",
@@ -63,6 +75,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ListFields: map[string][]FakeField{"client_ip_ranges": []FakeField{
 			FakeField{Name: "start_ip", Description: "The first ip of the range"},
 			FakeField{Name: "end_ip", Description: "The last ip of the range"}}},
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	}, ResourceTemplateV2{
 		ResourceName:             "QosPolicy",
 		Path:                     ToStringPointer("qospolicies"),
@@ -74,6 +90,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_qos_policy",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "QosDynamicLimits",
@@ -110,6 +130,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_protection_policy",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ProtectionPolicySchedule",
@@ -143,6 +167,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		BeforePatchFunc:          utils.EntityMergeToUserQuotas,
 		DataSourceName:           "vastdata_quota",
 		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"grace_period": utils.GracePeriodFormatValidation},
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Quota Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "DefaultQuota",
@@ -198,6 +226,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_dns",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ViewPolicy",
@@ -215,6 +247,11 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:         true,
 		ResponseGetByURL: false,
 		DataSourceName:   "vastdata_view_policy",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+				utils.HttpFieldTuple{DisplayName: "Tenant Name", FieldName: "tenant_name__icontains"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "View",
@@ -278,6 +315,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_nis",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Domain Name", FieldName: "domain_name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Ldap",
@@ -292,6 +333,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		IgnoreUpdates:            NewStringSet("bindpw"),
 		DataSourceName:           "vastdata_ldap",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Domain name", FieldName: "domain_name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3LifeCycleRule",
@@ -307,6 +352,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ResponseProcessingFunc:   "ProcessingResultsListResponse",
 		BeforePatchFunc:          utils.EnabledMustBeSet,
 		BeforePostFunc:           utils.EnabledMustBeSet,
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ActiveDirectory",
@@ -335,6 +384,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_s3_policy",
 		BeforePostFunc:           utils.EnabledMustBeSet,
 		BeforePatchFunc:          utils.EnabledMustBeSet,
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ProtectedPath",
@@ -347,6 +400,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_protected_path",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Snapshot",
@@ -362,6 +419,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		FieldsValidators: map[string]schema.SchemaValidateDiagFunc{
 			"expiration_time": utils.SnapshotExpirationFormatValidation,
 		},
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "GlobalSnapshot",
@@ -377,6 +438,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		BeforePostFunc:           utils.AddStreamInfo,
 		BeforePatchFunc:          utils.UpdateStreamInfo,
 		IgnoreUpdates:            NewStringSet("loanee_tenant_id"),
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "GlobalLocalSnapshot",
@@ -428,6 +493,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_replication_peers",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3replicationPeers",
@@ -442,6 +511,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_s3_replication_peers",
 		SensitiveFields:          NewStringSet("secret_key", "access_key"),
 		IgnoreUpdates:            NewStringSet("secret_key", "access_key"),
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "UserKey",

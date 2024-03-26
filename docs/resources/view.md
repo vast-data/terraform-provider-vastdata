@@ -98,6 +98,6 @@ Optional:
 Import is supported using the following syntax:
 
 ```shell
-terraform import  vastdata_view.example <guid>
-terraform import  vastdata_view.example <Path>|<Tenant Name>
+terraform import vastdata_view.example <guid>
+terraform import vastdata_view.example <Path>|<Tenant Name>
 ```
