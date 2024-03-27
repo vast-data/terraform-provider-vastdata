@@ -349,7 +349,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_life_cycle_rule",
-		ResponseProcessingFunc:   "ProcessingResultsListResponse",
+		ResponseProcessingFunc:   utils.ProcessingResultsListResponse,
 		BeforePatchFunc:          utils.EnabledMustBeSet,
 		BeforePostFunc:           utils.EnabledMustBeSet,
 		Importer: utils.NewImportByHttpFields(false,

@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
@@ -354,6 +355,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	client := m.(vast_client.JwtSession)
 	values := url.Values{}
+	datasource_config := codegen_configs.GetDataSourceByName("View")
 
 	path := d.Get("path")
 	values.Add("path", fmt.Sprintf("%v", path))
@@ -376,8 +378,8 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	}
 	resource_l := []api_latest.View{}
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
 
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,

@@ -221,7 +221,7 @@ var _ = Describe(" S3LifeCycleRule", func() {
 
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "s3lifecyclerules", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
-					ghttp.RespondWith(200, `{ "results":[`+string(b)+`]}`),
+					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)
 

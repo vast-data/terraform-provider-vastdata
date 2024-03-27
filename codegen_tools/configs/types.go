@@ -139,7 +139,7 @@ type ResourceTemplateV2 struct {
 	Generate                 bool
 	DisableImport            bool
 	DataSourceName           string
-	ResponseProcessingFunc   string
+	ResponseProcessingFunc   utils.ResponseProcessingFunc
 	ResponseGetByURL         bool
 	IgnoreUpdates            *StringSet
 	TfNameToModelName        map[string]string
@@ -186,6 +186,9 @@ func (r *ResourceTemplateV2) SetFunctions() {
 	}
 	if r.Importer == nil {
 		r.Importer = utils.GetDefaultImporter()
+	}
+	if r.ResponseProcessingFunc == nil {
+		r.ResponseProcessingFunc = utils.DefaultProcessingFunc
 	}
 }
 

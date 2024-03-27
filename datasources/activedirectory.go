@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
@@ -68,6 +69,7 @@ func dataSourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, 
 
 	client := m.(vast_client.JwtSession)
 	values := url.Values{}
+	datasource_config := codegen_configs.GetDataSourceByName("ActiveDirectory")
 
 	machine_account_name := d.Get("machine_account_name")
 	values.Add("machine_account_name", fmt.Sprintf("%v", machine_account_name))
@@ -84,8 +86,8 @@ func dataSourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, 
 
 	}
 	resource_l := []api_latest.ActiveDirectory{}
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
 
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,

@@ -9,12 +9,12 @@ import (
 
 	//        "net/url"
 	"errors"
-	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
@@ -153,9 +153,9 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
+	resource_config := codegen_configs.GetResourceByName("Group")
 	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
-	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
+	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -169,7 +169,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 	}
 	resource := api_latest.Group{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
+	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -198,9 +198,10 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceGroupDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
+	resource_config := codegen_configs.GetResourceByName("Group")
 	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
 
-	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -225,6 +226,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
+	resource_config := codegen_configs.GetResourceByName("Group")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Group"))
 	reflect_Group := reflect.TypeOf((*api_latest.Group)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Group.Elem(), d, &data, "", false)
@@ -265,7 +267,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("groups")}
-	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
+	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Group %v", create_err))
 
 	if create_err != nil {
@@ -290,7 +292,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 
-	id_err := utils.DefaultIdFunc(ctx, client, resource.Id, d)
+	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
 	if id_err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -311,6 +313,7 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
+	resource_config := codegen_configs.GetResourceByName("Group")
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Group")
@@ -350,8 +353,8 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "groups", "id": d.Id()}
-	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
+	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Group %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -374,15 +377,15 @@ func resourceGroupImporter(ctx context.Context, d *schema.ResourceData, m interf
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("Group")
 	attrs := map[string]interface{}{"path": utils.GenPath("groups")}
-	response, err := utils.DefaultImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
 	resource_l := []api_latest.Group{}
+	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 	if err != nil {
 		return result, err
 	}
@@ -396,7 +399,7 @@ func resourceGroupImporter(ctx context.Context, d *schema.ResourceData, m interf
 	}
 
 	resource := resource_l[0]
-	id_err := utils.DefaultIdFunc(ctx, client, resource.Id, d)
+	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
 	if id_err != nil {
 		return result, id_err
 	}

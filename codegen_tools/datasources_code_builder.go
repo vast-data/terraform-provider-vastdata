@@ -24,7 +24,8 @@ import (
         api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
         "github.com/hashicorp/terraform-plugin-log/tflog"
         "net/url"
-        utils "github.com/vast-data/terraform-provider-vastdata/utils"
+         utils "github.com/vast-data/terraform-provider-vastdata/utils"
+         codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
        
         
 )
@@ -151,6 +152,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      {{ $cbl:="{" }}
      client:=m.(vast_client.JwtSession)
      values := url.Values{}
+     datasource_config := codegen_configs.GetDataSourceByName("{{ .ResourceName }}")
      {{ range $i,$v := .RequiredIdentifierFields.ToArray }} 
      {{$v}}:=d.Get("{{$v}}") 
      values.Add("{{$v}}",fmt.Sprintf("%v",{{$v}}))
@@ -174,11 +176,8 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
 
      }
      resource_l:=[]api_latest.{{.ResourceName}}{}
-     {{ if ne .ResponseProcessingFunc "" }}
-     body,err:=utils.{{.ResponseProcessingFunc}}(ctx,response)
-     {{else }}
-     body,err:=utils.DefaultProcessingFunc(ctx,response)
-     {{end -}}
+     body,err:=datasource_config.ResponseProcessingFunc(ctx,response)
+
      if err!=nil {
          diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,

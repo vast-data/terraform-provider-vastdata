@@ -370,37 +370,22 @@ var _ = Describe(" {{.RESOURCE.ResourceName}}", func() {
 					ghttp.RespondWith(200, request_url),
 				),
 				)
-                                {{ if eq .RESOURCE.ResponseProcessingFunc "ProcessingResultsListResponse" }}
-				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "{{.RESOURCE.Path}}100"),
-					ghttp.RespondWith(200, {{ .BT }}{ "results":[{{ .BT }}+string(b)+{{ .BT }}]}{{ .BT }}),
-				),
-				)
-
-                                {{ else }}
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "{{.RESOURCE.Path}}100"),
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
-                                {{end}}
-
+                                
                                 {{else}}
 
-                                {{ if eq .RESOURCE.ResponseProcessingFunc "ProcessingResultsListResponse" }}
-				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "{{.RESOURCE.Path}}", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
-					ghttp.RespondWith(200, {{ .BT }}{ "results":[{{ .BT }}+string(b)+{{ .BT }}]}{{ .BT }}),
-				),
-				)
 
-                                {{ else }}
+                                
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "{{.RESOURCE.Path}}", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, {{ .BT }}[{{ .BT }}+string(b)+{{ .BT }}]{{ .BT }}),
 				),
 				)
-                                {{end}}
+                                
                                 {{end}}
 				ctx = tflogtest.RootLogger(ctx, &output)
 				e := client.Start()
@@ -523,37 +508,20 @@ var _ = Describe(" {{.DATASOURCE.ResourceName}}", func() {
 					ghttp.RespondWith(200, request_url),
 				),
 				)
-                                {{ if eq .DATASOURCE.ResponseProcessingFunc "ProcessingResultsListResponse" }}
-				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "{{.DATASOURCE.Path}}100"),
-					ghttp.RespondWith(200, {{ .BT }}{ "results":[{{ .BT }}+string(b)+{{ .BT }}]}{{ .BT }}),
-				),
-				)
-
-                                {{ else }}
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "{{.DATASOURCE.Path}}100"),
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
-                                {{end}}
 
                                 {{else}}
 
-                                {{ if eq .DATASOURCE.ResponseProcessingFunc "ProcessingResultsListResponse" }}
-				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "{{.DATASOURCE.Path}}", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
-					ghttp.RespondWith(200, {{ .BT }}{ "results":[{{ .BT }}+string(b)+{{ .BT }}]}{{ .BT }}),
-				),
-				)
-
-                                {{ else }}
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "{{.DATASOURCE.Path}}", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, {{ .BT }}[{{ .BT }}+string(b)+{{ .BT }}]{{ .BT }}),
 				),
 				)
-                                {{end}}
+                               
                                 {{end}}
 				ctx = tflogtest.RootLogger(ctx, &output)
 				e := client.Start()

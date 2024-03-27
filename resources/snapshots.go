@@ -9,12 +9,12 @@ import (
 
 	//        "net/url"
 	"errors"
-	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
 	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
@@ -173,9 +173,9 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-
+	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
-	response, err := utils.DefaultGetFunc(ctx, client, attrs, d, map[string]string{})
+	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	tflog.Info(ctx, response.Request.URL.String())
@@ -189,7 +189,7 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 	}
 	resource := api_latest.Snapshot{}
-	body, err := utils.DefaultProcessingFunc(ctx, response)
+	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -218,9 +218,10 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 func resourceSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
+	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
 
-	response, err := utils.DefaultDeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	tflog.Info(ctx, response.Request.URL.String())
@@ -245,6 +246,7 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
+	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Snapshot"))
 	reflect_Snapshot := reflect.TypeOf((*api_latest.Snapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Snapshot.Elem(), d, &data, "", false)
@@ -285,7 +287,7 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots")}
-	response, create_err := utils.DefaultCreateFunc(ctx, client, attrs, data, map[string]string{})
+	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Snapshot %v", create_err))
 
 	if create_err != nil {
@@ -310,7 +312,7 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 
-	id_err := utils.DefaultIdFunc(ctx, client, resource.Id, d)
+	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
 	if id_err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -331,6 +333,7 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
+	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
 		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Snapshot")
@@ -370,8 +373,8 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": "snapshots", "id": d.Id()}
-	response, patch_err := utils.DefaultUpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
+	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Snapshot %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -394,15 +397,15 @@ func resourceSnapshotImporter(ctx context.Context, d *schema.ResourceData, m int
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots")}
-	response, err := utils.DefaultImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
 	resource_l := []api_latest.Snapshot{}
+	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
-	body, err := utils.DefaultProcessingFunc(ctx, response)
 	if err != nil {
 		return result, err
 	}
@@ -416,7 +419,7 @@ func resourceSnapshotImporter(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	resource := resource_l[0]
-	id_err := utils.DefaultIdFunc(ctx, client, resource.Id, d)
+	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
 	if id_err != nil {
 		return result, id_err
 	}

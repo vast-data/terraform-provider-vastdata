@@ -2,7 +2,10 @@ package configs
 
 import (
 	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
+	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 )
+
+var datasources_map map[string]ResourceTemplateV2 = map[string]ResourceTemplateV2{}
 
 var DatasourcesTemplates = []ResourceTemplateV2{
 	ResourceTemplateV2{
@@ -268,7 +271,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_life_cycle_rule",
-		ResponseProcessingFunc:   "ProcessingResultsListResponse",
+		ResponseProcessingFunc:   utils.ProcessingResultsListResponse,
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ActiveDirectory",
@@ -378,4 +381,19 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_replication_peers",
 	},
+}
+
+func init() {
+	for _, r := range DatasourcesTemplates {
+		r.SetFunctions()
+		datasources_map[r.ResourceName] = r
+	}
+}
+
+func GetDataSourceByName(name string) *ResourceTemplateV2 {
+	resource, exists := datasources_map[name]
+	if exists {
+		return &resource
+	}
+	return nil
 }

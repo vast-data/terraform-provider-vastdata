@@ -159,7 +159,6 @@ var _ = Describe(" Quota", func() {
 					ghttp.RespondWith(200, request_url),
 				),
 				)
-
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "quotas100"),
 					ghttp.RespondWith(200, string(b)),

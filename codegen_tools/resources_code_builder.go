@@ -48,7 +48,6 @@ import (
         "context"
         {{ if not .DisableImport }}
 //        "net/url"
-        codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
         "errors"
         {{ end }}
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -59,6 +58,7 @@ import (
         utils "github.com/vast-data/terraform-provider-vastdata/utils"
     	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
         vast_versions  "github.com/vast-data/terraform-provider-vastdata/vast_versions"
+        codegen_configs "github.com/vast-data/terraform-provider-vastdata/codegen_tools/configs"
         
 )
 
@@ -157,9 +157,9 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      {{ $cbr:="}" }}
      {{ $cbl:="{" }}
      client:=m.(vast_client.JwtSession)
-
+     resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
      attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}  
-     response,err:={{ funcName .GetFunc}}(ctx,client,attrs,d,map[string]string{})
+     response,err:=resource_config.GetFunc(ctx,client,attrs,d,map[string]string{})
      utils.VastVersionsWarn(ctx)
 
      tflog.Info(ctx,response.Request.URL.String())
@@ -173,7 +173,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 
      }
      resource:=api_latest.{{.ResourceName}}{}
-     body,err:=utils.DefaultProcessingFunc(ctx,response)
+     body,err:=resource_config.ResponseProcessingFunc(ctx,response)
      
      if err!=nil {
          diags = append(diags, diag.Diagnostic {
@@ -197,7 +197,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
  diags = Resource{{ .ResourceName }}ReadStructIntoSchema(ctx, resource ,d )
  {{ if .AfterReadFunc }}
  var after_read_error error
- after_read_error={{ funcName .AfterReadFunc}}(client,ctx,d)
+ after_read_error=resource_config.AfterReadFunc(client,ctx,d)
  if after_read_error!=nil {
     return diag.FromErr(after_read_error)
  }
@@ -208,18 +208,19 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
      var diags diag.Diagnostics
      client:=m.(vast_client.JwtSession)
+     resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
      attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
      {{ if .BeforeDeleteFunc  }}
-     data,before_delete_error:={{ funcName .BeforeDeleteFunc}}(ctx,d,m)
+     data,before_delete_error:=resource_config.BeforeDeleteFunc(ctx,d,m)
      if before_delete_error!=nil {
         return diag.FromErr(before_delete_error)
      }
      unmarshaled_data := map[string]interface{}{}
      _data,_:=io.ReadAll(data)
      json.Unmarshal(_data, &unmarshaled_data)
-     response,err:={{ funcName .DeleteFunc}}(ctx,client,attrs,unmarshaled_data,map[string]string{});
+     response,err:=resource_config.DeleteFunc(ctx,client,attrs,unmarshaled_data,map[string]string{});
      {{else}}
-     response,err:={{ funcName .DeleteFunc}}(ctx,client,attrs,nil,map[string]string{});
+     response,err:=resource_config.DeleteFunc(ctx,client,attrs,nil,map[string]string{});
      {{end}}
      tflog.Info(ctx,fmt.Sprintf("Removing Resource"))
      tflog.Info(ctx,response.Request.URL.String())
@@ -244,12 +245,13 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     var diags diag.Diagnostics
     data := make(map[string]interface{})
     client:=m.(vast_client.JwtSession)
+    resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
     tflog.Info(ctx,fmt.Sprintf("Creating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if  .BeforePostFunc  }}
     var before_post_error error
-    data,before_post_error={{ funcName .BeforePostFunc}}(data,client,ctx,d)
+    data,before_post_error=resource_config.BeforePostFunc(data,client,ctx,d)
     if before_post_error!=nil {
        return diag.FromErr(before_post_error)
     }
@@ -290,7 +292,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}")}
-    response ,create_err:={{ funcName .CreateFunc}}(ctx,client,attrs,data,map[string]string{});
+    response ,create_err:=resource_config.CreateFunc(ctx,client,attrs,data,map[string]string{});
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , create_err))
     
     if create_err != nil {
@@ -315,7 +317,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
         return diags
     }
    
-   id_err:={{ funcName .IdFunc}}(ctx,client,resource.Id,d)
+   id_err:=resource_config.IdFunc(ctx,client,resource.Id,d)
    if id_err!=nil {
         diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
@@ -328,7 +330,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
    resource{{ .ResourceName }}Read(ctx_with_resource,d,m)
     {{ if .BeforeCreateFunc }}
     var before_create_error error
-    _,before_create_error={{ funcName .BeforeCreateFunc}}(data,client,ctx,d)
+    _,before_create_error=resource_config.BeforeCreateFunc(data,client,ctx,d)
     if before_create_error!=nil {
        return diag.FromErr(before_create_error)
     }
@@ -343,6 +345,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     var diags diag.Diagnostics
     data := make(map[string]interface{})
     version_compare:=utils.VastVersionsWarn(ctx)
+    resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
     if version_compare!= metadata.CLUSTER_VERSION_EQUALS {
           cluster_version:=metadata.ClusterVersionString()
           t,t_exists:=vast_versions.GetVersionedType(cluster_version,"{{.ResourceName}}")
@@ -372,7 +375,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
     {{ if .BeforePatchFunc }}
     var before_patch_error error
-    data,before_patch_error={{ funcName .BeforePatchFunc}}(data,client,ctx,d)
+    data,before_patch_error=resource_config.BeforePatchFunc(data,client,ctx,d)
     if before_patch_error!=nil {
        return diag.FromErr(before_patch_error)
     }
@@ -389,8 +392,8 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
         return diags
     }
     tflog.Debug(ctx,fmt.Sprintf("Request json created %v", string(b)))
-    attrs:=map[string]interface{}{"path":"{{.Path}}","id":d.Id()}
-    response ,patch_err := {{ funcName .UpdateFunc}}(ctx,client,attrs,data,d,map[string]string{})
+    attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
+    response ,patch_err := resource_config.UpdateFunc(ctx,client,attrs,data,d,map[string]string{})
     tflog.Info(ctx,fmt.Sprintf("Server Error for  {{.ResourceName}} %v" , patch_err))
     if patch_err != nil {
             error_message:=patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response) 
@@ -404,7 +407,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
    resource{{ .ResourceName }}Read(ctx,d,m)
    {{ if .AfterPatchFunc }}
    var after_patch_error error
-   data,after_patch_error={{ funcName .AfterPatchFunc}}(data,client,ctx,d)
+   data,after_patch_error=resource_config.AfterPatchFunc(data,client,ctx,d)
    if after_patch_error!=nil {
       return diag.FromErr(after_patch_error)
    }
@@ -422,18 +425,14 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
     client := m.(vast_client.JwtSession)
     resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}")}
-    response,err:={{ funcName .ImportFunc}}(ctx,client,attrs,d,resource_config.Importer.GetFunc())
+    response,err:=resource_config.ImportFunc(ctx,client,attrs,d,resource_config.Importer.GetFunc())
 
     if err != nil {
 	    return result, err
     }
-   
+     
     resource_l:=[]api_latest.{{.ResourceName}}{}
-    {{ if ne .ResponseProcessingFunc "" }}
-    body,err:=utils.{{.ResponseProcessingFunc}}(ctx,response)
-    {{else }}
-    body,err:=utils.DefaultProcessingFunc(ctx,response)
-    {{end -}}
+    body,err:=resource_config.ResponseProcessingFunc(ctx,response)
 
     if err!=nil {
        return result, err
@@ -455,7 +454,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
      }
      
     resource:=resource_l[0]
-    id_err:={{ funcName .IdFunc}}(ctx,client,resource.Id,d)
+    id_err:=resource_config.IdFunc(ctx,client,resource.Id,d)
     if id_err!=nil {
 	 return result,id_err
      }
