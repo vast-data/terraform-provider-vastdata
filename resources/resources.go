@@ -27,4 +27,5 @@ var Resources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_replication_peers":     ResourceReplicationPeers(),
 	"vastdata_s3_replication_peers":  ResourceS3replicationPeers(),
 	"vastdata_user_key":              ResourceUserKey(),
+	"vastdata_active_directory2":     ResourceActiveDirectory2(),
 }

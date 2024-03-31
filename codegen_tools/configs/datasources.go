@@ -381,6 +381,18 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_replication_peers",
 	},
+	ResourceTemplateV2{
+		ResourceName:             "ActiveDirectory2",
+		Path:                     ToStringPointer("activedirectory"),
+		Model:                    api_latest.ActiveDirectory2{},
+		DestFile:                 ToStringPointer("activedirectory2.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("machine_account_name"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		DataSourceName:           "vastdata_active_directory2",
+	},
 }
 
 func init() {

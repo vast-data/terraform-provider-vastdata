@@ -370,6 +370,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		BeforeDeleteFunc:         utils.AlwaysSkipDeleteLdap,
 		DataSourceName:           "vastdata_active_directory",
 		ForceNewFields:           NewStringSet("machine_account_name", "organizational_unit"),
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Machine Account Name", FieldName: "machine_account_name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "S3Policy",
@@ -536,6 +540,25 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		AfterReadFunc:            utils.AddLostDataBackToUserKey,
 		SensitiveFields:          NewStringSet("secret_key"),
 		DisableImport:            true,
+	},
+	ResourceTemplateV2{
+		ResourceName:             "ActiveDirectory2",
+		Path:                     ToStringPointer("activedirectory"),
+		Model:                    api_latest.ActiveDirectory2{},
+		DestFile:                 ToStringPointer("activedirectory2.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("machine_account_name"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		DataSourceName:           "vastdata_active_directory2",
+		ForceNewFields:           NewStringSet("machine_account_name", "organizational_unit"),
+		SensitiveFields:          NewStringSet("bindpw"),
+		DisableImport:            false,
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Machine Account Name", FieldName: "machine_account_name"},
+			}),
 	},
 }
 
