@@ -316,11 +316,14 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"bindpw": &schema.Schema{
-			Type:        schema.TypeString,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   true,
-			Description: `The password used with the Bind DN to authenticate to the AD server.`,
+			Type: schema.TypeString,
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             true,
+			Description:           `The password used with the Bind DN to authenticate to the AD server.`,
 		},
 
 		"urls": &schema.Schema{

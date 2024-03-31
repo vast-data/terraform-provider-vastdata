@@ -23,3 +23,30 @@ func GetResponseBodyAsStr(r *http.Response) string {
 	}
 	return string(body)
 }
+
+func UnmarshelBodyToMap(r *http.Response, i *map[string]interface{}) error {
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(b, i)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func FakeHttpResponse(orig *http.Response, m map[string]interface{}) (*http.Response, error) {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	r := http.Response{
+		Request:    orig.Request,
+		Status:     orig.Status,
+		StatusCode: orig.StatusCode,
+		Body:       io.NopCloser(bytes.NewBuffer(b)),
+	}
+
+	return &r, nil
+}

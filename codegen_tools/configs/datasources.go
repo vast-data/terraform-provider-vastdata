@@ -388,9 +388,11 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		DestFile:                 ToStringPointer("activedirectory2.go"),
 		IgnoreFields:             NewStringSet("Id"),
 		RequiredIdentifierFields: NewStringSet("machine_account_name"),
+		GetFunc:                  utils.ActiveDirectory2GetFunc,
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
+		IgnoreUpdates:            NewStringSet("bindpw"),
 		DataSourceName:           "vastdata_active_directory2",
 	},
 }

@@ -551,9 +551,11 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
+		GetFunc:                  utils.ActiveDirectory2GetFunc,
 		DataSourceName:           "vastdata_active_directory2",
 		ForceNewFields:           NewStringSet("machine_account_name", "organizational_unit"),
 		SensitiveFields:          NewStringSet("bindpw"),
+		IgnoreUpdates:            NewStringSet("bindpw"),
 		DisableImport:            false,
 		Importer: utils.NewImportByHttpFields(false,
 			[]utils.HttpFieldTuple{
