@@ -552,6 +552,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
 		GetFunc:                  utils.ActiveDirectory2GetFunc,
+		DeleteFunc:               utils.ActiveDirectory2DeleteFunc,
 		DataSourceName:           "vastdata_active_directory2",
 		ForceNewFields:           NewStringSet("machine_account_name", "organizational_unit"),
 		SensitiveFields:          NewStringSet("bindpw"),

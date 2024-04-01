@@ -96,7 +96,7 @@ func DefaultDeleteFunc(ctx context.Context, _client interface{}, attr map[string
 	if err != nil {
 		return nil, err
 	}
-	delete_path := fmt.Sprintf("%v/%v", (*attributes)["path"], (*attributes)["id"])
+	delete_path := fmt.Sprintf("%v%v", (*attributes)["path"], (*attributes)["id"])
 	query := ""
 	_query := getAttributeOrDefault("query", nil, attr)
 	if _query != nil {
@@ -111,7 +111,7 @@ func DefaultDeleteFunc(ctx context.Context, _client interface{}, attr map[string
 		}
 		r = bytes.NewReader(b)
 	}
-	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH to path \"%v\"", delete_path))
+	tflog.Debug(ctx, fmt.Sprintf("Calling Delete to path \"%v\"", delete_path))
 	return client.Delete(ctx, delete_path, query, r, map[string]string{})
 }
 

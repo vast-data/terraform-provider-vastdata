@@ -1,11 +1,14 @@
 package utils
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
 var forbiddenKeys map[string]interface{} = map[string]interface{}{
@@ -24,8 +27,7 @@ var forbiddenKeys map[string]interface{} = map[string]interface{}{
 Ex:
 
 		{ "id": 1,
-		  "machine_account_name": "cluster123",
-		  .
+		  "machine_account_name": "cluster123",		  .
 		  .
 		  .
 		  "ldap": {
@@ -70,6 +72,25 @@ func ActiveDirectory2GetFunc(ctx context.Context, _client interface{}, attr map[
 		}
 	}
 	return FakeHttpResponse(response, temp2)
+}
+
+func ActiveDirectory2DeleteFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
+	client := _client.(vast_client.JwtSession)
+	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
+	if err != nil {
+		return nil, err
+	}
+	delete_path := fmt.Sprintf("%v%v", (*attributes)["path"], (*attributes)["id"])
+	query := ""
+	_query := getAttributeOrDefault("query", nil, attr)
+	if _query != nil {
+		query = *_query
+	}
+	b := []byte("{}")
+	r := bytes.NewReader(b)
+	tflog.Debug(ctx, fmt.Sprintf("Calling Delete to path \"%v\"", delete_path))
+	return client.Delete(ctx, delete_path, query, r, map[string]string{})
+
 }
 
 type ImportActiveDirectory2ByHttpFields struct {
