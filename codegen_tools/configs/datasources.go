@@ -347,7 +347,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ProtectionPolicy",
-		Path:                     ToStringPointer("protectionpolicy"),
+		Path:                     ToStringPointer("protectionpolicies"),
 		Model:                    api_latest.ProtectionPolicy{},
 		DestFile:                 ToStringPointer("protectionpolicy.go"),
 		IgnoreFields:             NewStringSet(),
