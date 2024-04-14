@@ -145,31 +145,6 @@ func DataSourceUser() *schema.Resource {
 				Description: `IS this a local user`,
 			},
 
-			"access_keys": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `List of User Access Keys`,
-
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-
-						"access_key": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "",
-						},
-
-						"enabled": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Description: "",
-						},
-					},
-				},
-			},
-
 			"allow_create_bucket": &schema.Schema{
 				Type:        schema.TypeBool,
 				Computed:    true,
@@ -437,18 +412,6 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"local\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AccessKeys", resource.AccessKeys))
-
-	err = d.Set("access_keys", utils.FlattenListOfStringsList(&resource.AccessKeys, []string{"access_key", "enabled"}))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"access_keys\"",
 			Detail:   err.Error(),
 		})
 	}

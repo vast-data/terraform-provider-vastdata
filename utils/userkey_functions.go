@@ -204,12 +204,15 @@ func GetUserKeyFunc(ctx context.Context, _client interface{}, attr map[string]in
 	tflog.Debug(ctx, fmt.Sprintf("USERKEY: %v User Access Key Found: %v", i["id"], access_keys))
 	if exists {
 		for _, l := range access_keys.([]interface{}) {
-			v := l.([]interface{})
-			if len(v) < 2 {
-				continue
+			v := l.(map[string]interface{})
+			key, key_exists := v["key"]
+			if !key_exists {
+				key = ""
 			}
-			key := fmt.Sprintf("%v", v[0])
-			enabled := fmt.Sprintf("%v", v[1])
+			enabled, enabled_exists := v["status"]
+			if !enabled_exists {
+				enabled = ""
+			}
 			//we assume that the the respone is []string where fisrt string element is always the access key and the second is enabled/disabled
 			if key == access_key {
 				response_payload["access_key"] = key

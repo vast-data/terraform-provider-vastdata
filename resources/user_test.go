@@ -31,48 +31,6 @@ var _ = Describe(" User", func() {
 	var UserResourceData *schema.ResourceData
 	var model_json = `
                          {
-   "access_keys": [
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ],
-      [
-         "string-0",
-         "string-1"
-      ]
-   ],
    "gids": [
       1,
       2,

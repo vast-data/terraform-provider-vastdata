@@ -153,33 +153,6 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Description: `IS this a local user`,
 		},
 
-		"access_keys": &schema.Schema{
-			Type:        schema.TypeList,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `List of User Access Keys`,
-
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-
-					"access_key": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: "",
-					},
-
-					"enabled": &schema.Schema{
-						Type:        schema.TypeString,
-						Computed:    true,
-						Optional:    true,
-						Description: "",
-					},
-				},
-			},
-		},
-
 		"allow_create_bucket": &schema.Schema{
 			Type:        schema.TypeBool,
 			Computed:    true,
@@ -218,9 +191,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 	}
 }
 
-var User_names_mapping map[string][]string = map[string][]string{
-	"access_keys": []string{"access_key", "enabled"},
-}
+var User_names_mapping map[string][]string = map[string][]string{}
 
 func ResourceUserReadStructIntoSchema(ctx context.Context, resource api_latest.User, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -378,18 +349,6 @@ func ResourceUserReadStructIntoSchema(ctx context.Context, resource api_latest.U
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"local\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AccessKeys", resource.AccessKeys))
-
-	err = d.Set("access_keys", utils.FlattenListOfStringsList(&resource.AccessKeys, []string{"access_key", "enabled"}))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"access_keys\"",
 			Detail:   err.Error(),
 		})
 	}

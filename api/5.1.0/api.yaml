@@ -323,13 +323,6 @@ components:
         local:
           type: "boolean"
           description: "IS this a local user"
-        access_keys:
-          type: "array"
-          items:
-             type: "array"
-             items:
-               type: "string"
-          description: "List of User Access Keys"
         allow_create_bucket:
           type: "boolean"
           description: "Allow create bucket"

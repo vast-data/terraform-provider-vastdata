@@ -52,7 +52,6 @@ gids = [
 
 ### Optional
 
-- `access_keys` (Block List) List of User Access Keys (see [below for nested schema](#nestedblock--access_keys))
 - `allow_create_bucket` (Boolean) Allow create bucket
 - `allow_delete_bucket` (Boolean) Allow delete bucket
 - `gids` (List of Number) List of supplementary GID list
@@ -73,14 +72,6 @@ gids = [
 
 - `guid` (String) A uniq guid given to the user
 - `id` (String) The ID of this resource.
-
-<a id="nestedblock--access_keys"></a>
-### Nested Schema for `access_keys`
-
-Optional:
-
-- `access_key` (String)
-- `enabled` (String)
 
 ## Import
 

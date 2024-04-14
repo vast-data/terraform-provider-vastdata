@@ -37,8 +37,6 @@ type User struct {
 	Sids []string `json:"sids,omitempty"`
 	// IS this a local user
 	Local bool `json:"local,omitempty"`
-	// List of User Access Keys
-	AccessKeys [][]string `json:"access_keys,omitempty"`
 	// Allow create bucket
 	AllowCreateBucket bool `json:"allow_create_bucket,omitempty"`
 	// Allow delete bucket

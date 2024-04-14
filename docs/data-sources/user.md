@@ -27,7 +27,6 @@ data vastdata_user user1 {
 
 ### Read-Only
 
-- `access_keys` (List of Object) List of User Access Keys (see [below for nested schema](#nestedatt--access_keys))
 - `allow_create_bucket` (Boolean) Allow create bucket
 - `allow_delete_bucket` (Boolean) Allow delete bucket
 - `gids` (List of Number) List of supplementary GID list
@@ -45,11 +44,3 @@ data vastdata_user user1 {
 - `sid` (String) The user SID
 - `sids` (List of String) supplementary SID list
 - `uid` (Number) The user unix UID
-
-<a id="nestedatt--access_keys"></a>
-### Nested Schema for `access_keys`
-
-Read-Only:
-
-- `access_key` (String)
-- `enabled` (String)

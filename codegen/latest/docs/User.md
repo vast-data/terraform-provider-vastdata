@@ -17,7 +17,6 @@ Name | Type | Description | Notes
 **PrimaryGroupSid** | **string** | The user primary group SID | [optional] [default to null]
 **Sids** | **[]string** | supplementary SID list | [optional] [default to null]
 **Local** | **bool** | IS this a local user | [optional] [default to null]
-**AccessKeys** | [**[][]string**](array.md) | List of User Access Keys | [optional] [default to null]
 **AllowCreateBucket** | **bool** | Allow create bucket | [optional] [default to null]
 **AllowDeleteBucket** | **bool** | Allow delete bucket | [optional] [default to null]
 **S3Superuser** | **bool** | Is S3 superuser | [optional] [default to null]
