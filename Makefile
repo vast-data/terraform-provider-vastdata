@@ -170,4 +170,4 @@ github-pre-release: is-tag pack-all-archs
 
 github-release: is-tag pack-all-archs
 	tag=$$(git describe --tags); \
-	gh release create $${tag} ./build/*.zip ./build/*.json ./build/*.sig  ./build/*_SHA256SUMS --title "Release $${tag}" --generate-notes
+	gh release create $${tag} ./build/*.zip ./build/*.sig  ./build/*_SHA256SUMS --title "Release $${tag}" --generate-notes
