@@ -267,19 +267,27 @@ func (s *JwtSession) ClusterVersion(ctx context.Context) (version string, respon
 		return *s.clusterVersion, nil, nil
 	}
 	var b []byte
-	response, response_error := s.Get(ctx, "/api/clusters/1/", "", map[string]string{})
+	response, response_error := s.Get(ctx, "/api/clusters/", "", map[string]string{})
 	response, response_error = validateResponse(response, response_error, 200, 201, 204)
 	if response_error != nil {
 		return "", response, response_error
 	}
-	clusterVersion := ClusterVersion{}
+	clustersVersions := []ClusterVersion{}
 	b, response_error = io.ReadAll(response.Body)
 	if response_error != nil {
 		return "", response, errors.New("Failed to read http response body")
 	}
-	response_error = json.Unmarshal(b, &clusterVersion)
+	response_error = json.Unmarshal(b, &clustersVersions)
 	if response_error != nil {
-		return "", response, errors.New("Falied to extract sw_version from server response")
+		return "", response, errors.New("Falied to extract list of clusters version from server response")
+	}
+	if len(clustersVersions) <= 0 {
+		return "", response, errors.New("Could not found clusters to obtain version from")
+	}
+	//For now we as assume that there is only one cluster so we always grab the first cluster in the list.
+	clusterVersion := clustersVersions[0]
+	if clusterVersion.ClusterVersion == "" {
+		return "", response, errors.New("Empty Cluster version returned")
 	}
 	s.clusterVersion = &clusterVersion.ClusterVersion
 	return clusterVersion.ClusterVersion, response, nil
