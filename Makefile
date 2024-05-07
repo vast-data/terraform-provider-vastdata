@@ -156,7 +156,7 @@ pack-archs: clean-releases is-tag
 	cd $(BUILD_DEST);\
 	shasum -a 256 *.zip > terraform-provider-vastdata_$${tf_tag}_SHA256SUMS;\
 	popd;\
-	gpg --detach-sign --local-user $${TF_GPG_SIG} build/terraform-provider-vastdata_1.1.0_SHA256SUMS
+	gpg --detach-sign --local-user $${TF_GPG_SIG} build/terraform-provider-vastdata_1.1.1_SHA256SUMS
 
 
 
