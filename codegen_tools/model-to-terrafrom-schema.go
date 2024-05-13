@@ -90,10 +90,11 @@ func LoadApi(filename string) (libopenapi.Document, error) {
 func aPISchemasPopulate(doc libopenapi.Document) {
 	v3, _ := doc.BuildV3Model()
 	//All is converted to lower to preven conversion names with swagger
-	for n, s := range v3.Model.Components.Schemas {
-		apiSchemasMap[strings.ToLower(n)] = s
+	collections := v3.Model.Components.Schemas
+	for pair := collections.First(); pair != nil; pair = pair.Next() {
+		print(pair)
+		apiSchemasMap[strings.ToLower(pair.Key())] = pair.Value()
 	}
-
 }
 func getSchemaProxy(name string) *base.SchemaProxy {
 	name = strings.ToLower(name)

@@ -192,26 +192,35 @@ func (r *ResourceTemplateV2) SetFunctions() {
 	}
 }
 
-func (r *ResourceTemplateV2) HasProperty(property string) bool {
+func (r *ResourceTemplateV2) GetProperty(property string) *base.SchemaProxy {
 	if r.ApiSchema != nil {
 		schema := r.ApiSchema.Schema()
-		_, exists := schema.Properties[property]
-		return exists
+		p := schema.Properties
+		for pair := p.First(); pair != nil; pair = pair.Next() {
+			if pair.Key() == property {
+				return pair.Value()
+			}
+		}
+
 	}
-	return false
+	return nil
 }
 
 func (r *ResourceTemplateV2) GetEnum(property string) []interface{} {
-	if r.HasProperty(property) {
-		schema := r.ApiSchema.Schema()
-		property_schema := schema.Properties[property].Schema()
-		if property_schema == nil {
-			return []interface{}{}
-		}
-		return property_schema.Enum
-
+	e := []interface{}{}
+	property_schema_proxy := r.GetProperty(property)
+	if property_schema_proxy == nil {
+		return e
 	}
-	return []interface{}{}
+	property_schema := property_schema_proxy.Schema()
+	enum := property_schema.Enum
+	if len(enum) == 0 {
+		return e
+	}
+	for _, r := range enum {
+		e = append(e, r.Value)
+	}
+	return e
 }
 
 func (r ResourceTemplateV2) HasValidatorFunc(s string) bool {
@@ -230,44 +239,43 @@ func (r ResourceTemplateV2) GetValidatorFunc(s string) string {
 
 func (r *ResourceTemplateV2) GetSchemaDocumentation() string {
 	if r.ApiSchema != nil {
-		return r.ApiSchema.Schema().Description
+		return fmt.Sprintf("%v", r.ApiSchema.Schema().Description)
 	}
 	return ""
 }
 
 func (r *ResourceTemplateV2) GetSchemaProperyDocument(property string) string {
 	if r.ApiSchema != nil {
-		schema := r.ApiSchema.Schema()
-		property_schema, exists := schema.Properties[property]
-		if !exists {
+		property_schema_proxy := r.GetProperty(property)
+		if property_schema_proxy == nil {
 			return ""
 		}
+		property_schema := property_schema_proxy.Schema()
 		enum := r.GetEnum(property)
-		out := property_schema.Schema().Description
+		out := fmt.Sprintf("%v", property_schema.Description)
 		if len(enum) > 0 {
 			out += fmt.Sprintf(" Allowed Values are %v", ListAsStringsList(enum))
 		}
 		return out
 	}
-
 	return ""
 }
 
 func (r *ResourceTemplateV2) GetSchemaProperyDefault(property string) string {
 	if r.ApiSchema != nil {
-		schema := r.ApiSchema.Schema()
-		property_schema, exists := schema.Properties[property]
-		if !exists {
+		property_schema_proxy := r.GetProperty(property)
+		if property_schema_proxy == nil {
 			return ""
 		}
-		_default := property_schema.Schema().Default
-		if _default != nil {
-			if reflect.TypeOf(_default).String() == "string" {
-				return fmt.Sprintf("\"%v\"", _default)
-
-			}
-			return fmt.Sprintf("%v", _default)
+		property_schema := property_schema_proxy.Schema()
+		_default := property_schema.Default
+		if _default == nil {
+			return ""
 		}
+		if property_schema.Type[0] == "string" {
+			return fmt.Sprintf(`"%v"`, _default.Value)
+		}
+		return fmt.Sprintf("%v", _default.Value)
 	}
 
 	return ""
