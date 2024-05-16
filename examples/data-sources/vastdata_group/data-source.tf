@@ -1,3 +1,3 @@
-data vastdata_group group1 {
+data "vastdata_group" "group1" {
   name = "group1"
 }

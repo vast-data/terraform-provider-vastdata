@@ -1,6 +1,6 @@
-resource vastdata_s3_policy s3policy {
-        name = "s3policy1"
-        policy = <<EOT
+resource "vastdata_s3_policy" "s3policy" {
+  name    = "s3policy1"
+  policy  = <<EOT
         {
    "Version":"2012-10-17",
    "Statement":[
@@ -28,5 +28,5 @@ resource vastdata_s3_policy s3policy {
    ]
 }
         EOT
-        enabled = false
+  enabled = false
 }
