@@ -13,7 +13,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-data vastdata_user user1 {
+data "vastdata_user" "user1" {
   name = "user1"
 }
 ```

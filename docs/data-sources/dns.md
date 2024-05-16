@@ -13,8 +13,8 @@ description: |-
 ## Example Usage
 
 ```terraform
-data vastdata_dns dns1 {
- name = "dns1"
+data "vastdata_dns" "dns1" {
+  name = "dns1"
 }
 ```
 

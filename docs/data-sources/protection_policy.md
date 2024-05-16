@@ -13,7 +13,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-data vastdata_protection_policy policy1 {
+data "vastdata_protection_policy" "policy1" {
   name = "policy1"
 }
 ```

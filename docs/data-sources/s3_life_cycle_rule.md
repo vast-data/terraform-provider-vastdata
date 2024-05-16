@@ -13,7 +13,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-data vastdata_s3_life_cycle_rule s3rule {
+data "vastdata_s3_life_cycle_rule" "s3rule" {
   name = "s3rule"
 }
 ```
