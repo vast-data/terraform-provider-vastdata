@@ -83,6 +83,7 @@ build-all: clean build-formatter build document
 $(BUILD_DEST)/linux_amd64/terraform-provider-vastdata:
 	export GOOS="linux" ;\
 	export GOARCH="amd64" ;\
+	export CGO_ENABLED=0 ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
 	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
@@ -100,6 +101,7 @@ build-linux-arm64:   $(BUILD_DEST)/linux_arm64/terraform-provider-vastdata
 $(BUILD_DEST)/darwin_amd64/terraform-provider-vastdata:
 	export GOOS="darwin" ;\
 	export GOARCH="amd64" ;\
+	export CGO_ENABLED=0 ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
 	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
@@ -109,6 +111,7 @@ build-darwin-amd64: $(BUILD_DEST)/darwin_amd64/terraform-provider-vastdata
 $(BUILD_DEST)/darwin_arm64/terraform-provider-vastdata:
 	export GOOS="darwin" ;\
 	export GOARCH="arm64" ;\
+	export CGO_ENABLED=0 ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
 	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
@@ -118,6 +121,7 @@ build-darwin-arm64: $(BUILD_DEST)/darwin_arm64/terraform-provider-vastdata
 $(BUILD_DEST)/windows_amd64/terraform-provider-vastdata:
 	export GOOS="windows" ;\
 	export GOARCH="amd64" ;\
+	export CGO_ENABLED=0 ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
 	go build -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
@@ -126,6 +130,7 @@ build-windows-amd64: $(BUILD_DEST)/windows_amd64/terraform-provider-vastdata
 $(BUILD_DEST)/windows_arm64/terraform-provider-vastdata:
 	export GOOS="windows" ;\
 	export GOARCH="arm64" ;\
+	export CGO_ENABLED=0 ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
 	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
@@ -156,7 +161,7 @@ pack-archs: clean-releases is-tag
 	cd $(BUILD_DEST);\
 	shasum -a 256 *.zip > terraform-provider-vastdata_$${tf_tag}_SHA256SUMS;\
 	popd;\
-	gpg --detach-sign --local-user $${TF_GPG_SIG} build/terraform-provider-vastdata_1.1.1_SHA256SUMS
+	gpg --detach-sign --local-user $${TF_GPG_SIG} build/terraform-provider-vastdata_$${tf_tag}_SHA256SUMS
 
 
 
