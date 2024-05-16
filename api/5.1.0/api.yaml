@@ -135,9 +135,11 @@ components:
           description: "Period should be positive in format like 0d|2d|1y|2y"
         physical_capacity:
           type: "integer"
+          format: "int64"
           description: "Physical Capacity"
         logical_capacity:
           type: "integer"
+          format: "int64"
           description: "Logical Capacity"
         nfs_interop_flags:
           type: "string"
@@ -244,9 +246,11 @@ components:
           description: "Period should be positive in format like 0d|2d|1y|2y"
         physical_capacity:
           type: "integer"
+          format: "int64"
           description: "Physical Capacity"
         logical_capacity:
           type: "integer"
+          format: "int64"
           description: "Logical Capacity"
         nfs_interop_flags:
           type: "string"

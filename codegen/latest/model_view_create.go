@@ -54,9 +54,9 @@ type ViewCreate struct {
 	// Period should be positive in format like 0d|2d|1y|2y
 	S3LocksRetentionPeriod string `json:"s3_locks_retention_period,omitempty"`
 	// Physical Capacity
-	PhysicalCapacity int32 `json:"physical_capacity,omitempty"`
+	PhysicalCapacity int64 `json:"physical_capacity,omitempty"`
 	// Logical Capacity
-	LogicalCapacity int32 `json:"logical_capacity,omitempty"`
+	LogicalCapacity int64 `json:"logical_capacity,omitempty"`
 	// Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.
 	NfsInteropFlags string `json:"nfs_interop_flags,omitempty"`
 	IsRemote bool `json:"is_remote,omitempty"`
