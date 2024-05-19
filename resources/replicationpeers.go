@@ -41,7 +41,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,12 +50,14 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -62,7 +65,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"leading_vip": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -70,7 +74,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"remote_vip_range": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -78,7 +83,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"version": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -86,7 +92,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"remote_version": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -94,7 +101,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"is_local": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -102,7 +110,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"peer_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -110,7 +119,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"secure_mode": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -118,7 +128,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"pool_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

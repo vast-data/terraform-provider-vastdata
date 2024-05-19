@@ -41,7 +41,8 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,17 +50,20 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"policy": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

@@ -41,7 +41,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,17 +50,20 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"subnet_cidr": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"subnet_cidr_ipv6": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -67,7 +71,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"gw_ip": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +80,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"gw_ipv6": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,7 +89,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vlan": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -91,7 +98,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"state": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -99,11 +107,14 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"cnode_ids": &schema.Schema{
-			Type:        schema.TypeList,
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `IDs of cnodes comprising cnode group`,
+			Type: schema.TypeList,
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("VipPool").GetAttributeDiffFunc("cnode_ids"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `IDs of cnodes comprising cnode group`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -111,7 +122,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -119,7 +131,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -127,7 +140,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -135,12 +149,14 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"role": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"ip_ranges": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
@@ -164,7 +180,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vms_preferred": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -172,7 +189,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -180,7 +198,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"port_membership": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -188,7 +207,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"active_interfaces": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -196,7 +216,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"enable_l3": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -204,7 +225,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vast_asn": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -212,7 +234,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"peer_asn": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

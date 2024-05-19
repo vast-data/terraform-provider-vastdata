@@ -163,6 +163,16 @@ type ResourceTemplateV2 struct {
 	IdFunc                   utils.IdFuncType
 	ImportFunc               utils.ImportFunc
 	Importer                 utils.ImportInterface
+	AttributesDiffFuncs      map[string]schema.SchemaDiffSuppressFunc
+}
+
+func (r *ResourceTemplateV2) GetAttributeDiffFunc(attr string) schema.SchemaDiffSuppressFunc {
+	return r.AttributesDiffFuncs[attr]
+}
+
+func (r *ResourceTemplateV2) AttributeHasDiffFunc(attr string) bool {
+	_, exists := r.AttributesDiffFuncs[attr]
+	return exists
 }
 
 func (r *ResourceTemplateV2) SetFunctions() {

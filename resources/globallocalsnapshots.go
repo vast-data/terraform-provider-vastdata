@@ -41,7 +41,8 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,27 +50,32 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"loanee_tenant_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"loanee_root_path": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"loanee_snapshot_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -79,19 +85,22 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"owner_tenant": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
 					"name": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 
 					"guid": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 				},

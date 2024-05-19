@@ -59,6 +59,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{"cnode_ids": utils.VippoolCnodeIdsDiffSupress},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Tenant",

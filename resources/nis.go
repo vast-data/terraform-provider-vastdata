@@ -41,7 +41,8 @@ func getResourceNisSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,12 +50,14 @@ func getResourceNisSchema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"hosts": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

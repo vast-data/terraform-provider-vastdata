@@ -41,7 +41,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,13 +50,15 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"machine_account_name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 			ForceNew: true,
 		},
 
 		"organizational_unit": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -64,7 +67,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"smb_allowed": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -74,7 +78,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"ntlm_enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -84,7 +89,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_auto_discovery": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -94,7 +100,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_ldaps": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -104,7 +111,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"port": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -114,7 +122,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"binddn": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -122,7 +131,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"searchbase": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -130,7 +140,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -138,7 +149,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"method": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  false,
 			Optional:  true,
 			Sensitive: false,
@@ -150,7 +162,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"query_groups_mode": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  false,
 			Optional:  true,
 			Sensitive: false,
@@ -162,7 +175,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"posix_attributes_source": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -172,7 +186,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_tls": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -182,7 +197,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"tls_certificate": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -190,7 +206,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"reverse_lookup": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -200,7 +217,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"gid_number": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -208,7 +226,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_multi_forest": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -218,7 +237,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -226,7 +246,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid_number": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -234,7 +255,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"match_user": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -242,7 +264,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid_member_value_property_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -250,7 +273,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid_member": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -258,7 +282,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"posix_account": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -266,7 +291,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"posix_group": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -274,7 +300,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"username_property_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -282,7 +309,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"user_login_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -290,7 +318,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"group_login_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -298,7 +327,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"mail_property_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -306,7 +336,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"is_vms_auth_provider": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
@@ -320,14 +351,16 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             true,
-			Description:           `The password used with the Bind DN to authenticate to the AD server.`,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   true,
+			Description: `The password used with the Bind DN to authenticate to the AD server.`,
 		},
 
 		"urls": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

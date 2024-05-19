@@ -41,7 +41,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,12 +50,14 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -62,7 +65,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"target_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -70,7 +74,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"target_object_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -78,17 +83,20 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"prefix": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"clone_type": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"frames": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -98,7 +106,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"every": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -107,7 +116,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"start_at": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -116,7 +126,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"keep_local": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -125,7 +136,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"keep_remote": &schema.Schema{
-						Type:             schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:         true,
 						Optional:         true,
 						Sensitive:        false,
@@ -137,7 +149,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"indestructible": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

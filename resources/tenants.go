@@ -41,7 +41,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,12 +50,14 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"smb_privileged_user_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -62,7 +65,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_privileged_group_sid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -70,7 +74,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_administrators_group_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -78,7 +83,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -88,7 +94,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"trash_gid": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -96,7 +103,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"client_ip_ranges": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -123,7 +131,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -133,7 +142,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"ad_provider_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -141,7 +151,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"ldap_provider_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -149,7 +160,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"nis_provider_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -157,7 +169,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"encryption_crn": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

@@ -505,7 +505,10 @@ func ResourceBuildTemplateToTerrafromElem(r codegen_configs.ResourceElem, indent
              {{indent $I " "}}   DiffSuppressOnRefresh: false,
              DiffSuppressFunc: utils.DoNothingOnUpdate(),
              {{ end }}
-
+             {{if AttributeHasDiffFunc .Attributes.name  }}
+             {{indent $I " "}}   DiffSuppressOnRefresh: false,
+             DiffSuppressFunc: codegen_configs.GetResourceByName("{{GetResourceName}}").GetAttributeDiffFunc("{{.Attributes.name}}"),
+             {{ end }}
 	     {{- if eq .Attributes.required "true" -}}
 	     {{indent $I " "}}   Required: true,
 	     {{ else -}}
@@ -569,6 +572,11 @@ func ResourceBuildTemplateToTerrafromElem(r codegen_configs.ResourceElem, indent
 	localFuncMap["GetSchemaProperyDefault"] = r.Parent.GetSchemaProperyDefault
 	localFuncMap["HasValidatorFunc"] = r.Parent.HasValidatorFunc
 	localFuncMap["GetValidatorFunc"] = r.Parent.GetValidatorFunc
+	localFuncMap["AttributeHasDiffFunc"] = r.Parent.AttributeHasDiffFunc
+	localFuncMap["GetAttributeDiffFunc"] = r.Parent.GetAttributeDiffFunc
+	localFuncMap["GetResourceName"] = func() string {
+		return r.Parent.ResourceName
+	}
 	t := template.Must(template.New("tf").Funcs(localFuncMap).Parse(tmpl))
 	err := t.Execute(&b, r)
 	if err != nil {

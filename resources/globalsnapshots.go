@@ -41,7 +41,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,7 +50,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
@@ -58,31 +60,37 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Required:              true,
+
+			Required: true,
 		},
 
 		"loanee_root_path": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"remote_target_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 		},
 
 		"remote_target_guid": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"remote_target_path": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -90,14 +98,16 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"owner_root_snapshot": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
 					"clone_id": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
@@ -105,12 +115,14 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 					},
 
 					"name": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 
 					"parent_handle_ehandle": &schema.Schema{
-						Type:        schema.TypeString,
+						Type: schema.TypeString,
+
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
@@ -121,19 +133,22 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"owner_tenant": &schema.Schema{
-			Type:     schema.TypeList,
+			Type: schema.TypeList,
+
 			Required: true,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
 					"name": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 
 					"guid": &schema.Schema{
-						Type:     schema.TypeString,
+						Type: schema.TypeString,
+
 						Required: true,
 					},
 				},

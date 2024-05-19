@@ -41,12 +41,14 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -54,7 +56,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"protection_policy_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -62,7 +65,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"source_dir": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -70,7 +74,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"target_exported_dir": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -78,7 +83,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -86,7 +92,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"remote_tenant_guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -94,7 +101,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		},
 
 		"target_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

@@ -34,13 +34,15 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"user_id": &schema.Schema{
-			Type:     schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Required: true,
 			ForceNew: true,
 		},
 
 		"access_key": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -48,7 +50,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"secret_key": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   true,
@@ -56,7 +59,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"pgp_public_key": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -65,7 +69,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"encrypted_secret_key": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -73,7 +78,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,

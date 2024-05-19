@@ -41,7 +41,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,12 +50,14 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"mode": &schema.Schema{
-			Type:      schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:  true,
 			Optional:  true,
 			Sensitive: false,
@@ -64,7 +67,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"io_size_bytes": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -72,7 +76,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"static_limits": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -82,7 +87,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"min_reads_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -90,7 +96,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -98,7 +105,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_writes_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -106,7 +114,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_bw_mbps": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -114,7 +123,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_reads_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -122,7 +132,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -130,7 +141,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_writes_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -138,7 +150,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_iops": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -149,7 +162,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"capacity_limits": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -159,7 +173,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"max_reads_bw_mbps_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -167,7 +182,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_bw_mbps_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -175,7 +191,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_iops_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
@@ -183,7 +200,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_iops_per_gb_capacity": &schema.Schema{
-						Type:        schema.TypeInt,
+						Type: schema.TypeInt,
+
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,

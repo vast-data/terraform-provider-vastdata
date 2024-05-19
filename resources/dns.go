@@ -41,12 +41,14 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"vip": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -54,7 +56,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"domain_suffix": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -62,7 +65,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_gateway": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -70,7 +74,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -78,7 +83,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -86,7 +92,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_subnet_cidr": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -94,7 +101,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_vlan": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -102,7 +110,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"cnode_ids": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -114,7 +123,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_ipv6": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -122,7 +132,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_ipv6_subnet_cidr": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -130,7 +141,8 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 		},
 
 		"vip_ipv6_gateway": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

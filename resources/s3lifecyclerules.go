@@ -41,12 +41,14 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -54,7 +56,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -62,12 +65,14 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"prefix": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"min_size": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -75,7 +80,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"max_size": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -83,7 +89,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_days": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -91,7 +98,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_date": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -99,7 +107,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expired_obj_delete_marker": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -107,7 +116,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"noncurrent_days": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -115,7 +125,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"newer_noncurrent_versions": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -123,7 +134,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"abort_mpu_days_after_initiation": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -131,7 +143,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"view_path": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -139,7 +152,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"view_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

@@ -41,7 +41,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,7 +50,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_time": &schema.Schema{
-			Type:             schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:         true,
 			Optional:         true,
 			Sensitive:        false,
@@ -58,12 +60,14 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"path": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -71,7 +75,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type:        schema.TypeInt,
+			Type: schema.TypeInt,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -79,7 +84,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"indestructible": &schema.Schema{
-			Type:        schema.TypeBool,
+			Type: schema.TypeBool,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,

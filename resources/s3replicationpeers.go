@@ -41,7 +41,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
@@ -49,12 +50,14 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type:     schema.TypeString,
+			Type: schema.TypeString,
+
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -62,7 +65,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"bucket_name": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -70,7 +74,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"http_protocol": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -78,7 +83,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"type_": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -86,7 +92,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"proxies": &schema.Schema{
-			Type:        schema.TypeList,
+			Type: schema.TypeList,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -98,7 +105,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"aws_region": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
@@ -110,10 +118,11 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             true,
-			Description:           `The S3 access key`,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   true,
+			Description: `The S3 access key`,
 		},
 
 		"secret_key": &schema.Schema{
@@ -121,14 +130,16 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             true,
-			Description:           `The S3 secret key`,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   true,
+			Description: `The S3 secret key`,
 		},
 
 		"custom_bucket_url": &schema.Schema{
-			Type:        schema.TypeString,
+			Type: schema.TypeString,
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
