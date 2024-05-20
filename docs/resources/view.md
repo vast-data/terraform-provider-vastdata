@@ -89,7 +89,7 @@ Optional:
 
 - `fqdn` (String)
 - `grantee` (String) Allowed Values are [users groups]
-- `permissions` (String) Allowed Values are [FULL]
+- `permissions` (String) Allowed Values are [FULL CHANGE READ]
 - `sid_str` (String)
 - `uid_or_gid` (String)
 

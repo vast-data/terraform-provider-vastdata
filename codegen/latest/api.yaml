@@ -40,7 +40,7 @@ components:
           enum: [users,groups]
         permissions:
           type: "string"
-          enum: [FULL]
+          enum: [FULL,CHANGE,READ]
         sid_str:
           type: "string"
         uid_or_gid:

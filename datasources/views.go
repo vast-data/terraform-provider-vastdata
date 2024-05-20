@@ -298,7 +298,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
-										Description: ` Allowed Values are [FULL]`,
+										Description: ` Allowed Values are [FULL CHANGE READ]`,
 									},
 
 									"sid_str": &schema.Schema{

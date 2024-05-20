@@ -343,8 +343,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Optional:  true,
 									Sensitive: false,
 
-									ValidateDiagFunc: utils.OneOf([]string{"FULL"}),
-									Description:      ` Allowed Values are [FULL]`,
+									ValidateDiagFunc: utils.OneOf([]string{"FULL", "CHANGE", "READ"}),
+									Description:      ` Allowed Values are [FULL CHANGE READ]`,
 								},
 
 								"sid_str": &schema.Schema{
