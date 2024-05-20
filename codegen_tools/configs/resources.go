@@ -411,6 +411,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
 		CreateFunc: utils.ProtectedPathCreateFunc,
+		DeleteFunc: utils.ProtectedPathDeleteFunc,
 		Timeouts: &schema.ResourceTimeout{
 			Delete: MinToDuration(15),
 		},
