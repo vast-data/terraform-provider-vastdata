@@ -1408,6 +1408,10 @@ components:
         target_id:
           type: "integer"
           description: "The remote target object id"
+        capabilities:
+          type: "string"
+          description: "Replication capabilities which define , avaliable only for cluster from version 5.1"
+          enum: [ASYNC_REPLICATION]
     Snapshot:
       type: "object"
       properties:

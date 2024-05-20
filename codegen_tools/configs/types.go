@@ -164,6 +164,11 @@ type ResourceTemplateV2 struct {
 	ImportFunc               utils.ImportFunc
 	Importer                 utils.ImportInterface
 	AttributesDiffFuncs      map[string]schema.SchemaDiffSuppressFunc
+	Timeouts                 *schema.ResourceTimeout
+}
+
+func (r *ResourceTemplateV2) GetResourceTimeouts() *schema.ResourceTimeout {
+	return r.Timeouts
 }
 
 func (r *ResourceTemplateV2) GetAttributeDiffFunc(attr string) schema.SchemaDiffSuppressFunc {

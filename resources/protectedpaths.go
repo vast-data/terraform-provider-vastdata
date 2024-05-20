@@ -32,6 +32,8 @@ func ResourceProtectedPath() *schema.Resource {
 			StateContext: resourceProtectedPathImporter,
 		},
 
+		Timeouts: codegen_configs.GetResourceByName("ProtectedPath").GetResourceTimeouts(),
+
 		Description: ``,
 		Schema:      getResourceProtectedPathSchema(),
 	}
@@ -103,10 +105,24 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 		"target_id": &schema.Schema{
 			Type: schema.TypeInt,
 
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
 			Description: `The remote target object id`,
+		},
+
+		"capabilities": &schema.Schema{
+			Type: schema.TypeString,
+
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"ASYNC_REPLICATION"}),
+			Description:      `Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]`,
 		},
 	}
 }
@@ -209,6 +225,18 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"target_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Capabilities", resource.Capabilities))
+
+	err = d.Set("capabilities", resource.Capabilities)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"capabilities\"",
 			Detail:   err.Error(),
 		})
 	}

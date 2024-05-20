@@ -73,6 +73,9 @@ func Resource{{ .ResourceName }}() *schema.Resource {
                       StateContext: resource{{ .ResourceName }}Importer,
      },
      {{ end }}
+     {{ if .Timeouts }}
+     Timeouts: codegen_configs.GetResourceByName("{{ .ResourceName }}").GetResourceTimeouts(),
+     {{ end }}
      Description: {{getBT}}{{ .ResourceDocumantation }}{{getBT}},
      Schema: getResource{{ .ResourceName }}Schema(),
    }

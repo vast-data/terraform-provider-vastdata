@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **TenantId** | **int32** | Local Tenant ID | [optional] [default to null]
 **RemoteTenantGuid** | **string** | The Remote tenant guid | [optional] [default to null]
 **TargetId** | **int32** | The remote target object id | [optional] [default to null]
+**Capabilities** | **string** | Replication capabilities which define , avaliable only for cluster from version 5.1 | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

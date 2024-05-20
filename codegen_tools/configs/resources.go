@@ -400,6 +400,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Model:                    api_latest.ProtectedPath{},
 		DestFile:                 ToStringPointer("protectedpaths.go"),
 		IgnoreFields:             NewStringSet("Id"),
+		IgnoreUpdates:            NewStringSet("target_id"),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{},
@@ -409,6 +410,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
+		CreateFunc: utils.ProtectedPathCreateFunc,
+		Timeouts: &schema.ResourceTimeout{
+			Delete: MinToDuration(15),
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Snapshot",

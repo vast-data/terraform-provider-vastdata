@@ -92,6 +92,14 @@ func DataSourceProtectedPath() *schema.Resource {
 				Optional:    false,
 				Description: `The remote target object id`,
 			},
+
+			"capabilities": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]`,
+			},
 		},
 	}
 }
@@ -264,6 +272,18 @@ func dataSourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m 
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"target_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Capabilities", resource.Capabilities))
+
+	err = d.Set("capabilities", resource.Capabilities)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"capabilities\"",
 			Detail:   err.Error(),
 		})
 	}

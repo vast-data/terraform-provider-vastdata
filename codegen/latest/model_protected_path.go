@@ -25,4 +25,6 @@ type ProtectedPath struct {
 	RemoteTenantGuid string `json:"remote_tenant_guid,omitempty"`
 	// The remote target object id
 	TargetId int32 `json:"target_id,omitempty"`
+	// Replication capabilities which define , avaliable only for cluster from version 5.1
+	Capabilities string `json:"capabilities,omitempty"`
 }

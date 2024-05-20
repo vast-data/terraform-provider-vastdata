@@ -27,6 +27,7 @@ var _ = Describe(" ProtectedPath", func() {
 	var ProtectedPathDataSourceData *schema.ResourceData
 	var model_json = `
                          {
+   "capabilities": "string",
    "guid": "string",
    "id": 100,
    "name": "string",
