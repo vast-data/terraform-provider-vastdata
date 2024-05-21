@@ -6,7 +6,7 @@ The VastData Terrafrom provider is a provider to manage VastData clusters [resou
 **Table of Contents**
 
 - [Terraform Provider Vastdata](#terraform-provider-vastdata)
-    - [Configuring Provider to be downloaded from [Terraform Registry](https://registry.terraform.io/providers/vast-data/vastdata/latest)](#configuring-provider-to-be-downloaded-from-terraform-registryhttpsregistryterraformioprovidersvast-datavastdatalatest)
+    - [Configuring Provider to be downloaded from Terraform Registry](#configuring-provider-to-be-downloaded-from-terraform-registryhttpsregistryterraformioprovidersvast-datavastdatalatest)
     - [Building The Provider Directly From Github](#building-the-provider-directly-from-github)
     - [Building The Provider Locally](#building-the-provider-locally)
         - [Cloning The Source Code](#cloning-the-source-code)
