@@ -111,5 +111,9 @@ skip_ssl_verify = true
 version_validation_mode = "warn"
 }
 ```
+## Submitting Bugs/Feature Requests
 
+While it is common to submit Bugs/Feature Requests using github issues.
+We would rather if you open a Bug/Feature Request to Vast Data support at [VastData Support Portal](https://support.vastdata.com/s/login/),
+Or by sending mail to support@vastdata.com
 
