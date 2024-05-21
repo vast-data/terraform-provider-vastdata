@@ -1,7 +1,23 @@
 # Terraform Provider Vastdata
 
-
 The VastData Terrafrom provider is a provider to manage VastData clusters [resources](./resources).
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Terraform Provider Vastdata](#terraform-provider-vastdata)
+    - [Configuring Provider to be downloaded from [Terraform Registry](https://registry.terraform.io/providers/vast-data/vastdata/latest)](#configuring-provider-to-be-downloaded-from-terraform-registryhttpsregistryterraformioprovidersvast-datavastdatalatest)
+    - [Building The Provider Directly From Github](#building-the-provider-directly-from-github)
+    - [Building The Provider Locally](#building-the-provider-locally)
+        - [Cloning The Source Code](#cloning-the-source-code)
+        - [Building The Code Locally](#building-the-code-locally)
+        - [Building Into A Differant directory](#building-into-a-differant-directory)
+    - [Using Local Copy Using dev_overrides](#using-local-copy-using-dev_overrides)
+        - [Edit ~/.terraformrc file](#edit-terraformrc-file)
+    - [Submitting Bugs/Feature Requests](#submitting-bugsfeature-requests)
+
+<!-- markdown-toc end -->
+
 
 ## Configuring Provider to be downloaded from [Terraform Registry](https://registry.terraform.io/providers/vast-data/vastdata/latest)
 In order to configure the provider to be used directly from Terraform registry, use the following provider defenition. 
@@ -111,9 +127,8 @@ skip_ssl_verify = true
 version_validation_mode = "warn"
 }
 ```
-## Submitting Bugs/Feature Requests
+# Submitting Bugs/Feature Requests
 
-While it is common to submit Bugs/Feature Requests using github issues.
-We would rather if you open a Bug/Feature Request to Vast Data support at [VastData Support Portal](https://support.vastdata.com/s/login/),
-Or by sending mail to support@vastdata.com
+While it is common to submit Bugs/Feature Requests using github issues,
+we would rather if you open a Bug/Feature Request to Vast Data support at customer.support@vastdata.com
 
