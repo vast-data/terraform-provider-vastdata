@@ -121,19 +121,23 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		"use_auth_provider": &schema.Schema{
 			Type: schema.TypeBool,
 
-			Computed:    true,
+			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Use configured Auth Provider(s) to enforce group permissions. Required if SMB Flavor is selected`,
+			Description: `Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source`,
+
+			Default: false,
 		},
 
 		"auth_source": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `The source of authentication`,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"PROVIDERS", "RPC", "RPC_AND_PROVIDERS"}),
+			Description:      `The source of authentication Allowed Values are [PROVIDERS RPC RPC_AND_PROVIDERS]`,
 		},
 
 		"read_write": &schema.Schema{

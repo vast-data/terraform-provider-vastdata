@@ -253,6 +253,8 @@ var ResourcesTemplates = []ResourceTemplateV2{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 				utils.HttpFieldTuple{DisplayName: "Tenant Name", FieldName: "tenant_name__icontains"},
 			}),
+		CreateFunc: utils.ViewPolicyCreateFunc,
+		UpdateFunc: utils.ViewPolicyUpdateFunc,
 	},
 	ResourceTemplateV2{
 		ResourceName:             "View",

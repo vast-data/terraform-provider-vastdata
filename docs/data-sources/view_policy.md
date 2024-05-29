@@ -25,13 +25,17 @@ data "vastdata_view_policy" "view_policy1" {
 
 - `name` (String) A uniqe name given to the view policy.
 
+### Optional
+
+- `use_auth_provider` (Boolean) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source
+
 ### Read-Only
 
 - `access_flavor` (String) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)
 - `allowed_characters` (String) How to determine the allowed characters in a path
 - `apple_sid` (Boolean) Apple sid
 - `atime_frequency` (String) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.
-- `auth_source` (String) The source of authentication
+- `auth_source` (String) The source of authentication Allowed Values are [PROVIDERS RPC RPC_AND_PROVIDERS]
 - `cluster` (String) Parent Cluster
 - `cluster_id` (Number) Parent Cluster ID
 - `count_views` (Number) Number of Policy related Views
@@ -87,5 +91,4 @@ data "vastdata_view_policy" "view_policy1" {
 - `trash_access` (List of String) Hosts with trash permissions
 - `url` (String)
 - `use32bit_fileid` (Boolean)
-- `use_auth_provider` (Boolean) Use configured Auth Provider(s) to enforce group permissions. Required if SMB Flavor is selected
 - `vip_pools` (List of Number) Comma separated vip pool ids.

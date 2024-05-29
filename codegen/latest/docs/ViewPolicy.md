@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **AllowedCharacters** | **string** | How to determine the allowed characters in a path | [optional] [default to null]
 **Use32bitFileid** | **bool** |  | [optional] [default to null]
 **ExposeIdInFsid** | **bool** |  | [optional] [default to null]
-**UseAuthProvider** | **bool** | Use configured Auth Provider(s) to enforce group permissions. Required if SMB Flavor is selected | [optional] [default to null]
+**UseAuthProvider** | **bool** | Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to \&quot;PROVIDERS\&quot;. if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source | [optional] [default to false]
 **AuthSource** | **string** | The source of authentication | [optional] [default to null]
 **ReadWrite** | **[]string** | Hosts with NFS read/write permissions | [optional] [default to null]
 **ReadOnly** | **[]string** | Hosts with NFS read only permissions | [optional] [default to null]
