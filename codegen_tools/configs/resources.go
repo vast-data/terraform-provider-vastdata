@@ -237,7 +237,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Path:                     ToStringPointer("viewpolicies"),
 		Model:                    api_latest.ViewPolicy{},
 		DestFile:                 ToStringPointer("viewpolicies.go"),
-		IgnoreFields:             NewStringSet("RemoteMapping", "ProtocolsAudit", "Created", "Id"),
+		IgnoreFields:             NewStringSet("RemoteMapping", "Created", "Id"),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap: map[string][]string{"nfs_read_write": []string{"address"},
@@ -278,6 +278,12 @@ var ResourcesTemplates = []ResourceTemplateV2{
 				utils.HttpFieldTuple{DisplayName: "Path", FieldName: "path"},
 				utils.HttpFieldTuple{DisplayName: "Tenant Name", FieldName: "tenant_name__icontains"},
 			}),
+		FieldsValidators: map[string]schema.SchemaValidateDiagFunc{
+			"max_retention_period":     utils.ValidateRetention,
+			"min_retention_period":     utils.ValidateRetention,
+			"default_retention_period": utils.ValidateRetention,
+			"auto_commit":              utils.ValidateRetention,
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ViewShareAcl",
@@ -570,6 +576,18 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Machine Account Name", FieldName: "machine_account_name"},
 			}),
+	},
+	ResourceTemplateV2{
+		ResourceName:             "ProtocolsAudit",
+		Path:                     nil,
+		Model:                    api_latest.ProtocolsAudit{},
+		DestFile:                 nil,
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet(),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 false,
+		DataSourceName:           "",
 	},
 }
 

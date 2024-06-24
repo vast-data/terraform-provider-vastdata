@@ -130,6 +130,7 @@ var vast_versions map[string]map[string]reflect.Type = map[string]map[string]ref
 		"ProtectedPath":                   reflect.TypeOf((*version_5_1_0.ProtectedPath)(nil)).Elem(),
 		"ProtectionPolicy":                reflect.TypeOf((*version_5_1_0.ProtectionPolicy)(nil)).Elem(),
 		"ProtectionPolicySchedule":        reflect.TypeOf((*version_5_1_0.ProtectionPolicySchedule)(nil)).Elem(),
+		"ProtocolsAudit":                  reflect.TypeOf((*version_5_1_0.ProtocolsAudit)(nil)).Elem(),
 		"QosDynamicLimits":                reflect.TypeOf((*version_5_1_0.QosDynamicLimits)(nil)).Elem(),
 		"QosPolicy":                       reflect.TypeOf((*version_5_1_0.QosPolicy)(nil)).Elem(),
 		"QosStaticLimits":                 reflect.TypeOf((*version_5_1_0.QosStaticLimits)(nil)).Elem(),

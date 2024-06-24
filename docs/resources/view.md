@@ -41,6 +41,7 @@ resource "vastdata_view" "example-view" {
 - `alias` (String) Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path
 - `allow_anonymous_access` (Boolean) Allow S3 anonymous access
 - `allow_s3_anonymous_access` (Boolean) Allow S3 anonymous access
+- `auto_commit` (String) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
 - `bucket` (String) S3 Bucket name
 - `bucket_creators` (List of String) List of bucket creators users
 - `bucket_creators_groups` (List of String) List of bucket creators groups
@@ -48,9 +49,16 @@ resource "vastdata_view" "example-view" {
 - `cluster` (String) Parent Cluster
 - `cluster_id` (Number) Parent Cluster ID
 - `create_dir` (Boolean) Creates the directory specified by the path
+- `default_retention_period` (String) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
 - `directory` (Boolean) Create the directory if it does not exist
+- `files_retention_mode` (String) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]
+- `ignore_oos` (Boolean) Ignore oos
 - `is_remote` (Boolean)
+- `is_seamless` (Boolean) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
+- `locking` (Boolean) Write Once Read Many (WORM) locking enabled
 - `logical_capacity` (Number) Logical Capacity
+- `max_retention_period` (String) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
+- `min_retention_period` (String) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
 - `name` (String) A uniq name given to the view
 - `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]
 - `physical_capacity` (Number) Physical Capacity
@@ -59,6 +67,7 @@ resource "vastdata_view" "example-view" {
 - `s3_locks` (Boolean) S3 Object Lock
 - `s3_locks_retention_mode` (String) S3 Locks retention mode
 - `s3_locks_retention_period` (String) Period should be positive in format like 0d|2d|1y|2y
+- `s3_object_ownership_rule` (String) S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: BucketOwnerEnforced - The bucket owner has full control over any object in the bucket ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. None - S3 Object Ownership is disabled for the bucket.  Allowed Values are [None BucketOwnerPreferred ObjectWriter BucketOwnerEnforced]
 - `s3_unverified_lookup` (Boolean) Allow S3 Unverified Lookup
 - `s3_versioning` (Boolean) Trun on S3 Versioning
 - `share` (String) Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?

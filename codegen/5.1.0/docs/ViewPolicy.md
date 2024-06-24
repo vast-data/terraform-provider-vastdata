@@ -55,7 +55,6 @@ Name | Type | Description | Notes
 **S3Visibility** | **[]string** | A list of usernames for bucket listing permissions | [optional] [default to null]
 **S3VisibilityGroups** | **[]string** | A list of group names for bucket listing permissions | [optional] [default to null]
 **AppleSid** | **bool** | Apple sid | [optional] [default to null]
-**ProtocolsAudit** | [***interface{}**](interface{}.md) | Map of protocols audit configurations | [optional] [default to null]
 **Protocols** | **[]string** | Protocols to audit | [optional] [default to null]
 **DataCreateDelete** | **bool** | Create/Delete Files/Directories/Objects | [optional] [default to null]
 **DataModify** | **bool** | Modify data/MD | [optional] [default to null]
@@ -68,6 +67,13 @@ Name | Type | Description | Notes
 **CountViews** | **int32** | Number of Policy related Views | [optional] [default to null]
 **EnableSnapshotLookup** | **bool** | Specifies whether to make the .snapshot directory accessible in subdirectories of the View. | [optional] [default to null]
 **EnableListingOfSnapshotDir** | **bool** | Specifies whether to make the .snapshot directory visible in subdirectories of the View. | [optional] [default to null]
+**S3SpecialCharsSupport** | **bool** | This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols. | [optional] [default to null]
+**SmbIsCa** | **bool** | When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event. | [optional] [default to null]
+**NfsCaseInsensitive** | **bool** | Force case insensitivity for NFSv3 and NFSv4 | [optional] [default to null]
+**EnableAccessToSnapshotDirInSubdirs** | **bool** | Specifies whether to make the .snapshot directory visible in subdirectories of the View. | [optional] [default to null]
+**EnableVisibilityOfSnapshotDir** | **bool** | Specifies whether to make the .snapshot directory visible in subdirectories of the View. | [optional] [default to null]
+**NfsEnforceTls** | **bool** | Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None. | [optional] [default to null]
+**ProtocolsAudit** | [***ProtocolsAudit**](ProtocolsAudit.md) |  | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

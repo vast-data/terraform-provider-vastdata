@@ -165,6 +165,41 @@ components:
         qos_policy_id:
           type: "integer"
           description: "QoS Policy ID"
+        is_seamless:
+          type: "boolean"
+          description: "Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer."
+        max_retention_period:
+          type: "string"
+          description: "Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years)."
+        min_retention_period:
+           type: "string"
+           description: "Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day)."
+        files_retention_mode:
+          type: "string"
+          enum: [GOVERNANCE,COMPLIANCE,NONE]
+          description: "Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object."
+        default_retention_period:
+          type: "string"
+          description: "Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y."
+        auto_commit:
+          type: "string"
+          description: "Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours)."
+        s3_object_ownership_rule:
+          type: "string"
+          enum: [ None, BucketOwnerPreferred, ObjectWriter, BucketOwnerEnforced ]
+          Description: "S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket.
+A bucket can be configured with one of the following object ownership rules:
+BucketOwnerEnforced - The bucket owner has full control over any object in the bucket
+ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object.
+BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects.
+None - S3 Object Ownership is disabled for the bucket.
+"
+        locking:
+          type: "boolean"
+          description: "Write Once Read Many (WORM) locking enabled"
+        ignore_oos:
+          type: "boolean"
+          description: "Ignore oos"
     ViewCreate:
       type: "object"
       required:
@@ -396,12 +431,21 @@ components:
         name:
           type: "string"
           description: "A uniq name given to the tenant"
+        use_smb_privileged_user:
+          type: "boolean"
+          description: "Enables SMB privileged user"
         smb_privileged_user_name:
           type: "string"
           description: "Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'"
+        use_smb_privileged_group:
+          type: "boolean"
+          description: "Enables SMB privileged user group"
         smb_privileged_group_sid:
           type: "string"
           description: "Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group."
+        smb_privileged_group_full_access:
+          type: "boolean"
+          description: "True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access."
         smb_administrators_group_name:
           type: "string"
           description: "Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group."
@@ -435,6 +479,26 @@ components:
         encryption_crn:
           type: "string"
           description: "Tenant's encryption group unique identifier"
+        is_nfsv42_supported:
+          type: "boolean"
+          description: "Enable NFSv4.2"
+        allow_locked_users:
+          type: "boolean"
+          description: "Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts."
+          default: false
+        allow_disabled_users:
+          type: "boolean"
+          description: "Allow IO from users whose Active Directory accounts are explicitly disabled."
+          default: false
+        use_smb_native:
+          type: "boolean"
+          description: "Use native SMB authentication"
+        vippool_ids:
+           type: "array"
+           items:
+             type: "integer"
+             format: "int64"
+           description: "An array of VIP Pool ids to attach to tenant"
     ViewPolicy:
       type: "object"
       required:
@@ -461,6 +525,7 @@ components:
         path_length:
           type: "string"
           description: "How to determine the maximum allowed path length"
+          enum: [ LCD, NPL ]
         allowed_characters:
           type: "string"
           description: "How to determine the allowed characters in a path"
@@ -619,6 +684,7 @@ therefor it is adviasable to always specify the value of auth_source"
         nfs_minimal_protection_level:
           type: "string"
           description: "NFS 4.1 minimal protection level"
+          enum: [ NONE, SYSTEM, KRB_AUTH_ONLY, KRB_INTEGRITY, KRB_PRIVACY ]
         s3_visibility:
           type: "array"
           items:
@@ -632,9 +698,6 @@ therefor it is adviasable to always specify the value of auth_source"
         apple_sid:
           type: "boolean"
           description: "Apple sid"
-        protocols_audit:
-          type: "object"
-          description: "Map of protocols audit configurations"
         protocols:
           type: "array"
           items:
@@ -673,6 +736,28 @@ therefor it is adviasable to always specify the value of auth_source"
         enable_listing_of_snapshot_dir:
           type: "boolean"
           description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
+        s3_special_chars_support:
+          type: "boolean"
+          description: "This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols."
+        smb_is_ca:
+          type: "boolean"
+          description: "When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event."
+        nfs_case_insensitive:
+          type: "boolean"
+          description: "Force case insensitivity for NFSv3 and NFSv4"
+        enable_access_to_snapshot_dir_in_subdirs:
+          type: "boolean"
+          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
+        enable_visibility_of_snapshot_dir:
+          type: "boolean"
+          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
+        nfs_enforce_tls:
+          type: "boolean"
+          description: "Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None."
+        protocols_audit:
+          type: "object"
+          $ref: "#/components/schemas/ProtocolsAudit"
+          description: "Configure auditing"
     VIPPool:
       type: "object"
       properties:
@@ -1786,4 +1871,40 @@ The object class that defines a group entry on the AD server, if different from 
           items:
             type: "string"
           description: "Comma separated list of URIs of AD servers in the format SCHEME://ADDRESS. The order of listing defines the priority order. The URI with highest priority that has a good health status is used."
+    ProtocolsAudit:
+      type: "object"
+      properties:
+        create_delete_files_dirs_objects:
+          type: "boolean"
+          description: "Audit operations that create or delete files, directories, or objects."
+          default: false
+        log_deleted_files_dirs:
+          type: "boolean"
+          description: "Log deleted files and directories."
+          default: false
+        log_full_path:
+          type: "boolean"
+          description: "Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded."
+          default: true
+        log_username:
+          type: "boolean"
+          description: "Log username of requesting user. Disabled by default"
+          default: false
+        log_hostname:
+          type: "boolean"
+          description: "Log the accessing Hostname"
+        modify_data_md:
+          type: "boolean"
+          description: "Audit operations that modify data (including operations that change the file size) and metadata"
+          default: false
+        read_data:
+          type: "boolean"
+          description: "Audit operations that read data and metadata"
+          default: false
+        modify_data:
+          type: "boolean"
+          default: false
+        read_data_md:
+          type: "boolean"
+          default: false
 

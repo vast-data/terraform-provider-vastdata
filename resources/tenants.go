@@ -55,6 +55,15 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Required: true,
 		},
 
+		"use_smb_privileged_user": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Enables SMB privileged user`,
+		},
+
 		"smb_privileged_user_name": &schema.Schema{
 			Type: schema.TypeString,
 
@@ -64,6 +73,15 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'`,
 		},
 
+		"use_smb_privileged_group": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Enables SMB privileged user group`,
+		},
+
 		"smb_privileged_group_sid": &schema.Schema{
 			Type: schema.TypeString,
 
@@ -71,6 +89,15 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Optional:    true,
 			Sensitive:   false,
 			Description: `Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.`,
+		},
+
+		"smb_privileged_group_full_access": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.`,
 		},
 
 		"smb_administrators_group_name": &schema.Schema{
@@ -176,6 +203,59 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Sensitive:   false,
 			Description: `Tenant's encryption group unique identifier`,
 		},
+
+		"is_nfsv42_supported": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Enable NFSv4.2`,
+		},
+
+		"allow_locked_users": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    false,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.`,
+
+			Default: false,
+		},
+
+		"allow_disabled_users": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    false,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Allow IO from users whose Active Directory accounts are explicitly disabled.`,
+
+			Default: false,
+		},
+
+		"use_smb_native": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Use native SMB authentication`,
+		},
+
+		"vippool_ids": &schema.Schema{
+			Type: schema.TypeList,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `An array of VIP Pool ids to attach to tenant`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeInt,
+			},
+		},
 	}
 }
 
@@ -211,6 +291,18 @@ func ResourceTenantReadStructIntoSchema(ctx context.Context, resource api_latest
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UseSmbPrivilegedUser", resource.UseSmbPrivilegedUser))
+
+	err = d.Set("use_smb_privileged_user", resource.UseSmbPrivilegedUser)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"use_smb_privileged_user\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SmbPrivilegedUserName", resource.SmbPrivilegedUserName))
 
 	err = d.Set("smb_privileged_user_name", resource.SmbPrivilegedUserName)
@@ -223,6 +315,18 @@ func ResourceTenantReadStructIntoSchema(ctx context.Context, resource api_latest
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UseSmbPrivilegedGroup", resource.UseSmbPrivilegedGroup))
+
+	err = d.Set("use_smb_privileged_group", resource.UseSmbPrivilegedGroup)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"use_smb_privileged_group\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SmbPrivilegedGroupSid", resource.SmbPrivilegedGroupSid))
 
 	err = d.Set("smb_privileged_group_sid", resource.SmbPrivilegedGroupSid)
@@ -231,6 +335,18 @@ func ResourceTenantReadStructIntoSchema(ctx context.Context, resource api_latest
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"smb_privileged_group_sid\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SmbPrivilegedGroupFullAccess", resource.SmbPrivilegedGroupFullAccess))
+
+	err = d.Set("smb_privileged_group_full_access", resource.SmbPrivilegedGroupFullAccess)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"smb_privileged_group_full_access\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -339,6 +455,66 @@ func ResourceTenantReadStructIntoSchema(ctx context.Context, resource api_latest
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"encryption_crn\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsNfsv42Supported", resource.IsNfsv42Supported))
+
+	err = d.Set("is_nfsv42_supported", resource.IsNfsv42Supported)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"is_nfsv42_supported\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowLockedUsers", resource.AllowLockedUsers))
+
+	err = d.Set("allow_locked_users", resource.AllowLockedUsers)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"allow_locked_users\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowDisabledUsers", resource.AllowDisabledUsers))
+
+	err = d.Set("allow_disabled_users", resource.AllowDisabledUsers)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"allow_disabled_users\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "UseSmbNative", resource.UseSmbNative))
+
+	err = d.Set("use_smb_native", resource.UseSmbNative)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"use_smb_native\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VippoolIds", resource.VippoolIds))
+
+	err = d.Set("vippool_ids", utils.FlattenListOfPrimitives(&resource.VippoolIds))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"vippool_ids\"",
 			Detail:   err.Error(),
 		})
 	}

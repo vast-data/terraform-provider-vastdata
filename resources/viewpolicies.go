@@ -85,10 +85,12 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		"path_length": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `How to determine the maximum allowed path length`,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"LCD", "NPL"}),
+			Description:      `How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
 		},
 
 		"allowed_characters": &schema.Schema{
@@ -519,10 +521,12 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		"nfs_minimal_protection_level": &schema.Schema{
 			Type: schema.TypeString,
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `NFS 4.1 minimal protection level`,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"NONE", "SYSTEM", "KRB_AUTH_ONLY", "KRB_INTEGRITY", "KRB_PRIVACY"}),
+			Description:      `NFS 4.1 minimal protection level Allowed Values are [NONE SYSTEM KRB_AUTH_ONLY KRB_INTEGRITY KRB_PRIVACY]`,
 		},
 
 		"s3_visibility": &schema.Schema{
@@ -661,6 +665,171 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Optional:    true,
 			Sensitive:   false,
 			Description: `Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
+		},
+
+		"s3_special_chars_support": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols.`,
+		},
+
+		"smb_is_ca": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.`,
+		},
+
+		"nfs_case_insensitive": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Force case insensitivity for NFSv3 and NFSv4`,
+		},
+
+		"enable_access_to_snapshot_dir_in_subdirs": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
+		},
+
+		"enable_visibility_of_snapshot_dir": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
+		},
+
+		"nfs_enforce_tls": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.`,
+		},
+
+		"protocols_audit": &schema.Schema{
+			Type: schema.TypeList,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: ``,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"create_delete_files_dirs_objects": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `Audit operations that create or delete files, directories, or objects.`,
+
+						Default: false,
+					},
+
+					"log_deleted_files_dirs": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `Log deleted files and directories.`,
+
+						Default: false,
+					},
+
+					"log_full_path": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.`,
+
+						Default: true,
+					},
+
+					"log_username": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `Log username of requesting user. Disabled by default`,
+
+						Default: false,
+					},
+
+					"log_hostname": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `Log the accessing Hostname`,
+					},
+
+					"modify_data_md": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `Audit operations that modify data (including operations that change the file size) and metadata`,
+
+						Default: false,
+					},
+
+					"read_data": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `Audit operations that read data and metadata`,
+
+						Default: false,
+					},
+
+					"modify_data": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: ``,
+
+						Default: false,
+					},
+
+					"read_data_md": &schema.Schema{
+						Type: schema.TypeBool,
+
+						Computed:    false,
+						Optional:    true,
+						Sensitive:   false,
+						Description: ``,
+
+						Default: false,
+					},
+				},
+			},
 		},
 	}
 }
@@ -1411,6 +1580,91 @@ func ResourceViewPolicyReadStructIntoSchema(ctx context.Context, resource api_la
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"enable_listing_of_snapshot_dir\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "S3SpecialCharsSupport", resource.S3SpecialCharsSupport))
+
+	err = d.Set("s3_special_chars_support", resource.S3SpecialCharsSupport)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"s3_special_chars_support\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SmbIsCa", resource.SmbIsCa))
+
+	err = d.Set("smb_is_ca", resource.SmbIsCa)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"smb_is_ca\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "NfsCaseInsensitive", resource.NfsCaseInsensitive))
+
+	err = d.Set("nfs_case_insensitive", resource.NfsCaseInsensitive)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"nfs_case_insensitive\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "EnableAccessToSnapshotDirInSubdirs", resource.EnableAccessToSnapshotDirInSubdirs))
+
+	err = d.Set("enable_access_to_snapshot_dir_in_subdirs", resource.EnableAccessToSnapshotDirInSubdirs)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"enable_access_to_snapshot_dir_in_subdirs\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "EnableVisibilityOfSnapshotDir", resource.EnableVisibilityOfSnapshotDir))
+
+	err = d.Set("enable_visibility_of_snapshot_dir", resource.EnableVisibilityOfSnapshotDir)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"enable_visibility_of_snapshot_dir\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "NfsEnforceTls", resource.NfsEnforceTls))
+
+	err = d.Set("nfs_enforce_tls", resource.NfsEnforceTls)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"nfs_enforce_tls\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ProtocolsAudit", resource.ProtocolsAudit))
+
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.ProtocolsAudit))
+	err = d.Set("protocols_audit", utils.FlattenModelAsList(ctx, resource.ProtocolsAudit))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"protocols_audit\"",
 			Detail:   err.Error(),
 		})
 	}

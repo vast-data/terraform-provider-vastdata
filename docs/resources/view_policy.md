@@ -64,8 +64,10 @@ resource "vastdata_view_policy" "vpolicy1" {
 - `data_create_delete` (Boolean) Create/Delete Files/Directories/Objects
 - `data_modify` (Boolean) Modify data/MD
 - `data_read` (Boolean) Read data
+- `enable_access_to_snapshot_dir_in_subdirs` (Boolean) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
 - `enable_listing_of_snapshot_dir` (Boolean) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
 - `enable_snapshot_lookup` (Boolean) Specifies whether to make the .snapshot directory accessible in subdirectories of the View.
+- `enable_visibility_of_snapshot_dir` (Boolean) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
 - `expose_id_in_fsid` (Boolean)
 - `flavor` (String) Security flavor, which determines how file and directory permissions are applied in multiprotocol views.
 - `gid_inheritance` (String) Determine the way a file inherits GID
@@ -74,15 +76,18 @@ resource "vastdata_view_policy" "vpolicy1" {
 - `log_hostname` (Boolean) Log hostname
 - `log_username` (Boolean) Log username
 - `nfs_all_squash` (List of String) Hosts with all squash policy
-- `nfs_minimal_protection_level` (String) NFS 4.1 minimal protection level
+- `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
+- `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
+- `nfs_minimal_protection_level` (String) NFS 4.1 minimal protection level Allowed Values are [NONE SYSTEM KRB_AUTH_ONLY KRB_INTEGRITY KRB_PRIVACY]
 - `nfs_no_squash` (List of String) Hosts with no squash policy
 - `nfs_posix_acl` (Boolean) Enable POSIX ACL
 - `nfs_read_only` (List of String) Hosts with NFS read only permissions
 - `nfs_read_write` (List of String) Hosts with NFS read/write permissions
 - `nfs_return_open_permissions` (Boolean) when using smb use open permissions for files
 - `nfs_root_squash` (List of String) Hosts with root squash policy
-- `path_length` (String) How to determine the maximum allowed path length
+- `path_length` (String) How to determine the maximum allowed path length Allowed Values are [LCD NPL]
 - `protocols` (List of String) Protocols to audit
+- `protocols_audit` (Block List) (see [below for nested schema](#nestedblock--protocols_audit))
 - `read_only` (List of String) Hosts with NFS read only permissions
 - `read_write` (List of String) Hosts with NFS read/write permissions
 - `s3_bucket_full_control` (String) Hosts with full permissions
@@ -98,12 +103,14 @@ resource "vastdata_view_policy" "vpolicy1" {
 - `s3_object_write_acp` (String) Hosts with full permissions
 - `s3_read_only` (List of String) Hosts with S3 read only permissions
 - `s3_read_write` (List of String) Hosts with S3 read/write permissions
+- `s3_special_chars_support` (Boolean) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols.
 - `s3_visibility` (List of String) A list of usernames for bucket listing permissions
 - `s3_visibility_groups` (List of String) A list of group names for bucket listing permissions
 - `smb_directory_mode` (Number) Default unix type permissions on new folder
 - `smb_directory_mode_padded` (String) Default unix type permissions on new folder
 - `smb_file_mode` (Number) Default unix type permissions on new file
 - `smb_file_mode_padded` (String) Default unix type permissions on new file
+- `smb_is_ca` (Boolean) When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.
 - `smb_read_only` (List of String) Hosts with SMB read only permissions
 - `smb_read_write` (List of String) Hosts with SMB read/write permissions
 - `tenant_id` (Number) Tenant ID
@@ -118,6 +125,21 @@ resource "vastdata_view_policy" "vpolicy1" {
 
 - `guid` (String) A uniqe guid given to the view policy
 - `id` (String) The ID of this resource.
+
+<a id="nestedblock--protocols_audit"></a>
+### Nested Schema for `protocols_audit`
+
+Optional:
+
+- `create_delete_files_dirs_objects` (Boolean) Audit operations that create or delete files, directories, or objects.
+- `log_deleted_files_dirs` (Boolean) Log deleted files and directories.
+- `log_full_path` (Boolean) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
+- `log_hostname` (Boolean) Log the accessing Hostname
+- `log_username` (Boolean) Log username of requesting user. Disabled by default
+- `modify_data` (Boolean)
+- `modify_data_md` (Boolean) Audit operations that modify data (including operations that change the file size) and metadata
+- `read_data` (Boolean) Audit operations that read data and metadata
+- `read_data_md` (Boolean)
 
 ## Import
 

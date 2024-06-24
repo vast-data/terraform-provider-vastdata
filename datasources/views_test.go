@@ -28,6 +28,7 @@ var _ = Describe(" View", func() {
 	var model_json = `
                          {
    "alias": "string",
+   "auto_commit": "string",
    "bucket": "string",
    "bucket_creators": [
       "A",
@@ -46,9 +47,13 @@ var _ = Describe(" View", func() {
    "bucket_owner": "string",
    "cluster": "string",
    "cluster_id": 100,
+   "default_retention_period": "string",
+   "files_retention_mode": "string",
    "guid": "string",
    "id": 100,
    "logical_capacity": 100,
+   "max_retention_period": "string",
+   "min_retention_period": "string",
    "name": "string",
    "nfs_interop_flags": "string",
    "path": "string",
@@ -64,6 +69,7 @@ var _ = Describe(" View", func() {
    "qos_policy_id": 100,
    "s3_locks_retention_mode": "string",
    "s3_locks_retention_period": "string",
+   "s3_object_ownership_rule": "string",
    "share": "string",
    "share_acl": {
       "acl": [

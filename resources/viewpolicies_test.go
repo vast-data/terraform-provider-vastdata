@@ -86,6 +86,7 @@ var _ = Describe(" ViewPolicy", func() {
       "D",
       "E"
    ],
+   "protocols_audit": {},
    "read_only": [
       "A",
       "B",

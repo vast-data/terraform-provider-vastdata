@@ -394,6 +394,95 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Sensitive:   false,
 			Description: `QoS Policy ID`,
 		},
+
+		"is_seamless": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.`,
+		},
+
+		"max_retention_period": &schema.Schema{
+			Type: schema.TypeString,
+
+			Computed:         true,
+			Optional:         true,
+			Sensitive:        false,
+			ValidateDiagFunc: utils.ValidateRetention,
+			Description:      `Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).`,
+		},
+
+		"min_retention_period": &schema.Schema{
+			Type: schema.TypeString,
+
+			Computed:         true,
+			Optional:         true,
+			Sensitive:        false,
+			ValidateDiagFunc: utils.ValidateRetention,
+			Description:      `Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).`,
+		},
+
+		"files_retention_mode": &schema.Schema{
+			Type: schema.TypeString,
+
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"GOVERNANCE", "COMPLIANCE", "NONE"}),
+			Description:      `Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]`,
+		},
+
+		"default_retention_period": &schema.Schema{
+			Type: schema.TypeString,
+
+			Computed:         true,
+			Optional:         true,
+			Sensitive:        false,
+			ValidateDiagFunc: utils.ValidateRetention,
+			Description:      `Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.`,
+		},
+
+		"auto_commit": &schema.Schema{
+			Type: schema.TypeString,
+
+			Computed:         true,
+			Optional:         true,
+			Sensitive:        false,
+			ValidateDiagFunc: utils.ValidateRetention,
+			Description:      `Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).`,
+		},
+
+		"s3_object_ownership_rule": &schema.Schema{
+			Type: schema.TypeString,
+
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"None", "BucketOwnerPreferred", "ObjectWriter", "BucketOwnerEnforced"}),
+			Description:      `S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: BucketOwnerEnforced - The bucket owner has full control over any object in the bucket ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. None - S3 Object Ownership is disabled for the bucket.  Allowed Values are [None BucketOwnerPreferred ObjectWriter BucketOwnerEnforced]`,
+		},
+
+		"locking": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Write Once Read Many (WORM) locking enabled`,
+		},
+
+		"ignore_oos": &schema.Schema{
+			Type: schema.TypeBool,
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `Ignore oos`,
+		},
 	}
 }
 
@@ -748,6 +837,114 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"qos_policy_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsSeamless", resource.IsSeamless))
+
+	err = d.Set("is_seamless", resource.IsSeamless)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"is_seamless\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "MaxRetentionPeriod", resource.MaxRetentionPeriod))
+
+	err = d.Set("max_retention_period", resource.MaxRetentionPeriod)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"max_retention_period\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "MinRetentionPeriod", resource.MinRetentionPeriod))
+
+	err = d.Set("min_retention_period", resource.MinRetentionPeriod)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"min_retention_period\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "FilesRetentionMode", resource.FilesRetentionMode))
+
+	err = d.Set("files_retention_mode", resource.FilesRetentionMode)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"files_retention_mode\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "DefaultRetentionPeriod", resource.DefaultRetentionPeriod))
+
+	err = d.Set("default_retention_period", resource.DefaultRetentionPeriod)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"default_retention_period\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AutoCommit", resource.AutoCommit))
+
+	err = d.Set("auto_commit", resource.AutoCommit)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"auto_commit\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "S3ObjectOwnershipRule", resource.S3ObjectOwnershipRule))
+
+	err = d.Set("s3_object_ownership_rule", resource.S3ObjectOwnershipRule)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"s3_object_ownership_rule\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Locking", resource.Locking))
+
+	err = d.Set("locking", resource.Locking)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"locking\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IgnoreOos", resource.IgnoreOos))
+
+	err = d.Set("ignore_oos", resource.IgnoreOos)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"ignore_oos\"",
 			Detail:   err.Error(),
 		})
 	}

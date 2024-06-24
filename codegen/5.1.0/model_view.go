@@ -67,4 +67,21 @@ type View struct {
 	ShareAcl *ViewShareAcl `json:"share_acl,omitempty"`
 	// QoS Policy ID
 	QosPolicyId int32 `json:"qos_policy_id,omitempty"`
+	// Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
+	IsSeamless bool `json:"is_seamless,omitempty"`
+	// Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
+	MaxRetentionPeriod string `json:"max_retention_period,omitempty"`
+	// Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
+	MinRetentionPeriod string `json:"min_retention_period,omitempty"`
+	// Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object.
+	FilesRetentionMode string `json:"files_retention_mode,omitempty"`
+	// Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
+	DefaultRetentionPeriod string `json:"default_retention_period,omitempty"`
+	// Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
+	AutoCommit string `json:"auto_commit,omitempty"`
+	S3ObjectOwnershipRule string `json:"s3_object_ownership_rule,omitempty"`
+	// Write Once Read Many (WORM) locking enabled
+	Locking bool `json:"locking,omitempty"`
+	// Ignore oos
+	IgnoreOos bool `json:"ignore_oos,omitempty"`
 }

@@ -68,3 +68,13 @@ func ProtectionPolicyTimeIntervalValidation(i interface{}, c cty.Path) diag.Diag
 	}
 	return diags
 }
+
+func ValidateRetention(i interface{}, c cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+	b, e := regexp.MatchString(`^[1-9](\d)*[h|m|d|y]$`, i.(string))
+	if !b {
+		return diag.FromErr(e)
+	}
+	return diags
+
+}

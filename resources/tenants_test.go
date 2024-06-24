@@ -84,7 +84,15 @@ var _ = Describe(" Tenant", func() {
    "smb_administrators_group_name": "string",
    "smb_privileged_group_sid": "string",
    "smb_privileged_user_name": "string",
-   "trash_gid": 100
+   "trash_gid": 100,
+   "vippool_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+   ]
 }
                          `
 	var server *ghttp.Server

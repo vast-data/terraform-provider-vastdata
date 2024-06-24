@@ -110,8 +110,6 @@ type ViewPolicy struct {
 	S3VisibilityGroups []string `json:"s3_visibility_groups,omitempty"`
 	// Apple sid
 	AppleSid bool `json:"apple_sid,omitempty"`
-	// Map of protocols audit configurations
-	ProtocolsAudit *interface{} `json:"protocols_audit,omitempty"`
 	// Protocols to audit
 	Protocols []string `json:"protocols,omitempty"`
 	// Create/Delete Files/Directories/Objects
@@ -135,4 +133,17 @@ type ViewPolicy struct {
 	EnableSnapshotLookup bool `json:"enable_snapshot_lookup,omitempty"`
 	// Specifies whether to make the .snapshot directory visible in subdirectories of the View.
 	EnableListingOfSnapshotDir bool `json:"enable_listing_of_snapshot_dir,omitempty"`
+	// This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols.
+	S3SpecialCharsSupport bool `json:"s3_special_chars_support,omitempty"`
+	// When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.
+	SmbIsCa bool `json:"smb_is_ca,omitempty"`
+	// Force case insensitivity for NFSv3 and NFSv4
+	NfsCaseInsensitive bool `json:"nfs_case_insensitive,omitempty"`
+	// Specifies whether to make the .snapshot directory visible in subdirectories of the View.
+	EnableAccessToSnapshotDirInSubdirs bool `json:"enable_access_to_snapshot_dir_in_subdirs,omitempty"`
+	// Specifies whether to make the .snapshot directory visible in subdirectories of the View.
+	EnableVisibilityOfSnapshotDir bool `json:"enable_visibility_of_snapshot_dir,omitempty"`
+	// Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
+	NfsEnforceTls bool `json:"nfs_enforce_tls,omitempty"`
+	ProtocolsAudit *ProtocolsAudit `json:"protocols_audit,omitempty"`
 }
