@@ -240,6 +240,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet("RemoteMapping", "ProtocolsAudit", "Created", "Id"),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
+		BeforePostFunc:           utils.ViewPolicyPermissionsSetup,
 		ListsNamesMap: map[string][]string{"nfs_read_write": []string{"address"},
 			"nfs_root_squash": []string{"address"},
 			"read_write":      []string{"address"},

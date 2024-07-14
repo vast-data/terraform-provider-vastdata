@@ -1500,6 +1500,12 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ViewPolicy.Elem(), d, &data, "", false)
 
+	var before_post_error error
+	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
+
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
