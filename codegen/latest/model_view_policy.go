@@ -35,17 +35,17 @@ type ViewPolicy struct {
 	ReadWrite []string `json:"read_write,omitempty"`
 	// Hosts with NFS read only permissions
 	ReadOnly []string `json:"read_only,omitempty"`
-	// Hosts with NFS read/write permissions
+	// Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 	NfsReadWrite []string `json:"nfs_read_write,omitempty"`
-	// Hosts with NFS read only permissions
+	// Hosts with NFS read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 	NfsReadOnly []string `json:"nfs_read_only,omitempty"`
-	// Hosts with SMB read/write permissions
+	// Hosts with SMB read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 	SmbReadWrite []string `json:"smb_read_write,omitempty"`
-	// Hosts with SMB read only permissions
+	// Hosts with SMB read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 	SmbReadOnly []string `json:"smb_read_only,omitempty"`
-	// Hosts with S3 read/write permissions
+	// Hosts with S3 read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 	S3ReadWrite []string `json:"s3_read_write,omitempty"`
-	// Hosts with S3 read only permissions
+	// Hosts with S3 read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 	S3ReadOnly []string `json:"s3_read_only,omitempty"`
 	// Hosts with trash permissions
 	TrashAccess []string `json:"trash_access,omitempty"`
@@ -55,9 +55,9 @@ type ViewPolicy struct {
 	NfsReturnOpenPermissions bool `json:"nfs_return_open_permissions,omitempty"`
 	// Hosts with no squash policy
 	NfsNoSquash []string `json:"nfs_no_squash,omitempty"`
-	// Hosts with root squash policy
+	// Hosts with root squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 	NfsRootSquash []string `json:"nfs_root_squash,omitempty"`
-	// Hosts with all squash policy
+	// Hosts with all squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to []
 	NfsAllSquash []string `json:"nfs_all_squash,omitempty"`
 	// Hosts with full permissions
 	S3BucketFullControl string `json:"s3_bucket_full_control,omitempty"`

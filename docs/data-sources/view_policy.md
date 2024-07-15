@@ -53,14 +53,14 @@ data "vastdata_view_policy" "view_policy1" {
 - `log_full_path` (Boolean) Log full path
 - `log_hostname` (Boolean) Log hostname
 - `log_username` (Boolean) Log username
-- `nfs_all_squash` (List of String) Hosts with all squash policy
+- `nfs_all_squash` (List of String) Hosts with all squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to []
 - `nfs_minimal_protection_level` (String) NFS 4.1 minimal protection level
 - `nfs_no_squash` (List of String) Hosts with no squash policy
 - `nfs_posix_acl` (Boolean) Enable POSIX ACL
-- `nfs_read_only` (List of String) Hosts with NFS read only permissions
-- `nfs_read_write` (List of String) Hosts with NFS read/write permissions
+- `nfs_read_only` (List of String) Hosts with NFS read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `nfs_read_write` (List of String) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 - `nfs_return_open_permissions` (Boolean) when using smb use open permissions for files
-- `nfs_root_squash` (List of String) Hosts with root squash policy
+- `nfs_root_squash` (List of String) Hosts with root squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 - `path_length` (String) How to determine the maximum allowed path length
 - `protocols` (List of String) Protocols to audit
 - `read_only` (List of String) Hosts with NFS read only permissions
@@ -76,16 +76,16 @@ data "vastdata_view_policy" "view_policy1" {
 - `s3_object_read_acp` (String) Hosts with full permissions
 - `s3_object_write` (String) Hosts with full permissions
 - `s3_object_write_acp` (String) Hosts with full permissions
-- `s3_read_only` (List of String) Hosts with S3 read only permissions
-- `s3_read_write` (List of String) Hosts with S3 read/write permissions
+- `s3_read_only` (List of String) Hosts with S3 read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `s3_read_write` (List of String) Hosts with S3 read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 - `s3_visibility` (List of String) A list of usernames for bucket listing permissions
 - `s3_visibility_groups` (List of String) A list of group names for bucket listing permissions
 - `smb_directory_mode` (Number) Default unix type permissions on new folder
 - `smb_directory_mode_padded` (String) Default unix type permissions on new folder
 - `smb_file_mode` (Number) Default unix type permissions on new file
 - `smb_file_mode_padded` (String) Default unix type permissions on new file
-- `smb_read_only` (List of String) Hosts with SMB read only permissions
-- `smb_read_write` (List of String) Hosts with SMB read/write permissions
+- `smb_read_only` (List of String) Hosts with SMB read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `smb_read_write` (List of String) Hosts with SMB read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
 - `tenant_id` (Number) Tenant ID
 - `tenant_name` (String) Tenant Name
 - `trash_access` (List of String) Hosts with trash permissions
