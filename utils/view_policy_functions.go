@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+var permissions_attributes []string = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
+
 func checkAuthProviders(ctx context.Context, data map[string]interface{}) (string, error) {
 	use_auth_providers, exists := data["use_auth_provider"]
 	_use_auth_providers := strings.ToLower(fmt.Sprintf("%v", use_auth_providers))
@@ -45,7 +47,7 @@ func checkAuthProviders(ctx context.Context, data map[string]interface{}) (strin
 }
 
 func ViewPolicyPermissionsSetup(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
-	for _, v := range []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write"} {
+	for _, v := range permissions_attributes {
 		q, k := d.GetOk(v)
 		tflog.Debug(ctx, fmt.Sprintf("Data recived for ViewPolicy : %v Before Creation %v:%v", v, q, k))
 		if !k {
@@ -98,7 +100,7 @@ func ViewPolicyUpdateFunc(ctx context.Context, _client interface{}, attr map[str
 	data["auth_provider"] = auth_provider
 	zero := []string{}
 
-	for _, v := range []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write"} {
+	for _, v := range permissions_attributes {
 		q, f := d.GetChange(v)
 		k := d.HasChange(v)
 		tflog.Debug(ctx, fmt.Sprintf("ViewPolicy attribute: %v Has Change: %v , Change: %v <==> %v", v, k, q, f))

@@ -281,7 +281,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Hosts with no squash policy`,
+			Description: `Hosts with no squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
