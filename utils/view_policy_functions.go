@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+var permissions_attributes []string = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
+
 func checkAuthProviders(ctx context.Context, data map[string]interface{}) (string, error) {
 	use_auth_providers, exists := data["use_auth_provider"]
 	_use_auth_providers := strings.ToLower(fmt.Sprintf("%v", use_auth_providers))
@@ -44,6 +46,27 @@ func checkAuthProviders(ctx context.Context, data map[string]interface{}) (strin
 	return "RPC", nil
 }
 
+func ViewPolicyPermissionsSetup(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	for _, v := range permissions_attributes {
+		q, k := d.GetOk(v)
+		tflog.Debug(ctx, fmt.Sprintf("Data recived for ViewPolicy : %v Before Creation %v:%v", v, q, k))
+		if !k {
+			/*
+					If k is false it means one of 2 things
+					1. No value was given and this means to use the Zero value ([]).
+					2. That the user provided the Zero Value ([]).
+				        In any case we want the Zero Value otherwise it means that some value was provided by the user which is not Zero.
+			*/
+			m[v] = []string{}
+		}
+
+	}
+
+	//	tflog.Debug(ctx, fmt.Sprintf("Data recived for ViewPolicy Before Creation nfs_read_write %v", d.Get("nfs_read_write")))
+	//	tflog.Debug(ctx, fmt.Sprintf("Data recived for ViewPolicy Before Creation nfs_all_squash %v", d.Get("nfs_all_squash")))
+	return m, nil
+}
+
 func ViewPolicyCreateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
 	auth_provider, err := checkAuthProviders(ctx, data)
 	if err != nil {
@@ -75,5 +98,21 @@ func ViewPolicyUpdateFunc(ctx context.Context, _client interface{}, attr map[str
 		return nil, err
 	}
 	data["auth_provider"] = auth_provider
+	zero := []string{}
+
+	for _, v := range permissions_attributes {
+		q, f := d.GetChange(v)
+		k := d.HasChange(v)
+		tflog.Debug(ctx, fmt.Sprintf("ViewPolicy attribute: %v Has Change: %v , Change: %v <==> %v", v, k, q, f))
+		if k {
+			i := f.([]interface{})
+			if len(i) == 0 {
+				tflog.Debug(ctx, fmt.Sprintf("ViewPolicy attribute : %v is zero value and will be set", v))
+				data[v] = zero
+			}
+		}
+
+	}
+
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
 }

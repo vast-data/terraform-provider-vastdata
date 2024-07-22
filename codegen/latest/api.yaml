@@ -561,32 +561,50 @@ therefor it is adviasable to always specify the value of auth_source"
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read/write permissions"
+          description: "Hosts with NFS read/write permissions.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         nfs_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read only permissions"
+          description: "Hosts with NFS read only permissions.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         smb_read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with SMB read/write permissions"
+          description: "Hosts with SMB read/write permissions.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         smb_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with SMB read only permissions"
+          description: "Hosts with SMB read only permissions.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         s3_read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with S3 read/write permissions"
+          description: "Hosts with S3 read/write permissions.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         s3_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with S3 read only permissions"
+          description: "Hosts with S3 read only permissions.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         trash_access:
           type: "array"
           items:
@@ -602,17 +620,26 @@ therefor it is adviasable to always specify the value of auth_source"
           type: "array"
           items:
             type: "string"
-          description: "Hosts with no squash policy"
+          description: "Hosts with no squash policy.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         nfs_root_squash:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with root squash policy"
+          description: "Hosts with root squash policy.
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []."
         nfs_all_squash:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with all squash policy"
+          description: "Hosts with all squash policy. 
+when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
+However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
+If there is a need to change the value an empty list it must be secifed and set to []"
         s3_bucket_full_control:
           type: "string"
           description: "Hosts with full permissions"
