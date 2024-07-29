@@ -12,6 +12,10 @@ import (
 
 var permissions_attributes []string = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
 
+func setupS3SpecialCharsSupport(ctx context.Context, v string, m *map[string]interface{}) {
+	(*m)["s3_special_chars_support"] = v
+}
+
 func checkAuthProviders(ctx context.Context, data map[string]interface{}) (string, error) {
 	use_auth_providers, exists := data["use_auth_provider"]
 	_use_auth_providers := strings.ToLower(fmt.Sprintf("%v", use_auth_providers))
@@ -73,6 +77,11 @@ func ViewPolicyCreateFunc(ctx context.Context, _client interface{}, attr map[str
 		return nil, err
 	}
 	data["auth_provider"] = auth_provider
+	z, e := data["s3_special_chars_support"]
+	if !e {
+		z = "false"
+	}
+	setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
 	return DefaultCreateFunc(ctx, _client, attr, data, headers)
 }
 
@@ -113,6 +122,10 @@ func ViewPolicyUpdateFunc(ctx context.Context, _client interface{}, attr map[str
 		}
 
 	}
-
+	z, e := data["s3_special_chars_support"]
+	if !e {
+		z = "false"
+	}
+	setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
 }
