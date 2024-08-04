@@ -41,7 +41,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"gid_inheritance": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("gid_inheritance"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,7 +68,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"flavor": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("flavor"),
 
 			Computed:    true,
 			Optional:    true,
@@ -74,7 +78,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"access_flavor": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("access_flavor"),
 
 			Computed:    true,
 			Optional:    true,
@@ -83,7 +88,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"path_length": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("path_length"),
 
 			Computed:  true,
 			Optional:  true,
@@ -94,7 +100,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"allowed_characters": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("allowed_characters"),
 
 			Computed:    true,
 			Optional:    true,
@@ -103,7 +110,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"use32bit_fileid": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("use32bit_fileid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -112,7 +120,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"expose_id_in_fsid": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("expose_id_in_fsid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -121,7 +130,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"use_auth_provider": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("use_auth_provider"),
 
 			Computed:    false,
 			Optional:    true,
@@ -132,7 +142,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"auth_source": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("auth_source"),
 
 			Computed:  true,
 			Optional:  true,
@@ -143,7 +154,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"read_write": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("read_write"),
 
 			Computed:    true,
 			Optional:    true,
@@ -156,7 +168,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"read_only": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("read_only"),
 
 			Computed:    true,
 			Optional:    true,
@@ -169,7 +182,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_read_write": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_read_write"),
 
 			Computed:    true,
 			Optional:    true,
@@ -182,7 +196,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_read_only": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_read_only"),
 
 			Computed:    true,
 			Optional:    true,
@@ -195,7 +210,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_read_write": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_read_write"),
 
 			Computed:    true,
 			Optional:    true,
@@ -208,7 +224,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_read_only": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_read_only"),
 
 			Computed:    true,
 			Optional:    true,
@@ -221,7 +238,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_read_write": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_read_write"),
 
 			Computed:    true,
 			Optional:    true,
@@ -234,7 +252,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_read_only": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_read_only"),
 
 			Computed:    true,
 			Optional:    true,
@@ -247,7 +266,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"trash_access": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("trash_access"),
 
 			Computed:    true,
 			Optional:    true,
@@ -260,7 +280,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_posix_acl": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_posix_acl"),
 
 			Computed:    true,
 			Optional:    true,
@@ -269,7 +290,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_return_open_permissions": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_return_open_permissions"),
 
 			Computed:    true,
 			Optional:    true,
@@ -278,7 +300,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_no_squash": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_no_squash"),
 
 			Computed:    true,
 			Optional:    true,
@@ -291,7 +314,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_root_squash": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_root_squash"),
 
 			Computed:    true,
 			Optional:    true,
@@ -304,7 +328,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_all_squash": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_all_squash"),
 
 			Computed:    true,
 			Optional:    true,
@@ -317,7 +342,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_full_control": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_full_control"),
 
 			Computed:    true,
 			Optional:    true,
@@ -326,7 +352,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_listing": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_listing"),
 
 			Computed:    true,
 			Optional:    true,
@@ -335,7 +362,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_read": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_read"),
 
 			Computed:    true,
 			Optional:    true,
@@ -344,7 +372,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_read_acp": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_read_acp"),
 
 			Computed:    true,
 			Optional:    true,
@@ -353,7 +382,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_write": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_write"),
 
 			Computed:    true,
 			Optional:    true,
@@ -362,7 +392,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_bucket_write_acp": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_write_acp"),
 
 			Computed:    true,
 			Optional:    true,
@@ -371,7 +402,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_full_control": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_full_control"),
 
 			Computed:    true,
 			Optional:    true,
@@ -380,7 +412,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_read": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_read"),
 
 			Computed:    true,
 			Optional:    true,
@@ -389,7 +422,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_read_acp": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_read_acp"),
 
 			Computed:    true,
 			Optional:    true,
@@ -398,7 +432,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_write": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_write"),
 
 			Computed:    true,
 			Optional:    true,
@@ -407,7 +442,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_object_write_acp": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_write_acp"),
 
 			Computed:    true,
 			Optional:    true,
@@ -416,7 +452,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_file_mode": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_file_mode"),
 
 			Computed:    true,
 			Optional:    true,
@@ -425,7 +462,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_directory_mode": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_directory_mode"),
 
 			Computed:    true,
 			Optional:    true,
@@ -434,7 +472,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_file_mode_padded": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_file_mode_padded"),
 
 			Computed:    true,
 			Optional:    true,
@@ -443,7 +482,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_directory_mode_padded": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_directory_mode_padded"),
 
 			Computed:    true,
 			Optional:    true,
@@ -452,7 +492,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("cluster"),
 
 			Computed:    true,
 			Optional:    true,
@@ -461,7 +502,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"cluster_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("cluster_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -470,7 +512,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("tenant_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -479,7 +522,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"tenant_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("tenant_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -488,7 +532,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("url"),
 
 			Computed:    true,
 			Optional:    true,
@@ -497,7 +542,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"atime_frequency": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("atime_frequency"),
 
 			Computed:    true,
 			Optional:    true,
@@ -506,12 +552,15 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"vip_pools": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("vip_pools"),
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `Comma separated vip pool ids.`,
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("ViewPolicy").GetAttributeDiffFunc("vip_pools"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `Comma separated vip pool ids.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -519,7 +568,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_minimal_protection_level": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_minimal_protection_level"),
 
 			Computed:  true,
 			Optional:  true,
@@ -530,7 +580,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_visibility": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_visibility"),
 
 			Computed:    true,
 			Optional:    true,
@@ -543,7 +594,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_visibility_groups": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_visibility_groups"),
 
 			Computed:    true,
 			Optional:    true,
@@ -556,7 +608,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"apple_sid": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("apple_sid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -565,7 +618,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"protocols": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("protocols"),
 
 			Computed:    true,
 			Optional:    true,
@@ -578,7 +632,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"data_create_delete": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("data_create_delete"),
 
 			Computed:    true,
 			Optional:    true,
@@ -587,7 +642,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"data_modify": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("data_modify"),
 
 			Computed:    true,
 			Optional:    true,
@@ -596,7 +652,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"data_read": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("data_read"),
 
 			Computed:    true,
 			Optional:    true,
@@ -605,7 +662,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_full_path": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_full_path"),
 
 			Computed:    true,
 			Optional:    true,
@@ -614,7 +672,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_hostname": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_hostname"),
 
 			Computed:    true,
 			Optional:    true,
@@ -623,7 +682,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_username": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_username"),
 
 			Computed:    true,
 			Optional:    true,
@@ -632,7 +692,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"log_deleted": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_deleted"),
 
 			Computed:    true,
 			Optional:    true,
@@ -641,7 +702,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"count_views": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("count_views"),
 
 			Computed:    true,
 			Optional:    true,
@@ -650,7 +712,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"enable_snapshot_lookup": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_snapshot_lookup"),
 
 			Computed:    true,
 			Optional:    true,
@@ -659,7 +722,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"enable_listing_of_snapshot_dir": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_listing_of_snapshot_dir"),
 
 			Computed:    true,
 			Optional:    true,
@@ -668,7 +732,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"s3_special_chars_support": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_special_chars_support"),
 
 			Computed:    true,
 			Optional:    true,
@@ -677,7 +742,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"smb_is_ca": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_is_ca"),
 
 			Computed:    true,
 			Optional:    true,
@@ -686,7 +752,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_case_insensitive": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_case_insensitive"),
 
 			Computed:    true,
 			Optional:    true,
@@ -695,7 +762,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"enable_access_to_snapshot_dir_in_subdirs": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_access_to_snapshot_dir_in_subdirs"),
 
 			Computed:    true,
 			Optional:    true,
@@ -704,7 +772,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"enable_visibility_of_snapshot_dir": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_visibility_of_snapshot_dir"),
 
 			Computed:    true,
 			Optional:    true,
@@ -713,7 +782,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"nfs_enforce_tls": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_enforce_tls"),
 
 			Computed:    true,
 			Optional:    true,
@@ -722,7 +792,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 		},
 
 		"protocols_audit": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("protocols_audit"),
 
 			Computed:    true,
 			Optional:    true,
@@ -733,7 +804,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"create_delete_files_dirs_objects": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("create_delete_files_dirs_objects"),
 
 						Computed:    false,
 						Optional:    true,
@@ -744,7 +816,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"log_deleted_files_dirs": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_deleted_files_dirs"),
 
 						Computed:    false,
 						Optional:    true,
@@ -755,7 +828,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"log_full_path": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_full_path"),
 
 						Computed:    false,
 						Optional:    true,
@@ -766,7 +840,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"log_username": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_username"),
 
 						Computed:    false,
 						Optional:    true,
@@ -777,7 +852,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"log_hostname": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_hostname"),
 
 						Computed:    true,
 						Optional:    true,
@@ -786,7 +862,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"modify_data_md": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("modify_data_md"),
 
 						Computed:    false,
 						Optional:    true,
@@ -797,7 +874,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"read_data": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("read_data"),
 
 						Computed:    false,
 						Optional:    true,
@@ -808,7 +886,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"modify_data": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("modify_data"),
 
 						Computed:    false,
 						Optional:    true,
@@ -819,7 +898,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 					},
 
 					"read_data_md": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("read_data_md"),
 
 						Computed:    false,
 						Optional:    true,
@@ -827,6 +907,47 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Description: ``,
 
 						Default: false,
+					},
+				},
+			},
+		},
+
+		"vippool_permissions": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("vippool_permissions"),
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("ViewPolicy").GetAttributeDiffFunc("vippool_permissions"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `List of VIP pool permissions`,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"vippool_id": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("PermissionsPerVipPool").GetConflictingFields("vippool_id"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `The Vippool ID`,
+					},
+
+					"vippool_permissions": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("PermissionsPerVipPool").GetConflictingFields("vippool_permissions"),
+
+						Computed:  false,
+						Optional:  true,
+						Sensitive: false,
+
+						ValidateDiagFunc: utils.OneOf([]string{"RW"}),
+						Description:      `VIP pool permissions  Allowed Values are [RW]`,
+
+						Default: "RW",
 					},
 				},
 			},
@@ -1665,6 +1786,18 @@ func ResourceViewPolicyReadStructIntoSchema(ctx context.Context, resource api_la
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"protocols_audit\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VippoolPermissions", resource.VippoolPermissions))
+
+	err = d.Set("vippool_permissions", utils.FlattenListOfModelsToList(ctx, resource.VippoolPermissions))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"vippool_permissions\"",
 			Detail:   err.Error(),
 		})
 	}

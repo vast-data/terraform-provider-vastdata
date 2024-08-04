@@ -73,6 +73,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_tenant",
+		AfterReadFunc:            utils.ConvertVippoolToIDs,
 		ListFields: map[string][]FakeField{"client_ip_ranges": []FakeField{
 			FakeField{Name: "start_ip", Description: "The first ip of the range"},
 			FakeField{Name: "end_ip", Description: "The last ip of the range"}}},
@@ -80,6 +81,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"vippool_ids": utils.ListsDiffSupress,
+		},
 	}, ResourceTemplateV2{
 		ResourceName:             "QosPolicy",
 		Path:                     ToStringPointer("qospolicies"),
@@ -254,8 +258,14 @@ var ResourcesTemplates = []ResourceTemplateV2{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 				utils.HttpFieldTuple{DisplayName: "Tenant Name", FieldName: "tenant_name__icontains"},
 			}),
-		CreateFunc: utils.ViewPolicyCreateFunc,
-		UpdateFunc: utils.ViewPolicyUpdateFunc,
+		CreateFunc:        utils.ViewPolicyCreateFunc,
+		UpdateFunc:        utils.ViewPolicyUpdateFunc,
+		GetFunc:           utils.ViewPolicyGetFunc,
+		ConflictingFields: map[string][]string{"vippool_permissions": []string{"vip_pools"}},
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"vippool_permissions": utils.VippoolPermissionsIdsDiffSupress,
+			"vip_pools":           utils.ListsDiffSupress,
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "View",
@@ -588,6 +598,19 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 false,
+		DataSourceName:           "",
+	},
+	ResourceTemplateV2{
+		ResourceName:             "PermissionsPerVipPool",
+		Path:                     ToStringPointer("permissions_per_vip_pool"),
+		Model:                    api_latest.PermissionsPerVipPool{},
+		DestFile:                 ToStringPointer("views.go"),
+		IgnoreFields:             NewStringSet(),
+		RequiredIdentifierFields: NewStringSet(),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 false,
+		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
 }

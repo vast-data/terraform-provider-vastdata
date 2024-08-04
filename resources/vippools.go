@@ -41,7 +41,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,19 +51,22 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"subnet_cidr": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("subnet_cidr"),
 
 			Required: true,
 		},
 
 		"subnet_cidr_ipv6": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("subnet_cidr_ipv6"),
 
 			Computed:    true,
 			Optional:    true,
@@ -71,7 +75,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"gw_ip": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("gw_ip"),
 
 			Computed:    true,
 			Optional:    true,
@@ -80,7 +85,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"gw_ipv6": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("gw_ipv6"),
 
 			Computed:    true,
 			Optional:    true,
@@ -89,7 +95,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vlan": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("vlan"),
 
 			Computed:    true,
 			Optional:    true,
@@ -98,7 +105,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"state": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("state"),
 
 			Computed:    true,
 			Optional:    true,
@@ -107,7 +115,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"cnode_ids": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("cnode_ids"),
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      codegen_configs.GetResourceByName("VipPool").GetAttributeDiffFunc("cnode_ids"),
@@ -122,7 +131,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("cluster"),
 
 			Computed:    true,
 			Optional:    true,
@@ -131,7 +141,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("url"),
 
 			Computed:    true,
 			Optional:    true,
@@ -140,7 +151,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("domain_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -149,13 +161,15 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"role": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("role"),
 
 			Required: true,
 		},
 
 		"ip_ranges": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("ip_ranges"),
 
 			Required: true,
 
@@ -180,7 +194,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vms_preferred": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("vms_preferred"),
 
 			Computed:    true,
 			Optional:    true,
@@ -189,7 +204,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("enabled"),
 
 			Computed:    true,
 			Optional:    true,
@@ -198,7 +214,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"port_membership": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("port_membership"),
 
 			Computed:    true,
 			Optional:    true,
@@ -207,7 +224,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"active_interfaces": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("active_interfaces"),
 
 			Computed:    true,
 			Optional:    true,
@@ -216,7 +234,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"enable_l3": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("enable_l3"),
 
 			Computed:    true,
 			Optional:    true,
@@ -225,7 +244,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"vast_asn": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("vast_asn"),
 
 			Computed:    true,
 			Optional:    true,
@@ -234,7 +254,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 		},
 
 		"peer_asn": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("peer_asn"),
 
 			Computed:    true,
 			Optional:    true,

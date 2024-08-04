@@ -206,12 +206,24 @@ func DataSourceTenant() *schema.Resource {
 				Description: `Use native SMB authentication`,
 			},
 
+			"vippool_names": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `An array of VIP Pool names attached to this tenant.`,
+
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+
 			"vippool_ids": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `An array of VIP Pool ids to attach to tenant`,
+				Description: `An array of VIP Pool ids to attach to tenant.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -533,6 +545,18 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"use_smb_native\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VippoolNames", resource.VippoolNames))
+
+	err = d.Set("vippool_names", utils.FlattenListOfPrimitives(&resource.VippoolNames))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"vippool_names\"",
 			Detail:   err.Error(),
 		})
 	}

@@ -51,7 +51,8 @@ data "vastdata_tenant" "tenant1" {
 - `use_smb_native` (Boolean) Use native SMB authentication
 - `use_smb_privileged_group` (Boolean) Enables SMB privileged user group
 - `use_smb_privileged_user` (Boolean) Enables SMB privileged user
-- `vippool_ids` (List of Number) An array of VIP Pool ids to attach to tenant
+- `vippool_ids` (List of Number) An array of VIP Pool ids to attach to tenant.
+- `vippool_names` (List of String) An array of VIP Pool names attached to this tenant.
 
 <a id="nestedatt--client_ip_ranges"></a>
 ### Nested Schema for `client_ip_ranges`

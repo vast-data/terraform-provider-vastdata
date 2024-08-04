@@ -171,6 +171,9 @@ var _ = Describe(" ViewPolicy", func() {
       4,
       5,
       6
+   ],
+   "vippool_permissions": [
+      {}
    ]
 }
                          `

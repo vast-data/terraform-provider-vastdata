@@ -34,14 +34,16 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"user_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("UserKey").GetConflictingFields("user_id"),
 
 			Required: true,
 			ForceNew: true,
 		},
 
 		"access_key": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("UserKey").GetConflictingFields("access_key"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,7 +52,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"secret_key": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("UserKey").GetConflictingFields("secret_key"),
 
 			Computed:    true,
 			Optional:    false,
@@ -59,7 +62,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"pgp_public_key": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("UserKey").GetConflictingFields("pgp_public_key"),
 
 			Computed:    true,
 			Optional:    true,
@@ -69,7 +73,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"encrypted_secret_key": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("UserKey").GetConflictingFields("encrypted_secret_key"),
 
 			Computed:    true,
 			Optional:    false,
@@ -78,7 +83,8 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("UserKey").GetConflictingFields("enabled"),
 
 			Computed:    false,
 			Optional:    true,

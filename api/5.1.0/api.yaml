@@ -493,12 +493,17 @@ None - S3 Object Ownership is disabled for the bucket.
         use_smb_native:
           type: "boolean"
           description: "Use native SMB authentication"
+        vippool_names:
+           type: "array"
+           items:
+             type: "string"
+           description: "An array of VIP Pool names attached to this tenant."
         vippool_ids:
            type: "array"
            items:
              type: "integer"
              format: "int64"
-           description: "An array of VIP Pool ids to attach to tenant"
+           description: "An array of VIP Pool ids to attach to tenant."
     ViewPolicy:
       type: "object"
       required:
@@ -785,6 +790,18 @@ If there is a need to change the value an empty list it must be secifed and set 
           type: "object"
           $ref: "#/components/schemas/ProtocolsAudit"
           description: "Configure auditing"
+        vippool_permissions:
+          type: "array"
+          items:
+            type: "object"
+            $ref: "#/components/schemas/PermissionsPerVipPool"
+            description: "A schedule for creating a snapshot"
+          description: "List of VIP pool permissions"
+        # permission_per_vip_pool:
+        #   type: "object"
+        #   additionalProperties:
+        #     type: "string"
+    
     VIPPool:
       type: "object"
       properties:
@@ -1934,4 +1951,14 @@ The object class that defines a group entry on the AD server, if different from 
         read_data_md:
           type: "boolean"
           default: false
-
+    PermissionsPerVipPool:
+      type: "object"
+      properties:
+        vippool_id:
+          type: "string"
+          description: "The Vippool ID"
+        vippool_permissions:
+          type: "string"
+          description: "VIP pool permissions "
+          default: "RW"
+          enum: [RW]

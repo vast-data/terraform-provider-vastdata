@@ -41,7 +41,8 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,14 +51,16 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"machine_account_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("machine_account_name"),
 
 			Required: true,
 			ForceNew: true,
 		},
 
 		"organizational_unit": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("organizational_unit"),
 
 			Computed:    true,
 			Optional:    true,
@@ -67,7 +70,8 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 		},
 
 		"ldap_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("ldap_id"),
 
 			Required: true,
 		},

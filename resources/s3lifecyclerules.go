@@ -41,13 +41,15 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -56,7 +58,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("enabled"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,13 +68,15 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"prefix": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("prefix"),
 
 			Required: true,
 		},
 
 		"min_size": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("min_size"),
 
 			Computed:    true,
 			Optional:    true,
@@ -80,7 +85,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"max_size": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("max_size"),
 
 			Computed:    true,
 			Optional:    true,
@@ -89,7 +95,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_days": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("expiration_days"),
 
 			Computed:    true,
 			Optional:    true,
@@ -98,7 +105,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_date": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("expiration_date"),
 
 			Computed:    true,
 			Optional:    true,
@@ -107,7 +115,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"expired_obj_delete_marker": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("expired_obj_delete_marker"),
 
 			Computed:    true,
 			Optional:    true,
@@ -116,7 +125,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"noncurrent_days": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("noncurrent_days"),
 
 			Computed:    true,
 			Optional:    true,
@@ -125,7 +135,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"newer_noncurrent_versions": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("newer_noncurrent_versions"),
 
 			Computed:    true,
 			Optional:    true,
@@ -134,7 +145,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"abort_mpu_days_after_initiation": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("abort_mpu_days_after_initiation"),
 
 			Computed:    true,
 			Optional:    true,
@@ -143,7 +155,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"view_path": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("view_path"),
 
 			Computed:    true,
 			Optional:    true,
@@ -152,7 +165,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 		},
 
 		"view_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("view_id"),
 
 			Computed:    true,
 			Optional:    true,

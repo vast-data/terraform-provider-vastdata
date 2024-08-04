@@ -41,7 +41,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"use_smb_privileged_user": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("use_smb_privileged_user"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,7 +68,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_privileged_user_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_privileged_user_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -74,7 +78,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"use_smb_privileged_group": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("use_smb_privileged_group"),
 
 			Computed:    true,
 			Optional:    true,
@@ -83,7 +88,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_privileged_group_sid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_privileged_group_sid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -92,7 +98,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_privileged_group_full_access": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_privileged_group_full_access"),
 
 			Computed:    true,
 			Optional:    true,
@@ -101,7 +108,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"smb_administrators_group_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_administrators_group_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -110,7 +118,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("default_others_share_level_perm"),
 
 			Computed:  true,
 			Optional:  true,
@@ -121,7 +130,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"trash_gid": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("trash_gid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -130,7 +140,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"client_ip_ranges": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("client_ip_ranges"),
 
 			Computed:    true,
 			Optional:    true,
@@ -158,7 +169,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("posix_primary_provider"),
 
 			Computed:  true,
 			Optional:  true,
@@ -169,7 +181,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"ad_provider_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("ad_provider_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -178,7 +191,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"ldap_provider_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("ldap_provider_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -187,7 +201,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"nis_provider_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("nis_provider_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -196,7 +211,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"encryption_crn": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("encryption_crn"),
 
 			Computed:    true,
 			Optional:    true,
@@ -205,7 +221,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"is_nfsv42_supported": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("is_nfsv42_supported"),
 
 			Computed:    true,
 			Optional:    true,
@@ -214,7 +231,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"allow_locked_users": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("allow_locked_users"),
 
 			Computed:    false,
 			Optional:    true,
@@ -225,7 +243,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"allow_disabled_users": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("allow_disabled_users"),
 
 			Computed:    false,
 			Optional:    true,
@@ -236,7 +255,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 		},
 
 		"use_smb_native": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("use_smb_native"),
 
 			Computed:    true,
 			Optional:    true,
@@ -244,13 +264,30 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `Use native SMB authentication`,
 		},
 
-		"vippool_ids": &schema.Schema{
-			Type: schema.TypeList,
+		"vippool_names": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("vippool_names"),
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `An array of VIP Pool ids to attach to tenant`,
+			Description: `An array of VIP Pool names attached to this tenant.`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+
+		"vippool_ids": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("vippool_ids"),
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("Tenant").GetAttributeDiffFunc("vippool_ids"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `An array of VIP Pool ids to attach to tenant.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -507,6 +544,18 @@ func ResourceTenantReadStructIntoSchema(ctx context.Context, resource api_latest
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VippoolNames", resource.VippoolNames))
+
+	err = d.Set("vippool_names", utils.FlattenListOfPrimitives(&resource.VippoolNames))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"vippool_names\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VippoolIds", resource.VippoolIds))
 
 	err = d.Set("vippool_ids", utils.FlattenListOfPrimitives(&resource.VippoolIds))
@@ -564,6 +613,12 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	}
 	diags = ResourceTenantReadStructIntoSchema(ctx, resource, d)
+
+	var after_read_error error
+	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
+	if after_read_error != nil {
+		return diag.FromErr(after_read_error)
+	}
 
 	return diags
 }

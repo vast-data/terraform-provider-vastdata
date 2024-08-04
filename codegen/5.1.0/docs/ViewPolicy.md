@@ -74,6 +74,7 @@ Name | Type | Description | Notes
 **EnableVisibilityOfSnapshotDir** | **bool** | Specifies whether to make the .snapshot directory visible in subdirectories of the View. | [optional] [default to null]
 **NfsEnforceTls** | **bool** | Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None. | [optional] [default to null]
 **ProtocolsAudit** | [***ProtocolsAudit**](ProtocolsAudit.md) |  | [optional] [default to null]
+**VippoolPermissions** | [**[]PermissionsPerVipPool**](PermissionsPerVipPool.md) | List of VIP pool permissions | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

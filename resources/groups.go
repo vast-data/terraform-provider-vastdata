@@ -41,7 +41,8 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,19 +51,22 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"gid": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("gid"),
 
 			Required: true,
 		},
 
 		"sid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("sid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -71,7 +75,8 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 		},
 
 		"s3_policies_ids": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("s3_policies_ids"),
 
 			Computed:    true,
 			Optional:    true,

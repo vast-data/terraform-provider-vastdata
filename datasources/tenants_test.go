@@ -89,6 +89,13 @@ var _ = Describe(" Tenant", func() {
       4,
       5,
       6
+   ],
+   "vippool_names": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
    ]
 }
                          `

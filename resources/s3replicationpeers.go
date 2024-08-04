@@ -41,7 +41,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("url"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,7 +68,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"bucket_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("bucket_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -74,7 +78,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"http_protocol": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("http_protocol"),
 
 			Computed:    true,
 			Optional:    true,
@@ -83,7 +88,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"type_": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("type_"),
 
 			Computed:    true,
 			Optional:    true,
@@ -92,7 +98,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"proxies": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("proxies"),
 
 			Computed:    true,
 			Optional:    true,
@@ -105,7 +112,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"aws_region": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("aws_region"),
 
 			Computed:    true,
 			Optional:    true,
@@ -114,7 +122,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"access_key": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("access_key"),
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
@@ -126,7 +135,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"secret_key": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("secret_key"),
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
@@ -138,7 +148,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"custom_bucket_url": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("custom_bucket_url"),
 
 			Computed:    true,
 			Optional:    true,

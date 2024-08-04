@@ -85,6 +85,7 @@ func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string
 		return nil, marshal_error
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH to path \"%v\"", update_path))
+	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH with payload: %v", string(b)))
 	return client.Patch(ctx, update_path, "application/json", bytes.NewReader(b), map[string]string{})
 }
 

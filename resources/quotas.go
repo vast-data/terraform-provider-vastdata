@@ -41,7 +41,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"state": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("state"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,7 +68,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"pretty_state": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("pretty_state"),
 
 			Computed:    true,
 			Optional:    true,
@@ -74,7 +78,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"path": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("path"),
 
 			Computed:    true,
 			Optional:    true,
@@ -83,7 +88,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"pretty_grace_period": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("pretty_grace_period"),
 
 			Computed:    true,
 			Optional:    true,
@@ -92,7 +98,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"grace_period": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("grace_period"),
 
 			Computed:         true,
 			Optional:         true,
@@ -102,7 +109,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"time_to_block": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("time_to_block"),
 
 			Computed:    true,
 			Optional:    true,
@@ -111,7 +119,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"soft_limit": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("soft_limit"),
 
 			Computed:    true,
 			Optional:    true,
@@ -120,7 +129,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"hard_limit": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("hard_limit"),
 
 			Computed:    true,
 			Optional:    true,
@@ -129,7 +139,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"hard_limit_inodes": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("hard_limit_inodes"),
 
 			Computed:    true,
 			Optional:    true,
@@ -138,7 +149,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"soft_limit_inodes": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("soft_limit_inodes"),
 
 			Computed:    true,
 			Optional:    true,
@@ -147,7 +159,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_inodes": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_inodes"),
 
 			Computed:    true,
 			Optional:    true,
@@ -156,7 +169,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_capacity": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_capacity"),
 
 			Computed:    true,
 			Optional:    true,
@@ -165,7 +179,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_capacity_tb": &schema.Schema{
-			Type: schema.TypeFloat,
+			Type:          schema.TypeFloat,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_capacity_tb"),
 
 			Computed:    true,
 			Optional:    true,
@@ -174,7 +189,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_effective_capacity": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_effective_capacity"),
 
 			Computed:    true,
 			Optional:    true,
@@ -183,7 +199,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"used_effective_capacity_tb": &schema.Schema{
-			Type: schema.TypeFloat,
+			Type:          schema.TypeFloat,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_effective_capacity_tb"),
 
 			Computed:    true,
 			Optional:    true,
@@ -192,7 +209,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("tenant_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -201,7 +219,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("tenant_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -210,7 +229,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"cluster": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("cluster"),
 
 			Computed:    true,
 			Optional:    true,
@@ -219,7 +239,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"cluster_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("cluster_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -228,7 +249,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"system_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("system_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -237,7 +259,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"is_user_quota": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("is_user_quota"),
 
 			Computed:    true,
 			Optional:    true,
@@ -246,7 +269,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"enable_email_providers": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("enable_email_providers"),
 
 			Computed:    true,
 			Optional:    true,
@@ -255,7 +279,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"num_exceeded_users": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("num_exceeded_users"),
 
 			Computed:    true,
 			Optional:    true,
@@ -264,7 +289,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"num_blocked_users": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("num_blocked_users"),
 
 			Computed:    true,
 			Optional:    true,
@@ -273,7 +299,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"enable_alarms": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("enable_alarms"),
 
 			Computed:    true,
 			Optional:    true,
@@ -282,7 +309,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"default_email": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("default_email"),
 
 			Computed:    true,
 			Optional:    true,
@@ -291,7 +319,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"percent_inodes": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("percent_inodes"),
 
 			Computed:    true,
 			Optional:    true,
@@ -300,7 +329,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"percent_capacity": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("percent_capacity"),
 
 			Computed:    true,
 			Optional:    true,
@@ -309,7 +339,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"default_user_quota": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("default_user_quota"),
 
 			Computed:    true,
 			Optional:    true,
@@ -320,7 +351,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"quota_system_id": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("quota_system_id"),
 
 						Computed:    true,
 						Optional:    true,
@@ -329,7 +361,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("soft_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -338,7 +371,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -347,7 +381,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"sof_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("sof_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -356,7 +391,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -365,7 +401,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"grace_period": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("grace_period"),
 
 						Computed:         true,
 						Optional:         true,
@@ -378,7 +415,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"default_group_quota": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("default_group_quota"),
 
 			Computed:    true,
 			Optional:    true,
@@ -389,7 +427,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"quota_system_id": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("quota_system_id"),
 
 						Computed:    true,
 						Optional:    true,
@@ -398,7 +437,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("soft_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -407,7 +447,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -416,7 +457,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"sof_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("sof_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -425,7 +467,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -434,7 +477,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"grace_period": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("grace_period"),
 
 						Computed:         true,
 						Optional:         true,
@@ -447,7 +491,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"user_quotas": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("user_quotas"),
 
 			Computed:    true,
 			Optional:    true,
@@ -458,7 +503,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"grace_period": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
 
 						Computed:         true,
 						Optional:         true,
@@ -468,7 +514,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"time_to_block": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("time_to_block"),
 
 						Computed:    true,
 						Optional:    true,
@@ -477,7 +524,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -486,7 +534,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -495,7 +544,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -504,7 +554,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -513,7 +564,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -522,7 +574,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_capacity": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_capacity"),
 
 						Computed:    true,
 						Optional:    true,
@@ -531,7 +584,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"is_accountable": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("is_accountable"),
 
 						Computed:    true,
 						Optional:    true,
@@ -540,7 +594,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"quota_system_id": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("quota_system_id"),
 
 						Computed:    true,
 						Optional:    true,
@@ -549,7 +604,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"entity": &schema.Schema{
-						Type: schema.TypeList,
+						Type:          schema.TypeList,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("entity"),
 
 						Computed:    true,
 						Optional:    true,
@@ -560,7 +616,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"name": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("name"),
 
 									Computed:    true,
 									Optional:    true,
@@ -569,7 +626,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"vast_id": &schema.Schema{
-									Type: schema.TypeInt,
+									Type:          schema.TypeInt,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("vast_id"),
 
 									Computed:    true,
 									Optional:    true,
@@ -578,7 +636,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"email": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
 
 									Computed:    true,
 									Optional:    true,
@@ -587,7 +646,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"is_group": &schema.Schema{
-									Type: schema.TypeBool,
+									Type:          schema.TypeBool,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
 
 									Computed:    true,
 									Optional:    true,
@@ -596,13 +656,15 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"identifier": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
 
 									Required: true,
 								},
 
 								"identifier_type": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
 
 									Computed:    true,
 									Optional:    true,
@@ -617,7 +679,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		},
 
 		"group_quotas": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("group_quotas"),
 
 			Computed:    true,
 			Optional:    true,
@@ -628,7 +691,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"grace_period": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
 
 						Computed:         true,
 						Optional:         true,
@@ -638,7 +702,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"time_to_block": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("time_to_block"),
 
 						Computed:    true,
 						Optional:    true,
@@ -647,7 +712,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -656,7 +722,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit"),
 
 						Computed:    true,
 						Optional:    true,
@@ -665,7 +732,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"hard_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -674,7 +742,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"soft_limit_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -683,7 +752,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_inodes": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_inodes"),
 
 						Computed:    true,
 						Optional:    true,
@@ -692,7 +762,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"used_capacity": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_capacity"),
 
 						Computed:    true,
 						Optional:    true,
@@ -701,7 +772,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"is_accountable": &schema.Schema{
-						Type: schema.TypeBool,
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("is_accountable"),
 
 						Computed:    true,
 						Optional:    true,
@@ -710,7 +782,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"quota_system_id": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("quota_system_id"),
 
 						Computed:    true,
 						Optional:    true,
@@ -719,7 +792,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 					},
 
 					"entity": &schema.Schema{
-						Type: schema.TypeList,
+						Type:          schema.TypeList,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("entity"),
 
 						Computed:    true,
 						Optional:    true,
@@ -730,7 +804,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 							Schema: map[string]*schema.Schema{
 
 								"name": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("name"),
 
 									Computed:    true,
 									Optional:    true,
@@ -739,7 +814,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"vast_id": &schema.Schema{
-									Type: schema.TypeInt,
+									Type:          schema.TypeInt,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("vast_id"),
 
 									Computed:    true,
 									Optional:    true,
@@ -748,7 +824,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"email": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
 
 									Computed:    true,
 									Optional:    true,
@@ -757,7 +834,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"is_group": &schema.Schema{
-									Type: schema.TypeBool,
+									Type:          schema.TypeBool,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
 
 									Computed:    true,
 									Optional:    true,
@@ -766,13 +844,15 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								},
 
 								"identifier": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
 
 									Required: true,
 								},
 
 								"identifier_type": &schema.Schema{
-									Type: schema.TypeString,
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
 
 									Computed:    true,
 									Optional:    true,

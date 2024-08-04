@@ -51,6 +51,8 @@ type Tenant struct {
 	AllowDisabledUsers bool `json:"allow_disabled_users,omitempty"`
 	// Use native SMB authentication
 	UseSmbNative bool `json:"use_smb_native,omitempty"`
-	// An array of VIP Pool ids to attach to tenant
+	// An array of VIP Pool names attached to this tenant.
+	VippoolNames []string `json:"vippool_names,omitempty"`
+	// An array of VIP Pool ids to attach to tenant.
 	VippoolIds []int64 `json:"vippool_ids,omitempty"`
 }

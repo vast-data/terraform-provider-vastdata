@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"cmp"
 	"fmt"
 	"reflect"
 	"slices"
@@ -11,17 +10,6 @@ import (
 
 var cnode_ids_cache = map[string]bool{}
 
-func asStingsList(i []any) []string {
-	s := []string{}
-	for _, o := range i {
-		s = append(s, fmt.Sprintf("%v", o))
-	}
-	return s
-}
-
-func compareStrings(x, y string) int {
-	return cmp.Compare(x, y)
-}
 func VippoolCnodeIdsDiffSupress(k, oldValue, newValue string, d *schema.ResourceData) bool {
 	/*Due to unducumented terraform behaviour this will run on every element of the list
 	  and not on th list itself.

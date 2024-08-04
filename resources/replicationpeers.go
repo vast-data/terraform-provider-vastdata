@@ -41,7 +41,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("url"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,7 +68,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"leading_vip": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("leading_vip"),
 
 			Computed:    true,
 			Optional:    true,
@@ -74,7 +78,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"remote_vip_range": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("remote_vip_range"),
 
 			Computed:    true,
 			Optional:    true,
@@ -83,7 +88,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"version": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("version"),
 
 			Computed:    true,
 			Optional:    true,
@@ -92,7 +98,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"remote_version": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("remote_version"),
 
 			Computed:    true,
 			Optional:    true,
@@ -101,7 +108,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"is_local": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("is_local"),
 
 			Computed:    true,
 			Optional:    true,
@@ -110,7 +118,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"peer_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("peer_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -119,7 +128,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"secure_mode": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("secure_mode"),
 
 			Computed:    true,
 			Optional:    true,
@@ -128,7 +138,8 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 		},
 
 		"pool_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("pool_id"),
 
 			Computed:    true,
 			Optional:    true,
