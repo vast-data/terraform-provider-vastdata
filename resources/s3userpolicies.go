@@ -41,7 +41,8 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,19 +51,22 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"policy": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("policy"),
 
 			Required: true,
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("enabled"),
 
 			Computed:    true,
 			Optional:    true,

@@ -41,7 +41,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"mode": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("mode"),
 
 			Computed:  true,
 			Optional:  true,
@@ -67,7 +70,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"io_size_bytes": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("io_size_bytes"),
 
 			Computed:    true,
 			Optional:    true,
@@ -76,7 +80,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"static_limits": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("static_limits"),
 
 			Computed:    true,
 			Optional:    true,
@@ -87,7 +92,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"min_reads_bw_mbps": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_reads_bw_mbps"),
 
 						Computed:    true,
 						Optional:    true,
@@ -96,7 +102,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_bw_mbps": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_reads_bw_mbps"),
 
 						Computed:    true,
 						Optional:    true,
@@ -105,7 +112,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_writes_bw_mbps": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_writes_bw_mbps"),
 
 						Computed:    true,
 						Optional:    true,
@@ -114,7 +122,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_bw_mbps": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_writes_bw_mbps"),
 
 						Computed:    true,
 						Optional:    true,
@@ -123,7 +132,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_reads_iops": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_reads_iops"),
 
 						Computed:    true,
 						Optional:    true,
@@ -132,7 +142,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_iops": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_reads_iops"),
 
 						Computed:    true,
 						Optional:    true,
@@ -141,7 +152,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"min_writes_iops": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_writes_iops"),
 
 						Computed:    true,
 						Optional:    true,
@@ -150,7 +162,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_iops": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_writes_iops"),
 
 						Computed:    true,
 						Optional:    true,
@@ -162,7 +175,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 		},
 
 		"capacity_limits": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("capacity_limits"),
 
 			Computed:    true,
 			Optional:    true,
@@ -173,7 +187,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"max_reads_bw_mbps_per_gb_capacity": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_reads_bw_mbps_per_gb_capacity"),
 
 						Computed:    true,
 						Optional:    true,
@@ -182,7 +197,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_bw_mbps_per_gb_capacity": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_writes_bw_mbps_per_gb_capacity"),
 
 						Computed:    true,
 						Optional:    true,
@@ -191,7 +207,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_reads_iops_per_gb_capacity": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_reads_iops_per_gb_capacity"),
 
 						Computed:    true,
 						Optional:    true,
@@ -200,7 +217,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 					},
 
 					"max_writes_iops_per_gb_capacity": &schema.Schema{
-						Type: schema.TypeInt,
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_writes_iops_per_gb_capacity"),
 
 						Computed:    true,
 						Optional:    true,

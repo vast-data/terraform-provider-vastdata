@@ -41,7 +41,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,7 +51,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"expiration_time": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("expiration_time"),
 
 			Computed:         true,
 			Optional:         true,
@@ -60,13 +62,15 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"path": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("path"),
 
 			Computed:    true,
 			Optional:    true,
@@ -75,7 +79,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"tenant_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("tenant_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -84,7 +89,8 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"indestructible": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("indestructible"),
 
 			Computed:    true,
 			Optional:    true,

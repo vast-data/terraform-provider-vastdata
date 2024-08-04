@@ -98,3 +98,9 @@ data "vastdata_view_policy" "view_policy1" {
 - `url` (String)
 - `use32bit_fileid` (Boolean)
 - `vip_pools` (List of Number) Comma separated vip pool ids.
+- `vippool_permissions` (List of Object) List of VIP pool permissions (see [below for nested schema](#nestedatt--vippool_permissions))
+
+<a id="nestedatt--vippool_permissions"></a>
+### Nested Schema for `vippool_permissions`
+
+Read-Only:

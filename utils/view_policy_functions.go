@@ -12,6 +12,50 @@ import (
 
 var permissions_attributes []string = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
 
+// func convert_permission_per_vip_pool_to_vippools(p []interface{}) ([]interface{}, error) {
+
+// }
+
+func _vippool_permission_convert(ctx context.Context, i interface{}, m *map[string]interface{}) {
+	tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyConvertVippoolPermissions] - VipPool Permissions : %v ", i))
+	permission_per_vip_pool := map[string]string{}
+	perms, is_interface_list := i.([]interface{})
+	if is_interface_list && len(perms) > 0 {
+		for _, p := range perms {
+			q, is_interface_map := p.(map[string]interface{})
+			if is_interface_map {
+				vippool_id, e1 := q["vippool_id"]
+				vippool_permissions, e2 := q["vippool_permissions"]
+				if e1 && e2 {
+					permission_per_vip_pool[fmt.Sprintf("%v", vippool_id)] = fmt.Sprintf("%v", vippool_permissions)
+				}
+
+			}
+		}
+	}
+	if len(permission_per_vip_pool) > 0 {
+		(*m)["permission_per_vip_pool"] = permission_per_vip_pool
+	}
+}
+
+func vippool_permission_convert_for_update(ctx context.Context, d *schema.ResourceData, m *map[string]interface{}) {
+	tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyUpdate] - VipPool Permissions : %v", d.Get("vippool_permissions")))
+	i, e := d.GetOkExists("vippool_permissions")
+	if !e {
+		return
+	}
+	_vippool_permission_convert(ctx, i, m)
+}
+
+func vippool_permission_convert_for_create(ctx context.Context, m *map[string]interface{}) {
+	i, exists := (*m)["vippool_permissions"]
+	tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyCreate] - VipPool Permissions : %v , Exist: %v", i, exists))
+	if !exists {
+		return
+	}
+	_vippool_permission_convert(ctx, i, m)
+
+}
 func setupS3SpecialCharsSupport(ctx context.Context, v string, m *map[string]interface{}) {
 	(*m)["s3_special_chars_support"] = v
 }
@@ -82,6 +126,7 @@ func ViewPolicyCreateFunc(ctx context.Context, _client interface{}, attr map[str
 		z = "false"
 	}
 	setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
+	vippool_permission_convert_for_create(ctx, &data)
 	return DefaultCreateFunc(ctx, _client, attr, data, headers)
 }
 
@@ -127,5 +172,27 @@ func ViewPolicyUpdateFunc(ctx context.Context, _client interface{}, attr map[str
 		z = "false"
 	}
 	setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
+	vippool_permission_convert_for_update(ctx, d, &data)
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
+}
+
+func ViewPolicyGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
+	response, err := DefaultGetFunc(ctx, _client, attr, d, headers)
+	if err != nil {
+		return response, err
+	}
+	u := map[string]interface{}{}
+	err = UnmarshelBodyToMap(response, &u)
+	if err != nil {
+		return response, err
+	}
+	l := []map[string]interface{}{}
+	i, e := u["permission_per_vip_pool"]
+	if e {
+		for k, v := range i.(map[string]interface{}) {
+			l = append(l, map[string]interface{}{"vippool_id": k, "vippool_permissions": v})
+		}
+		u["vippool_permissions"] = l
+	}
+	return FakeHttpResponse(response, u)
 }

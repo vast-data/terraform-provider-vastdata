@@ -41,7 +41,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,7 +51,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"urls": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("urls"),
 
 			Computed:    true,
 			Optional:    true,
@@ -63,7 +65,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"port": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("port"),
 
 			Computed:    false,
 			Optional:    true,
@@ -74,7 +77,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"binddn": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("binddn"),
 
 			Computed:    true,
 			Optional:    true,
@@ -83,7 +87,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"bindpw": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("bindpw"),
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
@@ -95,7 +100,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"searchbase": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("searchbase"),
 
 			Computed:    true,
 			Optional:    true,
@@ -104,7 +110,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"group_searchbase": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("group_searchbase"),
 
 			Computed:    true,
 			Optional:    true,
@@ -113,7 +120,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"method": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("method"),
 
 			Computed:  true,
 			Optional:  true,
@@ -124,7 +132,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"gid_number": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("gid_number"),
 
 			Computed:    false,
 			Optional:    true,
@@ -135,7 +144,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("uid"),
 
 			Computed:    false,
 			Optional:    true,
@@ -146,7 +156,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid_number": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("uid_number"),
 
 			Computed:    false,
 			Optional:    true,
@@ -157,7 +168,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"match_user": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("match_user"),
 
 			Computed:    false,
 			Optional:    true,
@@ -168,7 +180,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid_member": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("uid_member"),
 
 			Computed:    false,
 			Optional:    true,
@@ -179,7 +192,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_account": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("posix_account"),
 
 			Computed:    false,
 			Optional:    true,
@@ -190,7 +204,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_group": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("posix_group"),
 
 			Computed:    false,
 			Optional:    true,
@@ -201,7 +216,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"use_tls": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("use_tls"),
 
 			Computed:    false,
 			Optional:    true,
@@ -212,7 +228,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_primary_provider": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("posix_primary_provider"),
 
 			Computed:    true,
 			Optional:    true,
@@ -221,7 +238,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"posix_attributes_source": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("posix_attributes_source"),
 
 			Computed:    false,
 			Optional:    true,
@@ -232,7 +250,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"reverse_lookup": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("reverse_lookup"),
 
 			Computed:    false,
 			Optional:    true,
@@ -243,7 +262,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"tls_certificate": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("tls_certificate"),
 
 			Computed:    true,
 			Optional:    true,
@@ -252,7 +272,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"active_directory": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("active_directory"),
 
 			Computed:    true,
 			Optional:    true,
@@ -261,7 +282,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"query_groups_mode": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("query_groups_mode"),
 
 			Computed:  true,
 			Optional:  true,
@@ -272,7 +294,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"username_property_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("username_property_name"),
 
 			Computed:    false,
 			Optional:    true,
@@ -283,13 +306,15 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("domain_name"),
 
 			Required: true,
 		},
 
 		"user_login_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("user_login_name"),
 
 			Computed:    false,
 			Optional:    true,
@@ -300,7 +325,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"group_login_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("group_login_name"),
 
 			Computed:    false,
 			Optional:    true,
@@ -311,7 +337,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"mail_property_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("mail_property_name"),
 
 			Computed:    false,
 			Optional:    true,
@@ -322,7 +349,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"uid_member_value_property_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("uid_member_value_property_name"),
 
 			Computed:    false,
 			Optional:    true,
@@ -333,7 +361,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"use_auto_discovery": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("use_auto_discovery"),
 
 			Computed:    true,
 			Optional:    true,
@@ -342,7 +371,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"use_ldaps": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("use_ldaps"),
 
 			Computed:    true,
 			Optional:    true,
@@ -351,7 +381,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"is_vms_auth_provider": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("is_vms_auth_provider"),
 
 			Computed:    false,
 			Optional:    true,
@@ -362,7 +393,8 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 		},
 
 		"query_posix_attributes_from_gc": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("Ldap").GetConflictingFields("query_posix_attributes_from_gc"),
 
 			Computed:  false,
 			Optional:  true,

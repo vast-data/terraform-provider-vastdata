@@ -24,7 +24,8 @@ Name | Type | Description | Notes
 **AllowLockedUsers** | **bool** | Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts. | [optional] [default to false]
 **AllowDisabledUsers** | **bool** | Allow IO from users whose Active Directory accounts are explicitly disabled. | [optional] [default to false]
 **UseSmbNative** | **bool** | Use native SMB authentication | [optional] [default to null]
-**VippoolIds** | **[]int64** | An array of VIP Pool ids to attach to tenant | [optional] [default to null]
+**VippoolNames** | **[]string** | An array of VIP Pool names attached to this tenant. | [optional] [default to null]
+**VippoolIds** | **[]int64** | An array of VIP Pool ids to attach to tenant. | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

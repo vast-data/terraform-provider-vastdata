@@ -135,6 +135,7 @@ type ResourceTemplateV2 struct {
 	OptionalIdentifierFields *StringSet
 	ComputedFields           *StringSet
 	ForceNewFields           *StringSet
+	ConflictingFields        map[string][]string
 	ListsNamesMap            map[string][]string
 	Generate                 bool
 	DisableImport            bool
@@ -372,4 +373,12 @@ func (r *ResourceTemplateV2) SetupListProperties(s string, m *map[string]string)
 		(*m)["set_type"] = "Float"
 	}
 
+}
+
+func (r *ResourceTemplateV2) GetConflictingFields(name string) []string {
+	i, e := r.ConflictingFields[name]
+	if e {
+		return i
+	}
+	return []string{}
 }

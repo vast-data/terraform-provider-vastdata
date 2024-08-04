@@ -41,7 +41,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"uid": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("uid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,7 +68,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"leading_gid": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("leading_gid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -74,7 +78,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"gids": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("gids"),
 
 			Computed:    true,
 			Optional:    true,
@@ -87,7 +92,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"groups": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("groups"),
 
 			Computed:    true,
 			Optional:    true,
@@ -100,7 +106,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"group_count": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("group_count"),
 
 			Computed:    true,
 			Optional:    true,
@@ -109,7 +116,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"leading_group_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("leading_group_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -118,7 +126,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"leading_group_gid": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("leading_group_gid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -127,7 +136,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"sid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("sid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -136,7 +146,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"primary_group_sid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("primary_group_sid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -145,7 +156,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"sids": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("sids"),
 
 			Computed:    true,
 			Optional:    true,
@@ -158,7 +170,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"local": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("local"),
 
 			Computed:    true,
 			Optional:    true,
@@ -167,7 +180,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"allow_create_bucket": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("allow_create_bucket"),
 
 			Computed:    true,
 			Optional:    true,
@@ -176,7 +190,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"allow_delete_bucket": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("allow_delete_bucket"),
 
 			Computed:    true,
 			Optional:    true,
@@ -185,7 +200,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"s3_superuser": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("s3_superuser"),
 
 			Computed:    true,
 			Optional:    true,
@@ -194,7 +210,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 		},
 
 		"s3_policies_ids": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("s3_policies_ids"),
 
 			Computed:    true,
 			Optional:    true,

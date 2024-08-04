@@ -41,7 +41,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,14 +51,16 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"machine_account_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("machine_account_name"),
 
 			Required: true,
 			ForceNew: true,
 		},
 
 		"organizational_unit": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("organizational_unit"),
 
 			Computed:    true,
 			Optional:    true,
@@ -67,7 +70,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"smb_allowed": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("smb_allowed"),
 
 			Computed:    false,
 			Optional:    true,
@@ -78,7 +82,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"ntlm_enabled": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("ntlm_enabled"),
 
 			Computed:    false,
 			Optional:    true,
@@ -89,7 +94,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_auto_discovery": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_auto_discovery"),
 
 			Computed:    false,
 			Optional:    true,
@@ -100,7 +106,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_ldaps": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_ldaps"),
 
 			Computed:    false,
 			Optional:    true,
@@ -111,7 +118,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"port": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("port"),
 
 			Computed:    false,
 			Optional:    true,
@@ -122,7 +130,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"binddn": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("binddn"),
 
 			Computed:    true,
 			Optional:    true,
@@ -131,7 +140,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"searchbase": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("searchbase"),
 
 			Computed:    true,
 			Optional:    true,
@@ -140,7 +150,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("domain_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -149,7 +160,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"method": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("method"),
 
 			Computed:  false,
 			Optional:  true,
@@ -162,7 +174,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"query_groups_mode": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("query_groups_mode"),
 
 			Computed:  false,
 			Optional:  true,
@@ -175,7 +188,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"posix_attributes_source": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("posix_attributes_source"),
 
 			Computed:    false,
 			Optional:    true,
@@ -186,7 +200,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_tls": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_tls"),
 
 			Computed:    false,
 			Optional:    true,
@@ -197,7 +212,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"tls_certificate": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("tls_certificate"),
 
 			Computed:    true,
 			Optional:    true,
@@ -206,7 +222,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"reverse_lookup": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("reverse_lookup"),
 
 			Computed:    false,
 			Optional:    true,
@@ -217,7 +234,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"gid_number": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("gid_number"),
 
 			Computed:    true,
 			Optional:    true,
@@ -226,7 +244,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"use_multi_forest": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_multi_forest"),
 
 			Computed:    false,
 			Optional:    true,
@@ -237,7 +256,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid"),
 
 			Computed:    true,
 			Optional:    true,
@@ -246,7 +266,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid_number": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid_number"),
 
 			Computed:    true,
 			Optional:    true,
@@ -255,7 +276,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"match_user": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("match_user"),
 
 			Computed:    true,
 			Optional:    true,
@@ -264,7 +286,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid_member_value_property_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid_member_value_property_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -273,7 +296,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"uid_member": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid_member"),
 
 			Computed:    true,
 			Optional:    true,
@@ -282,7 +306,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"posix_account": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("posix_account"),
 
 			Computed:    true,
 			Optional:    true,
@@ -291,7 +316,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"posix_group": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("posix_group"),
 
 			Computed:    true,
 			Optional:    true,
@@ -300,7 +326,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"username_property_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("username_property_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -309,7 +336,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"user_login_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("user_login_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -318,7 +346,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"group_login_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("group_login_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -327,7 +356,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"mail_property_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("mail_property_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -336,7 +366,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"is_vms_auth_provider": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("is_vms_auth_provider"),
 
 			Computed:    false,
 			Optional:    true,
@@ -347,7 +378,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"bindpw": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("bindpw"),
 
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
@@ -359,7 +391,8 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 		},
 
 		"urls": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("urls"),
 
 			Computed:    true,
 			Optional:    true,

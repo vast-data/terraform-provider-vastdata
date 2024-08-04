@@ -504,6 +504,7 @@ func ResourceBuildTemplateToTerrafromElem(r codegen_configs.ResourceElem, indent
              {{ $name:=.Attributes.name}}
 	     {{indent $I " "}}"{{ .Attributes.name }}": &schema.Schema{
 	     {{indent $I " "}}   Type: 	  schema.{{ .Attributes.type }},
+	     {{indent $I " "}}   ConflictsWith: codegen_configs.GetResourceByName("{{GetResourceName}}").GetConflictingFields("{{.Attributes.name}}"),
              {{if eq .Attributes.ignore_update "true" }}
              {{indent $I " "}}   DiffSuppressOnRefresh: false,
              DiffSuppressFunc: utils.DoNothingOnUpdate(),

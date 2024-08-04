@@ -41,7 +41,8 @@ func getResourceNisSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Nis").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceNisSchema() map[string]*schema.Schema {
 		},
 
 		"domain_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Nis").GetConflictingFields("domain_name"),
 
 			Required: true,
 		},
 
 		"hosts": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Nis").GetConflictingFields("hosts"),
 
 			Computed:    true,
 			Optional:    true,

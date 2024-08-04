@@ -41,7 +41,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,13 +51,15 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"url": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("url"),
 
 			Computed:    true,
 			Optional:    true,
@@ -65,7 +68,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"target_name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("target_name"),
 
 			Computed:    true,
 			Optional:    true,
@@ -74,7 +78,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"target_object_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("target_object_id"),
 
 			Computed:    true,
 			Optional:    true,
@@ -83,19 +88,22 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"prefix": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("prefix"),
 
 			Required: true,
 		},
 
 		"clone_type": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("clone_type"),
 
 			Required: true,
 		},
 
 		"frames": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("frames"),
 
 			Computed:    true,
 			Optional:    true,
@@ -106,7 +114,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"every": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("every"),
 
 						Computed:         true,
 						Optional:         true,
@@ -116,7 +125,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"start_at": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("start_at"),
 
 						Computed:         true,
 						Optional:         true,
@@ -126,7 +136,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"keep_local": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("keep_local"),
 
 						Computed:         true,
 						Optional:         true,
@@ -136,7 +147,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 					},
 
 					"keep_remote": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("keep_remote"),
 
 						Computed:         true,
 						Optional:         true,
@@ -149,7 +161,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 		},
 
 		"indestructible": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("indestructible"),
 
 			Computed:    true,
 			Optional:    true,

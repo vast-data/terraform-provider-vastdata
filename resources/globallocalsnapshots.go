@@ -41,7 +41,8 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
@@ -50,31 +51,36 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"name": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("name"),
 
 			Required: true,
 		},
 
 		"loanee_tenant_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("loanee_tenant_id"),
 
 			Required: true,
 		},
 
 		"loanee_root_path": &schema.Schema{
-			Type: schema.TypeString,
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("loanee_root_path"),
 
 			Required: true,
 		},
 
 		"loanee_snapshot_id": &schema.Schema{
-			Type: schema.TypeInt,
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("loanee_snapshot_id"),
 
 			Required: true,
 		},
 
 		"enabled": &schema.Schema{
-			Type: schema.TypeBool,
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("enabled"),
 
 			Computed:    false,
 			Optional:    true,
@@ -85,7 +91,8 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 		},
 
 		"owner_tenant": &schema.Schema{
-			Type: schema.TypeList,
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("owner_tenant"),
 
 			Required: true,
 
@@ -93,13 +100,15 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 				Schema: map[string]*schema.Schema{
 
 					"name": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("name"),
 
 						Required: true,
 					},
 
 					"guid": &schema.Schema{
-						Type: schema.TypeString,
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("guid"),
 
 						Required: true,
 					},

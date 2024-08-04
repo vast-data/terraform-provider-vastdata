@@ -146,4 +146,6 @@ type ViewPolicy struct {
 	// Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
 	NfsEnforceTls bool `json:"nfs_enforce_tls,omitempty"`
 	ProtocolsAudit *ProtocolsAudit `json:"protocols_audit,omitempty"`
+	// List of VIP pool permissions
+	VippoolPermissions []PermissionsPerVipPool `json:"vippool_permissions,omitempty"`
 }

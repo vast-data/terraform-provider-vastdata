@@ -636,6 +636,18 @@ func DataSourceViewPolicy() *schema.Resource {
 				Optional:    false,
 				Description: `Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.`,
 			},
+
+			"vippool_permissions": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `List of VIP pool permissions`,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{},
+				},
+			},
 		},
 	}
 }
@@ -1528,6 +1540,18 @@ func dataSourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m int
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"nfs_enforce_tls\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VippoolPermissions", resource.VippoolPermissions))
+
+	err = d.Set("vippool_permissions", utils.FlattenListOfModelsToList(ctx, resource.VippoolPermissions))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"vippool_permissions\"",
 			Detail:   err.Error(),
 		})
 	}
