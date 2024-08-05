@@ -134,11 +134,16 @@ func ViewPolicyCreateFunc(ctx context.Context, _client interface{}, attr map[str
 		return nil, err
 	}
 	data["auth_provider"] = auth_provider
-	z, e := data["s3_special_chars_support"]
-	if !e {
-		z = "false"
+
+	flavor, flavor_exists := data["flavor"]
+	if flavor_exists && fmt.Sprintf("%v", flavor) == "S3_NATIVE" {
+
+		z, e := data["s3_special_chars_support"]
+		if !e {
+			z = "false"
+		}
+		setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
 	}
-	setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
 	vippool_permission_convert_for_create(ctx, &data)
 	return DefaultCreateFunc(ctx, _client, attr, data, headers)
 }
@@ -180,11 +185,16 @@ func ViewPolicyUpdateFunc(ctx context.Context, _client interface{}, attr map[str
 		}
 
 	}
-	z, e := data["s3_special_chars_support"]
-	if !e {
-		z = "false"
+	flavor, flavor_exists := data["flavor"]
+	if flavor_exists && fmt.Sprintf("%v", flavor) == "S3_NATIVE" {
+
+		z, e := data["s3_special_chars_support"]
+		if !e {
+			z = "false"
+		}
+		setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
+
 	}
-	setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
 	vippool_permission_convert_for_update(ctx, d, &data)
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
 }
@@ -207,5 +217,6 @@ func ViewPolicyGetFunc(ctx context.Context, _client interface{}, attr map[string
 		}
 		u["vippool_permissions"] = l
 	}
+
 	return FakeHttpResponse(response, u)
 }
