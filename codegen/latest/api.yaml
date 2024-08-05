@@ -1961,4 +1961,4 @@ The object class that defines a group entry on the AD server, if different from 
           type: "string"
           description: "VIP pool permissions "
           default: "RW"
-          enum: [RW]
+          enum: [RW,RO]

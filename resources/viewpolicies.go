@@ -944,8 +944,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Optional:  true,
 						Sensitive: false,
 
-						ValidateDiagFunc: utils.OneOf([]string{"RW"}),
-						Description:      `VIP pool permissions  Allowed Values are [RW]`,
+						ValidateDiagFunc: utils.OneOf([]string{"RW", "RO"}),
+						Description:      `VIP pool permissions  Allowed Values are [RW RO]`,
 
 						Default: "RW",
 					},

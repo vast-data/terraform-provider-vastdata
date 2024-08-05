@@ -149,7 +149,7 @@ Optional:
 Optional:
 
 - `vippool_id` (String) The Vippool ID
-- `vippool_permissions` (String) VIP pool permissions  Allowed Values are [RW]
+- `vippool_permissions` (String) VIP pool permissions  Allowed Values are [RW RO]
 
 ## Import
 
