@@ -47,7 +47,7 @@ func getResourceNisSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `A uniq guid given to the nis server configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) A uniq guid given to the nis server configuration`,
 		},
 
 		"domain_name": &schema.Schema{
@@ -64,7 +64,7 @@ func getResourceNisSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `List of ip addresses/hostnames of nis servers`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) List of ip addresses/hostnames of nis servers`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,

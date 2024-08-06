@@ -23,16 +23,16 @@ data "vastdata_qos_policy" "qos1" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0)
 
 ### Read-Only
 
-- `capacity_limits` (List of Object) (see [below for nested schema](#nestedatt--capacity_limits))
-- `guid` (String) QoS Policy guid
-- `id` (Number) The ID of this resource.
-- `io_size_bytes` (Number) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
-- `mode` (String) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]
-- `static_limits` (List of Object) (see [below for nested schema](#nestedatt--static_limits))
+- `capacity_limits` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--capacity_limits))
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) QoS Policy guid
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `io_size_bytes` (Number) (Valid for versions: 5.0.0,5.1.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
+- `mode` (String) (Valid for versions: 5.0.0,5.1.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]
+- `static_limits` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--static_limits))
 
 <a id="nestedatt--capacity_limits"></a>
 ### Nested Schema for `capacity_limits`

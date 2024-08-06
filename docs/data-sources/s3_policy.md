@@ -23,14 +23,14 @@ data "vastdata_s3_policy" "s3policy" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0)
 
 ### Read-Only
 
-- `enabled` (Boolean)
-- `groups` (List of String)
-- `guid` (String) GUID
-- `id` (Number) The ID of this resource.
-- `is_replicated` (Boolean)
-- `policy` (String)
-- `users` (List of String)
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) GUID
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `is_replicated` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `policy` (String) (Valid for versions: 5.1.0,5.0.0)
+- `users` (List of String) (Valid for versions: 5.1.0,5.0.0)

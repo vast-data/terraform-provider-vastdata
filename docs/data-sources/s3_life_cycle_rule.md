@@ -23,21 +23,21 @@ data "vastdata_s3_life_cycle_rule" "s3rule" {
 
 ### Required
 
-- `name` (String) A unique name
+- `name` (String) (Valid for versions: 5.0.0,5.1.0) A unique name
 
 ### Read-Only
 
-- `abort_mpu_days_after_initiation` (Number) The number of days until expiration after an incomplete multipart upload
-- `enabled` (Boolean)
-- `expiration_date` (String) The expiration date of the object
-- `expiration_days` (Number) The number of days from creation until an object expires
-- `expired_obj_delete_marker` (Boolean) Remove expired objects delete markers
-- `guid` (String)
-- `id` (Number) The ID of this resource.
-- `max_size` (Number) The maximum size of the object
-- `min_size` (Number) The minimum size of the object
-- `newer_noncurrent_versions` (Number) The number of newer versions to retain
-- `noncurrent_days` (Number) Number of days after objects become noncurrent
-- `prefix` (String) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.
-- `view_id` (Number) The ID of the related View
-- `view_path` (String) The path of the related View
+- `abort_mpu_days_after_initiation` (Number) (Valid for versions: 5.1.0,5.0.0) The number of days until expiration after an incomplete multipart upload
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `expiration_date` (String) (Valid for versions: 5.0.0,5.1.0) The expiration date of the object
+- `expiration_days` (Number) (Valid for versions: 5.0.0,5.1.0) The number of days from creation until an object expires
+- `expired_obj_delete_marker` (Boolean) (Valid for versions: 5.0.0,5.1.0) Remove expired objects delete markers
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0)
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `max_size` (Number) (Valid for versions: 5.0.0,5.1.0) The maximum size of the object
+- `min_size` (Number) (Valid for versions: 5.0.0,5.1.0) The minimum size of the object
+- `newer_noncurrent_versions` (Number) (Valid for versions: 5.0.0,5.1.0) The number of newer versions to retain
+- `noncurrent_days` (Number) (Valid for versions: 5.0.0,5.1.0) Number of days after objects become noncurrent
+- `prefix` (String) (Valid for versions: 5.1.0,5.0.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.
+- `view_id` (Number) (Valid for versions: 5.0.0,5.1.0) The ID of the related View
+- `view_path` (String) (Valid for versions: 5.0.0,5.1.0) The path of the related View

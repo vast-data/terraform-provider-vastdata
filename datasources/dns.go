@@ -26,7 +26,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `Specifies a name for the VAST DNS server configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies a name for the VAST DNS server configuration`,
 			},
 
 			"id": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `A uniqe id given to the VAST DNS server configurations`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A uniqe id given to the VAST DNS server configurations`,
 			},
 
 			"vip": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.`,
 			},
 
 			"domain_suffix": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.`,
 			},
 
 			"vip_gateway": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
 			},
 
 			"enabled": &schema.Schema{
@@ -66,7 +66,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Enable the VAST DNS server configurations`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Enable the VAST DNS server configurations`,
 			},
 
 			"guid": &schema.Schema{
@@ -74,7 +74,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `A uniqe guid assigned to the VAST DNS server configurations`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) A uniqe guid assigned to the VAST DNS server configurations`,
 			},
 
 			"vip_subnet_cidr": &schema.Schema{
@@ -82,7 +82,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Specifies the subnet, as a CIDR index, on which the DNS resides.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies the subnet, as a CIDR index, on which the DNS resides.`,
 			},
 
 			"vip_vlan": &schema.Schema{
@@ -90,7 +90,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Specifies a VLAN if needed to enable communication with external DNS server(s).`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies a VLAN if needed to enable communication with external DNS server(s).`,
 			},
 
 			"cnode_ids": &schema.Schema{
@@ -98,7 +98,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: ``,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -110,7 +110,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Assigns an IPv6 to the DNS service.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Assigns an IPv6 to the DNS service.`,
 			},
 
 			"vip_ipv6_subnet_cidr": &schema.Schema{
@@ -118,7 +118,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
 			},
 
 			"vip_ipv6_gateway": &schema.Schema{
@@ -126,7 +126,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Specifies a gateway IPv6 to external DNS server if on different subnet.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies a gateway IPv6 to external DNS server if on different subnet.`,
 			},
 		},
 	}

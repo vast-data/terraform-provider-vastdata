@@ -76,42 +76,42 @@ resource "vastdata_quota" "quota2" {
 
 ### Optional
 
-- `cluster` (String) Parent Cluster
-- `cluster_id` (Number) Parent Cluster ID
-- `default_email` (String) The default Email if there is no suffix and no address in the providers
-- `default_group_quota` (Block List) (see [below for nested schema](#nestedblock--default_group_quota))
-- `default_user_quota` (Block List) (see [below for nested schema](#nestedblock--default_user_quota))
-- `enable_alarms` (Boolean) Enable alarms when users or groups are exceeding their limit
-- `enable_email_providers` (Boolean)
-- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
-- `group_quotas` (Block List) (see [below for nested schema](#nestedblock--group_quotas))
-- `hard_limit` (Number) Hard quota limit
-- `hard_limit_inodes` (Number) Hard inodes quota limit
-- `is_user_quota` (Boolean)
-- `num_blocked_users` (Number)
-- `num_exceeded_users` (Number)
-- `path` (String) Directory path
-- `percent_capacity` (Number) Percent of used capacity out of the hard limit
-- `percent_inodes` (Number) Percent of used inodes out of the hard limit
-- `pretty_grace_period` (String) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
-- `pretty_state` (String)
-- `soft_limit` (Number) Soft quota limit
-- `soft_limit_inodes` (Number) Soft inodes quota limit
-- `state` (String)
-- `system_id` (Number)
-- `tenant_id` (Number) Tenant ID
-- `tenant_name` (String) Tenant Name
-- `time_to_block` (String) Grace period expiration time
-- `used_capacity` (Number) Used capacity in bytes
-- `used_capacity_tb` (Number) Used capacity in TB
-- `used_effective_capacity` (Number) Used effective capacity in bytes
-- `used_effective_capacity_tb` (Number) Used effective capacity in TB
-- `used_inodes` (Number) Used inodes
-- `user_quotas` (Block List) (see [below for nested schema](#nestedblock--user_quotas))
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0) Parent Cluster
+- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0) Parent Cluster ID
+- `default_email` (String) (Valid for versions: 5.0.0,5.1.0) The default Email if there is no suffix and no address in the providers
+- `default_group_quota` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--default_group_quota))
+- `default_user_quota` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--default_user_quota))
+- `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable alarms when users or groups are exceeding their limit
+- `enable_email_providers` (Boolean) (Valid for versions: 5.1.0,5.0.0)
+- `grace_period` (String) (Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `group_quotas` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--group_quotas))
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Hard inodes quota limit
+- `is_user_quota` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `num_blocked_users` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `num_exceeded_users` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `path` (String) (Valid for versions: 5.0.0,5.1.0) Directory path
+- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Percent of used capacity out of the hard limit
+- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Percent of used inodes out of the hard limit
+- `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
+- `pretty_state` (String) (Valid for versions: 5.0.0,5.1.0)
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Soft quota limit
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit
+- `state` (String) (Valid for versions: 5.0.0,5.1.0)
+- `system_id` (Number) (Valid for versions: 5.1.0,5.0.0)
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0) Tenant ID
+- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0) Tenant Name
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0) Grace period expiration time
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Used capacity in bytes
+- `used_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0) Used capacity in TB
+- `used_effective_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Used effective capacity in bytes
+- `used_effective_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0) Used effective capacity in TB
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Used inodes
+- `user_quotas` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--user_quotas))
 
 ### Read-Only
 
-- `guid` (String) Quota guid
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) Quota guid
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--default_group_quota"></a>
@@ -119,12 +119,12 @@ resource "vastdata_quota" "quota2" {
 
 Optional:
 
-- `grace_period` (String) Quota enforcement grace period at the format of HH:MM:SS
-- `hard_limit` (Number) The size hard limit in bytes
-- `hard_limit_inodes` (Number) The hard limit in inode number
-- `quota_system_id` (Number) The system ID of the quota
-- `sof_limit_inodes` (Number) The sof limit of inodes number
-- `soft_limit` (Number) The size soft limit in bytes
+- `grace_period` (String) (Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period at the format of HH:MM:SS
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) The size hard limit in bytes
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) The hard limit in inode number
+- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0) The system ID of the quota
+- `sof_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) The sof limit of inodes number
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0) The size soft limit in bytes
 
 
 <a id="nestedblock--default_user_quota"></a>
@@ -132,12 +132,12 @@ Optional:
 
 Optional:
 
-- `grace_period` (String) Quota enforcement grace period at the format of HH:MM:SS
-- `hard_limit` (Number) The size hard limit in bytes
-- `hard_limit_inodes` (Number) The hard limit in inode number
-- `quota_system_id` (Number) The system ID of the quota
-- `sof_limit_inodes` (Number) The sof limit of inodes number
-- `soft_limit` (Number) The size soft limit in bytes
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) The size hard limit in bytes
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) The hard limit in inode number
+- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0) The system ID of the quota
+- `sof_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) The sof limit of inodes number
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0) The size soft limit in bytes
 
 
 <a id="nestedblock--group_quotas"></a>
@@ -145,17 +145,17 @@ Optional:
 
 Optional:
 
-- `entity` (Block List) (see [below for nested schema](#nestedblock--group_quotas--entity))
-- `grace_period` (String) Quota enforcement grace period at the format of HH:MM:SS
-- `hard_limit` (Number) Hard quota limit
-- `hard_limit_inodes` (Number) Hard inodes quota limit
-- `is_accountable` (Boolean)
-- `quota_system_id` (Number)
-- `soft_limit` (Number) Soft quota limit
-- `soft_limit_inodes` (Number) Soft inodes quota limit
-- `time_to_block` (String) Grace period expiration time
-- `used_capacity` (Number) Used capacity in bytes
-- `used_inodes` (Number) Used inodes
+- `entity` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--group_quotas--entity))
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
+- `hard_limit_inodes` (Number) (Valid for versions: 5.1.0,5.0.0) Hard inodes quota limit
+- `is_accountable` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `soft_limit` (Number) (Valid for versions: 5.1.0,5.0.0) Soft quota limit
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0) Grace period expiration time
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Used capacity in bytes
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Used inodes
 
 <a id="nestedblock--group_quotas--entity"></a>
 ### Nested Schema for `group_quotas.entity`
@@ -166,11 +166,11 @@ Required:
 
 Optional:
 
-- `email` (String)
-- `identifier_type` (String)
-- `is_group` (Boolean)
-- `name` (String) The name of the entity
-- `vast_id` (Number)
+- `email` (String) (Valid for versions: 5.0.0,5.1.0)
+- `identifier_type` (String) (Valid for versions: 5.1.0,5.0.0)
+- `is_group` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0) The name of the entity
+- `vast_id` (Number) (Valid for versions: 5.0.0,5.1.0)
 
 
 
@@ -179,17 +179,17 @@ Optional:
 
 Optional:
 
-- `entity` (Block List) (see [below for nested schema](#nestedblock--user_quotas--entity))
-- `grace_period` (String) Quota enforcement grace period at the format of HH:MM:SS
-- `hard_limit` (Number) Hard quota limit
-- `hard_limit_inodes` (Number) Hard inodes quota limit
-- `is_accountable` (Boolean)
-- `quota_system_id` (Number)
-- `soft_limit` (Number) Soft quota limit
-- `soft_limit_inodes` (Number) Soft inodes quota limit
-- `time_to_block` (String) Grace period expiration time
-- `used_capacity` (Number) Used capacity in bytes
-- `used_inodes` (Number) Used inodes
+- `entity` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--user_quotas--entity))
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Hard inodes quota limit
+- `is_accountable` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Soft quota limit
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0) Grace period expiration time
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Used capacity in bytes
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Used inodes
 
 <a id="nestedblock--user_quotas--entity"></a>
 ### Nested Schema for `user_quotas.entity`
@@ -200,11 +200,11 @@ Required:
 
 Optional:
 
-- `email` (String)
-- `identifier_type` (String)
-- `is_group` (Boolean)
-- `name` (String) The name of the entity
-- `vast_id` (Number)
+- `email` (String) (Valid for versions: 5.0.0,5.1.0)
+- `identifier_type` (String) (Valid for versions: 5.0.0,5.1.0)
+- `is_group` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0) The name of the entity
+- `vast_id` (Number) (Valid for versions: 5.0.0,5.1.0)
 
 ## Import
 

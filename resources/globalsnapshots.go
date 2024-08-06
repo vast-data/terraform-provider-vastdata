@@ -47,7 +47,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `A unique guid given to the global snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) A unique guid given to the global snapshot`,
 		},
 
 		"name": &schema.Schema{
@@ -102,7 +102,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Is the snapshot enabled`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Is the snapshot enabled`,
 		},
 
 		"owner_root_snapshot": &schema.Schema{
@@ -121,7 +121,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
-						Description: `The ID of the clone`,
+						Description: `(Valid for versions: 5.0.0,5.1.0) The ID of the clone`,
 					},
 
 					"name": &schema.Schema{
@@ -138,7 +138,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
-						Description: `The remote handle (inode)`,
+						Description: `(Valid for versions: 5.0.0,5.1.0) The remote handle (inode)`,
 					},
 				},
 			},

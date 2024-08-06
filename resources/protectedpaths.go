@@ -56,7 +56,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `guid`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) guid`,
 		},
 
 		"protection_policy_id": &schema.Schema{
@@ -66,7 +66,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `protection policy id`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) protection policy id`,
 		},
 
 		"source_dir": &schema.Schema{
@@ -76,7 +76,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `path to replicate`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) path to replicate`,
 		},
 
 		"target_exported_dir": &schema.Schema{
@@ -86,7 +86,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `where to replicate on the remote`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) where to replicate on the remote`,
 		},
 
 		"tenant_id": &schema.Schema{
@@ -96,7 +96,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Local Tenant ID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Local Tenant ID`,
 		},
 
 		"remote_tenant_guid": &schema.Schema{
@@ -106,7 +106,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The Remote tenant guid`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The Remote tenant guid`,
 		},
 
 		"target_id": &schema.Schema{
@@ -119,7 +119,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The remote target object id`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The remote target object id`,
 		},
 
 		"capabilities": &schema.Schema{
@@ -131,7 +131,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"ASYNC_REPLICATION"}),
-			Description:      `Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]`,
+			Description:      `(Valid for versions: 5.1.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]`,
 		},
 	}
 }

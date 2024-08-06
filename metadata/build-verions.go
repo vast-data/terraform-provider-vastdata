@@ -5,6 +5,7 @@ import (
 )
 
 var build_version, _ = version.NewVersion("5.1.0")
+var min_version, _ = version.NewVersion("5.0.0")
 
 const (
 	CLUSTER_VERSION_EQUALS int = 0
@@ -19,6 +20,10 @@ func GetBuildVersion() version.Version {
 func ClusterVersionCompare() int {
 	return build_version.Compare(cluster_version)
 
+}
+
+func GetMinVersion() version.Version {
+	return *min_version
 }
 
 func BuildVersionString() string {

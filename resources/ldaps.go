@@ -47,7 +47,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"urls": &schema.Schema{
@@ -57,7 +57,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -71,7 +71,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `LDAP server port. 389 (LDAP)  636 (LDAPS)`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) LDAP server port. 389 (LDAP)  636 (LDAPS)`,
 
 			Default: 389,
 		},
@@ -83,7 +83,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Distinguished name of LDAP superuser`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Distinguished name of LDAP superuser`,
 		},
 
 		"bindpw": &schema.Schema{
@@ -96,7 +96,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   true,
-			Description: `Password for the LDAP superuser`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Password for the LDAP superuser`,
 		},
 
 		"searchbase": &schema.Schema{
@@ -106,7 +106,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
 		},
 
 		"group_searchbase": &schema.Schema{
@@ -116,7 +116,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.`,
 		},
 
 		"method": &schema.Schema{
@@ -128,7 +128,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"simple", "sasl", "anonymous"}),
-			Description:      `Bind Authentication Method Allowed Values are [simple sasl anonymous]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0) Bind Authentication Method Allowed Values are [simple sasl anonymous]`,
 		},
 
 		"gid_number": &schema.Schema{
@@ -138,7 +138,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Attrirbute mapping for gid number`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for gid number`,
 
 			Default: "gidNumber",
 		},
@@ -150,7 +150,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Attrirbute mapping for uid`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for uid`,
 
 			Default: "uid",
 		},
@@ -162,7 +162,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Attrirbute mapping for uid number`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Attrirbute mapping for uid number`,
 
 			Default: "uidNumber",
 		},
@@ -174,7 +174,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Attribute mapping for user matching`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attribute mapping for user matching`,
 
 			Default: "uid",
 		},
@@ -186,7 +186,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Attrirbute mapping for uid member`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for uid member`,
 
 			Default: "memberUID",
 		},
@@ -198,7 +198,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Attrirbute mapping for posix account`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for posix account`,
 
 			Default: "posixAccount",
 		},
@@ -210,7 +210,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Attrirbute mapping for posix account`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for posix account`,
 
 			Default: "posixGroup",
 		},
@@ -222,7 +222,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `configure LDAP with TLS`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) configure LDAP with TLS`,
 
 			Default: false,
 		},
@@ -234,7 +234,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `POSIX primary provider`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) POSIX primary provider`,
 		},
 
 		"posix_attributes_source": &schema.Schema{
@@ -244,7 +244,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 
 			Default: "JOINED_DOMAIN",
 		},
@@ -256,7 +256,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 
 			Default: false,
 		},
@@ -268,7 +268,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"active_directory": &schema.Schema{
@@ -278,7 +278,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"query_groups_mode": &schema.Schema{
@@ -290,7 +290,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"COMPATIBLE", "RFC2307BIS", "RFC2307", "NONE"}),
-			Description:      `Query group mode Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0) Query group mode Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]`,
 		},
 
 		"username_property_name": &schema.Schema{
@@ -300,7 +300,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Username property name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Username property name`,
 
 			Default: "cn",
 		},
@@ -319,7 +319,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 
 			Default: "uid",
 		},
@@ -331,7 +331,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 
 			Default: "cn",
 		},
@@ -343,7 +343,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 
 			Default: "mail",
 		},
@@ -355,7 +355,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 
 			Default: "uid",
 		},
@@ -367,7 +367,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
 		},
 
 		"use_ldaps": &schema.Schema{
@@ -377,7 +377,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Use LDAPS for Auto-Discovery`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Use LDAPS for Auto-Discovery`,
 		},
 
 		"is_vms_auth_provider": &schema.Schema{
@@ -387,7 +387,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.`,
 
 			Default: false,
 		},
@@ -399,7 +399,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:  false,
 			Optional:  true,
 			Sensitive: false,
-			Description: `When set to True - users/groups from non-joined domain POSIX attributes are supported,
+			Description: `(Valid for versions: 5.0.0,5.1.0) When set to True - users/groups from non-joined domain POSIX attributes are supported,
 when set to False - Posix attributes of users/groups from non-joined domain are not supported.
 As a condition Global catalog needs to be configured to support Posix attributes.
 `,

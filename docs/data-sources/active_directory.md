@@ -23,11 +23,11 @@ data "vastdata_active_directory" "ad1" {
 
 ### Required
 
-- `machine_account_name` (String)
+- `machine_account_name` (String) (Valid for versions: 5.0.0,5.1.0)
 
 ### Read-Only
 
-- `guid` (String)
-- `id` (Number) The ID of this resource.
-- `ldap_id` (Number)
-- `organizational_unit` (String)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0)
+- `id` (Number) (Valid for versions: 5.1.0,5.0.0)
+- `ldap_id` (Number) (Valid for versions: 5.0.0,5.1.0)
+- `organizational_unit` (String) (Valid for versions: 5.0.0,5.1.0)

@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	base "github.com/pb33f/libopenapi/datamodel/high/base"
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
+	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
 )
 
 func ToStringPointer(s string) *string {
@@ -239,6 +240,18 @@ func (r *ResourceTemplateV2) GetEnum(property string) []interface{} {
 	return e
 }
 
+func (r *ResourceTemplateV2) GetSchemaProperySupportedVersions(property string) string {
+	l := vast_versions.VersionsSupportingAttributes(r.ResourceName, property)
+	if len(l) == 0 {
+		return "Valid for versions: Unkown"
+	}
+	e := "Valid for versions: "
+	for _, s := range l {
+		e = e + fmt.Sprintf("%v,", s)
+	}
+	return strings.TrimSuffix(e, ",")
+}
+
 func (r ResourceTemplateV2) HasValidatorFunc(s string) bool {
 	_, exists := r.FieldsValidators[s]
 	return exists
@@ -272,6 +285,7 @@ func (r *ResourceTemplateV2) GetSchemaProperyDocument(property string) string {
 		if len(enum) > 0 {
 			out += fmt.Sprintf(" Allowed Values are %v", ListAsStringsList(enum))
 		}
+		out = fmt.Sprintf("(%s) %s", r.GetSchemaProperySupportedVersions(property), out)
 		return out
 	}
 	return ""

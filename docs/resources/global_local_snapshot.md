@@ -67,11 +67,11 @@ resource "vastdata_global_local_snapshot" "local_snapshot" {
 
 ### Optional
 
-- `enabled` (Boolean) Is the snapshot enabled
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is the snapshot enabled
 
 ### Read-Only
 
-- `guid` (String) A unique guid given to the global snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the global snapshot
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--owner_tenant"></a>

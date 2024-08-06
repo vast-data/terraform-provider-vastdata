@@ -48,7 +48,7 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `The access id of the user key`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The access id of the user key`,
 		},
 
 		"secret_key": &schema.Schema{
@@ -58,7 +58,7 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   true,
-			Description: `The secret id of the user key, please note that that the secret id is not encrypted and should be kept in an highly secure backend ,this field will only be returned if pgp_public_key is not provided`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The secret id of the user key, please note that that the secret id is not encrypted and should be kept in an highly secure backend ,this field will only be returned if pgp_public_key is not provided`,
 		},
 
 		"pgp_public_key": &schema.Schema{
@@ -68,7 +68,7 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect`,
 			ForceNew:    true,
 		},
 
@@ -79,7 +79,7 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key`,
 		},
 
 		"enabled": &schema.Schema{
@@ -89,7 +89,7 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Should the key be enabled or disabled`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Should the key be enabled or disabled`,
 
 			Default: true,
 		},

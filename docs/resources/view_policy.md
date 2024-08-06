@@ -155,78 +155,78 @@ resource "vastdata_view_policy" "vpolicy1" {
 
 ### Optional
 
-- `access_flavor` (String) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)
-- `allowed_characters` (String) How to determine the allowed characters in a path
-- `apple_sid` (Boolean) Apple sid
-- `atime_frequency` (String) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.
-- `auth_source` (String) The source of authentication Allowed Values are [PROVIDERS RPC RPC_AND_PROVIDERS]
-- `cluster` (String) Parent Cluster
-- `cluster_id` (Number) Parent Cluster ID
-- `count_views` (Number) Number of Policy related Views
-- `data_create_delete` (Boolean) Create/Delete Files/Directories/Objects
-- `data_modify` (Boolean) Modify data/MD
-- `data_read` (Boolean) Read data
-- `enable_access_to_snapshot_dir_in_subdirs` (Boolean) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
-- `enable_listing_of_snapshot_dir` (Boolean) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
-- `enable_snapshot_lookup` (Boolean) Specifies whether to make the .snapshot directory accessible in subdirectories of the View.
-- `enable_visibility_of_snapshot_dir` (Boolean) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
-- `expose_id_in_fsid` (Boolean)
-- `flavor` (String) Security flavor, which determines how file and directory permissions are applied in multiprotocol views.
-- `gid_inheritance` (String) Determine the way a file inherits GID
-- `log_deleted` (Boolean) Log deleted files/dirs from trash dir
-- `log_full_path` (Boolean) Log full path
-- `log_hostname` (Boolean) Log hostname
-- `log_username` (Boolean) Log username
-- `nfs_all_squash` (List of String) Hosts with all squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to []
-- `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
-- `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
-- `nfs_minimal_protection_level` (String) NFS 4.1 minimal protection level Allowed Values are [NONE SYSTEM KRB_AUTH_ONLY KRB_INTEGRITY KRB_PRIVACY]
-- `nfs_no_squash` (List of String) Hosts with no squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `nfs_posix_acl` (Boolean) Enable POSIX ACL
-- `nfs_read_only` (List of String) Hosts with NFS read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `nfs_read_write` (List of String) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `nfs_return_open_permissions` (Boolean) when using smb use open permissions for files
-- `nfs_root_squash` (List of String) Hosts with root squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `path_length` (String) How to determine the maximum allowed path length Allowed Values are [LCD NPL]
-- `protocols` (List of String) Protocols to audit
-- `protocols_audit` (Block List) (see [below for nested schema](#nestedblock--protocols_audit))
-- `read_only` (List of String) Hosts with NFS read only permissions
-- `read_write` (List of String) Hosts with NFS read/write permissions
-- `s3_bucket_full_control` (String) Hosts with full permissions
-- `s3_bucket_listing` (String) Hosts with full permissions
-- `s3_bucket_read` (String) Hosts with full permissions
-- `s3_bucket_read_acp` (String) Hosts with full permissions
-- `s3_bucket_write` (String) Hosts with full permissions
-- `s3_bucket_write_acp` (String) Hosts with full permissions
-- `s3_object_full_control` (String) Hosts with full permissions
-- `s3_object_read` (String) Hosts with full permissions
-- `s3_object_read_acp` (String) Hosts with full permissions
-- `s3_object_write` (String) Hosts with full permissions
-- `s3_object_write_acp` (String) Hosts with full permissions
-- `s3_read_only` (List of String) Hosts with S3 read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `s3_read_write` (List of String) Hosts with S3 read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `s3_special_chars_support` (Boolean) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols.
-- `s3_visibility` (List of String) A list of usernames for bucket listing permissions
-- `s3_visibility_groups` (List of String) A list of group names for bucket listing permissions
-- `smb_directory_mode` (Number) Default unix type permissions on new folder
-- `smb_directory_mode_padded` (String) Default unix type permissions on new folder
-- `smb_file_mode` (Number) Default unix type permissions on new file
-- `smb_file_mode_padded` (String) Default unix type permissions on new file
-- `smb_is_ca` (Boolean) When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.
-- `smb_read_only` (List of String) Hosts with SMB read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `smb_read_write` (List of String) Hosts with SMB read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
-- `tenant_id` (Number) Tenant ID
-- `tenant_name` (String) Tenant Name
-- `trash_access` (List of String) Hosts with trash permissions
-- `url` (String)
+- `access_flavor` (String) (Valid for versions: 5.0.0,5.1.0) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)
+- `allowed_characters` (String) (Valid for versions: 5.0.0,5.1.0) How to determine the allowed characters in a path
+- `apple_sid` (Boolean) (Valid for versions: 5.0.0,5.1.0) Apple sid
+- `atime_frequency` (String) (Valid for versions: 5.0.0,5.1.0) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.
+- `auth_source` (String) (Valid for versions: 5.0.0,5.1.0) The source of authentication Allowed Values are [PROVIDERS RPC RPC_AND_PROVIDERS]
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0) Parent Cluster
+- `cluster_id` (Number) (Valid for versions: 5.1.0,5.0.0) Parent Cluster ID
+- `count_views` (Number) (Valid for versions: 5.0.0,5.1.0) Number of Policy related Views
+- `data_create_delete` (Boolean) (Valid for versions: 5.0.0,5.1.0) Create/Delete Files/Directories/Objects
+- `data_modify` (Boolean) (Valid for versions: 5.0.0,5.1.0) Modify data/MD
+- `data_read` (Boolean) (Valid for versions: 5.0.0,5.1.0) Read data
+- `enable_access_to_snapshot_dir_in_subdirs` (Boolean) (Valid for versions: 5.1.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
+- `enable_listing_of_snapshot_dir` (Boolean) (Valid for versions: 5.0.0,5.1.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
+- `enable_snapshot_lookup` (Boolean) (Valid for versions: 5.0.0,5.1.0) Specifies whether to make the .snapshot directory accessible in subdirectories of the View.
+- `enable_visibility_of_snapshot_dir` (Boolean) (Valid for versions: 5.1.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.
+- `expose_id_in_fsid` (Boolean) (Valid for versions: 5.1.0,5.0.0)
+- `flavor` (String) (Valid for versions: 5.0.0,5.1.0) Security flavor, which determines how file and directory permissions are applied in multiprotocol views.
+- `gid_inheritance` (String) (Valid for versions: 5.0.0,5.1.0) Determine the way a file inherits GID
+- `log_deleted` (Boolean) (Valid for versions: 5.0.0,5.1.0) Log deleted files/dirs from trash dir
+- `log_full_path` (Boolean) (Valid for versions: 5.0.0,5.1.0) Log full path
+- `log_hostname` (Boolean) (Valid for versions: 5.0.0,5.1.0) Log hostname
+- `log_username` (Boolean) (Valid for versions: 5.0.0,5.1.0) Log username
+- `nfs_all_squash` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with all squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to []
+- `nfs_case_insensitive` (Boolean) (Valid for versions: 5.1.0) Force case insensitivity for NFSv3 and NFSv4
+- `nfs_enforce_tls` (Boolean) (Valid for versions: 5.1.0) Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
+- `nfs_minimal_protection_level` (String) (Valid for versions: 5.0.0,5.1.0) NFS 4.1 minimal protection level Allowed Values are [NONE SYSTEM KRB_AUTH_ONLY KRB_INTEGRITY KRB_PRIVACY]
+- `nfs_no_squash` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with no squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `nfs_posix_acl` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable POSIX ACL
+- `nfs_read_only` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with NFS read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `nfs_read_write` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `nfs_return_open_permissions` (Boolean) (Valid for versions: 5.0.0,5.1.0) when using smb use open permissions for files
+- `nfs_root_squash` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with root squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `path_length` (String) (Valid for versions: 5.0.0,5.1.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]
+- `protocols` (List of String) (Valid for versions: 5.0.0,5.1.0) Protocols to audit
+- `protocols_audit` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--protocols_audit))
+- `read_only` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with NFS read only permissions
+- `read_write` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with NFS read/write permissions
+- `s3_bucket_full_control` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_bucket_listing` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_bucket_read` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_bucket_read_acp` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_bucket_write` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_bucket_write_acp` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_object_full_control` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_object_read` (String) (Valid for versions: 5.1.0,5.0.0) Hosts with full permissions
+- `s3_object_read_acp` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_object_write` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_object_write_acp` (String) (Valid for versions: 5.0.0,5.1.0) Hosts with full permissions
+- `s3_read_only` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with S3 read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `s3_read_write` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with S3 read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `s3_special_chars_support` (Boolean) (Valid for versions: 5.1.0) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols.
+- `s3_visibility` (List of String) (Valid for versions: 5.0.0,5.1.0) A list of usernames for bucket listing permissions
+- `s3_visibility_groups` (List of String) (Valid for versions: 5.0.0,5.1.0) A list of group names for bucket listing permissions
+- `smb_directory_mode` (Number) (Valid for versions: 5.0.0,5.1.0) Default unix type permissions on new folder
+- `smb_directory_mode_padded` (String) (Valid for versions: 5.1.0,5.0.0) Default unix type permissions on new folder
+- `smb_file_mode` (Number) (Valid for versions: 5.0.0,5.1.0) Default unix type permissions on new file
+- `smb_file_mode_padded` (String) (Valid for versions: 5.0.0,5.1.0) Default unix type permissions on new file
+- `smb_is_ca` (Boolean) (Valid for versions: 5.1.0) When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.
+- `smb_read_only` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with SMB read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `smb_read_write` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with SMB read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0) Tenant ID
+- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0) Tenant Name
+- `trash_access` (List of String) (Valid for versions: 5.0.0,5.1.0) Hosts with trash permissions
+- `url` (String) (Valid for versions: 5.0.0,5.1.0)
 - `use32bit_fileid` (Boolean)
-- `use_auth_provider` (Boolean) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source
-- `vip_pools` (List of Number) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write
-- `vippool_permissions` (Block List) List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather (see [below for nested schema](#nestedblock--vippool_permissions))
+- `use_auth_provider` (Boolean) (Valid for versions: 5.1.0,5.0.0) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source
+- `vip_pools` (List of Number) (Valid for versions: 5.1.0,5.0.0) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write
+- `vippool_permissions` (Block List) (Valid for versions: 5.1.0) List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather (see [below for nested schema](#nestedblock--vippool_permissions))
 
 ### Read-Only
 
-- `guid` (String) A uniqe guid given to the view policy
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniqe guid given to the view policy
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--protocols_audit"></a>
@@ -234,15 +234,15 @@ resource "vastdata_view_policy" "vpolicy1" {
 
 Optional:
 
-- `create_delete_files_dirs_objects` (Boolean) Audit operations that create or delete files, directories, or objects.
-- `log_deleted_files_dirs` (Boolean) Log deleted files and directories.
-- `log_full_path` (Boolean) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
-- `log_hostname` (Boolean) Log the accessing Hostname
-- `log_username` (Boolean) Log username of requesting user. Disabled by default
-- `modify_data` (Boolean)
-- `modify_data_md` (Boolean) Audit operations that modify data (including operations that change the file size) and metadata
-- `read_data` (Boolean) Audit operations that read data and metadata
-- `read_data_md` (Boolean)
+- `create_delete_files_dirs_objects` (Boolean) (Valid for versions: 5.1.0) Audit operations that create or delete files, directories, or objects.
+- `log_deleted_files_dirs` (Boolean) (Valid for versions: 5.1.0) Log deleted files and directories.
+- `log_full_path` (Boolean) (Valid for versions: 5.1.0) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
+- `log_hostname` (Boolean) (Valid for versions: 5.1.0) Log the accessing Hostname
+- `log_username` (Boolean) (Valid for versions: 5.1.0) Log username of requesting user. Disabled by default
+- `modify_data` (Boolean) (Valid for versions: 5.1.0)
+- `modify_data_md` (Boolean) (Valid for versions: 5.1.0) Audit operations that modify data (including operations that change the file size) and metadata
+- `read_data` (Boolean) (Valid for versions: 5.1.0) Audit operations that read data and metadata
+- `read_data_md` (Boolean) (Valid for versions: 5.1.0)
 
 
 <a id="nestedblock--vippool_permissions"></a>
@@ -250,8 +250,8 @@ Optional:
 
 Optional:
 
-- `vippool_id` (String) The Vippool ID
-- `vippool_permissions` (String) VIP pool permissions  Allowed Values are [RW RO]
+- `vippool_id` (String) (Valid for versions: 5.1.0) The Vippool ID
+- `vippool_permissions` (String) (Valid for versions: 5.1.0) VIP pool permissions  Allowed Values are [RW RO]
 
 ## Import
 

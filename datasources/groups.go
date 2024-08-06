@@ -26,7 +26,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `A uniqe Identifier of a group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A uniqe Identifier of a group`,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `A uniqe GUID assigned to the group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A uniqe GUID assigned to the group`,
 			},
 
 			"name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `A uniq name given to the group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A uniq name given to the group`,
 			},
 
 			"gid": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The group linux gid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) The group linux gid`,
 			},
 
 			"sid": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `The group SID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) The group SID`,
 			},
 
 			"s3_policies_ids": &schema.Schema{
@@ -66,7 +66,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `List of S3 policies IDs`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) List of S3 policies IDs`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,

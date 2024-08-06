@@ -26,7 +26,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: ``,
+				Description: `(Valid for versions: 5.1.0,5.0.0) `,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: ``,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"machine_account_name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: ``,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"organizational_unit": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: ``,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"ldap_id": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceActiveDirectory() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: ``,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 		},
 	}

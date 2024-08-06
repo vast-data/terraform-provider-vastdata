@@ -78,15 +78,15 @@ resource "vastdata_protection_policy" "protection-policy" {
 
 ### Optional
 
-- `frames` (Block List) List of snapshots schedules (see [below for nested schema](#nestedblock--frames))
-- `indestructible` (Boolean) Is the snapshot indestructable
-- `target_name` (String) The target peer name
-- `target_object_id` (Number) The id of the target peer
-- `url` (String) Direct link to the replication policy
+- `frames` (Block List) (Valid for versions: 5.0.0,5.1.0) List of snapshots schedules (see [below for nested schema](#nestedblock--frames))
+- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is the snapshot indestructable
+- `target_name` (String) (Valid for versions: 5.0.0,5.1.0) The target peer name
+- `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0) The id of the target peer
+- `url` (String) (Valid for versions: 5.0.0,5.1.0) Direct link to the replication policy
 
 ### Read-Only
 
-- `guid` (String) A unique guid given to the  replication peer configuration
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the  replication peer configuration
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--frames"></a>
@@ -94,7 +94,7 @@ resource "vastdata_protection_policy" "protection-policy" {
 
 Optional:
 
-- `every` (String) How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day
+- `every` (String) (Valid for versions: 5.0.0,5.1.0) How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day
 - `keep_local` (String)
 - `keep_remote` (String)
 - `start_at` (String)

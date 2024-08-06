@@ -47,7 +47,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `GUID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) GUID`,
 		},
 
 		"name": &schema.Schema{
@@ -71,7 +71,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.1.0,5.0.0) `,
 		},
 	}
 }

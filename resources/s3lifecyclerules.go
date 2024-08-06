@@ -54,7 +54,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"enabled": &schema.Schema{
@@ -64,7 +64,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: ``,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"prefix": &schema.Schema{
@@ -81,7 +81,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The minimum size of the object`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) The minimum size of the object`,
 		},
 
 		"max_size": &schema.Schema{
@@ -91,7 +91,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The maximum size of the object`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The maximum size of the object`,
 		},
 
 		"expiration_days": &schema.Schema{
@@ -101,7 +101,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The number of days from creation until an object expires`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The number of days from creation until an object expires`,
 		},
 
 		"expiration_date": &schema.Schema{
@@ -111,7 +111,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The expiration date of the object`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) The expiration date of the object`,
 		},
 
 		"expired_obj_delete_marker": &schema.Schema{
@@ -121,7 +121,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Remove expired objects delete markers`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Remove expired objects delete markers`,
 		},
 
 		"noncurrent_days": &schema.Schema{
@@ -131,7 +131,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Number of days after objects become noncurrent`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Number of days after objects become noncurrent`,
 		},
 
 		"newer_noncurrent_versions": &schema.Schema{
@@ -141,7 +141,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The number of newer versions to retain`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The number of newer versions to retain`,
 		},
 
 		"abort_mpu_days_after_initiation": &schema.Schema{
@@ -151,7 +151,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The number of days until expiration after an incomplete multipart upload`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The number of days until expiration after an incomplete multipart upload`,
 		},
 
 		"view_path": &schema.Schema{
@@ -161,7 +161,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The path of the related View`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The path of the related View`,
 		},
 
 		"view_id": &schema.Schema{
@@ -171,7 +171,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The ID of the related View`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The ID of the related View`,
 		},
 	}
 }

@@ -30,20 +30,20 @@ resource "vastdata_dns" "dns1" {
 
 ### Optional
 
-- `cnode_ids` (List of Number)
-- `domain_suffix` (String) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.
-- `enabled` (Boolean) Enable the VAST DNS server configurations
-- `vip` (String) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.
-- `vip_gateway` (String) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.
-- `vip_ipv6` (String) Assigns an IPv6 to the DNS service.
-- `vip_ipv6_gateway` (String) Specifies a gateway IPv6 to external DNS server if on different subnet.
-- `vip_ipv6_subnet_cidr` (Number) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]
-- `vip_subnet_cidr` (Number) Specifies the subnet, as a CIDR index, on which the DNS resides.
-- `vip_vlan` (Number) Specifies a VLAN if needed to enable communication with external DNS server(s).
+- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0)
+- `domain_suffix` (String) (Valid for versions: 5.0.0,5.1.0) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable the VAST DNS server configurations
+- `vip` (String) (Valid for versions: 5.0.0,5.1.0) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.
+- `vip_gateway` (String) (Valid for versions: 5.0.0,5.1.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.
+- `vip_ipv6` (String) (Valid for versions: 5.1.0,5.0.0) Assigns an IPv6 to the DNS service.
+- `vip_ipv6_gateway` (String) (Valid for versions: 5.0.0,5.1.0) Specifies a gateway IPv6 to external DNS server if on different subnet.
+- `vip_ipv6_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]
+- `vip_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0) Specifies the subnet, as a CIDR index, on which the DNS resides.
+- `vip_vlan` (Number) (Valid for versions: 5.0.0,5.1.0) Specifies a VLAN if needed to enable communication with external DNS server(s).
 
 ### Read-Only
 
-- `guid` (String) A uniqe guid assigned to the VAST DNS server configurations
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniqe guid assigned to the VAST DNS server configurations
 - `id` (String) The ID of this resource.
 
 ## Import

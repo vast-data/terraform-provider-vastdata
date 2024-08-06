@@ -47,7 +47,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `A unique guid given to the s3 replication peer configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) A unique guid given to the s3 replication peer configuration`,
 		},
 
 		"name": &schema.Schema{
@@ -64,7 +64,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `Direct link to the s3 replication peer configurations`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Direct link to the s3 replication peer configurations`,
 		},
 
 		"bucket_name": &schema.Schema{
@@ -74,7 +74,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The name of the peer bucket to replicate to`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The name of the peer bucket to replicate to`,
 		},
 
 		"http_protocol": &schema.Schema{
@@ -84,7 +84,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The http protocol user http/https`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The http protocol user http/https`,
 		},
 
 		"type_": &schema.Schema{
@@ -104,7 +104,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `List of http procies`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) List of http procies`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -118,7 +118,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The Bucket AWS region, Valid only when type is AWS_S3`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The Bucket AWS region, Valid only when type is AWS_S3`,
 		},
 
 		"access_key": &schema.Schema{
@@ -131,7 +131,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   true,
-			Description: `The S3 access key`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The S3 access key`,
 		},
 
 		"secret_key": &schema.Schema{
@@ -144,7 +144,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   true,
-			Description: `The S3 secret key`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) The S3 secret key`,
 		},
 
 		"custom_bucket_url": &schema.Schema{
@@ -154,7 +154,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3`,
 		},
 	}
 }

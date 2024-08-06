@@ -36,14 +36,14 @@ resource "vastdata_qos_policy" "qos1" {
 
 ### Optional
 
-- `capacity_limits` (Block List) (see [below for nested schema](#nestedblock--capacity_limits))
-- `io_size_bytes` (Number) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
-- `mode` (String) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]
-- `static_limits` (Block List) (see [below for nested schema](#nestedblock--static_limits))
+- `capacity_limits` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--capacity_limits))
+- `io_size_bytes` (Number) (Valid for versions: 5.0.0,5.1.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
+- `mode` (String) (Valid for versions: 5.0.0,5.1.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]
+- `static_limits` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--static_limits))
 
 ### Read-Only
 
-- `guid` (String) QoS Policy guid
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) QoS Policy guid
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--capacity_limits"></a>
@@ -51,10 +51,10 @@ resource "vastdata_qos_policy" "qos1" {
 
 Optional:
 
-- `max_reads_bw_mbps_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_reads_iops_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_writes_bw_mbps_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_writes_iops_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_reads_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_reads_iops_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_writes_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_writes_iops_per_gb_capacity` (Number) (Valid for versions: 5.1.0,5.0.0) Maximal amount of performance per GB to provide when there is no resource contention
 
 
 <a id="nestedblock--static_limits"></a>
@@ -62,14 +62,14 @@ Optional:
 
 Optional:
 
-- `max_reads_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
-- `max_reads_iops` (Number) Maximal amount of performance to provide when there is no resource contention
-- `max_writes_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
-- `max_writes_iops` (Number) Maximal amount of performance to provide when there is no resource contention
-- `min_reads_bw_mbps` (Number) Minimal amount of performance to provide when there is resource contention
-- `min_reads_iops` (Number) Minimal amount of performance to provide when there is resource contention
-- `min_writes_bw_mbps` (Number) Minimal amount of performance to provide when there is resource contention
-- `min_writes_iops` (Number) Minimal amount of performance to provide when there is resource contention
+- `max_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
+- `max_reads_iops` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_iops` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
+- `min_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0) Minimal amount of performance to provide when there is resource contention
+- `min_reads_iops` (Number) (Valid for versions: 5.0.0,5.1.0) Minimal amount of performance to provide when there is resource contention
+- `min_writes_bw_mbps` (Number) (Valid for versions: 5.1.0,5.0.0) Minimal amount of performance to provide when there is resource contention
+- `min_writes_iops` (Number) (Valid for versions: 5.0.0,5.1.0) Minimal amount of performance to provide when there is resource contention
 
 ## Import
 
