@@ -712,7 +712,8 @@ If there is a need to change the value an empty list it must be secifed and set 
           type: "array"
           items:
             type: "integer"
-          description: "Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather."
+          description: "Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.
+Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write"
         nfs_minimal_protection_level:
           type: "string"
           description: "NFS 4.1 minimal protection level"

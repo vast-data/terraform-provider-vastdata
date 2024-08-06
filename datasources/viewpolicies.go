@@ -450,7 +450,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.`,
+				Description: `Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,

@@ -97,7 +97,7 @@ data "vastdata_view_policy" "view_policy1" {
 - `trash_access` (List of String) Hosts with trash permissions
 - `url` (String)
 - `use32bit_fileid` (Boolean)
-- `vip_pools` (List of Number) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.
+- `vip_pools` (List of Number) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write
 - `vippool_permissions` (List of Object) List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather (see [below for nested schema](#nestedatt--vippool_permissions))
 
 <a id="nestedatt--vippool_permissions"></a>

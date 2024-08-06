@@ -100,7 +100,7 @@ type ViewPolicy struct {
 	Url string `json:"url,omitempty"`
 	// Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.
 	AtimeFrequency string `json:"atime_frequency,omitempty"`
-	// Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.
+	// Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write
 	VipPools []int32 `json:"vip_pools,omitempty"`
 	// NFS 4.1 minimal protection level
 	NfsMinimalProtectionLevel string `json:"nfs_minimal_protection_level,omitempty"`

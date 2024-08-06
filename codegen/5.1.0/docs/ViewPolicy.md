@@ -50,7 +50,7 @@ Name | Type | Description | Notes
 **TenantName** | **string** | Tenant Name | [optional] [default to null]
 **Url** | **string** |  | [optional] [default to null]
 **AtimeFrequency** | **string** | Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file&#x27;s atime value is greater than the atime frequency. Specify as time in seconds. | [optional] [default to null]
-**VipPools** | **[]int32** | Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. | [optional] [default to null]
+**VipPools** | **[]int32** | Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write | [optional] [default to null]
 **NfsMinimalProtectionLevel** | **string** | NFS 4.1 minimal protection level | [optional] [default to null]
 **S3Visibility** | **[]string** | A list of usernames for bucket listing permissions | [optional] [default to null]
 **S3VisibilityGroups** | **[]string** | A list of group names for bucket listing permissions | [optional] [default to null]
