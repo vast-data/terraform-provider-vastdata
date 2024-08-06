@@ -560,7 +560,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `Comma separated vip pool ids.`,
+			Description:           `Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -921,7 +921,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `List of VIP pool permissions`,
+			Description:           `List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather`,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{

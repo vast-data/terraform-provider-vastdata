@@ -119,8 +119,8 @@ resource "vastdata_view_policy" "vpolicy1" {
 - `url` (String)
 - `use32bit_fileid` (Boolean)
 - `use_auth_provider` (Boolean) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source
-- `vip_pools` (List of Number) Comma separated vip pool ids.
-- `vippool_permissions` (Block List) List of VIP pool permissions (see [below for nested schema](#nestedblock--vippool_permissions))
+- `vip_pools` (List of Number) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.
+- `vippool_permissions` (Block List) List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather (see [below for nested schema](#nestedblock--vippool_permissions))
 
 ### Read-Only
 

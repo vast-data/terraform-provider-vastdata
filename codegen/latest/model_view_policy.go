@@ -100,7 +100,7 @@ type ViewPolicy struct {
 	Url string `json:"url,omitempty"`
 	// Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.
 	AtimeFrequency string `json:"atime_frequency,omitempty"`
-	// Comma separated vip pool ids.
+	// Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.
 	VipPools []int32 `json:"vip_pools,omitempty"`
 	// NFS 4.1 minimal protection level
 	NfsMinimalProtectionLevel string `json:"nfs_minimal_protection_level,omitempty"`
@@ -146,6 +146,6 @@ type ViewPolicy struct {
 	// Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
 	NfsEnforceTls bool `json:"nfs_enforce_tls,omitempty"`
 	ProtocolsAudit *ProtocolsAudit `json:"protocols_audit,omitempty"`
-	// List of VIP pool permissions
+	// List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather
 	VippoolPermissions []PermissionsPerVipPool `json:"vippool_permissions,omitempty"`
 }

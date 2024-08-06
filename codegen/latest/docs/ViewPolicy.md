@@ -50,7 +50,7 @@ Name | Type | Description | Notes
 **TenantName** | **string** | Tenant Name | [optional] [default to null]
 **Url** | **string** |  | [optional] [default to null]
 **AtimeFrequency** | **string** | Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file&#x27;s atime value is greater than the atime frequency. Specify as time in seconds. | [optional] [default to null]
-**VipPools** | **[]int32** | Comma separated vip pool ids. | [optional] [default to null]
+**VipPools** | **[]int32** | Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. | [optional] [default to null]
 **NfsMinimalProtectionLevel** | **string** | NFS 4.1 minimal protection level | [optional] [default to null]
 **S3Visibility** | **[]string** | A list of usernames for bucket listing permissions | [optional] [default to null]
 **S3VisibilityGroups** | **[]string** | A list of group names for bucket listing permissions | [optional] [default to null]
@@ -74,7 +74,7 @@ Name | Type | Description | Notes
 **EnableVisibilityOfSnapshotDir** | **bool** | Specifies whether to make the .snapshot directory visible in subdirectories of the View. | [optional] [default to null]
 **NfsEnforceTls** | **bool** | Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None. | [optional] [default to null]
 **ProtocolsAudit** | [***ProtocolsAudit**](ProtocolsAudit.md) |  | [optional] [default to null]
-**VippoolPermissions** | [**[]PermissionsPerVipPool**](PermissionsPerVipPool.md) | List of VIP pool permissions | [optional] [default to null]
+**VippoolPermissions** | [**[]PermissionsPerVipPool**](PermissionsPerVipPool.md) | List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
