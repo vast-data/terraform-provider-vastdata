@@ -74,7 +74,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The version of the source`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) The version of the source`,
 			},
 
 			"remote_version": &schema.Schema{

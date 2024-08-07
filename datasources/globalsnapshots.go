@@ -74,7 +74,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The remote replication peering guid`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) The remote replication peering guid`,
 			},
 
 			"remote_target_path": &schema.Schema{
@@ -110,7 +110,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) `,
+				Description: `(Valid for versions: 5.1.0,5.0.0) `,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{},

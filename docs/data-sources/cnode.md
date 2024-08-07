@@ -27,18 +27,18 @@ data "vastdata_cnode" "cnode1" {
 
 ### Read-Only
 
-- `bmc_fw_version` (String) (Valid for versions: 5.1.0,5.0.0) BMC FW version
-- `cbox` (String) (Valid for versions: 5.1.0,5.0.0) Parent CBox
-- `cbox_id` (Number) (Valid for versions: 5.0.0,5.1.0) Parent CBox id
+- `bmc_fw_version` (String) (Valid for versions: 5.0.0,5.1.0) BMC FW version
+- `cbox` (String) (Valid for versions: 5.0.0,5.1.0) Parent CBox
+- `cbox_id` (Number) (Valid for versions: 5.1.0,5.0.0) Parent CBox id
 - `cbox_uid` (String) (Valid for versions: 5.0.0,5.1.0) Unique Parent CBox identifier
-- `cluster` (String) (Valid for versions: 5.1.0,5.0.0) Parent Cluster
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0) Parent Cluster
 - `data_rdma_port` (Number) (Valid for versions: 5.0.0,5.1.0)
-- `data_tcp_port` (Number) (Valid for versions: 5.1.0,5.0.0)
+- `data_tcp_port` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `display_state` (String) (Valid for versions: 5.0.0,5.1.0)
 - `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) cnode enabled
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0)
 - `host_label` (String) (Valid for versions: 5.0.0,5.1.0) Host label, used to label container, e.g. 11.0.0.1-4000
-- `hostname` (String) (Valid for versions: 5.0.0,5.1.0) Host Name
+- `hostname` (String) (Valid for versions: 5.1.0,5.0.0) Host Name
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `ip` (String) (Valid for versions: 5.0.0,5.1.0) Currently used IP Address, bond of ip1 and ip2
 - `ip1` (String) (Valid for versions: 5.0.0,5.1.0) 1st internal IP Address
@@ -46,7 +46,7 @@ data "vastdata_cnode" "cnode1" {
 - `ipv6` (String) (Valid for versions: 5.0.0,5.1.0) External IPv6 Address
 - `is_mgmt` (Boolean) (Valid for versions: 5.0.0,5.1.0) The cnode is running management
 - `led_status` (String) (Valid for versions: 5.0.0,5.1.0)
-- `mgmt_ip` (String) (Valid for versions: 5.0.0,5.1.0) Management IP
+- `mgmt_ip` (String) (Valid for versions: 5.1.0,5.0.0) Management IP
 - `new_name` (String) (Valid for versions: 5.0.0,5.1.0)
 - `os_version` (String) (Valid for versions: 5.0.0,5.1.0) Node OS version
 - `platform_rdma_port` (Number) (Valid for versions: 5.0.0,5.1.0)

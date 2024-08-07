@@ -63,9 +63,9 @@ resource "vastdata_replication_peers" "clusterA-clusterB-peer" {
 
 - `is_local` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is the source of the replication local (this host is the source)
 - `leading_vip` (String) (Valid for versions: 5.0.0,5.1.0) The vip provided for the replication peer configuration
-- `peer_name` (String) (Valid for versions: 5.0.0,5.1.0) The name of the peer cluster
+- `peer_name` (String) (Valid for versions: 5.1.0,5.0.0) The name of the peer cluster
 - `pool_id` (Number) (Valid for versions: 5.0.0,5.1.0) The replication Vippool id
-- `remote_version` (String) (Valid for versions: 5.0.0,5.1.0) The version of the remote peer
+- `remote_version` (String) (Valid for versions: 5.1.0,5.0.0) The version of the remote peer
 - `remote_vip_range` (String) (Valid for versions: 5.0.0,5.1.0) The vip range which were reported by the peer
 - `secure_mode` (String) (Valid for versions: 5.0.0,5.1.0) Is the connection secure
 - `url` (String) (Valid for versions: 5.0.0,5.1.0) Direct url of the replication peer configurations

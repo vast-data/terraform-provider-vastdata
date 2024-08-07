@@ -38,7 +38,7 @@ data "vastdata_user" "user1" {
 - `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0) Leading Group GID
 - `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0) Leading Group Name
 - `local` (Boolean) (Valid for versions: 5.0.0,5.1.0) IS this a local user
-- `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0) The user primary group SID
+- `primary_group_sid` (String) (Valid for versions: 5.1.0,5.0.0) The user primary group SID
 - `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0) List S3 policies IDs
 - `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is S3 superuser
 - `sid` (String) (Valid for versions: 5.0.0,5.1.0) The user SID

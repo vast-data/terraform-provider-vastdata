@@ -86,7 +86,7 @@ resource "vastdata_protection_policy" "protection-policy" {
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the  replication peer configuration
+- `guid` (String) (Valid for versions: 5.1.0,5.0.0) A unique guid given to the  replication peer configuration
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--frames"></a>

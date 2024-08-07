@@ -47,7 +47,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) A unique guid given to the  replication peer configuration`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) A unique guid given to the  replication peer configuration`,
 		},
 
 		"name": &schema.Schema{

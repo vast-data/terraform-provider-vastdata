@@ -33,12 +33,12 @@ data "vastdata_tenant" "tenant1" {
 
 ### Read-Only
 
-- `ad_provider_id` (Number) (Valid for versions: 5.1.0,5.0.0) AD provider ID
+- `ad_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0) AD provider ID
 - `client_ip_ranges` (List of Object) (Valid for versions: 5.0.0,5.1.0) Array of source IP ranges to allow for the tenant. (see [below for nested schema](#nestedatt--client_ip_ranges))
-- `default_others_share_level_perm` (String) (Valid for versions: 5.1.0,5.0.0) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]
-- `encryption_crn` (String) (Valid for versions: 5.0.0,5.1.0) Tenant's encryption group unique identifier
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniq guid given to the tenant
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0) A uniq id given to the tenant
+- `default_others_share_level_perm` (String) (Valid for versions: 5.0.0,5.1.0) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]
+- `encryption_crn` (String) (Valid for versions: 5.1.0,5.0.0) Tenant's encryption group unique identifier
+- `guid` (String) (Valid for versions: 5.1.0,5.0.0) A uniq guid given to the tenant
+- `id` (Number) (Valid for versions: 5.1.0,5.0.0) A uniq id given to the tenant
 - `is_nfsv42_supported` (Boolean) (Valid for versions: 5.1.0) Enable NFSv4.2
 - `ldap_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0) Open-LDAP provider ID specified separately by the user
 - `nis_provider_id` (Number) (Valid for versions: 5.1.0,5.0.0) NIS provider ID

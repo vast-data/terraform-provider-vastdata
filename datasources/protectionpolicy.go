@@ -26,7 +26,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) A unique id given to the replication peer configuration`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) A unique id given to the replication peer configuration`,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) A unique guid given to the  replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A unique guid given to the  replication peer configuration`,
 			},
 
 			"name": &schema.Schema{
@@ -74,7 +74,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The prefix to be given to the replicated data`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) The prefix to be given to the replicated data`,
 			},
 
 			"clone_type": &schema.Schema{
@@ -135,7 +135,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Is the snapshot indestructable`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Is the snapshot indestructable`,
 			},
 		},
 	}

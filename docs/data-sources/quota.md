@@ -41,7 +41,7 @@ data "vastdata_quota" "quota3" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.1.0,5.0.0) The name
+- `name` (String) (Valid for versions: 5.0.0,5.1.0) The name
 
 ### Optional
 
@@ -50,28 +50,28 @@ data "vastdata_quota" "quota3" {
 ### Read-Only
 
 - `cluster` (String) (Valid for versions: 5.0.0,5.1.0) Parent Cluster
-- `cluster_id` (Number) (Valid for versions: 5.1.0,5.0.0) Parent Cluster ID
+- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0) Parent Cluster ID
 - `default_email` (String) (Valid for versions: 5.0.0,5.1.0) The default Email if there is no suffix and no address in the providers
-- `default_group_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--default_group_quota))
+- `default_group_quota` (List of Object) (Valid for versions: 5.1.0,5.0.0) (see [below for nested schema](#nestedatt--default_group_quota))
 - `default_user_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--default_user_quota))
 - `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable alarms when users or groups are exceeding their limit
-- `enable_email_providers` (Boolean) (Valid for versions: 5.1.0,5.0.0)
-- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `enable_email_providers` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `grace_period` (String) (Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
 - `group_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--group_quotas))
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) Quota guid
-- `hard_limit` (Number) (Valid for versions: 5.1.0,5.0.0) Hard quota limit
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
 - `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Hard inodes quota limit
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `is_user_quota` (Boolean) (Valid for versions: 5.0.0,5.1.0)
 - `num_blocked_users` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `num_exceeded_users` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `path` (String) (Valid for versions: 5.1.0,5.0.0) Directory path
-- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Percent of used capacity out of the hard limit
-- `percent_inodes` (Number) (Valid for versions: 5.1.0,5.0.0) Percent of used inodes out of the hard limit
+- `percent_capacity` (Number) (Valid for versions: 5.1.0,5.0.0) Percent of used capacity out of the hard limit
+- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Percent of used inodes out of the hard limit
 - `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
 - `pretty_state` (String) (Valid for versions: 5.0.0,5.1.0)
 - `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Soft quota limit
-- `soft_limit_inodes` (Number) (Valid for versions: 5.1.0,5.0.0) Soft inodes quota limit
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit
 - `state` (String) (Valid for versions: 5.0.0,5.1.0)
 - `system_id` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0) Tenant Name

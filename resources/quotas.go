@@ -115,7 +115,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Grace period expiration time`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Grace period expiration time`,
 		},
 
 		"soft_limit": &schema.Schema{
@@ -135,7 +135,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Hard quota limit`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Hard quota limit`,
 		},
 
 		"hard_limit_inodes": &schema.Schema{
@@ -185,7 +185,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Used capacity in TB`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Used capacity in TB`,
 		},
 
 		"used_effective_capacity": &schema.Schema{
@@ -255,7 +255,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"is_user_quota": &schema.Schema{
@@ -275,7 +275,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"num_exceeded_users": &schema.Schema{
@@ -357,7 +357,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) The system ID of the quota`,
+						Description: `(Valid for versions: 5.1.0,5.0.0) The system ID of the quota`,
 					},
 
 					"soft_limit": &schema.Schema{
@@ -377,7 +377,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) The size hard limit in bytes`,
+						Description: `(Valid for versions: 5.1.0,5.0.0) The size hard limit in bytes`,
 					},
 
 					"sof_limit_inodes": &schema.Schema{
@@ -397,7 +397,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) The hard limit in inode number`,
+						Description: `(Valid for versions: 5.1.0,5.0.0) The hard limit in inode number`,
 					},
 
 					"grace_period": &schema.Schema{
@@ -484,7 +484,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Optional:         true,
 						Sensitive:        false,
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `(Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period at the format of HH:MM:SS`,
+						Description:      `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 				},
 			},
@@ -493,6 +493,194 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 		"user_quotas": &schema.Schema{
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("user_quotas"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"grace_period": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
+
+						Computed:         true,
+						Optional:         true,
+						Sensitive:        false,
+						ValidateDiagFunc: utils.GracePeriodFormatValidation,
+						Description:      `(Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period at the format of HH:MM:SS`,
+					},
+
+					"time_to_block": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("time_to_block"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Grace period expiration time`,
+					},
+
+					"soft_limit": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Soft quota limit`,
+					},
+
+					"hard_limit": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Hard quota limit`,
+					},
+
+					"hard_limit_inodes": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit_inodes"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Hard inodes quota limit`,
+					},
+
+					"soft_limit_inodes": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit_inodes"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit`,
+					},
+
+					"used_inodes": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_inodes"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Used inodes`,
+					},
+
+					"used_capacity": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_capacity"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Used capacity in bytes`,
+					},
+
+					"is_accountable": &schema.Schema{
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("is_accountable"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) `,
+					},
+
+					"quota_system_id": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("quota_system_id"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.1.0,5.0.0) `,
+					},
+
+					"entity": &schema.Schema{
+						Type:          schema.TypeList,
+						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("entity"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.0.0,5.1.0) `,
+
+						Elem: &schema.Resource{
+							Schema: map[string]*schema.Schema{
+
+								"name": &schema.Schema{
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("name"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.0.0,5.1.0) The name of the entity`,
+								},
+
+								"vast_id": &schema.Schema{
+									Type:          schema.TypeInt,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("vast_id"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
+								},
+
+								"email": &schema.Schema{
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
+								},
+
+								"is_group": &schema.Schema{
+									Type:          schema.TypeBool,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+								},
+
+								"identifier": &schema.Schema{
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
+
+									Required: true,
+								},
+
+								"identifier_type": &schema.Schema{
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		"group_quotas": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("group_quotas"),
 
 			Computed:    true,
 			Optional:    true,
@@ -600,7 +788,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) `,
+						Description: `(Valid for versions: 5.1.0,5.0.0) `,
 					},
 
 					"entity": &schema.Schema{
@@ -628,236 +816,48 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 								"vast_id": &schema.Schema{
 									Type:          schema.TypeInt,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("vast_id"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) `,
-								},
-
-								"email": &schema.Schema{
-									Type:          schema.TypeString,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) `,
-								},
-
-								"is_group": &schema.Schema{
-									Type:          schema.TypeBool,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) `,
-								},
-
-								"identifier": &schema.Schema{
-									Type:          schema.TypeString,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
-
-									Required: true,
-								},
-
-								"identifier_type": &schema.Schema{
-									Type:          schema.TypeString,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) `,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-
-		"group_quotas": &schema.Schema{
-			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("group_quotas"),
-
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) `,
-
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-
-					"grace_period": &schema.Schema{
-						Type:          schema.TypeString,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
-
-						Computed:         true,
-						Optional:         true,
-						Sensitive:        false,
-						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS`,
-					},
-
-					"time_to_block": &schema.Schema{
-						Type:          schema.TypeString,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("time_to_block"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) Grace period expiration time`,
-					},
-
-					"soft_limit": &schema.Schema{
-						Type:          schema.TypeInt,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) Soft quota limit`,
-					},
-
-					"hard_limit": &schema.Schema{
-						Type:          schema.TypeInt,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) Hard quota limit`,
-					},
-
-					"hard_limit_inodes": &schema.Schema{
-						Type:          schema.TypeInt,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit_inodes"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) Hard inodes quota limit`,
-					},
-
-					"soft_limit_inodes": &schema.Schema{
-						Type:          schema.TypeInt,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit_inodes"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit`,
-					},
-
-					"used_inodes": &schema.Schema{
-						Type:          schema.TypeInt,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_inodes"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) Used inodes`,
-					},
-
-					"used_capacity": &schema.Schema{
-						Type:          schema.TypeInt,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_capacity"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) Used capacity in bytes`,
-					},
-
-					"is_accountable": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("is_accountable"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) `,
-					},
-
-					"quota_system_id": &schema.Schema{
-						Type:          schema.TypeInt,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("quota_system_id"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) `,
-					},
-
-					"entity": &schema.Schema{
-						Type:          schema.TypeList,
-						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("entity"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0) `,
-
-						Elem: &schema.Resource{
-							Schema: map[string]*schema.Schema{
-
-								"name": &schema.Schema{
-									Type:          schema.TypeString,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("name"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) The name of the entity`,
-								},
-
-								"vast_id": &schema.Schema{
-									Type:          schema.TypeInt,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("vast_id"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) `,
-								},
-
-								"email": &schema.Schema{
-									Type:          schema.TypeString,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) `,
-								},
-
-								"is_group": &schema.Schema{
-									Type:          schema.TypeBool,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
-
-									Computed:    true,
-									Optional:    true,
-									Sensitive:   false,
-									Description: `(Valid for versions: 5.0.0,5.1.0) `,
-								},
-
-								"identifier": &schema.Schema{
-									Type:          schema.TypeString,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
-
-									Required: true,
-								},
-
-								"identifier_type": &schema.Schema{
-									Type:          schema.TypeString,
-									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
 
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
 									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+								},
+
+								"email": &schema.Schema{
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+								},
+
+								"is_group": &schema.Schema{
+									Type:          schema.TypeBool,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
+								},
+
+								"identifier": &schema.Schema{
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
+
+									Required: true,
+								},
+
+								"identifier_type": &schema.Schema{
+									Type:          schema.TypeString,
+									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
+
+									Computed:    true,
+									Optional:    true,
+									Sensitive:   false,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
 								},
 							},
 						},

@@ -57,7 +57,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) A uniq name given to the view`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) A uniq name given to the view`,
 		},
 
 		"path": &schema.Schema{
@@ -144,7 +144,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Create the directory if it does not exist`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Create the directory if it does not exist`,
 		},
 
 		"s3_versioning": &schema.Schema{
@@ -194,7 +194,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Protocols exposed by this view`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Protocols exposed by this view`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -208,7 +208,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
 		},
 
 		"bucket_owner": &schema.Schema{
@@ -228,7 +228,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) List of bucket creators users`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) List of bucket creators users`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -242,7 +242,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) List of bucket creators groups`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) List of bucket creators groups`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -286,7 +286,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Physical Capacity`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Physical Capacity`,
 		},
 
 		"logical_capacity": &schema.Schema{
@@ -296,7 +296,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Logical Capacity`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Logical Capacity`,
 		},
 
 		"nfs_interop_flags": &schema.Schema{

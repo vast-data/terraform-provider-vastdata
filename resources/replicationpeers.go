@@ -104,7 +104,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) The version of the remote peer`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) The version of the remote peer`,
 		},
 
 		"is_local": &schema.Schema{
@@ -124,7 +124,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) The name of the peer cluster`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) The name of the peer cluster`,
 		},
 
 		"secure_mode": &schema.Schema{

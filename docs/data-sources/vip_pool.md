@@ -27,16 +27,16 @@ data "vastdata_vip_pool" "pool1" {
 
 ### Read-Only
 
-- `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0) Numver of active interfaces
+- `active_interfaces` (Number) (Valid for versions: 5.1.0,5.0.0) Numver of active interfaces
 - `cluster` (String) (Valid for versions: 5.0.0,5.1.0) Parent Cluster
-- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0) IDs of cnodes comprising cnode group
+- `cnode_ids` (List of Number) (Valid for versions: 5.1.0,5.0.0) IDs of cnodes comprising cnode group
 - `domain_name` (String) (Valid for versions: 5.0.0,5.1.0)
 - `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enables L3 CNode access
 - `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) True for enable, False for disable
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniq guid given to the vippool
 - `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0) Gateway IP Address
 - `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0) GW IPv6 Address
-- `id` (Number) (Valid for versions: 5.1.0,5.0.0) A uniq id given to the vippool
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0) A uniq id given to the vippool
 - `ip_ranges` (List of Object) (Valid for versions: 5.0.0,5.1.0) IP ranges (see [below for nested schema](#nestedatt--ip_ranges))
 - `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0) Peer ASN
 - `port_membership` (String) (Valid for versions: 5.0.0,5.1.0) The port on the CNode this pool will use. Right, left or all
@@ -44,7 +44,7 @@ data "vastdata_vip_pool" "pool1" {
 - `state` (String) (Valid for versions: 5.0.0,5.1.0)
 - `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0) IPv4 Subnet CIDR prefix (bits number)
 - `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0) IPv6 Subnet CIDR prefix (bits number)
-- `url` (String) (Valid for versions: 5.0.0,5.1.0)
+- `url` (String) (Valid for versions: 5.1.0,5.0.0)
 - `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0) VAST ASN
 - `vlan` (Number) (Valid for versions: 5.0.0,5.1.0) VIPPool VLAN
 - `vms_preferred` (Boolean) (Valid for versions: 5.0.0,5.1.0) If true, CNodes participating in the vip pool are preferred in VMS host election

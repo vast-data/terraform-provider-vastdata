@@ -28,6 +28,6 @@ data "vastdata_active_directory" "ad1" {
 ### Read-Only
 
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0)
-- `id` (Number) (Valid for versions: 5.1.0,5.0.0)
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `ldap_id` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `organizational_unit` (String) (Valid for versions: 5.0.0,5.1.0)

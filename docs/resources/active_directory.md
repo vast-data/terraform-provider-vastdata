@@ -48,7 +48,7 @@ resource "vastdata_active_directory" "ad1" {
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0)
+- `guid` (String) (Valid for versions: 5.1.0,5.0.0)
 - `id` (String) The ID of this resource.
 
 ## Import

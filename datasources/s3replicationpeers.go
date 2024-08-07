@@ -34,7 +34,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) A unique guid given to the s3 replication peer configuration`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) A unique guid given to the s3 replication peer configuration`,
 			},
 
 			"name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The name of the s3 replication peer configuration`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) The name of the s3 replication peer configuration`,
 			},
 
 			"url": &schema.Schema{

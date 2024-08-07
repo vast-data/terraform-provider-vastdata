@@ -76,7 +76,7 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) path to replicate`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) path to replicate`,
 		},
 
 		"target_exported_dir": &schema.Schema{

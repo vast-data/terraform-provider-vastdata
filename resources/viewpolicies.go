@@ -96,7 +96,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"LCD", "NPL"}),
-			Description:      `(Valid for versions: 5.0.0,5.1.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
+			Description:      `(Valid for versions: 5.1.0,5.0.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
 		},
 
 		"allowed_characters": &schema.Schema{
@@ -106,7 +106,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) How to determine the allowed characters in a path`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) How to determine the allowed characters in a path`,
 		},
 
 		"use32bit_fileid": &schema.Schema{
@@ -136,7 +136,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source`,
 
 			Default: false,
 		},
@@ -188,7 +188,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -388,7 +388,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
 		},
 
 		"s3_bucket_write_acp": &schema.Schema{
@@ -398,7 +398,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
 		},
 
 		"s3_object_full_control": &schema.Schema{
@@ -448,7 +448,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
 		},
 
 		"smb_file_mode": &schema.Schema{
@@ -488,7 +488,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Default unix type permissions on new folder`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Default unix type permissions on new folder`,
 		},
 
 		"cluster": &schema.Schema{
@@ -508,7 +508,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Parent Cluster ID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Parent Cluster ID`,
 		},
 
 		"tenant_id": &schema.Schema{
@@ -560,7 +560,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.1.0,5.0.0) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -624,7 +624,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Protocols to audit`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Protocols to audit`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -648,7 +648,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Modify data/MD`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Modify data/MD`,
 		},
 
 		"data_read": &schema.Schema{

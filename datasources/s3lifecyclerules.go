@@ -58,7 +58,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
 			},
 
 			"min_size": &schema.Schema{
@@ -114,7 +114,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The number of newer versions to retain`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) The number of newer versions to retain`,
 			},
 
 			"abort_mpu_days_after_initiation": &schema.Schema{
@@ -122,7 +122,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) The number of days until expiration after an incomplete multipart upload`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) The number of days until expiration after an incomplete multipart upload`,
 			},
 
 			"view_path": &schema.Schema{

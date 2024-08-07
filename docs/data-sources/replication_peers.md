@@ -37,4 +37,4 @@ data "vastdata_replication_peers" "peer1" {
 - `remote_vip_range` (String) (Valid for versions: 5.0.0,5.1.0) The vip range which were reported by the peer
 - `secure_mode` (String) (Valid for versions: 5.0.0,5.1.0) Is the connection secure
 - `url` (String) (Valid for versions: 5.0.0,5.1.0) Direct url of the replication peer configurations
-- `version` (String) (Valid for versions: 5.0.0,5.1.0) The version of the source
+- `version` (String) (Valid for versions: 5.1.0,5.0.0) The version of the source

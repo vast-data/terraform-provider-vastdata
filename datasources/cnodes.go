@@ -154,7 +154,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"enabled": &schema.Schema{
@@ -178,7 +178,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Parent CBox`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Parent CBox`,
 			},
 
 			"cbox_uid": &schema.Schema{
@@ -194,7 +194,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Parent CBox id`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) Parent CBox id`,
 			},
 
 			"cluster": &schema.Schema{
@@ -202,7 +202,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Parent Cluster`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Parent Cluster`,
 			},
 
 			"os_version": &schema.Schema{
@@ -218,7 +218,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) BMC FW version`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) BMC FW version`,
 			},
 
 			"vms_preferred": &schema.Schema{
@@ -242,7 +242,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Management IP`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) Management IP`,
 			},
 
 			"hostname": &schema.Schema{
@@ -250,7 +250,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Host Name`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) Host Name`,
 			},
 		},
 	}

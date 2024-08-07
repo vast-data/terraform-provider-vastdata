@@ -74,7 +74,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
 			},
 
 			"allowed_characters": &schema.Schema{
@@ -98,7 +98,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) `,
+				Description: `(Valid for versions: 5.1.0,5.0.0) `,
 			},
 
 			"use_auth_provider": &schema.Schema{
@@ -106,7 +106,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source`,
 			},
 
 			"auth_source": &schema.Schema{
@@ -230,7 +230,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Enable POSIX ACL`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Enable POSIX ACL`,
 			},
 
 			"nfs_return_open_permissions": &schema.Schema{
@@ -306,7 +306,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 			},
 
 			"s3_bucket_write": &schema.Schema{
@@ -314,7 +314,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
 			},
 
 			"s3_bucket_write_acp": &schema.Schema{
@@ -338,7 +338,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 			},
 
 			"s3_object_read_acp": &schema.Schema{
@@ -346,7 +346,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
 			},
 
 			"s3_object_write": &schema.Schema{
@@ -354,7 +354,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
 			},
 
 			"s3_object_write_acp": &schema.Schema{
@@ -426,7 +426,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Tenant Name`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) Tenant Name`,
 			},
 
 			"url": &schema.Schema{
@@ -470,7 +470,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) A list of usernames for bucket listing permissions`,
+				Description: `(Valid for versions: 5.1.0,5.0.0) A list of usernames for bucket listing permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -502,7 +502,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Protocols to audit`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Protocols to audit`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -514,7 +514,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Create/Delete Files/Directories/Objects`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Create/Delete Files/Directories/Objects`,
 			},
 
 			"data_modify": &schema.Schema{

@@ -71,7 +71,7 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) The group SID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The group SID`,
 		},
 
 		"s3_policies_ids": &schema.Schema{

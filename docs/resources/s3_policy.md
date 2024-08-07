@@ -57,11 +57,11 @@ resource "vastdata_s3_policy" "s3policy" {
 
 ### Optional
 
-- `enabled` (Boolean) (Valid for versions: 5.1.0,5.0.0)
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0)
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0) GUID
+- `guid` (String) (Valid for versions: 5.1.0,5.0.0) GUID
 - `id` (String) The ID of this resource.
 
 ## Import

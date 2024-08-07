@@ -5,13 +5,32 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 
+	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 )
 
 var permissions_attributes []string = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
+
+var min_vippool_permission_version, _ = version.NewVersion("5.1.0")
+
+func _convert_vip_pools_to_permission_per_vip_pool(i interface{}, m *map[string]interface{}) {
+	t := map[string]string{}
+	l, is_list := i.([]interface{})
+	if is_list {
+		for _, v := range l {
+			t[fmt.Sprintf("%v", v)] = "RW"
+		}
+	}
+	if len(t) > 0 {
+		(*m)["permission_per_vip_pool"] = t
+	}
+
+}
 
 func __vippool_permission_convert(i interface{}) map[string]string {
 	permission_per_vip_pool := map[string]string{}
@@ -143,6 +162,11 @@ func ViewPolicyCreateFunc(ctx context.Context, _client interface{}, attr map[str
 		setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
 
 	}
+	vippool, vippoolexists := data["vip_pools"]
+	ver := metadata.GetClusterVersion()
+	if vippoolexists && ver.GreaterThanOrEqual(min_vippool_permission_version) {
+		_convert_vip_pools_to_permission_per_vip_pool(vippool, &data)
+	}
 	vippool_permission_convert_for_create(ctx, &data)
 	return DefaultCreateFunc(ctx, _client, attr, data, headers)
 }
@@ -193,7 +217,27 @@ func ViewPolicyUpdateFunc(ctx context.Context, _client interface{}, attr map[str
 		setupS3SpecialCharsSupport(ctx, fmt.Sprintf("%v", z), &data)
 
 	}
-	vippool_permission_convert_for_update(ctx, d, &data)
+	vippool, vippoolexists := data["vip_pools"]
+	tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyUpdateFunc] - Vippool Exist : %v , vippool %v", vippoolexists, vippool))
+	ver := metadata.GetClusterVersion()
+	if vippoolexists && ver.GreaterThanOrEqual(min_vippool_permission_version) {
+		tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyUpdateFunc] - Converting vip_pools %v to permission_per_vip_pool format", vippool))
+		_convert_vip_pools_to_permission_per_vip_pool(vippool, &data)
+		pr, _ := data["permission_per_vip_pool"]
+		tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyUpdateFunc] - converted vip_pools %v to permission_per_vip_pool format, result :%v", vippool, pr))
+
+	}
+	old, new := d.GetChange("vip_pools")
+	tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyUpdateFunc] - vip_pools changed from %v To %v", old, new)) // this is a special case where the vip_pools was defined but set to []
+	if (!vippoolexists) && (!reflect.DeepEqual(old, new)) {
+		vippoolexists = true
+		data["permission_per_vip_pool"] = map[string]string{}
+		data["vip_pools"] = []int{}
+	}
+
+	if !vippoolexists {
+		vippool_permission_convert_for_update(ctx, d, &data)
+	}
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
 }
 
@@ -208,12 +252,21 @@ func ViewPolicyGetFunc(ctx context.Context, _client interface{}, attr map[string
 		return response, err
 	}
 	l := []map[string]interface{}{}
+	r := []int{}
 	i, e := u["permission_per_vip_pool"]
 	if e {
 		for k, v := range i.(map[string]interface{}) {
 			l = append(l, map[string]interface{}{"vippool_id": k, "vippool_permissions": v})
+			n, converr := strconv.Atoi(k)
+			if converr != nil {
+				tflog.Debug(ctx, fmt.Sprintf("[ViewPolicyGetFunc] - Can not convert %v to integer, error: %v", k, converr))
+			} else {
+				r = append(r, n)
+			}
 		}
 		u["vippool_permissions"] = l
+		u["vip_pools"] = r
+
 	}
 
 	return FakeHttpResponse(response, u)

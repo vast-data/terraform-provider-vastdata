@@ -29,7 +29,7 @@ resource "vastdata_nis" "nis1" {
 
 ### Optional
 
-- `hosts` (List of String) (Valid for versions: 5.1.0,5.0.0) List of ip addresses/hostnames of nis servers
+- `hosts` (List of String) (Valid for versions: 5.0.0,5.1.0) List of ip addresses/hostnames of nis servers
 
 ### Read-Only
 

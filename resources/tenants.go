@@ -47,7 +47,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) A uniq guid given to the tenant`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) A uniq guid given to the tenant`,
 		},
 
 		"name": &schema.Schema{
@@ -114,7 +114,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
@@ -187,7 +187,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) AD provider ID`,
+			Description: `(Valid for versions: 5.1.0,5.0.0) AD provider ID`,
 		},
 
 		"ldap_provider_id": &schema.Schema{

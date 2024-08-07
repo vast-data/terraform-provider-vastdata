@@ -31,7 +31,7 @@ resource "vastdata_group" "group1" {
 ### Optional
 
 - `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0) List of S3 policies IDs
-- `sid` (String) (Valid for versions: 5.1.0,5.0.0) The group SID
+- `sid` (String) (Valid for versions: 5.0.0,5.1.0) The group SID
 
 ### Read-Only
 
