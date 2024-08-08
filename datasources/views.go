@@ -26,7 +26,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) A uniqe ID used to identify the View`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A uniqe ID used to identify the View`,
 			},
 
 			"guid": &schema.Schema{
@@ -306,7 +306,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
-										Description: `(Valid for versions: 5.1.0,5.0.0) `,
+										Description: `(Valid for versions: 5.0.0,5.1.0) `,
 									},
 
 									"uid_or_gid": &schema.Schema{
@@ -322,7 +322,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    false,
 										Required:    true,
 										Optional:    false,
-										Description: `(Valid for versions: 5.1.0,5.0.0) `,
+										Description: `(Valid for versions: 5.0.0,5.1.0) `,
 									},
 
 									"fqdn": &schema.Schema{
@@ -344,7 +344,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) QoS Policy ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) QoS Policy ID`,
 			},
 
 			"is_seamless": &schema.Schema{

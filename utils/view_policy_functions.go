@@ -15,7 +15,7 @@ import (
 )
 
 var permissions_attributes []string = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
-
+var viewpolicy_boolean_attributes []string = []string{"smb_is_ca", "enable_access_to_snapshot_dir_in_subdirs", "enable_visibility_of_snapshot_dir", "nfs_enforce_tls", "nfs_case_insensitive"}
 var min_vippool_permission_version, _ = version.NewVersion("5.1.0")
 
 func _convert_vip_pools_to_permission_per_vip_pool(i interface{}, m *map[string]interface{}) {
@@ -144,6 +144,7 @@ func ViewPolicyPermissionsSetup(m map[string]interface{}, i interface{}, ctx con
 
 	//	tflog.Debug(ctx, fmt.Sprintf("Data recived for ViewPolicy Before Creation nfs_read_write %v", d.Get("nfs_read_write")))
 	//	tflog.Debug(ctx, fmt.Sprintf("Data recived for ViewPolicy Before Creation nfs_all_squash %v", d.Get("nfs_all_squash")))
+	FieldsUpdate(ctx, viewpolicy_boolean_attributes, d, &m)
 	return m, nil
 }
 
@@ -238,6 +239,7 @@ func ViewPolicyUpdateFunc(ctx context.Context, _client interface{}, attr map[str
 	if !vippoolexists {
 		vippool_permission_convert_for_update(ctx, d, &data)
 	}
+
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
 }
 
@@ -270,4 +272,9 @@ func ViewPolicyGetFunc(ctx context.Context, _client interface{}, attr map[string
 	}
 
 	return FakeHttpResponse(response, u)
+}
+
+func ViewPolicyBeforePatchFunc(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	FieldsUpdate(ctx, viewpolicy_boolean_attributes, d, &m)
+	return m, nil
 }

@@ -50,7 +50,7 @@ data "vastdata_snapshot" "snapshot1" {
 ### Read-Only
 
 - `expiration_time` (String) (Valid for versions: 5.0.0,5.1.0) When will this sanpshot expire
-- `guid` (String) (Valid for versions: 5.1.0,5.0.0) A unique guid given to the snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the snapshot
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0) A unique id given to the snapshot
 - `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is it indestructable
 - `path` (String) (Valid for versions: 5.0.0,5.1.0) The path to make snapshot from

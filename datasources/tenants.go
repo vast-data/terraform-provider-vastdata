@@ -26,7 +26,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) A uniq id given to the tenant`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A uniq id given to the tenant`,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) A uniq guid given to the tenant`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A uniq guid given to the tenant`,
 			},
 
 			"name": &schema.Schema{
@@ -163,7 +163,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) NIS provider ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) NIS provider ID`,
 			},
 
 			"encryption_crn": &schema.Schema{
@@ -171,7 +171,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Tenant's encryption group unique identifier`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Tenant's encryption group unique identifier`,
 			},
 
 			"is_nfsv42_supported": &schema.Schema{

@@ -43,7 +43,7 @@ resource "vastdata_view" "example-view" {
 - `allow_s3_anonymous_access` (Boolean) (Valid for versions: 5.0.0,5.1.0) Allow S3 anonymous access
 - `auto_commit` (String) (Valid for versions: 5.1.0) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
 - `bucket` (String) (Valid for versions: 5.0.0,5.1.0) S3 Bucket name
-- `bucket_creators` (List of String) (Valid for versions: 5.1.0,5.0.0) List of bucket creators users
+- `bucket_creators` (List of String) (Valid for versions: 5.0.0,5.1.0) List of bucket creators users
 - `bucket_creators_groups` (List of String) (Valid for versions: 5.0.0,5.1.0) List of bucket creators groups
 - `bucket_owner` (String) (Valid for versions: 5.0.0,5.1.0) S3 Bucket owner
 - `cluster` (String) (Valid for versions: 5.0.0,5.1.0) Parent Cluster
@@ -59,10 +59,10 @@ resource "vastdata_view" "example-view" {
 - `logical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Logical Capacity
 - `max_retention_period` (String) (Valid for versions: 5.1.0) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
 - `min_retention_period` (String) (Valid for versions: 5.1.0) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
-- `name` (String) (Valid for versions: 5.1.0,5.0.0) A uniq name given to the view
+- `name` (String) (Valid for versions: 5.0.0,5.1.0) A uniq name given to the view
 - `nfs_interop_flags` (String) (Valid for versions: 5.0.0,5.1.0) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]
-- `physical_capacity` (Number) (Valid for versions: 5.1.0,5.0.0) Physical Capacity
-- `protocols` (List of String) (Valid for versions: 5.1.0,5.0.0) Protocols exposed by this view
+- `physical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Physical Capacity
+- `protocols` (List of String) (Valid for versions: 5.0.0,5.1.0) Protocols exposed by this view
 - `qos_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0) QoS Policy ID
 - `s3_locks` (Boolean) (Valid for versions: 5.0.0,5.1.0) S3 Object Lock
 - `s3_locks_retention_mode` (String) (Valid for versions: 5.0.0,5.1.0) S3 Locks retention mode

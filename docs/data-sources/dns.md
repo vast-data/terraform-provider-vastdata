@@ -33,9 +33,9 @@ data "vastdata_dns" "dns1" {
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniqe guid assigned to the VAST DNS server configurations
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0) A uniqe id given to the VAST DNS server configurations
 - `vip` (String) (Valid for versions: 5.0.0,5.1.0) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.
-- `vip_gateway` (String) (Valid for versions: 5.1.0,5.0.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.
+- `vip_gateway` (String) (Valid for versions: 5.0.0,5.1.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.
 - `vip_ipv6` (String) (Valid for versions: 5.0.0,5.1.0) Assigns an IPv6 to the DNS service.
 - `vip_ipv6_gateway` (String) (Valid for versions: 5.0.0,5.1.0) Specifies a gateway IPv6 to external DNS server if on different subnet.
-- `vip_ipv6_subnet_cidr` (Number) (Valid for versions: 5.1.0,5.0.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]
+- `vip_ipv6_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]
 - `vip_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0) Specifies the subnet, as a CIDR index, on which the DNS resides.
 - `vip_vlan` (Number) (Valid for versions: 5.0.0,5.1.0) Specifies a VLAN if needed to enable communication with external DNS server(s).

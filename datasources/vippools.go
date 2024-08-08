@@ -98,7 +98,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) IDs of cnodes comprising cnode group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) IDs of cnodes comprising cnode group`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -118,7 +118,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"domain_name": &schema.Schema{
@@ -191,7 +191,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Numver of active interfaces`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Numver of active interfaces`,
 			},
 
 			"enable_l3": &schema.Schema{

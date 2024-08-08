@@ -30,9 +30,9 @@ data "vastdata_protection_policy" "policy1" {
 - `clone_type` (String) (Valid for versions: 5.0.0,5.1.0) The type the replication Allowed Values are [NATIVE_REPLICATION]
 - `frames` (List of Object) (Valid for versions: 5.0.0,5.1.0) List of snapshots schedules (see [below for nested schema](#nestedatt--frames))
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the  replication peer configuration
-- `id` (Number) (Valid for versions: 5.1.0,5.0.0) A unique id given to the replication peer configuration
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0) A unique id given to the replication peer configuration
 - `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is the snapshot indestructable
-- `prefix` (String) (Valid for versions: 5.1.0,5.0.0) The prefix to be given to the replicated data
+- `prefix` (String) (Valid for versions: 5.0.0,5.1.0) The prefix to be given to the replicated data
 - `target_name` (String) (Valid for versions: 5.0.0,5.1.0) The target peer name
 - `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0) The id of the target peer
 - `url` (String) (Valid for versions: 5.0.0,5.1.0) Direct link to the replication policy

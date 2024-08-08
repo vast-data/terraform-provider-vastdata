@@ -31,7 +31,7 @@ data "vastdata_protected_path" "protected_path1" {
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) guid
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0) protection policy id
-- `remote_tenant_guid` (String) (Valid for versions: 5.1.0,5.0.0) The Remote tenant guid
+- `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0) The Remote tenant guid
 - `source_dir` (String) (Valid for versions: 5.0.0,5.1.0) path to replicate
 - `target_exported_dir` (String) (Valid for versions: 5.0.0,5.1.0) where to replicate on the remote
 - `target_id` (Number) (Valid for versions: 5.0.0,5.1.0) The remote target object id

@@ -56,19 +56,19 @@ resource "vastdata_s3_life_cycle_rule" "s3-bucket-view-lifecycle-rule" {
 
 - `abort_mpu_days_after_initiation` (Number) (Valid for versions: 5.0.0,5.1.0) The number of days until expiration after an incomplete multipart upload
 - `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0)
-- `expiration_date` (String) (Valid for versions: 5.1.0,5.0.0) The expiration date of the object
-- `expiration_days` (Number) (Valid for versions: 5.1.0,5.0.0) The number of days from creation until an object expires
-- `expired_obj_delete_marker` (Boolean) (Valid for versions: 5.1.0,5.0.0) Remove expired objects delete markers
+- `expiration_date` (String) (Valid for versions: 5.0.0,5.1.0) The expiration date of the object
+- `expiration_days` (Number) (Valid for versions: 5.0.0,5.1.0) The number of days from creation until an object expires
+- `expired_obj_delete_marker` (Boolean) (Valid for versions: 5.0.0,5.1.0) Remove expired objects delete markers
 - `max_size` (Number) (Valid for versions: 5.0.0,5.1.0) The maximum size of the object
 - `min_size` (Number) (Valid for versions: 5.0.0,5.1.0) The minimum size of the object
-- `newer_noncurrent_versions` (Number) (Valid for versions: 5.1.0,5.0.0) The number of newer versions to retain
+- `newer_noncurrent_versions` (Number) (Valid for versions: 5.0.0,5.1.0) The number of newer versions to retain
 - `noncurrent_days` (Number) (Valid for versions: 5.0.0,5.1.0) Number of days after objects become noncurrent
 - `view_id` (Number) (Valid for versions: 5.0.0,5.1.0) The ID of the related View
-- `view_path` (String) (Valid for versions: 5.1.0,5.0.0) The path of the related View
+- `view_path` (String) (Valid for versions: 5.0.0,5.1.0) The path of the related View
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.1.0,5.0.0)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0)
 - `id` (String) The ID of this resource.
 
 ## Import

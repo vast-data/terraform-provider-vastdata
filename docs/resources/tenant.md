@@ -32,7 +32,7 @@ resource "vastdata_tenant" "tenant1" {
 
 ### Optional
 
-- `ad_provider_id` (Number) (Valid for versions: 5.1.0,5.0.0) AD provider ID
+- `ad_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0) AD provider ID
 - `allow_disabled_users` (Boolean) (Valid for versions: 5.1.0) Allow IO from users whose Active Directory accounts are explicitly disabled.
 - `allow_locked_users` (Boolean) (Valid for versions: 5.1.0) Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.
 - `client_ip_ranges` (Block List) (Valid for versions: 5.0.0,5.1.0) Array of source IP ranges to allow for the tenant. (see [below for nested schema](#nestedblock--client_ip_ranges))
@@ -42,7 +42,7 @@ resource "vastdata_tenant" "tenant1" {
 - `ldap_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0) Open-LDAP provider ID specified separately by the user
 - `nis_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0) NIS provider ID
 - `posix_primary_provider` (String) (Valid for versions: 5.0.0,5.1.0) POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]
-- `smb_administrators_group_name` (String) (Valid for versions: 5.1.0,5.0.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.
+- `smb_administrators_group_name` (String) (Valid for versions: 5.0.0,5.1.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.
 - `smb_privileged_group_full_access` (Boolean) (Valid for versions: 5.1.0) True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.
 - `smb_privileged_group_sid` (String) (Valid for versions: 5.0.0,5.1.0) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.
 - `smb_privileged_user_name` (String) (Valid for versions: 5.0.0,5.1.0) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'
@@ -55,7 +55,7 @@ resource "vastdata_tenant" "tenant1" {
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.1.0,5.0.0) A uniq guid given to the tenant
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniq guid given to the tenant
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--client_ip_ranges"></a>

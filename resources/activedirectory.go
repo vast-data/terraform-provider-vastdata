@@ -47,7 +47,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"machine_account_name": &schema.Schema{

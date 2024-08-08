@@ -78,7 +78,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
 			},
 
 			"group_searchbase": &schema.Schema{
@@ -246,7 +246,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.0.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"uid_member_value_property_name": &schema.Schema{
@@ -270,7 +270,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Use LDAPS for Auto-Discovery`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Use LDAPS for Auto-Discovery`,
 			},
 
 			"is_vms_auth_provider": &schema.Schema{
@@ -286,7 +286,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed: false,
 				Required: false,
 				Optional: true,
-				Description: `(Valid for versions: 5.1.0,5.0.0) When set to True - users/groups from non-joined domain POSIX attributes are supported,
+				Description: `(Valid for versions: 5.0.0,5.1.0) When set to True - users/groups from non-joined domain POSIX attributes are supported,
 when set to False - Posix attributes of users/groups from non-joined domain are not supported.
 As a condition Global catalog needs to be configured to support Posix attributes.
 `,

@@ -28,5 +28,5 @@ data "vastdata_nis" "nis1" {
 ### Read-Only
 
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniq guid given to the nis server configuration
-- `hosts` (List of String) (Valid for versions: 5.1.0,5.0.0) List of ip addresses/hostnames of nis servers
-- `id` (Number) (Valid for versions: 5.1.0,5.0.0) A uniq id given to the nis server configuration
+- `hosts` (List of String) (Valid for versions: 5.0.0,5.1.0) List of ip addresses/hostnames of nis servers
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0) A uniq id given to the nis server configuration

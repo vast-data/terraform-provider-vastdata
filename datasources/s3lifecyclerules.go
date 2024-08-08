@@ -114,7 +114,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) The number of newer versions to retain`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) The number of newer versions to retain`,
 			},
 
 			"abort_mpu_days_after_initiation": &schema.Schema{

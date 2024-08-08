@@ -84,7 +84,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) List of supplementary GID list`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) List of supplementary GID list`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -176,7 +176,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) IS this a local user`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) IS this a local user`,
 		},
 
 		"allow_create_bucket": &schema.Schema{

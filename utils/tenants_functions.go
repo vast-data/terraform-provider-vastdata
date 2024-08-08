@@ -11,6 +11,8 @@ import (
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
+var tenant_booleans []string = []string{"use_smb_privileged_user", "use_smb_privileged_group", "smb_privileged_group_full_access"}
+
 type GenericInt64ID struct {
 	Id int64 `json:"id,omitempty"`
 }
@@ -49,4 +51,14 @@ func ConvertVippoolToIDs(i interface{}, ctx context.Context, d *schema.ResourceD
 	}
 	d.Set("vippool_ids", vippool_ids)
 	return nil
+}
+
+func TenantBeforePostFunc(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	FieldsUpdate(ctx, tenant_booleans, d, &m)
+	return m, nil
+}
+
+func TenantBeforePatchFunc(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	FieldsUpdate(ctx, tenant_booleans, d, &m)
+	return m, nil
 }

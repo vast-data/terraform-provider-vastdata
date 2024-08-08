@@ -47,7 +47,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) A uniq guid given to the tenant`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) A uniq guid given to the tenant`,
 		},
 
 		"name": &schema.Schema{
@@ -114,7 +114,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
 		},
 
 		"default_others_share_level_perm": &schema.Schema{
@@ -187,7 +187,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) AD provider ID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) AD provider ID`,
 		},
 
 		"ldap_provider_id": &schema.Schema{
@@ -659,6 +659,12 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Tenant.Elem(), d, &data, "", false)
 
+	var before_post_error error
+	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
+
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
@@ -769,6 +775,12 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Tenant"))
 	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Tenant.Elem(), d, &data, "", false)
+
+	var before_patch_error error
+	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")

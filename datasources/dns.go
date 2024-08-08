@@ -58,7 +58,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
 			},
 
 			"enabled": &schema.Schema{
@@ -118,7 +118,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
 			},
 
 			"vip_ipv6_gateway": &schema.Schema{

@@ -31,6 +31,6 @@ data "vastdata_s3_policy" "s3policy" {
 - `groups` (List of String) (Valid for versions: 5.0.0,5.1.0)
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) GUID
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0)
-- `is_replicated` (Boolean) (Valid for versions: 5.1.0,5.0.0)
+- `is_replicated` (Boolean) (Valid for versions: 5.0.0,5.1.0)
 - `policy` (String) (Valid for versions: 5.0.0,5.1.0)
 - `users` (List of String) (Valid for versions: 5.0.0,5.1.0)

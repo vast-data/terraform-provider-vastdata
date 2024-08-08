@@ -48,7 +48,7 @@ resource "vastdata_s3_replication_peers" "s3peer-aws" {
 ### Optional
 
 - `access_key` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0) The S3 access key
-- `aws_region` (String) (Valid for versions: 5.1.0,5.0.0) The Bucket AWS region, Valid only when type is AWS_S3
+- `aws_region` (String) (Valid for versions: 5.0.0,5.1.0) The Bucket AWS region, Valid only when type is AWS_S3
 - `bucket_name` (String) (Valid for versions: 5.0.0,5.1.0) The name of the peer bucket to replicate to
 - `custom_bucket_url` (String) (Valid for versions: 5.0.0,5.1.0) The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3
 - `http_protocol` (String) (Valid for versions: 5.0.0,5.1.0) The http protocol user http/https

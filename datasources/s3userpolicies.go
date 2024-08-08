@@ -82,7 +82,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"enabled": &schema.Schema{

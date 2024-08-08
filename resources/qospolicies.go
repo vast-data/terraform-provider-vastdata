@@ -148,7 +148,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) Maximal amount of performance to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"min_writes_iops": &schema.Schema{
@@ -213,7 +213,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_writes_iops_per_gb_capacity": &schema.Schema{

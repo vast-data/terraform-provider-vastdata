@@ -122,7 +122,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) The user primary group SID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) The user primary group SID`,
 			},
 
 			"sids": &schema.Schema{
@@ -130,7 +130,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) supplementary SID list`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) supplementary SID list`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -150,7 +150,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Allow create bucket`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Allow create bucket`,
 			},
 
 			"allow_delete_bucket": &schema.Schema{

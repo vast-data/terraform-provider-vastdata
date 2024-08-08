@@ -138,7 +138,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Assigns an IPv6 to the DNS service.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Assigns an IPv6 to the DNS service.`,
 		},
 
 		"vip_ipv6_subnet_cidr": &schema.Schema{

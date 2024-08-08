@@ -118,7 +118,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) The Bucket AWS region, Valid only when type is AWS_S3`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The Bucket AWS region, Valid only when type is AWS_S3`,
 		},
 
 		"access_key": &schema.Schema{

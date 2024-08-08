@@ -54,7 +54,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"enabled": &schema.Schema{
@@ -101,7 +101,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) The number of days from creation until an object expires`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The number of days from creation until an object expires`,
 		},
 
 		"expiration_date": &schema.Schema{
@@ -111,7 +111,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) The expiration date of the object`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The expiration date of the object`,
 		},
 
 		"expired_obj_delete_marker": &schema.Schema{
@@ -121,7 +121,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Remove expired objects delete markers`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Remove expired objects delete markers`,
 		},
 
 		"noncurrent_days": &schema.Schema{
@@ -141,7 +141,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) The number of newer versions to retain`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The number of newer versions to retain`,
 		},
 
 		"abort_mpu_days_after_initiation": &schema.Schema{
@@ -161,7 +161,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) The path of the related View`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The path of the related View`,
 		},
 
 		"view_id": &schema.Schema{

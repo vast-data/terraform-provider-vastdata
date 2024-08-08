@@ -52,7 +52,7 @@ resource "vastdata_qos_policy" "qos1" {
 Optional:
 
 - `max_reads_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_reads_iops_per_gb_capacity` (Number) (Valid for versions: 5.1.0,5.0.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_reads_iops_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention
 - `max_writes_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention
 - `max_writes_iops_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention
 
@@ -63,7 +63,7 @@ Optional:
 Optional:
 
 - `max_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
-- `max_reads_iops` (Number) (Valid for versions: 5.1.0,5.0.0) Maximal amount of performance to provide when there is no resource contention
+- `max_reads_iops` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
 - `max_writes_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
 - `max_writes_iops` (Number) (Valid for versions: 5.0.0,5.1.0) Maximal amount of performance to provide when there is no resource contention
 - `min_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0) Minimal amount of performance to provide when there is resource contention

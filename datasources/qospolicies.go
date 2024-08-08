@@ -124,7 +124,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.1.0,5.0.0) Minimal amount of performance to provide when there is resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0) Minimal amount of performance to provide when there is resource contention`,
 						},
 
 						"max_writes_iops": &schema.Schema{
@@ -177,7 +177,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.1.0,5.0.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 						},
 					},
 				},

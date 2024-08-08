@@ -96,7 +96,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"LCD", "NPL"}),
-			Description:      `(Valid for versions: 5.1.0,5.0.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
 		},
 
 		"allowed_characters": &schema.Schema{
@@ -106,7 +106,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) How to determine the allowed characters in a path`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) How to determine the allowed characters in a path`,
 		},
 
 		"use32bit_fileid": &schema.Schema{
@@ -126,7 +126,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"use_auth_provider": &schema.Schema{
@@ -188,7 +188,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -388,7 +388,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 		},
 
 		"s3_bucket_write_acp": &schema.Schema{
@@ -398,7 +398,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 		},
 
 		"s3_object_full_control": &schema.Schema{
@@ -418,7 +418,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 		},
 
 		"s3_object_read_acp": &schema.Schema{
@@ -448,7 +448,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 		},
 
 		"smb_file_mode": &schema.Schema{
@@ -624,7 +624,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Protocols to audit`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Protocols to audit`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -648,7 +648,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Modify data/MD`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Modify data/MD`,
 		},
 
 		"data_read": &schema.Schema{
@@ -2003,6 +2003,12 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ViewPolicy"))
 	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ViewPolicy.Elem(), d, &data, "", false)
+
+	var before_patch_error error
+	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")

@@ -82,7 +82,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) The Remote tenant guid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) The Remote tenant guid`,
 			},
 
 			"target_id": &schema.Schema{

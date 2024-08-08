@@ -138,7 +138,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Attrirbute mapping for gid number`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for gid number`,
 
 			Default: "gidNumber",
 		},
@@ -198,7 +198,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Attrirbute mapping for posix account`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for posix account`,
 
 			Default: "posixAccount",
 		},
@@ -210,7 +210,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Attrirbute mapping for posix account`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for posix account`,
 
 			Default: "posixGroup",
 		},
@@ -278,7 +278,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0) `,
 		},
 
 		"query_groups_mode": &schema.Schema{
@@ -319,7 +319,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 
 			Default: "uid",
 		},
@@ -367,7 +367,7 @@ func getResourceLdapSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
 		},
 
 		"use_ldaps": &schema.Schema{

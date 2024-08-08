@@ -3,6 +3,7 @@ package vast_versions
 import (
 	"reflect"
 	"regexp"
+	"sort"
 	"strings"
 
 	version "github.com/hashicorp/go-version"
@@ -63,5 +64,6 @@ func VersionsSupportingAttributes(struct_name string, attribute_name string) []s
 			l = append(l, k)
 		}
 	}
+	sort.Strings(l)
 	return l
 }

@@ -34,8 +34,8 @@ data "vastdata_global_snapshot" "global_snapshot1" {
 - `loanee_root_path` (String) (Valid for versions: 5.0.0,5.1.0) The path where to store the snapshot on a Target
 - `loanee_tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0) The tenant ID of the target
 - `owner_root_snapshot` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--owner_root_snapshot))
-- `owner_tenant` (List of Object) (Valid for versions: 5.1.0,5.0.0) (see [below for nested schema](#nestedatt--owner_tenant))
-- `remote_target_guid` (String) (Valid for versions: 5.1.0,5.0.0) The remote replication peering guid
+- `owner_tenant` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--owner_tenant))
+- `remote_target_guid` (String) (Valid for versions: 5.0.0,5.1.0) The remote replication peering guid
 - `remote_target_id` (Number) (Valid for versions: 5.0.0,5.1.0) The remote replication peering id
 - `remote_target_path` (String) (Valid for versions: 5.0.0,5.1.0) The path on the remote cluster
 

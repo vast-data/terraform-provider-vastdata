@@ -66,7 +66,7 @@ func DataSourceQuota() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Directory path`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Directory path`,
 			},
 
 			"pretty_grace_period": &schema.Schema{
@@ -82,7 +82,7 @@ func DataSourceQuota() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
 			},
 
 			"time_to_block": &schema.Schema{
@@ -266,7 +266,7 @@ func DataSourceQuota() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Percent of used capacity out of the hard limit`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Percent of used capacity out of the hard limit`,
 			},
 
 			"default_user_quota": &schema.Schema{
@@ -335,7 +335,7 @@ func DataSourceQuota() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -470,7 +470,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.1.0,5.0.0) `,
+							Description: `(Valid for versions: 5.0.0,5.1.0) `,
 						},
 
 						"quota_system_id": &schema.Schema{
@@ -600,7 +600,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.1.0,5.0.0) Soft inodes quota limit`,
+							Description: `(Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit`,
 						},
 
 						"used_inodes": &schema.Schema{

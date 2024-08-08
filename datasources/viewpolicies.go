@@ -98,7 +98,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
 
 			"use_auth_provider": &schema.Schema{
@@ -314,7 +314,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 			},
 
 			"s3_bucket_write_acp": &schema.Schema{
@@ -346,7 +346,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 			},
 
 			"s3_object_write": &schema.Schema{
@@ -354,7 +354,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Hosts with full permissions`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Hosts with full permissions`,
 			},
 
 			"s3_object_write_acp": &schema.Schema{
@@ -394,7 +394,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Default unix type permissions on new folder`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Default unix type permissions on new folder`,
 			},
 
 			"cluster": &schema.Schema{
@@ -426,7 +426,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) Tenant Name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Tenant Name`,
 			},
 
 			"url": &schema.Schema{
@@ -470,7 +470,7 @@ func DataSourceViewPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.0.0) A list of usernames for bucket listing permissions`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) A list of usernames for bucket listing permissions`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

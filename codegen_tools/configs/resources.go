@@ -84,7 +84,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"vippool_ids": utils.ListsDiffSupress,
 		},
-	}, ResourceTemplateV2{
+		BeforePostFunc:  utils.TenantBeforePostFunc,
+		BeforePatchFunc: utils.TenantBeforePatchFunc,
+	},
+	ResourceTemplateV2{
 		ResourceName:             "QosPolicy",
 		Path:                     ToStringPointer("qospolicies"),
 		Model:                    api_latest.QosPolicy{},
@@ -245,6 +248,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
 		BeforePostFunc:           utils.ViewPolicyPermissionsSetup,
+		BeforePatchFunc:          utils.ViewPolicyBeforePatchFunc,
 		ListsNamesMap: map[string][]string{"nfs_read_write": []string{"address"},
 			"nfs_root_squash": []string{"address"},
 			"read_write":      []string{"address"},

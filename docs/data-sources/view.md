@@ -59,7 +59,7 @@ data "vastdata_view" "view1" {
 - `directory` (Boolean) (Valid for versions: 5.0.0,5.1.0) Create the directory if it does not exist
 - `files_retention_mode` (String) (Valid for versions: 5.1.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniqe GUID assigned to the View
-- `id` (Number) (Valid for versions: 5.1.0,5.0.0) A uniqe ID used to identify the View
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0) A uniqe ID used to identify the View
 - `ignore_oos` (Boolean) (Valid for versions: 5.1.0) Ignore oos
 - `is_remote` (Boolean) (Valid for versions: 5.0.0,5.1.0)
 - `is_seamless` (Boolean) (Valid for versions: 5.1.0) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
@@ -72,7 +72,7 @@ data "vastdata_view" "view1" {
 - `physical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Physical Capacity
 - `policy_id` (Number) (Valid for versions: 5.0.0,5.1.0) Associated view policy ID
 - `protocols` (List of String) (Valid for versions: 5.0.0,5.1.0) Protocols exposed by this view
-- `qos_policy_id` (Number) (Valid for versions: 5.1.0,5.0.0) QoS Policy ID
+- `qos_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0) QoS Policy ID
 - `s3_locks` (Boolean) (Valid for versions: 5.0.0,5.1.0) S3 Object Lock
 - `s3_locks_retention_mode` (String) (Valid for versions: 5.0.0,5.1.0) S3 Locks retention mode
 - `s3_locks_retention_period` (String) (Valid for versions: 5.0.0,5.1.0) Period should be positive in format like 0d|2d|1y|2y

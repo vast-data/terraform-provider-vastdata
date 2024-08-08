@@ -37,10 +37,10 @@ resource "vastdata_ldap" "ldap1" {
 
 ### Optional
 
-- `active_directory` (String) (Valid for versions: 5.1.0,5.0.0)
+- `active_directory` (String) (Valid for versions: 5.0.0,5.1.0)
 - `binddn` (String) (Valid for versions: 5.0.0,5.1.0) Distinguished name of LDAP superuser
 - `bindpw` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0) Password for the LDAP superuser
-- `gid_number` (String) (Valid for versions: 5.1.0,5.0.0) Attrirbute mapping for gid number
+- `gid_number` (String) (Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for gid number
 - `group_login_name` (String) (Valid for versions: 5.0.0,5.1.0) The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.
 - `group_searchbase` (String) (Valid for versions: 5.0.0,5.1.0) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
 - `is_vms_auth_provider` (Boolean) (Valid for versions: 5.0.0,5.1.0) Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.
@@ -48,9 +48,9 @@ resource "vastdata_ldap" "ldap1" {
 - `match_user` (String) (Valid for versions: 5.0.0,5.1.0) Attribute mapping for user matching
 - `method` (String) (Valid for versions: 5.0.0,5.1.0) Bind Authentication Method Allowed Values are [simple sasl anonymous]
 - `port` (Number) (Valid for versions: 5.0.0,5.1.0) LDAP server port. 389 (LDAP)  636 (LDAPS)
-- `posix_account` (String) (Valid for versions: 5.1.0,5.0.0) Attrirbute mapping for posix account
+- `posix_account` (String) (Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for posix account
 - `posix_attributes_source` (String) (Valid for versions: 5.0.0,5.1.0)
-- `posix_group` (String) (Valid for versions: 5.1.0,5.0.0) Attrirbute mapping for posix account
+- `posix_group` (String) (Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for posix account
 - `posix_primary_provider` (Boolean) (Valid for versions: 5.0.0,5.1.0) POSIX primary provider
 - `query_groups_mode` (String) (Valid for versions: 5.0.0,5.1.0) Query group mode Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]
 - `query_posix_attributes_from_gc` (Boolean) (Valid for versions: 5.0.0,5.1.0) When set to True - users/groups from non-joined domain POSIX attributes are supported,
@@ -64,10 +64,10 @@ As a condition Global catalog needs to be configured to support Posix attributes
 - `uid_member_value_property_name` (String) (Valid for versions: 5.0.0,5.1.0)
 - `uid_number` (String) (Valid for versions: 5.0.0,5.1.0) Attrirbute mapping for uid number
 - `urls` (List of String) (Valid for versions: 5.0.0,5.1.0) List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
-- `use_auto_discovery` (Boolean) (Valid for versions: 5.1.0,5.0.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
+- `use_auto_discovery` (Boolean) (Valid for versions: 5.0.0,5.1.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
 - `use_ldaps` (Boolean) (Valid for versions: 5.0.0,5.1.0) Use LDAPS for Auto-Discovery
 - `use_tls` (Boolean) (Valid for versions: 5.0.0,5.1.0) configure LDAP with TLS
-- `user_login_name` (String) (Valid for versions: 5.1.0,5.0.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.
+- `user_login_name` (String) (Valid for versions: 5.0.0,5.1.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.
 - `username_property_name` (String) (Valid for versions: 5.0.0,5.1.0) Username property name
 
 ### Read-Only

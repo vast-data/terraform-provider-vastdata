@@ -71,7 +71,7 @@ resource "vastdata_global_local_snapshot" "local_snapshot" {
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.1.0,5.0.0) A unique guid given to the global snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the global snapshot
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--owner_tenant"></a>

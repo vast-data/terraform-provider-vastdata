@@ -105,7 +105,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Optional:         true,
 			Sensitive:        false,
 			ValidateDiagFunc: utils.GracePeriodFormatValidation,
-			Description:      `(Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
 		},
 
 		"time_to_block": &schema.Schema{
@@ -115,7 +115,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Grace period expiration time`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Grace period expiration time`,
 		},
 
 		"soft_limit": &schema.Schema{
@@ -135,7 +135,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Hard quota limit`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Hard quota limit`,
 		},
 
 		"hard_limit_inodes": &schema.Schema{
@@ -185,7 +185,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.0.0) Used capacity in TB`,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Used capacity in TB`,
 		},
 
 		"used_effective_capacity": &schema.Schema{
@@ -357,7 +357,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) The system ID of the quota`,
+						Description: `(Valid for versions: 5.0.0,5.1.0) The system ID of the quota`,
 					},
 
 					"soft_limit": &schema.Schema{
@@ -377,7 +377,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) The size hard limit in bytes`,
+						Description: `(Valid for versions: 5.0.0,5.1.0) The size hard limit in bytes`,
 					},
 
 					"sof_limit_inodes": &schema.Schema{
@@ -397,7 +397,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) The hard limit in inode number`,
+						Description: `(Valid for versions: 5.0.0,5.1.0) The hard limit in inode number`,
 					},
 
 					"grace_period": &schema.Schema{
@@ -510,7 +510,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Optional:         true,
 						Sensitive:        false,
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `(Valid for versions: 5.1.0,5.0.0) Quota enforcement grace period at the format of HH:MM:SS`,
+						Description:      `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 
 					"time_to_block": &schema.Schema{
@@ -600,7 +600,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) `,
+						Description: `(Valid for versions: 5.0.0,5.1.0) `,
 					},
 
 					"entity": &schema.Schema{
@@ -652,7 +652,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
-									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
 								},
 
 								"identifier": &schema.Schema{
@@ -669,7 +669,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
-									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
 								},
 							},
 						},
@@ -788,7 +788,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.0.0) `,
+						Description: `(Valid for versions: 5.0.0,5.1.0) `,
 					},
 
 					"entity": &schema.Schema{
@@ -820,7 +820,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
-									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
 								},
 
 								"email": &schema.Schema{
@@ -830,7 +830,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Computed:    true,
 									Optional:    true,
 									Sensitive:   false,
-									Description: `(Valid for versions: 5.1.0,5.0.0) `,
+									Description: `(Valid for versions: 5.0.0,5.1.0) `,
 								},
 
 								"is_group": &schema.Schema{
