@@ -64,14 +64,14 @@ resource "vastdata_user" "user1" {
 - `primary_group_sid` (String) The user primary group SID
 - `s3_policies_ids` (List of Number) List S3 policies IDs
 - `s3_superuser` (Boolean) Is S3 superuser
-- `sid` (String) The user SID
-- `sids` (List of String) supplementary SID list
 - `uid` (Number) The user unix UID
 
 ### Read-Only
 
 - `guid` (String) A uniq guid given to the user
 - `id` (String) The ID of this resource.
+- `sid` (String) The user SID
+- `sids` (List of String) supplementary SID list
 
 ## Import
 
