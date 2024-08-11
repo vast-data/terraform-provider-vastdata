@@ -11,7 +11,7 @@ import (
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
-var tenant_booleans []string = []string{"use_smb_privileged_user", "use_smb_privileged_group", "smb_privileged_group_full_access"}
+var tenant_booleans []string = []string{"use_smb_privileged_user", "use_smb_privileged_group", "smb_privileged_group_full_access", "is_nfsv42_supported", "allow_locked_users", "allow_disabled_users"}
 
 type GenericInt64ID struct {
 	Id int64 `json:"id,omitempty"`
