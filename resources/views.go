@@ -390,7 +390,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 								},
 
 								"uid_or_gid": &schema.Schema{
-									Type:          schema.TypeString,
+									Type:          schema.TypeInt,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("uid_or_gid"),
 
 									Computed:    true,

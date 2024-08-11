@@ -310,7 +310,7 @@ func DataSourceView() *schema.Resource {
 									},
 
 									"uid_or_gid": &schema.Schema{
-										Type:        schema.TypeString,
+										Type:        schema.TypeInt,
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
