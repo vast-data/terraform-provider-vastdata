@@ -81,12 +81,12 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("gids"),
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) List of supplementary GID list`,
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      codegen_configs.GetResourceByName("User").GetAttributeDiffFunc("gids"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `(Valid for versions: 5.0.0,5.1.0) List of supplementary GID list`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -97,19 +97,12 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("groups"),
 
-<<<<<<< HEAD
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) List of supplementary Group list`,
-=======
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      codegen_configs.GetResourceByName("User").GetAttributeDiffFunc("groups"),
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `List of supplementary Group list`,
->>>>>>> main
+			Description:           `(Valid for versions: 5.0.0,5.1.0) List of supplementary Group list`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -224,19 +217,12 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("s3_policies_ids"),
 
-<<<<<<< HEAD
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) List S3 policies IDs`,
-=======
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      codegen_configs.GetResourceByName("User").GetAttributeDiffFunc("s3_policies_ids"),
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `List S3 policies IDs`,
->>>>>>> main
+			Description:           `(Valid for versions: 5.0.0,5.1.0) List S3 policies IDs`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
