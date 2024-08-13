@@ -16,7 +16,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DestFile:                 ToStringPointer("user.go"),
 		IgnoreFields:             NewStringSet("Id"),
 		RequiredIdentifierFields: NewStringSet("name"),
+		ComputedFields:           NewStringSet("sid", "sids"),
 		OptionalIdentifierFields: NewStringSet(),
+		BeforePatchFunc:          utils.UserBeforePatchFunc,
 		ListsNamesMap:            map[string][]string{"access_keys": []string{"access_key", "enabled"}},
 		Generate:                 true,
 		ResponseGetByURL:         false,
@@ -25,6 +27,11 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"gids":            utils.ListsDiffSupress,
+			"groups":          utils.ListsDiffSupress,
+			"s3_policies_ids": utils.ListsDiffSupress,
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Group",

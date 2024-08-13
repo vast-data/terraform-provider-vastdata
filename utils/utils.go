@@ -32,7 +32,7 @@ func FieldsUpdate(ctx context.Context, fields []string, d *schema.ResourceData, 
 			continue
 		}
 		old, new := d.GetChange(i)
-		tflog.Debug(ctx, fmt.Sprintf("[SmbPermissionsSetup] - Old:%v , New:%v", old, new))
+		tflog.Debug(ctx, fmt.Sprintf("[FieldsUpdate] - Old:%v , New:%v", old, new))
 		if old == nil || new == nil { // creation time can generate nil especially if no default is provided
 			(*m)[i] = false
 
