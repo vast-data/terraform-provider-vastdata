@@ -191,10 +191,12 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("protocols"),
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Protocols exposed by this view`,
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("View").GetAttributeDiffFunc("protocols"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `(Valid for versions: 5.0.0,5.1.0) Protocols exposed by this view`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,

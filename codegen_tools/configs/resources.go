@@ -306,6 +306,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			"default_retention_period": utils.ValidateRetention,
 			"auto_commit":              utils.ValidateRetention,
 		},
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"protocols": utils.ListsDiffSupress,
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ViewShareAcl",
