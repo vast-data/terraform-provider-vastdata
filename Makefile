@@ -6,6 +6,7 @@ VERSION=0.0.1
 OS_ARCH=x86_64
 SWAGGER_CODEGEN_FILE=swagger-codegen-cli-3.0.41.jar
 SWAGGER_CODEGEN_URL= https://repo1.maven.org/maven2/io/swagger/codegen/v3/swagger-codegen-cli/3.0.41/
+USER_AGENT_UPDATE_FILE = ./vast-client/user_agent_version.go
 
 apifiles:=$(wildcard api/*/api.yaml)
 getVer = echo "${1}" |cut -d / -f 2 -
@@ -32,6 +33,7 @@ clean:
 	rm -rf $(BUILD_DEST)/*_*/
 	rm -rf $(BUILD_DEST)/{*.zip,*.tar,*.tar.gz,*.json,*.sig}
 	rm -rf docs
+	rm -rf $(USER_AGENT_UPDATE_FILE)
 
 $(BUILD_DIR)/swagger-codegen-cli.jar:
 	(! test -e $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE)  && wget $(SWAGGER_CODEGEN_URL)$(SWAGGER_CODEGEN_FILE) -O $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE)) || ( test -e $(BUILD_DIR)/$(SWAGGER_CODEGEN_FILE))
@@ -57,6 +59,16 @@ sort-versions: codegen
 	cp -av codegen/$$(cat /tmp/versions.txt |sort -V|tail -1) codegen/latest
 	cp -av api/$$(cat /tmp/versions.txt |sort -V|tail -1)/api.yaml codegen/latest
 
+build-user-agent-file:
+	tag=$$(git rev-parse HEAD); \
+	echo $${tag}}; \
+	if git describe --exact-match --tags $$(git log -n1 --pretty='%h'); then \
+		tag=$$(git describe --exact-match --tags $$(git log -n1 --pretty='%h')); \
+	fi; \
+	echo  -e "package vast_client \\n\\n func init() { \\n user_agent_version=\"$${tag}\" \\n }" > $(USER_AGENT_UPDATE_FILE) ;\
+	gofmt -w $(USER_AGENT_UPDATE_FILE) 
+
+
 build-provider: sort-versions
 	export BUILD_VERSIONS="$(BUILD_VERSIONS)"; \
 	cd codegen_tools; \
@@ -78,7 +90,7 @@ build: $(BUILD_DEST)/terraform-provider-vastdata
 test:
 	ginkgo $(GINKGO_FLAGS) ./...
 
-build-all: clean build-formatter build document
+build-all: clean build-formatter build-user-agent-file build document
 
 $(BUILD_DEST)/linux_amd64/terraform-provider-vastdata:
 	export GOOS="linux" ;\

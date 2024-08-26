@@ -153,6 +153,7 @@ func setupHeaders(s *JwtSession, r *http.Request, headers map[string]string) err
 	for k, v := range headers {
 		r.Header.Add(k, v)
 	}
+	r.Header.Set("User-Agent", GetUserAgent())
 	return nil
 
 }
