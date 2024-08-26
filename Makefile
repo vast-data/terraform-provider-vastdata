@@ -60,7 +60,7 @@ sort-versions: codegen
 	cp -av api/$$(cat /tmp/versions.txt |sort -V|tail -1)/api.yaml codegen/latest
 
 build-user-agent-file:
-	tag=$$(git rev-parse HEAD); \
+	tag=$$(git rev-parse --abbrev-ref HEAD); \
 	echo $${tag}}; \
 	if git describe --exact-match --tags $$(git log -n1 --pretty='%h'); then \
 		tag=$$(git describe --exact-match --tags $$(git log -n1 --pretty='%h')); \
