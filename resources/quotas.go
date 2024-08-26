@@ -92,7 +92,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("pretty_grace_period"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m`,
 		},

@@ -124,7 +124,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("leading_group_name"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.0.0,5.1.0) Leading Group Name`,
 		},

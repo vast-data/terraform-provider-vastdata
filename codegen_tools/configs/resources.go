@@ -16,7 +16,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DestFile:                 ToStringPointer("user.go"),
 		IgnoreFields:             NewStringSet("Id"),
 		RequiredIdentifierFields: NewStringSet("name"),
-		ComputedFields:           NewStringSet("sid", "sids"),
+		ComputedFields:           NewStringSet("sid", "sids", "leading_group_name"),
 		OptionalIdentifierFields: NewStringSet(),
 		BeforePatchFunc:          utils.UserBeforePatchFunc,
 		ListsNamesMap:            map[string][]string{"access_keys": []string{"access_key", "enabled"}},
@@ -166,6 +166,11 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			"keep_local":  utils.ProtectionPolicyTimeIntervalValidation,
 			"keep_remote": utils.ProtectionPolicyTimeIntervalValidation,
 		},
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"keep_local":  utils.FrameTimeDiff,
+			"keep_remote": utils.FrameTimeDiff,
+			"every":       utils.FrameTimeDiff,
+		},
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Quota",
@@ -173,6 +178,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Model:                    api_latest.Quota{},
 		DestFile:                 ToStringPointer("quotas.go"),
 		IgnoreFields:             NewStringSet("LastUserQuotasUpdate", "Id"),
+		ComputedFields:           NewStringSet("clone_id", "parent_handle_ehandle", "pretty_grace_period", "pretty_grace_period_expiration"),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet("tenant_id"),
 		ListsNamesMap:            map[string][]string{},

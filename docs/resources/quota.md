@@ -93,7 +93,6 @@ resource "vastdata_quota" "quota2" {
 - `path` (String) (Valid for versions: 5.0.0,5.1.0) Directory path
 - `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0) Percent of used capacity out of the hard limit
 - `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Percent of used inodes out of the hard limit
-- `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
 - `pretty_state` (String) (Valid for versions: 5.0.0,5.1.0)
 - `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Soft quota limit
 - `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Soft inodes quota limit
@@ -113,6 +112,7 @@ resource "vastdata_quota" "quota2" {
 
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) Quota guid
 - `id` (String) The ID of this resource.
+- `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
 
 <a id="nestedblock--default_group_quota"></a>
 ### Nested Schema for `default_group_quota`
