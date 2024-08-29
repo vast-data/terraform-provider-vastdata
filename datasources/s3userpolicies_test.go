@@ -38,6 +38,7 @@ var _ = Describe(" S3Policy", func() {
    "id": 100,
    "name": "string",
    "policy": "string",
+   "tenant_id": 100,
    "users": [
       "A",
       "B",

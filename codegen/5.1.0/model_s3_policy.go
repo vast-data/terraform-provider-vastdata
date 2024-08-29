@@ -18,4 +18,5 @@ type S3Policy struct {
 	Groups []string `json:"groups,omitempty"`
 	IsReplicated bool `json:"is_replicated,omitempty"`
 	Enabled bool `json:"enabled"`
+	TenantId int64 `json:"tenant_id,omitempty"`
 }

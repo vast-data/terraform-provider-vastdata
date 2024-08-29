@@ -61,10 +61,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("enabled"),
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) `,
+			Required: true,
 		},
 
 		"prefix": &schema.Schema{

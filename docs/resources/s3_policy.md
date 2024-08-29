@@ -52,12 +52,13 @@ resource "vastdata_s3_policy" "s3policy" {
 
 ### Required
 
+- `enabled` (Boolean)
 - `name` (String)
 - `policy` (String)
 
 ### Optional
 
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0)
+- `tenant_id` (Number) (Valid for versions: 5.1.0)
 
 ### Read-Only
 

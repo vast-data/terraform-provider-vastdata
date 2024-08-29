@@ -51,13 +51,8 @@ func EntityMergeToUserQuotas(m map[string]interface{}, i interface{}, ctx contex
 }
 
 func EnabledMustBeSet(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
-	_, exists := m["enabled"]
-
-	if !exists {
-		m["enabled"] = false
-	}
+	m["enabled"] = d.Get("enabled")
 	return m, nil
-
 }
 
 func list_snapshoted_paths_remote(remote_target_guid, remote_tenant_guid string, client interface{}, ctx context.Context) ([]map[string]interface{}, error) {

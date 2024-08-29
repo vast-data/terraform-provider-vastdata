@@ -1420,6 +1420,9 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "boolean"
         enabled:
           type: "boolean"
+        tenant_id:
+          type: "integer"
+          format: "int64"
     Cnode:
       type: "object"
       required:

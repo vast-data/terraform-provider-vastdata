@@ -68,10 +68,18 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("enabled"),
 
+			Required: true,
+		},
+
+		"tenant_id": &schema.Schema{
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("tenant_id"),
+
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) `,
+			Description: `(Valid for versions: 5.1.0) `,
+			ForceNew:    true,
 		},
 	}
 }
@@ -126,6 +134,18 @@ func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_late
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"enabled\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
+
+	err = d.Set("tenant_id", resource.TenantId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -293,6 +313,12 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 	}
 	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
 	resourceS3PolicyRead(ctx_with_resource, d, m)
+
+	var before_create_error error
+	_, before_create_error = resource_config.BeforeCreateFunc(data, client, ctx, d)
+	if before_create_error != nil {
+		return diag.FromErr(before_create_error)
+	}
 
 	return diags
 }

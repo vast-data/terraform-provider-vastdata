@@ -92,6 +92,14 @@ func DataSourceS3Policy() *schema.Resource {
 				Optional:    false,
 				Description: `(Valid for versions: 5.0.0,5.1.0) `,
 			},
+
+			"tenant_id": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0) `,
+			},
 		},
 	}
 }
@@ -252,6 +260,18 @@ func dataSourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"enabled\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
+
+	err = d.Set("tenant_id", resource.TenantId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}

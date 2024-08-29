@@ -49,13 +49,13 @@ resource "vastdata_s3_life_cycle_rule" "s3-bucket-view-lifecycle-rule" {
 
 ### Required
 
+- `enabled` (Boolean)
 - `name` (String)
 - `prefix` (String)
 
 ### Optional
 
 - `abort_mpu_days_after_initiation` (Number) (Valid for versions: 5.0.0,5.1.0) The number of days until expiration after an incomplete multipart upload
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0)
 - `expiration_date` (String) (Valid for versions: 5.0.0,5.1.0) The expiration date of the object
 - `expiration_days` (Number) (Valid for versions: 5.0.0,5.1.0) The number of days from creation until an object expires
 - `expired_obj_delete_marker` (Boolean) (Valid for versions: 5.0.0,5.1.0) Remove expired objects delete markers

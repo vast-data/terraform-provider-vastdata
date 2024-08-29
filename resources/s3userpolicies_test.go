@@ -33,7 +33,8 @@ var _ = Describe(" S3Policy", func() {
                          {
    "guid": "string",
    "name": "string",
-   "policy": "string"
+   "policy": "string",
+   "tenant_id": 100
 }
                          `
 	var server *ghttp.Server
