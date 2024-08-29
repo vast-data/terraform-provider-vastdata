@@ -55,11 +55,8 @@ resource "vastdata_user" "user1" {
 - `allow_create_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0) Allow create bucket
 - `allow_delete_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0) Allow delete bucket
 - `gids` (List of Number) (Valid for versions: 5.0.0,5.1.0) List of supplementary GID list
-- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0) Group Count
 - `groups` (List of String) (Valid for versions: 5.0.0,5.1.0) List of supplementary Group list
 - `leading_gid` (Number) (Valid for versions: 5.0.0,5.1.0) The user leading unix GID
-- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0) Leading Group GID
-- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0) IS this a local user
 - `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0) The user primary group SID
 - `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0) List S3 policies IDs
 - `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is S3 superuser
@@ -67,9 +64,12 @@ resource "vastdata_user" "user1" {
 
 ### Read-Only
 
+- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0) Group Count
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniq guid given to the user
 - `id` (String) The ID of this resource.
+- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0) Leading Group GID
 - `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0) Leading Group Name
+- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0) IS this a local user
 - `sid` (String) (Valid for versions: 5.0.0,5.1.0) The user SID
 - `sids` (List of String) (Valid for versions: 5.0.0,5.1.0) supplementary SID list
 

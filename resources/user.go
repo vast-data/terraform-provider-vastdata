@@ -114,7 +114,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("group_count"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.0.0,5.1.0) Group Count`,
 		},
@@ -134,7 +134,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("leading_group_gid"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.0.0,5.1.0) Leading Group GID`,
 		},
@@ -178,7 +178,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("local"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.0.0,5.1.0) IS this a local user`,
 		},
