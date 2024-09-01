@@ -21,6 +21,8 @@ RESOURCES = $(wildcard examples/resources/*)
 FORCE_TAG_MATCH = 1
 GOFLAGS = ""
 TF_GPG_SIG = ""
+USER_AGENT_FILE=user_agent_version
+
 
 document:
 	tfplugindocs $(TFPLUGIN_DOCS_OPTIONS) 
@@ -59,12 +61,20 @@ sort-versions: codegen
 	cp -av codegen/$$(cat /tmp/versions.txt |sort -V|tail -1) codegen/latest
 	cp -av api/$$(cat /tmp/versions.txt |sort -V|tail -1)/api.yaml codegen/latest
 
-build-user-agent-file:
-	tag=$$(git rev-parse --abbrev-ref HEAD); \
+validate_user_agent_version_file:
+	[ -e $(USER_AGENT_FILE) ] && true 
+
+
+validate_user_agent_version_file_release_ready: validate_user_agent_version_file is-tag
+	tag=$$(git describe --tags) ;\
+	user_agent_version_file=$$(cat $(USER_AGENT_FILE)) ;\
+	echo $${user_agent_version_file} ;\
+	[ $${tag} == $${user_agent_version_file} ] && true
+
+
+build-user-agent-file: validate_user_agent_version_file 
+	tag=$$(cat $(USER_AGENT_FILE)) ;\
 	echo $${tag}}; \
-	if git describe --exact-match --tags $$(git log -n1 --pretty='%h'); then \
-		tag=$$(git describe --exact-match --tags $$(git log -n1 --pretty='%h')); \
-	fi; \
 	echo  -e "package vast_client \\n\\n func init() { \\n user_agent_version=\"$${tag}\" \\n }" > $(USER_AGENT_UPDATE_FILE) ;\
 	gofmt -w $(USER_AGENT_UPDATE_FILE) 
 
@@ -181,10 +191,10 @@ pack-archs: clean-releases is-tag
 pack-all-archs: build-all-archs pack-archs
 
 
-github-pre-release: is-tag pack-all-archs
+github-pre-release: validate_user_agent_version_file_release_ready is-tag pack-all-archs
 	tag=$$(git describe --tags); \
 	gh release create $${tag}   ./build/*.zip ./build/*.json ./build/*.sig  ./build/*_SHA256SUMS --prerelease --title "Release $${tag}" --generate-notes
 
-github-release: is-tag pack-all-archs
+github-release: validate_user_agent_version_file_release_ready is-tag pack-all-archs
 	tag=$$(git describe --tags); \
 	gh release create $${tag} ./build/*.zip ./build/*.sig  ./build/*_SHA256SUMS --title "Release $${tag}" --generate-notes
