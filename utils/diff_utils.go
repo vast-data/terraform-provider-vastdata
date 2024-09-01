@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 )
 
 func GetListDimentionAndType(t reflect.Type) (int, reflect.Type) {
@@ -143,7 +143,9 @@ func VastVersionsWarn(ctx context.Context) int {
 	//Version checking//
 	version_compare := metadata.ClusterVersionCompare()
 	tflog.Debug(ctx, fmt.Sprintf("Version Compare %v", version_compare))
-	if version_compare == metadata.CLUSTER_VERSION_GRATER {
+	if metadata.IsLowerThanMinVersion() {
+		tflog.Warn(ctx, fmt.Sprintf("Cluster Version is lower than the minimum provider version (%s<%s), strict validation (strict_version_validation=True) is not supported", metadata.ClusterVersionString(), metadata.GetMinVersion()))
+	} else if version_compare == metadata.CLUSTER_VERSION_GRATER {
 		tflog.Warn(ctx, fmt.Sprintf("Cluster Version is greater than provider (%s>%s)  build version, please consider upgrading", metadata.ClusterVersionString(), metadata.BuildVersionString()))
 	} else if version_compare == metadata.CLUSTER_VERSION_LOWER {
 		tflog.Warn(ctx, fmt.Sprintf("Cluster Version is lower than the provider (%s<%s) this might result in resouce creation/update faliure", metadata.ClusterVersionString(), metadata.BuildVersionString()))

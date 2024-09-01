@@ -31,3 +31,8 @@ func BuildVersionString() string {
 	return bv.String()
 
 }
+
+func IsLowerThanMinVersion() bool {
+	return cluster_version.LessThan(min_version)
+
+}
