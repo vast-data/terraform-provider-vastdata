@@ -488,6 +488,12 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 	reflect_ProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectionPolicy.Elem(), d, &data, "", false)
 
+	var before_patch_error error
+	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
+
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
 	if err != nil {

@@ -145,6 +145,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{},
 		Generate:                 true,
+		BeforePatchFunc:          utils.CloneTypeLocal,
 		DataSourceName:           "vastdata_protection_policy",
 		Importer: utils.NewImportByHttpFields(false,
 			[]utils.HttpFieldTuple{
