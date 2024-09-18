@@ -1550,6 +1550,9 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "string"
           description: "Replication capabilities which define , avaliable only for cluster from version 5.1"
           enum: [ASYNC_REPLICATION]
+        enabled:
+          type: "boolean"
+          description: "Enable/Disable the protected path"
     Snapshot:
       type: "object"
       properties:

@@ -89,6 +89,7 @@ resource "vastdata_protected_path" "protected-path-view" {
 ### Optional
 
 - `capabilities` (String) (Valid for versions: 5.1.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable/Disable the protected path
 - `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0) protection policy id
 - `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0) The Remote tenant guid
 - `source_dir` (String) (Valid for versions: 5.0.0,5.1.0) path to replicate

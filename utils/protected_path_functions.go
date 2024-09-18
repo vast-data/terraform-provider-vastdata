@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,6 +11,7 @@ import (
 
 	"github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
@@ -61,4 +64,35 @@ func ProtectedPathDeleteFunc(ctx context.Context, _client interface{}, attr map[
 	}
 	return response, nil
 
+}
+
+func ProtectedPathBeforePostFunc(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	FieldsUpdate(ctx, []string{"enabled"}, d, &m)
+	return m, nil
+}
+
+func ProtectedPathBeforePatchFunc(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	FieldsUpdate(ctx, []string{"enabled"}, d, &m)
+	return m, nil
+}
+
+//In case of creating sending enabled=false will have no affect, still this indicates that the user intended to so we patch the newly created protected_path
+
+func ProtectedPathBeforeCreateFunc(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	enabled, exists := m["enabled"]
+	if !exists {
+		return m, nil
+	}
+
+	client := i.(vast_client.JwtSession)
+	tflog.Debug(ctx, fmt.Sprintf("[ProtectedPathBeforeCreateFunc] Setting the value of enabled to: %v ", enabled))
+	id := fmt.Sprintf("%v", d.Id())
+	z := map[string]interface{}{"enabled": enabled}
+	b, _ := json.Marshal(z)
+	_, err := client.Patch(ctx, GenPath(fmt.Sprintf("%v/%v", "protectedpaths", id)), "application/json", bytes.NewReader(b), map[string]string{})
+	if err != nil {
+		return m, err
+	}
+	d.Set("enabled", enabled)
+	return m, nil
 }

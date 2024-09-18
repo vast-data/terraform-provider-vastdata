@@ -133,6 +133,16 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: utils.OneOf([]string{"ASYNC_REPLICATION"}),
 			Description:      `(Valid for versions: 5.1.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]`,
 		},
+
+		"enabled": &schema.Schema{
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("ProtectedPath").GetConflictingFields("enabled"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.0.0,5.1.0) Enable/Disable the protected path`,
+		},
 	}
 }
 
@@ -250,6 +260,18 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Enabled", resource.Enabled))
+
+	err = d.Set("enabled", resource.Enabled)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"enabled\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	return diags
 
 }
@@ -335,6 +357,12 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 	reflect_ProtectedPath := reflect.TypeOf((*api_latest.ProtectedPath)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectedPath.Elem(), d, &data, "", false)
 
+	var before_post_error error
+	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
+
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
@@ -408,6 +436,12 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
 	resourceProtectedPathRead(ctx_with_resource, d, m)
 
+	var before_create_error error
+	_, before_create_error = resource_config.BeforeCreateFunc(data, client, ctx, d)
+	if before_create_error != nil {
+		return diag.FromErr(before_create_error)
+	}
+
 	return diags
 }
 
@@ -445,6 +479,12 @@ func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m 
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ProtectedPath"))
 	reflect_ProtectedPath := reflect.TypeOf((*api_latest.ProtectedPath)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectedPath.Elem(), d, &data, "", false)
+
+	var before_patch_error error
+	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")

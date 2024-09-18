@@ -28,6 +28,7 @@ data "vastdata_protected_path" "protected_path1" {
 ### Read-Only
 
 - `capabilities` (String) (Valid for versions: 5.1.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable/Disable the protected path
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) guid
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0)
 - `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0) protection policy id

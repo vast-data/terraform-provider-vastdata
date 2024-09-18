@@ -1404,6 +1404,9 @@ components:
         target_id:
           type: "integer"
           description: "The remote target object id"
+        enabled:
+          type: "boolean"
+          description: "Enable/Disable the protected path"
     Snapshot:
       type: "object"
       properties:

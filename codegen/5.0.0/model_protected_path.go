@@ -25,4 +25,6 @@ type ProtectedPath struct {
 	RemoteTenantGuid string `json:"remote_tenant_guid,omitempty"`
 	// The remote target object id
 	TargetId int32 `json:"target_id,omitempty"`
+	// Enable/Disable the protected path
+	Enabled bool `json:"enabled,omitempty"`
 }

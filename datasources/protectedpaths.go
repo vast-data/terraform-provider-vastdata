@@ -100,6 +100,14 @@ func DataSourceProtectedPath() *schema.Resource {
 				Optional:    false,
 				Description: `(Valid for versions: 5.1.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]`,
 			},
+
+			"enabled": &schema.Schema{
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Enable/Disable the protected path`,
+			},
 		},
 	}
 }
@@ -284,6 +292,18 @@ func dataSourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m 
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"capabilities\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Enabled", resource.Enabled))
+
+	err = d.Set("enabled", resource.Enabled)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
