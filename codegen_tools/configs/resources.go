@@ -78,6 +78,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{"client_ip_ranges": []string{"start_ip", "end_ip"}},
+		ComputedFields:           NewStringSet("vippool_names"),
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_tenant",

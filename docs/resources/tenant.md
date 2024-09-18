@@ -51,12 +51,12 @@ resource "vastdata_tenant" "tenant1" {
 - `use_smb_privileged_group` (Boolean) (Valid for versions: 5.1.0) Enables SMB privileged user group
 - `use_smb_privileged_user` (Boolean) (Valid for versions: 5.1.0) Enables SMB privileged user
 - `vippool_ids` (List of Number) (Valid for versions: 5.1.0) An array of VIP Pool ids to attach to tenant.
-- `vippool_names` (List of String) (Valid for versions: 5.1.0) An array of VIP Pool names attached to this tenant.
 
 ### Read-Only
 
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniq guid given to the tenant
 - `id` (String) The ID of this resource.
+- `vippool_names` (List of String) (Valid for versions: 5.1.0) An array of VIP Pool names attached to this tenant.
 
 <a id="nestedblock--client_ip_ranges"></a>
 ### Nested Schema for `client_ip_ranges`

@@ -269,7 +269,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("vippool_names"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.1.0) An array of VIP Pool names attached to this tenant.`,
 
