@@ -45,7 +45,6 @@ resource "vastdata_tenant" "tenant1" {
 - `ip_ranges` (Block List, Min: 1) (see [below for nested schema](#nestedblock--ip_ranges))
 - `name` (String)
 - `role` (String)
-- `subnet_cidr` (Number)
 
 ### Optional
 
@@ -60,6 +59,7 @@ resource "vastdata_tenant" "tenant1" {
 - `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0) Peer ASN
 - `port_membership` (String) (Valid for versions: 5.0.0,5.1.0) The port on the CNode this pool will use. Right, left or all
 - `state` (String) (Valid for versions: 5.0.0,5.1.0)
+- `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0) IPv4 Subnet CIDR prefix (bits number)
 - `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0) IPv6 Subnet CIDR prefix (bits number)
 - `url` (String) (Valid for versions: 5.0.0,5.1.0)
 - `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0) VAST ASN

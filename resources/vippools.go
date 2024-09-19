@@ -61,7 +61,10 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("subnet_cidr"),
 
-			Required: true,
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.0.0,5.1.0) IPv4 Subnet CIDR prefix (bits number)`,
 		},
 
 		"subnet_cidr_ipv6": &schema.Schema{

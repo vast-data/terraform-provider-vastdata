@@ -57,7 +57,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Model:                    api_latest.VipPool{},
 		DestFile:                 ToStringPointer("vippools.go"),
 		IgnoreFields:             NewStringSet("Id"),
-		RequiredIdentifierFields: NewStringSet("name", "subnet_cidr", "role", "ip_ranges"),
+		RequiredIdentifierFields: NewStringSet("name", "role", "ip_ranges"),
 		OptionalIdentifierFields: NewStringSet(),
 		ListsNamesMap:            map[string][]string{"ip_ranges": []string{"start_ip", "end_ip"}, "cnode_ids": []string{"id"}},
 		Generate:                 true,
