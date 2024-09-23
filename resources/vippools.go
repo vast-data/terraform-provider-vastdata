@@ -47,7 +47,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) A uniq guid given to the vippool`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the vippool`,
 		},
 
 		"name": &schema.Schema{
@@ -64,7 +64,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) IPv4 Subnet CIDR prefix (bits number)`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)`,
 		},
 
 		"subnet_cidr_ipv6": &schema.Schema{
@@ -74,7 +74,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) IPv6 Subnet CIDR prefix (bits number)`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)`,
 		},
 
 		"gw_ip": &schema.Schema{
@@ -84,7 +84,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Gateway IP Address`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IP Address`,
 		},
 
 		"gw_ipv6": &schema.Schema{
@@ -94,7 +94,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) GW IPv6 Address`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GW IPv6 Address`,
 		},
 
 		"vlan": &schema.Schema{
@@ -104,7 +104,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) VIPPool VLAN`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN`,
 		},
 
 		"state": &schema.Schema{
@@ -114,7 +114,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"cnode_ids": &schema.Schema{
@@ -126,7 +126,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0) IDs of cnodes comprising cnode group`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of cnodes comprising cnode group`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -140,7 +140,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Parent Cluster`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
 		},
 
 		"url": &schema.Schema{
@@ -150,7 +150,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"domain_name": &schema.Schema{
@@ -160,7 +160,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"role": &schema.Schema{
@@ -203,7 +203,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) If true, CNodes participating in the vip pool are preferred in VMS host election`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, CNodes participating in the vip pool are preferred in VMS host election`,
 		},
 
 		"enabled": &schema.Schema{
@@ -213,7 +213,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) True for enable, False for disable`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) True for enable, False for disable`,
 		},
 
 		"port_membership": &schema.Schema{
@@ -223,7 +223,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) The port on the CNode this pool will use. Right, left or all`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The port on the CNode this pool will use. Right, left or all`,
 		},
 
 		"active_interfaces": &schema.Schema{
@@ -233,7 +233,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Numver of active interfaces`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Numver of active interfaces`,
 		},
 
 		"enable_l3": &schema.Schema{
@@ -243,7 +243,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Enables L3 CNode access`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables L3 CNode access`,
 		},
 
 		"vast_asn": &schema.Schema{
@@ -253,7 +253,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) VAST ASN`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN`,
 		},
 
 		"peer_asn": &schema.Schema{
@@ -263,7 +263,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Peer ASN`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN`,
 		},
 	}
 }

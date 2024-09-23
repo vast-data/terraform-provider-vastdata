@@ -30,13 +30,13 @@ resource "vastdata_group" "group1" {
 
 ### Optional
 
-- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0) List of S3 policies IDs
+- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of S3 policies IDs
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniqe GUID assigned to the group
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the group
 - `id` (String) The ID of this resource.
-- `sid` (String) (Valid for versions: 5.0.0,5.1.0) The group SID
+- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The group SID
 
 ## Import
 

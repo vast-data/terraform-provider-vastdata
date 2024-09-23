@@ -42,6 +42,7 @@ Name | Type | Description | Notes
 **S3ObjectOwnershipRule** | **string** |  | [optional] [default to null]
 **Locking** | **bool** | Write Once Read Many (WORM) locking enabled | [optional] [default to null]
 **IgnoreOos** | **bool** | Ignore oos | [optional] [default to null]
+**BucketLogging** | [***BucketLogging**](BucketLogging.md) |  | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

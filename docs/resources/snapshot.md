@@ -65,14 +65,14 @@ resource "vastdata_snapshot" "snapshot" {
 
 ### Optional
 
-- `expiration_time` (String) (Valid for versions: 5.0.0,5.1.0) When will this sanpshot expire
-- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is it indestructable
-- `path` (String) (Valid for versions: 5.0.0,5.1.0) The path to make snapshot from
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0) The tenant id to use
+- `expiration_time` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire
+- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable
+- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the snapshot
 - `id` (String) The ID of this resource.
 
 ## Import

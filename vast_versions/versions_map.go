@@ -157,6 +157,7 @@ var vast_versions map[string]map[string]reflect.Type = map[string]map[string]ref
 	"5.2.0": map[string]reflect.Type{
 		"ActiveDirectory":                 reflect.TypeOf((*version_5_2_0.ActiveDirectory)(nil)).Elem(),
 		"ActiveDirectory2":                reflect.TypeOf((*version_5_2_0.ActiveDirectory2)(nil)).Elem(),
+		"BucketLogging":                   reflect.TypeOf((*version_5_2_0.BucketLogging)(nil)).Elem(),
 		"Cnode":                           reflect.TypeOf((*version_5_2_0.Cnode)(nil)).Elem(),
 		"DefaultQuota":                    reflect.TypeOf((*version_5_2_0.DefaultQuota)(nil)).Elem(),
 		"Dns":                             reflect.TypeOf((*version_5_2_0.Dns)(nil)).Elem(),

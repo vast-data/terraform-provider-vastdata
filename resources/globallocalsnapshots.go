@@ -47,7 +47,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) A unique guid given to the global snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot`,
 		},
 
 		"name": &schema.Schema{
@@ -85,7 +85,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Is the snapshot enabled`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled`,
 
 			Default: true,
 		},

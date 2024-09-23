@@ -26,7 +26,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 			},
 
 			"name": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) A unique name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name`,
 			},
 
 			"guid": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 			},
 
 			"enabled": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 			},
 
 			"prefix": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
 			},
 
 			"min_size": &schema.Schema{
@@ -66,7 +66,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The minimum size of the object`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The minimum size of the object`,
 			},
 
 			"max_size": &schema.Schema{
@@ -74,7 +74,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The maximum size of the object`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The maximum size of the object`,
 			},
 
 			"expiration_days": &schema.Schema{
@@ -82,7 +82,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The number of days from creation until an object expires`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days from creation until an object expires`,
 			},
 
 			"expiration_date": &schema.Schema{
@@ -90,7 +90,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The expiration date of the object`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The expiration date of the object`,
 			},
 
 			"expired_obj_delete_marker": &schema.Schema{
@@ -98,7 +98,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Remove expired objects delete markers`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remove expired objects delete markers`,
 			},
 
 			"noncurrent_days": &schema.Schema{
@@ -106,7 +106,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Number of days after objects become noncurrent`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Number of days after objects become noncurrent`,
 			},
 
 			"newer_noncurrent_versions": &schema.Schema{
@@ -114,7 +114,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The number of newer versions to retain`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of newer versions to retain`,
 			},
 
 			"abort_mpu_days_after_initiation": &schema.Schema{
@@ -122,7 +122,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The number of days until expiration after an incomplete multipart upload`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days until expiration after an incomplete multipart upload`,
 			},
 
 			"view_path": &schema.Schema{
@@ -130,7 +130,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The path of the related View`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path of the related View`,
 			},
 
 			"view_id": &schema.Schema{
@@ -138,7 +138,7 @@ func DataSourceS3LifeCycleRule() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) The ID of the related View`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the related View`,
 			},
 		},
 	}

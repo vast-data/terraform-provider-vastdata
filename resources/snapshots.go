@@ -47,7 +47,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) A unique guid given to the snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the snapshot`,
 		},
 
 		"expiration_time": &schema.Schema{
@@ -58,7 +58,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Optional:         true,
 			Sensitive:        false,
 			ValidateDiagFunc: utils.SnapshotExpirationFormatValidation,
-			Description:      `(Valid for versions: 5.0.0,5.1.0) When will this sanpshot expire`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire`,
 		},
 
 		"name": &schema.Schema{
@@ -75,7 +75,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) The path to make snapshot from`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from`,
 		},
 
 		"tenant_id": &schema.Schema{
@@ -85,7 +85,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) The tenant id to use`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use`,
 		},
 
 		"indestructible": &schema.Schema{
@@ -95,7 +95,7 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0) Is it indestructable`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable`,
 		},
 	}
 }

@@ -641,6 +641,19 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
+	ResourceTemplateV2{
+		ResourceName:             "BucketLogging",
+		Path:                     ToStringPointer("bucket_logging"),
+		Model:                    api_latest.BucketLogging{},
+		DestFile:                 ToStringPointer("views.go"),
+		IgnoreFields:             NewStringSet(),
+		RequiredIdentifierFields: NewStringSet(),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 false,
+		ResponseGetByURL:         false,
+		DataSourceName:           "",
+	},
 }
 
 func init() {

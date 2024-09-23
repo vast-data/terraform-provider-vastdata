@@ -44,6 +44,7 @@ var _ = Describe(" View", func() {
       "D",
       "E"
    ],
+   "bucket_logging": {},
    "bucket_owner": "string",
    "cluster": "string",
    "cluster_id": 100,

@@ -48,27 +48,27 @@ resource "vastdata_tenant" "tenant1" {
 
 ### Optional
 
-- `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0) Numver of active interfaces
-- `cluster` (String) (Valid for versions: 5.0.0,5.1.0) Parent Cluster
-- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0) IDs of cnodes comprising cnode group
-- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0)
-- `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enables L3 CNode access
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) True for enable, False for disable
-- `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0) Gateway IP Address
-- `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0) GW IPv6 Address
-- `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0) Peer ASN
-- `port_membership` (String) (Valid for versions: 5.0.0,5.1.0) The port on the CNode this pool will use. Right, left or all
-- `state` (String) (Valid for versions: 5.0.0,5.1.0)
-- `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0) IPv4 Subnet CIDR prefix (bits number)
-- `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0) IPv6 Subnet CIDR prefix (bits number)
-- `url` (String) (Valid for versions: 5.0.0,5.1.0)
-- `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0) VAST ASN
-- `vlan` (Number) (Valid for versions: 5.0.0,5.1.0) VIPPool VLAN
-- `vms_preferred` (Boolean) (Valid for versions: 5.0.0,5.1.0) If true, CNodes participating in the vip pool are preferred in VMS host election
+- `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Numver of active interfaces
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
+- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of cnodes comprising cnode group
+- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables L3 CNode access
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) True for enable, False for disable
+- `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IP Address
+- `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) GW IPv6 Address
+- `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN
+- `port_membership` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The port on the CNode this pool will use. Right, left or all
+- `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)
+- `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)
+- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN
+- `vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN
+- `vms_preferred` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, CNodes participating in the vip pool are preferred in VMS host election
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A uniq guid given to the vippool
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the vippool
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--ip_ranges"></a>

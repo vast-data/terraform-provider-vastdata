@@ -84,4 +84,5 @@ type View struct {
 	Locking bool `json:"locking,omitempty"`
 	// Ignore oos
 	IgnoreOos bool `json:"ignore_oos,omitempty"`
+	BucketLogging *BucketLogging `json:"bucket_logging,omitempty"`
 }

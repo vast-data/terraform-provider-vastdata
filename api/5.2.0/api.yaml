@@ -200,6 +200,9 @@ None - S3 Object Ownership is disabled for the bucket.
         ignore_oos:
           type: "boolean"
           description: "Ignore oos"
+        bucket_logging:
+          type: "object"
+          $ref: "#/components/schemas/BucketLogging"
     ViewCreate:
       type: "object"
       required:
@@ -1968,3 +1971,23 @@ The object class that defines a group entry on the AD server, if different from 
           description: "VIP pool permissions "
           default: "RW"
           enum: [RW,RO]
+    BucketLogging:
+      type: "object"
+      properties:
+        destination_id:
+          type: "integer"
+          format: "int64"
+          description: "The Logging bucket ID"
+        prefix:
+          type: "string"
+          description: "Log line prefix to add"
+          default: ""
+        key_format:
+          type: "string"
+          description: "The format for log object keys. 
+SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString], 
+PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the logged events occurred, 
+PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the log object has been delivered to the destination bucket. 
+Default: SIMPLE_PREFIX"
+          enum: [ SIMPLE_PREFIX, PARTITIONED_PREFIX_EVENT_TIME, PARTITIONED_PREFIX_DELIVERY_TIME ]
+          default: "SIMPLE_PREFIX"

@@ -123,11 +123,11 @@ resource "vastdata_global_snapshot" "gsnap1" {
 
 ### Optional
 
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0) Is the snapshot enabled
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0) A unique guid given to the global snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--owner_root_snapshot"></a>
@@ -139,8 +139,8 @@ Required:
 
 Read-Only:
 
-- `clone_id` (Number) (Valid for versions: 5.0.0,5.1.0) The ID of the clone
-- `parent_handle_ehandle` (String) (Valid for versions: 5.0.0,5.1.0) The remote handle (inode)
+- `clone_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the clone
+- `parent_handle_ehandle` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote handle (inode)
 
 
 <a id="nestedblock--owner_tenant"></a>
