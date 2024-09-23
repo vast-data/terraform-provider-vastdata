@@ -28,7 +28,8 @@ var api_verions []VastVersionStruct = []VastVersionStruct{
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("4.6.0")), Vast_ver: "v2"},
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("4.7.0")), Vast_ver: "v3"},
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.0.0")), Vast_ver: "v4"},
-	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.1.0")), Vast_ver: "v5"}}
+	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.1.0")), Vast_ver: "v5"},
+	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.2.0")), Vast_ver: "v5"}}
 
 func MaxVastVerion() string {
 	/*
