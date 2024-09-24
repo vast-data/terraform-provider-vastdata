@@ -27,6 +27,21 @@ var _ = Describe(" View", func() {
 	var ViewDataSourceData *schema.ResourceData
 	var model_json = `
                          {
+   "abac_tags": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+   ],
+   "abe_max_depth": 100,
+   "abe_protocols": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+   ],
    "alias": "string",
    "auto_commit": "string",
    "bucket": "string",

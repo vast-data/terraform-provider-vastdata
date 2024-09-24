@@ -44,6 +44,9 @@ data "vastdata_view" "view1" {
 
 ### Read-Only
 
+- `abac_tags` (List of String) (Valid for versions: 5.1.0,5.2.0) List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols
+- `abe_max_depth` (Number) (Valid for versions: 5.2.0) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.
+- `abe_protocols` (List of String) (Valid for versions: 5.2.0) The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]
 - `alias` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path
 - `allow_anonymous_access` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access
 - `allow_s3_anonymous_access` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access

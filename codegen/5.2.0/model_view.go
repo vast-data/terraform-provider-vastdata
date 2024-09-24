@@ -85,4 +85,10 @@ type View struct {
 	// Ignore oos
 	IgnoreOos bool `json:"ignore_oos,omitempty"`
 	BucketLogging *BucketLogging `json:"bucket_logging,omitempty"`
+	// List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols
+	AbacTags []string `json:"abac_tags,omitempty"`
+	// Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.
+	AbeMaxDepth int32 `json:"abe_max_depth,omitempty"`
+	// The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]
+	AbeProtocols []string `json:"abe_protocols,omitempty"`
 }

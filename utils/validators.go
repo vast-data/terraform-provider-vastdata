@@ -78,3 +78,40 @@ func ValidateRetention(i interface{}, c cty.Path) diag.Diagnostics {
 	return diags
 
 }
+
+func ValidateStringListMembers(s []string, allow_duplicates bool) schema.SchemaValidateDiagFunc {
+	return func(i interface{}, c cty.Path) diag.Diagnostics {
+		var diags diag.Diagnostics
+		l, is_string_list := i.([]string)
+		if !is_string_list {
+			return diag.FromErr(fmt.Errorf("%v is not a list of strings", i))
+		}
+		m := map[string]int{}
+		for _, j := range s {
+			m[j] = 0
+		}
+		for _, t := range l {
+			_, exists := m[t]
+			if !exists {
+				return diag.FromErr(fmt.Errorf("%v is not a valid value , valid values are, %v", t, s))
+			}
+		}
+		if !allow_duplicates {
+			// in the case that we are not allowing duplicates and we are sure that all the values in the given list are valid,
+			// if we try to pop more than one time the same value it means it is duplicate.
+			for _, t := range l {
+				_, exit := m[t]
+				if !exit {
+					return diag.FromErr(fmt.Errorf("Duplicate value %s was found , duplicates are not allowed", t))
+				}
+				delete(m, t)
+			}
+
+		}
+		return diags
+	}
+}
+
+func ValidateAbeProtocols(i interface{}, c cty.Path) diag.Diagnostics {
+	return ValidateStringListMembers([]string{"NFS", "SMB", "NFS4", "S3"}, false)(i, c)
+}

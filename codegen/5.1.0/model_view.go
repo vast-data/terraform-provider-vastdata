@@ -84,4 +84,6 @@ type View struct {
 	Locking bool `json:"locking,omitempty"`
 	// Ignore oos
 	IgnoreOos bool `json:"ignore_oos,omitempty"`
+	// List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols
+	AbacTags []string `json:"abac_tags,omitempty"`
 }

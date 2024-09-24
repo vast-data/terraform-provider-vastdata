@@ -582,6 +582,44 @@ func getResourceViewSchema() map[string]*schema.Schema {
 				},
 			},
 		},
+
+		"abac_tags": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("abac_tags"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+
+		"abe_max_depth": &schema.Schema{
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("abe_max_depth"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.`,
+		},
+
+		"abe_protocols": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("abe_protocols"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
 	}
 }
 
@@ -1057,6 +1095,42 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"bucket_logging\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AbacTags", resource.AbacTags))
+
+	err = d.Set("abac_tags", utils.FlattenListOfPrimitives(&resource.AbacTags))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"abac_tags\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AbeMaxDepth", resource.AbeMaxDepth))
+
+	err = d.Set("abe_max_depth", resource.AbeMaxDepth)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"abe_max_depth\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AbeProtocols", resource.AbeProtocols))
+
+	err = d.Set("abe_protocols", utils.FlattenListOfPrimitives(&resource.AbeProtocols))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"abe_protocols\"",
 			Detail:   err.Error(),
 		})
 	}
