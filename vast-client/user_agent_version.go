@@ -1,5 +1,5 @@
 package vast_client
 
 func init() {
-	user_agent_version = "v1.3.2"
+	user_agent_version = "v1.4.0"
 }
