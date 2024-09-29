@@ -1341,6 +1341,27 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: string
           enum: [STATIC, USED_CAPACITY, PROVISIONED_CAPACITY]
           description: QoS provisioning mode
+        policy_type:
+          type: string
+          enum: [VIEW,USER]
+          description: "The QoS type"
+        limit_by:
+          type: string
+          enum: [BW_IOPS,BW,IOPS]
+          default: "BW_IOPS"
+          description: "What attributes are setting the limitations."
+        tenant_id:
+          type: integer
+          format: int64
+          description: "When setting is_default this is the tenant which will take affect"
+        attached_users_identifiers:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of local user IDs to which this QoS Policy is affective."
+        is_default:
+          type: boolean
+          description: "Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute"
         io_size_bytes:
           type: "integer"
           format: "int64"
@@ -1351,6 +1372,16 @@ Also due to the lack of ability to configure vippool permissions using this atti
         capacity_limits:
           $ref: '#/components/schemas/QosDynamicLimits'
           description: 'Performance limits per unit of either used logical capacity or provisioned capacity, depending on the mode. Units are stated per limit. Valid values: 0-4294967296. 0 means unlimited.'
+        static_total_limits:
+          $ref: '#/components/schemas/QoSStaticTotalLimits'
+        capacity_total_limits:
+          $ref: '#/components/schemas/QoSDynamicTotalLimits'
+        attached_users:
+          type: "array"
+          items:
+            type: "object"
+            $ref: "#/components/schemas/QosUser"
+            description: "List of user associated with this QsS policy"
     QosStaticLimits:
       type: object
       properties:
@@ -1385,7 +1416,39 @@ Also due to the lack of ability to configure vippool permissions using this atti
         max_writes_iops:
           type: integer
           format: "int64"
-          description: Maximal amount of performance to provide when there is no resource contention
+          description: Maximal amount of performance to provide when there is no resource contention      
+        burst_reads_bw_mb:
+          type: "integer"
+          format: "int64"
+          description : "Burst reads BW Mb"
+        burst_reads_loan_mb:
+          type: "integer"
+          format: "int64"
+          description : "Burst reads loan Mb"
+        burst_writes_bw_mb:
+          type: "integer"
+          format: "int64"
+          description : "Burst writes BW Mb"
+        burst_writes_loan_mb:
+          type: "integer"
+          format: "int64"
+          description : "Burst writes loan Mb"
+        burst_reads_iops:
+          type: "integer"
+          format: "int64"
+          description : "Burst reads IOPS"
+        burst_reads_loan_iops:
+          type: "integer"
+          format: "int64"
+          description : "Burst reads loan IOPS"
+        burst_writes_iops:
+          type: "integer"
+          format: "int64"
+          description : "Burst writes IOPS"
+        burst_writes_loan_iops:
+          type: "integer"
+          format: "int64"
+          description : "Burst writes loan IOPS"          
     QosDynamicLimits:
       type: object
       properties:
@@ -1405,6 +1468,76 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: integer
           format: "int64"
           description: Maximal amount of performance per GB to provide when there is no resource contention
+    QoSStaticTotalLimits:
+      type: object
+      properties:
+        max_bw_mbps:
+          type: "integer"
+          format: "int64"
+          description: "Maximal BW Mb/s"
+        burst_bw_mb:
+          type: "integer"
+          format: "int64"
+          description: "Burst BW Mb"
+        burst_loan_mb:
+          type: "integer"
+          format: "int64"
+          description: "Burst loan Mb"
+        max_iops:
+          type: "integer"
+          format: "int64"
+          description: "Maximal IOPS"
+        burst_iops:
+          type: "integer"
+          format: "int64"
+          description: "Burst IOPS"
+        burst_loan_iops:
+          type: "integer"
+          format: "int64"
+          description: "Burst loan IOPS"
+    QoSDynamicTotalLimits:
+      type: object
+      properties:
+        max_bw_mbps_per_gb_capacity:
+          type: "integer"
+          format: "int64"
+          description: "Maximal amount of performance per GB to provide when there is no resource contention"
+        max_iops_per_gb_capacity:
+          type: "integer"
+          format: "int64"
+          description: "Maximal amount of performance per GB to provide when there is no resource contention"
+    QosUser:
+      type: object
+      properties:
+        fqdn:
+          type: string
+          description: "User FQDN"
+        is_sid:
+          type: boolean
+        sid_str:
+          type: string
+          description: "The user SID"
+        uid_or_gid:
+          type: integer
+          format: int64
+        label:
+          type: string
+          description: "How to display the user"
+        value:
+          type: string
+          description: "The user name"
+        login_name:
+          type: string
+          description: "The user login name"
+        name:
+          type: string
+          description: "The user name"
+        identifier_type:
+          type: string
+          description: "The user type of idetify"
+        identifier_value:
+          type: string
+          description: "The value to use fo the identifier_type"
     S3Policy:
       required:
       - "enabled"

@@ -31,17 +31,51 @@ var _ = Describe(" QosPolicy", func() {
 	var QosPolicyResourceData *schema.ResourceData
 	var model_json = `
                          {
+   "attached_users": [
+      {
+         "fqdn": "string",
+         "identifier_type": "string",
+         "identifier_value": "string",
+         "label": "string",
+         "login_name": "string",
+         "name": "string",
+         "sid_str": "string",
+         "uid_or_gid": 100,
+         "value": "string"
+      }
+   ],
+   "attached_users_identifiers": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+   ],
    "capacity_limits": {
       "max_reads_bw_mbps_per_gb_capacity": 100,
       "max_reads_iops_per_gb_capacity": 100,
       "max_writes_bw_mbps_per_gb_capacity": 100,
       "max_writes_iops_per_gb_capacity": 100
    },
+   "capacity_total_limits": {
+      "max_bw_mbps_per_gb_capacity": 100,
+      "max_iops_per_gb_capacity": 100
+   },
    "guid": "string",
    "io_size_bytes": 100,
+   "limit_by": "string",
    "mode": "string",
    "name": "string",
+   "policy_type": "string",
    "static_limits": {
+      "burst_reads_bw_mb": 100,
+      "burst_reads_iops": 100,
+      "burst_reads_loan_iops": 100,
+      "burst_reads_loan_mb": 100,
+      "burst_writes_bw_mb": 100,
+      "burst_writes_iops": 100,
+      "burst_writes_loan_iops": 100,
+      "burst_writes_loan_mb": 100,
       "max_reads_bw_mbps": 100,
       "max_reads_iops": 100,
       "max_writes_bw_mbps": 100,
@@ -50,7 +84,16 @@ var _ = Describe(" QosPolicy", func() {
       "min_reads_iops": 100,
       "min_writes_bw_mbps": 100,
       "min_writes_iops": 100
-   }
+   },
+   "static_total_limits": {
+      "burst_bw_mb": 100,
+      "burst_iops": 100,
+      "burst_loan_iops": 100,
+      "burst_loan_mb": 100,
+      "max_bw_mbps": 100,
+      "max_iops": 100
+   },
+   "tenant_id": 100
 }
                          `
 	var server *ghttp.Server

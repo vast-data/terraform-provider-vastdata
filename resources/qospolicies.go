@@ -69,6 +69,66 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 		},
 
+		"policy_type": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("policy_type"),
+
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"VIEW", "USER"}),
+			Description:      `(Valid for versions: 5.2.0) The QoS type Allowed Values are [VIEW USER]`,
+		},
+
+		"limit_by": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("limit_by"),
+
+			Computed:  false,
+			Optional:  true,
+			Sensitive: false,
+
+			ValidateDiagFunc: utils.OneOf([]string{"BW_IOPS", "BW", "IOPS"}),
+			Description:      `(Valid for versions: 5.2.0) What attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]`,
+
+			Default: "BW_IOPS",
+		},
+
+		"tenant_id": &schema.Schema{
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("tenant_id"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) When setting is_default this is the tenant which will take affect`,
+		},
+
+		"attached_users_identifiers": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("attached_users_identifiers"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) List of local user IDs to which this QoS Policy is affective.`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+
+		"is_default": &schema.Schema{
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("is_default"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute`,
+		},
+
 		"io_size_bytes": &schema.Schema{
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("io_size_bytes"),
@@ -170,6 +230,86 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Sensitive:   false,
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
+
+					"burst_reads_bw_mb": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_bw_mb"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst reads BW Mb`,
+					},
+
+					"burst_reads_loan_mb": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_loan_mb"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst reads loan Mb`,
+					},
+
+					"burst_writes_bw_mb": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_bw_mb"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst writes BW Mb`,
+					},
+
+					"burst_writes_loan_mb": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_loan_mb"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst writes loan Mb`,
+					},
+
+					"burst_reads_iops": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_iops"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst reads IOPS`,
+					},
+
+					"burst_reads_loan_iops": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_loan_iops"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst reads loan IOPS`,
+					},
+
+					"burst_writes_iops": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_iops"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst writes IOPS`,
+					},
+
+					"burst_writes_loan_iops": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_loan_iops"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst writes loan IOPS`,
+					},
 				},
 			},
 		},
@@ -228,6 +368,231 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 				},
 			},
 		},
+
+		"static_total_limits": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("static_total_limits"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) `,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"max_bw_mbps": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("max_bw_mbps"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Maximal BW Mb/s`,
+					},
+
+					"burst_bw_mb": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_bw_mb"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst BW Mb`,
+					},
+
+					"burst_loan_mb": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_loan_mb"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst loan Mb`,
+					},
+
+					"max_iops": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("max_iops"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Maximal IOPS`,
+					},
+
+					"burst_iops": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_iops"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst IOPS`,
+					},
+
+					"burst_loan_iops": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_loan_iops"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Burst loan IOPS`,
+					},
+				},
+			},
+		},
+
+		"capacity_total_limits": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("capacity_total_limits"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) `,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"max_bw_mbps_per_gb_capacity": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSDynamicTotalLimits").GetConflictingFields("max_bw_mbps_per_gb_capacity"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+					},
+
+					"max_iops_per_gb_capacity": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QoSDynamicTotalLimits").GetConflictingFields("max_iops_per_gb_capacity"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+					},
+				},
+			},
+		},
+
+		"attached_users": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("attached_users"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) `,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"fqdn": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("fqdn"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) User FQDN`,
+					},
+
+					"is_sid": &schema.Schema{
+						Type:          schema.TypeBool,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("is_sid"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) `,
+					},
+
+					"sid_str": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("sid_str"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) The user SID`,
+					},
+
+					"uid_or_gid": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("uid_or_gid"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) `,
+					},
+
+					"label": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("label"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) How to display the user`,
+					},
+
+					"value": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("value"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) The user name`,
+					},
+
+					"login_name": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("login_name"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) The user login name`,
+					},
+
+					"name": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("name"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) The user name`,
+					},
+
+					"identifier_type": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("identifier_type"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) The user type of idetify`,
+					},
+
+					"identifier_value": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("identifier_value"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.2.0) The value to use fo the identifier_type`,
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -273,6 +638,66 @@ func ResourceQosPolicyReadStructIntoSchema(ctx context.Context, resource api_lat
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PolicyType", resource.PolicyType))
+
+	err = d.Set("policy_type", resource.PolicyType)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"policy_type\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LimitBy", resource.LimitBy))
+
+	err = d.Set("limit_by", resource.LimitBy)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"limit_by\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
+
+	err = d.Set("tenant_id", resource.TenantId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"tenant_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AttachedUsersIdentifiers", resource.AttachedUsersIdentifiers))
+
+	err = d.Set("attached_users_identifiers", utils.FlattenListOfPrimitives(&resource.AttachedUsersIdentifiers))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"attached_users_identifiers\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsDefault", resource.IsDefault))
+
+	err = d.Set("is_default", resource.IsDefault)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"is_default\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IoSizeBytes", resource.IoSizeBytes))
 
 	err = d.Set("io_size_bytes", resource.IoSizeBytes)
@@ -307,6 +732,44 @@ func ResourceQosPolicyReadStructIntoSchema(ctx context.Context, resource api_lat
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"capacity_limits\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "StaticTotalLimits", resource.StaticTotalLimits))
+
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.StaticTotalLimits))
+	err = d.Set("static_total_limits", utils.FlattenModelAsList(ctx, resource.StaticTotalLimits))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"static_total_limits\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "CapacityTotalLimits", resource.CapacityTotalLimits))
+
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.CapacityTotalLimits))
+	err = d.Set("capacity_total_limits", utils.FlattenModelAsList(ctx, resource.CapacityTotalLimits))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"capacity_total_limits\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AttachedUsers", resource.AttachedUsers))
+
+	err = d.Set("attached_users", utils.FlattenListOfModelsToList(ctx, resource.AttachedUsers))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"attached_users\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -357,6 +820,12 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	diags = ResourceQosPolicyReadStructIntoSchema(ctx, resource, d)
 
+	var after_read_error error
+	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
+	if after_read_error != nil {
+		return diag.FromErr(after_read_error)
+	}
+
 	return diags
 }
 
@@ -395,6 +864,12 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource QosPolicy"))
 	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_QosPolicy.Elem(), d, &data, "", false)
+
+	var before_post_error error
+	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
@@ -506,6 +981,12 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource QosPolicy"))
 	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_QosPolicy.Elem(), d, &data, "", false)
+
+	var before_patch_error error
+	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")

@@ -53,6 +53,50 @@ func DataSourceQosPolicy() *schema.Resource {
 				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 			},
 
+			"policy_type": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) The QoS type Allowed Values are [VIEW USER]`,
+			},
+
+			"limit_by": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    false,
+				Optional:    true,
+				Description: `(Valid for versions: 5.2.0) What attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]`,
+			},
+
+			"tenant_id": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) When setting is_default this is the tenant which will take affect`,
+			},
+
+			"attached_users_identifiers": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) List of local user IDs to which this QoS Policy is affective.`,
+
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+
+			"is_default": &schema.Schema{
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute`,
+			},
+
 			"io_size_bytes": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
@@ -134,6 +178,70 @@ func DataSourceQosPolicy() *schema.Resource {
 							Optional:    false,
 							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
 						},
+
+						"burst_reads_bw_mb": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst reads BW Mb`,
+						},
+
+						"burst_reads_loan_mb": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst reads loan Mb`,
+						},
+
+						"burst_writes_bw_mb": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst writes BW Mb`,
+						},
+
+						"burst_writes_loan_mb": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst writes loan Mb`,
+						},
+
+						"burst_reads_iops": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst reads IOPS`,
+						},
+
+						"burst_reads_loan_iops": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst reads loan IOPS`,
+						},
+
+						"burst_writes_iops": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst writes IOPS`,
+						},
+
+						"burst_writes_loan_iops": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst writes loan IOPS`,
+						},
 					},
 				},
 			},
@@ -180,6 +288,42 @@ func DataSourceQosPolicy() *schema.Resource {
 							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 						},
 					},
+				},
+			},
+
+			"static_total_limits": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) `,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{},
+				},
+			},
+
+			"capacity_total_limits": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) `,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{},
+				},
+			},
+
+			"attached_users": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) `,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{},
 				},
 			},
 		},
@@ -298,6 +442,66 @@ func dataSourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m inte
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PolicyType", resource.PolicyType))
+
+	err = d.Set("policy_type", resource.PolicyType)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"policy_type\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LimitBy", resource.LimitBy))
+
+	err = d.Set("limit_by", resource.LimitBy)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"limit_by\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
+
+	err = d.Set("tenant_id", resource.TenantId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"tenant_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AttachedUsersIdentifiers", resource.AttachedUsersIdentifiers))
+
+	err = d.Set("attached_users_identifiers", utils.FlattenListOfPrimitives(&resource.AttachedUsersIdentifiers))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"attached_users_identifiers\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsDefault", resource.IsDefault))
+
+	err = d.Set("is_default", resource.IsDefault)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"is_default\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IoSizeBytes", resource.IoSizeBytes))
 
 	err = d.Set("io_size_bytes", resource.IoSizeBytes)
@@ -332,6 +536,44 @@ func dataSourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m inte
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"capacity_limits\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "StaticTotalLimits", resource.StaticTotalLimits))
+
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.StaticTotalLimits))
+	err = d.Set("static_total_limits", utils.FlattenModelAsList(ctx, resource.StaticTotalLimits))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"static_total_limits\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "CapacityTotalLimits", resource.CapacityTotalLimits))
+
+	tflog.Debug(ctx, fmt.Sprintf("Found a pointer object %v", resource.CapacityTotalLimits))
+	err = d.Set("capacity_total_limits", utils.FlattenModelAsList(ctx, resource.CapacityTotalLimits))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"capacity_total_limits\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AttachedUsers", resource.AttachedUsers))
+
+	err = d.Set("attached_users", utils.FlattenListOfModelsToList(ctx, resource.AttachedUsers))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"attached_users\"",
 			Detail:   err.Error(),
 		})
 	}
