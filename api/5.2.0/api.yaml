@@ -936,6 +936,25 @@ Also due to the lack of ability to configure vippool permissions using this atti
         vip_ipv6_gateway:
           type: "string"
           description: "Specifies a gateway IPv6 to external DNS server if on different subnet."
+        net_type:
+          type: "string"
+          description: "Select the interface, that listens for DNS service delegation requests"
+          enum: [NORTH_PORT, SOUTH_PORT, EXTERNAL_PORT]
+        invalid_name_response:
+          type: "string"
+          description: "The response DNS type for invalid dns name"
+          enum: [NXDOMAIN, REFUSED, SERVFAIL, NOERROR]
+        invalid_type_response:
+          type: "string"
+          description: "The response DNS type for invalid dns type"
+          enum: [NXDOMAIN, REFUSED, SERVFAIL, NOERROR]
+        ttl:
+          type: "integer"
+          description: "The reposne TTL in seconds"
+        dns_port:
+          type: "integer"
+          default: 53
+          description: "The DNS listenning port"
     Quota:
       description: "This is a quota"
       type: "object"

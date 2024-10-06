@@ -31,8 +31,13 @@ resource "vastdata_dns" "dns1" {
 ### Optional
 
 - `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `dns_port` (Number) (Valid for versions: 5.2.0) The DNS listenning port
 - `domain_suffix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.
 - `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enable the VAST DNS server configurations
+- `invalid_name_response` (String) (Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns name Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]
+- `invalid_type_response` (String) (Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns type Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]
+- `net_type` (String) (Valid for versions: 5.1.0,5.2.0) Select the interface, that listens for DNS service delegation requests Allowed Values are [NORTH_PORT SOUTH_PORT EXTERNAL_PORT]
+- `ttl` (Number) (Valid for versions: 5.1.0,5.2.0) The reposne TTL in seconds
 - `vip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.
 - `vip_gateway` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.
 - `vip_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns an IPv6 to the DNS service.

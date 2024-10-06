@@ -128,6 +128,46 @@ func DataSourceDns() *schema.Resource {
 				Optional:    false,
 				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IPv6 to external DNS server if on different subnet.`,
 			},
+
+			"net_type": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Select the interface, that listens for DNS service delegation requests Allowed Values are [NORTH_PORT SOUTH_PORT EXTERNAL_PORT]`,
+			},
+
+			"invalid_name_response": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns name Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
+			},
+
+			"invalid_type_response": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns type Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
+			},
+
+			"ttl": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The reposne TTL in seconds`,
+			},
+
+			"dns_port": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    false,
+				Required:    false,
+				Optional:    true,
+				Description: `(Valid for versions: 5.2.0) The DNS listenning port`,
+			},
 		},
 	}
 }
@@ -348,6 +388,66 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"vip_ipv6_gateway\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "NetType", resource.NetType))
+
+	err = d.Set("net_type", resource.NetType)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"net_type\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "InvalidNameResponse", resource.InvalidNameResponse))
+
+	err = d.Set("invalid_name_response", resource.InvalidNameResponse)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"invalid_name_response\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "InvalidTypeResponse", resource.InvalidTypeResponse))
+
+	err = d.Set("invalid_type_response", resource.InvalidTypeResponse)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"invalid_type_response\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Ttl", resource.Ttl))
+
+	err = d.Set("ttl", resource.Ttl)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"ttl\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "DnsPort", resource.DnsPort))
+
+	err = d.Set("dns_port", resource.DnsPort)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"dns_port\"",
 			Detail:   err.Error(),
 		})
 	}

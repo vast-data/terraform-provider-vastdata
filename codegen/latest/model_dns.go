@@ -34,4 +34,14 @@ type Dns struct {
 	VipIpv6SubnetCidr int32 `json:"vip_ipv6_subnet_cidr,omitempty"`
 	// Specifies a gateway IPv6 to external DNS server if on different subnet.
 	VipIpv6Gateway string `json:"vip_ipv6_gateway,omitempty"`
+	// Select the interface, that listens for DNS service delegation requests
+	NetType string `json:"net_type,omitempty"`
+	// The response DNS type for invalid dns name
+	InvalidNameResponse string `json:"invalid_name_response,omitempty"`
+	// The response DNS type for invalid dns type
+	InvalidTypeResponse string `json:"invalid_type_response,omitempty"`
+	// The reposne TTL in seconds
+	Ttl int32 `json:"ttl,omitempty"`
+	// The DNS listenning port
+	DnsPort int32 `json:"dns_port,omitempty"`
 }

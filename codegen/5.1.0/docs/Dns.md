@@ -16,6 +16,10 @@ Name | Type | Description | Notes
 **VipIpv6** | **string** | Assigns an IPv6 to the DNS service. | [optional] [default to null]
 **VipIpv6SubnetCidr** | **int32** | Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128] | [optional] [default to null]
 **VipIpv6Gateway** | **string** | Specifies a gateway IPv6 to external DNS server if on different subnet. | [optional] [default to null]
+**NetType** | **string** | Select the interface, that listens for DNS service delegation requests | [optional] [default to NET_TYPE.EXTERNAL_PORT]
+**InvalidNameResponse** | **string** | The response DNS type for invalid dns name | [optional] [default to null]
+**InvalidTypeResponse** | **string** | The response DNS type for invalid dns type | [optional] [default to null]
+**Ttl** | **int32** | The reposne TTL in seconds | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
