@@ -50,6 +50,16 @@ data "vastdata_qos_policy" "qos1" {
 
 Read-Only:
 
+- `fqdn` (String)
+- `identifier_type` (String)
+- `identifier_value` (String)
+- `is_sid` (Boolean)
+- `label` (String)
+- `login_name` (String)
+- `name` (String)
+- `sid_str` (String)
+- `uid_or_gid` (Number)
+- `value` (String)
 
 
 <a id="nestedatt--capacity_limits"></a>
@@ -68,6 +78,8 @@ Read-Only:
 
 Read-Only:
 
+- `max_bw_mbps_per_gb_capacity` (Number)
+- `max_iops_per_gb_capacity` (Number)
 
 
 <a id="nestedatt--static_limits"></a>
@@ -97,3 +109,10 @@ Read-Only:
 ### Nested Schema for `static_total_limits`
 
 Read-Only:
+
+- `burst_bw_mb` (Number)
+- `burst_iops` (Number)
+- `burst_loan_iops` (Number)
+- `burst_loan_mb` (Number)
+- `max_bw_mbps` (Number)
+- `max_iops` (Number)

@@ -91,6 +91,9 @@ data "vastdata_view" "view1" {
 
 Read-Only:
 
+- `destination_id` (Number)
+- `key_format` (String)
+- `prefix` (String)
 
 
 <a id="nestedatt--share_acl"></a>

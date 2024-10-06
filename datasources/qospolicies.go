@@ -299,7 +299,56 @@ func DataSourceQosPolicy() *schema.Resource {
 				Description: `(Valid for versions: 5.2.0) `,
 
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{},
+					Schema: map[string]*schema.Schema{
+
+						"max_bw_mbps": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Maximal BW Mb/s`,
+						},
+
+						"burst_bw_mb": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst BW Mb`,
+						},
+
+						"burst_loan_mb": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst loan Mb`,
+						},
+
+						"max_iops": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Maximal IOPS`,
+						},
+
+						"burst_iops": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst IOPS`,
+						},
+
+						"burst_loan_iops": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Burst loan IOPS`,
+						},
+					},
 				},
 			},
 
@@ -311,7 +360,24 @@ func DataSourceQosPolicy() *schema.Resource {
 				Description: `(Valid for versions: 5.2.0) `,
 
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{},
+					Schema: map[string]*schema.Schema{
+
+						"max_bw_mbps_per_gb_capacity": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						},
+
+						"max_iops_per_gb_capacity": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						},
+					},
 				},
 			},
 
@@ -323,7 +389,88 @@ func DataSourceQosPolicy() *schema.Resource {
 				Description: `(Valid for versions: 5.2.0) `,
 
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{},
+					Schema: map[string]*schema.Schema{
+
+						"fqdn": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) User FQDN`,
+						},
+
+						"is_sid": &schema.Schema{
+							Type:        schema.TypeBool,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) `,
+						},
+
+						"sid_str": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) The user SID`,
+						},
+
+						"uid_or_gid": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) `,
+						},
+
+						"label": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) How to display the user`,
+						},
+
+						"value": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) The user name`,
+						},
+
+						"login_name": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) The user login name`,
+						},
+
+						"name": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) The user name`,
+						},
+
+						"identifier_type": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) The user type of idetify`,
+						},
+
+						"identifier_value": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) The value to use fo the identifier_type`,
+						},
+					},
 				},
 			},
 		},

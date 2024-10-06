@@ -173,7 +173,10 @@ var _ = Describe(" ViewPolicy", func() {
       6
    ],
    "vippool_permissions": [
-      {}
+      {
+         "vippool_id": "string",
+         "vippool_permissions": "string"
+      }
    ]
 }
                          `

@@ -59,7 +59,11 @@ var _ = Describe(" View", func() {
       "D",
       "E"
    ],
-   "bucket_logging": {},
+   "bucket_logging": {
+      "destination_id": 100,
+      "key_format": "string",
+      "prefix": "string"
+   },
    "bucket_owner": "string",
    "cluster": "string",
    "cluster_id": 100,

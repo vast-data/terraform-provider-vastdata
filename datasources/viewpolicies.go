@@ -645,7 +645,24 @@ func DataSourceViewPolicy() *schema.Resource {
 				Description: `(Valid for versions: 5.1.0,5.2.0) List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather`,
 
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{},
+					Schema: map[string]*schema.Schema{
+
+						"vippool_id": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.1.0,5.2.0) The Vippool ID`,
+						},
+
+						"vippool_permissions": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    false,
+							Required:    false,
+							Optional:    true,
+							Description: `(Valid for versions: 5.1.0,5.2.0) VIP pool permissions  Allowed Values are [RW RO]`,
+						},
+					},
 				},
 			},
 		},

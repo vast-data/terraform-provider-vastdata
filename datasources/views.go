@@ -427,7 +427,32 @@ func DataSourceView() *schema.Resource {
 				Description: `(Valid for versions: 5.2.0) `,
 
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{},
+					Schema: map[string]*schema.Schema{
+
+						"destination_id": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.2.0) The Logging bucket ID`,
+						},
+
+						"prefix": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    false,
+							Required:    false,
+							Optional:    true,
+							Description: `(Valid for versions: 5.2.0) Log line prefix to add`,
+						},
+
+						"key_format": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    false,
+							Required:    false,
+							Optional:    true,
+							Description: `(Valid for versions: 5.2.0) The format for log object keys. SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString], PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the logged events occurred, PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: SIMPLE_PREFIX Allowed Values are [SIMPLE_PREFIX PARTITIONED_PREFIX_EVENT_TIME PARTITIONED_PREFIX_DELIVERY_TIME]`,
+						},
+					},
 				},
 			},
 

@@ -28,7 +28,17 @@ var _ = Describe(" QosPolicy", func() {
 	var model_json = `
                          {
    "attached_users": [
-      {}
+      {
+         "fqdn": "string",
+         "identifier_type": "string",
+         "identifier_value": "string",
+         "label": "string",
+         "login_name": "string",
+         "name": "string",
+         "sid_str": "string",
+         "uid_or_gid": 100,
+         "value": "string"
+      }
    ],
    "attached_users_identifiers": [
       "A",
@@ -43,7 +53,10 @@ var _ = Describe(" QosPolicy", func() {
       "max_writes_bw_mbps_per_gb_capacity": 100,
       "max_writes_iops_per_gb_capacity": 100
    },
-   "capacity_total_limits": {},
+   "capacity_total_limits": {
+      "max_bw_mbps_per_gb_capacity": 100,
+      "max_iops_per_gb_capacity": 100
+   },
    "guid": "string",
    "id": 100,
    "io_size_bytes": 100,
@@ -69,7 +82,14 @@ var _ = Describe(" QosPolicy", func() {
       "min_writes_bw_mbps": 100,
       "min_writes_iops": 100
    },
-   "static_total_limits": {},
+   "static_total_limits": {
+      "burst_bw_mb": 100,
+      "burst_iops": 100,
+      "burst_loan_iops": 100,
+      "burst_loan_mb": 100,
+      "max_bw_mbps": 100,
+      "max_iops": 100
+   },
    "tenant_id": 100
 }
                          `

@@ -104,3 +104,6 @@ data "vastdata_view_policy" "view_policy1" {
 ### Nested Schema for `vippool_permissions`
 
 Read-Only:
+
+- `vippool_id` (String)
+- `vippool_permissions` (String)
