@@ -42,6 +42,4 @@ type Dns struct {
 	InvalidTypeResponse string `json:"invalid_type_response,omitempty"`
 	// The reposne TTL in seconds
 	Ttl int32 `json:"ttl,omitempty"`
-	// The DNS listenning port
-	DnsPort int32 `json:"dns_port,omitempty"`
 }

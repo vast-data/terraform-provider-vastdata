@@ -31,7 +31,6 @@ resource "vastdata_dns" "dns1" {
 ### Optional
 
 - `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `dns_port` (Number) (Valid for versions: 5.2.0) The DNS listenning port
 - `domain_suffix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.
 - `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enable the VAST DNS server configurations
 - `invalid_name_response` (String) (Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns name Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]

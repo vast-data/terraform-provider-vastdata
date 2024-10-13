@@ -25,10 +25,6 @@ data "vastdata_dns" "dns1" {
 
 - `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a name for the VAST DNS server configuration
 
-### Optional
-
-- `dns_port` (Number) (Valid for versions: 5.2.0) The DNS listenning port
-
 ### Read-Only
 
 - `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)

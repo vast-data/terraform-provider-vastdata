@@ -167,6 +167,14 @@ type ResourceTemplateV2 struct {
 	Importer                 utils.ImportInterface
 	AttributesDiffFuncs      map[string]schema.SchemaDiffSuppressFunc
 	Timeouts                 *schema.ResourceTimeout
+	DisableAutoValidator     *StringSet
+}
+
+func (r *ResourceTemplateV2) AutomaticValidationIsDisabled(s string) bool {
+	if r.DisableAutoValidator == nil {
+		return false
+	}
+	return r.DisableAutoValidator.In(s)
 }
 
 func (r *ResourceTemplateV2) GetResourceTimeouts() *schema.ResourceTimeout {

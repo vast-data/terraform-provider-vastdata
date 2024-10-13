@@ -35,7 +35,6 @@ var _ = Describe(" Dns", func() {
       5,
       6
    ],
-   "dns_port": 100,
    "domain_suffix": "string",
    "guid": "string",
    "id": 100,

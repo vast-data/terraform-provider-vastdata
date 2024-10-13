@@ -951,10 +951,6 @@ Also due to the lack of ability to configure vippool permissions using this atti
         ttl:
           type: "integer"
           description: "The reposne TTL in seconds"
-        dns_port:
-          type: "integer"
-          default: 53
-          description: "The DNS listenning port"
     Quota:
       description: "This is a quota"
       type: "object"
@@ -2156,3 +2152,100 @@ PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBuck
 Default: SIMPLE_PREFIX"
           enum: [ SIMPLE_PREFIX, PARTITIONED_PREFIX_EVENT_TIME, PARTITIONED_PREFIX_DELIVERY_TIME ]
           default: "SIMPLE_PREFIX"
+    Realm:
+      type: "object"
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the realm"
+        name:
+          type: "string"
+          description: "A uniqe name of the realm"
+        object_types: 
+          type: "array"
+          items:
+            type: "string"
+          description: "List of allowed permissions"
+          enum: [cnodegroup, managedapplication, managedapplicationset, alarm, event, eventdefinition, eventdefinitionconfig, cbox, cnode, carrier, cluster, dbox, dnode, dtray, ebox, fan, host, nic, nvram, psu, port, rack, ssd, subnetmanager, switch, dns, globalsnapstream, kafkabroker, nativereplicationremotetarget, protectedpath, protectionpolicy, qospolicy, quota, quotaentityinfo, replicationrestorepoint, replicationstream, replicationtarget, s3lifecyclerule, snapshot, userquota, vip, vippool, view, viewpolicy, monitor, activedirectory, encryptedpath, encryptiongroup, group, indestructibility, ldap, manager, nis, permission, realm, role, s3policy, tenant, user, vms, callhomeconfig, challengetoken, env, license, module, supportbundle, systemsettingsdiff]
+    Role:
+      type: "object"
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the role"
+        name:
+          type: "string"
+          description: "A uniqe name of the role"
+        permissions_list:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of allowed permissions"
+          enum: [ create_support, create_settings, create_security, create_monitoring, create_logical, create_hardware, create_events, create_database, create_applications, view_support, view_settings, view_security, view_monitoring, view_logical, view_hardware, view_events, view_applications, view_database, edit_support, edit_settings, edit_security, edit_monitoring, edit_logical, edit_hardware, edit_events, edit_database, edit_applications, delete_support, delete_settings, delete_security, delete_monitoring, delete_logical, delete_hardware, delete_events, delete_applications, delete_database ]
+        permissions:
+            type: "array"
+            items:
+              type: "string"
+            description: "List of allowed permissions returned from the VMS"
+        tenants:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          description: "List of tenants to which this role is associated with"
+        is_admin:
+          type: "boolean"
+          description: "Is the role is an admin role"
+        is_default:
+          type: "boolean"
+          description: "Is the role is a default role"
+        realms_permissions:
+          type: "array"
+          items:
+            type: "object"
+            $ref: '#/components/schemas/RealmPermission'
+          description: "List of realms related permissions"
+    RealmPermission:
+      type: "object"
+      properties:
+        realm_name:
+          type: "string"
+          description: "The name of the realm"
+        create:
+          type: "boolean"
+          default: false
+          description: "Should allow create related to permissions associated with this realm"
+        view:
+          type: "boolean"
+          default: false
+          description: "Should allow view related to permissions associated with this realm"
+        delete:
+          type: "boolean"
+          default: false
+          description: "Should allow delete related to permissions associated with this realm"
+        edit:
+          type: "boolean"
+          default: false
+          description: "Should allow edit related to permissions associated with this realm"
+    # Manager:
+    #   type: "object"
+    #   properties:
+    #     realm_name:
+    #       type: "string"
+    #       description: "The name of the realm"
+    #     create:
+    #       type: "boolean"
+    #       default: false
+    #       description: "Should allow create related to permissions associated with this realm"
+    #     view:
+    #       type: "boolean"
+    #       default: false
+    #       description: "Should allow view related to permissions associated with this realm"
+    #     delete:
+    #       type: "boolean"
+    #       default: false
+    #       description: "Should allow delete related to permissions associated with this realm"
+    #     edit:
+    #       type: "boolean"
+    #       default: false
+    #       description: "Should allow edit related to permissions associated with this realm"

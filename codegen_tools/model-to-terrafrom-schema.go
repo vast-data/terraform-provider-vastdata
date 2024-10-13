@@ -124,8 +124,7 @@ func ProcessResourceTemplate(R *codegen_configs.ResourceTemplateV2) {
 		}
 		m["enum"] = ""
 		enum := R.GetEnum(m["name"])
-		if len(enum) > 0 && (!R.HasValidatorFunc(m["name"])) {
-			fmt.Println(m["name"])
+		if len(enum) > 0 && (!R.HasValidatorFunc(m["name"])) && !R.AutomaticValidationIsDisabled(m["name"]) {
 			l := codegen_configs.ListAsStringsList(enum)
 			m["enum"] = AsStringListDefentions(l)
 		}

@@ -206,18 +206,6 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.1.0,5.2.0) The reposne TTL in seconds`,
 		},
-
-		"dns_port": &schema.Schema{
-			Type:          schema.TypeInt,
-			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("dns_port"),
-
-			Computed:    false,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) The DNS listenning port`,
-
-			Default: 53,
-		},
 	}
 }
 
@@ -415,18 +403,6 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"ttl\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "DnsPort", resource.DnsPort))
-
-	err = d.Set("dns_port", resource.DnsPort)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"dns_port\"",
 			Detail:   err.Error(),
 		})
 	}

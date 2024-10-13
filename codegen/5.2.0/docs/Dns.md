@@ -20,7 +20,6 @@ Name | Type | Description | Notes
 **InvalidNameResponse** | **string** | The response DNS type for invalid dns name | [optional] [default to null]
 **InvalidTypeResponse** | **string** | The response DNS type for invalid dns type | [optional] [default to null]
 **Ttl** | **int32** | The reposne TTL in seconds | [optional] [default to null]
-**DnsPort** | **int32** | The DNS listenning port | [optional] [default to 53]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
