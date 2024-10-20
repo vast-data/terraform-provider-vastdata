@@ -54,21 +54,24 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"policy": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("policy"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"enabled": &schema.Schema{
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("enabled"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"tenant_id": &schema.Schema{
@@ -159,6 +162,7 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("S3Policy")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3policies"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceS3PolicyRead] Calling Get Function : %v for resource S3Policy", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

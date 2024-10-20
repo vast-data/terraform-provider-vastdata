@@ -44,7 +44,8 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name`,
 		},
 
 		"guid": &schema.Schema{
@@ -61,14 +62,16 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("enabled"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"prefix": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("prefix"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
 		},
 
 		"min_size": &schema.Schema{
@@ -356,6 +359,7 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceS3LifeCycleRuleRead] Calling Get Function : %v for resource S3LifeCycleRule", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

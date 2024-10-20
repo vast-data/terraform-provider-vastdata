@@ -54,7 +54,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name`,
 		},
 
 		"state": &schema.Schema{
@@ -101,11 +102,11 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("grace_period"),
 
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.GracePeriodFormatValidation,
-			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
 		},
 
 		"time_to_block": &schema.Schema{
@@ -404,11 +405,11 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("grace_period"),
 
-						Computed:         true,
-						Optional:         true,
-						Sensitive:        false,
+						Computed:  true,
+						Optional:  true,
+						Sensitive: false,
+
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 				},
 			},
@@ -480,11 +481,11 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("grace_period"),
 
-						Computed:         true,
-						Optional:         true,
-						Sensitive:        false,
+						Computed:  true,
+						Optional:  true,
+						Sensitive: false,
+
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 				},
 			},
@@ -506,11 +507,11 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
 
-						Computed:         true,
-						Optional:         true,
-						Sensitive:        false,
+						Computed:  true,
+						Optional:  true,
+						Sensitive: false,
+
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 
 					"time_to_block": &schema.Schema{
@@ -659,7 +660,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
 
-									Required: true,
+									Required:    true,
+									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
 								"identifier_type": &schema.Schema{
@@ -694,11 +696,11 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
 
-						Computed:         true,
-						Optional:         true,
-						Sensitive:        false,
+						Computed:  true,
+						Optional:  true,
+						Sensitive: false,
+
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
-						Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement grace period at the format of HH:MM:SS`,
 					},
 
 					"time_to_block": &schema.Schema{
@@ -847,7 +849,8 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
 
-									Required: true,
+									Required:    true,
+									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
 								"identifier_type": &schema.Schema{
@@ -1293,6 +1296,7 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("Quota")
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceQuotaRead] Calling Get Function : %v for resource Quota", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

@@ -46,7 +46,8 @@ func getResourceProtectedPathSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectedPath").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"guid": &schema.Schema{
@@ -281,6 +282,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectedPath")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceProtectedPathRead] Calling Get Function : %v for resource ProtectedPath", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

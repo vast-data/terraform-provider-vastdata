@@ -54,18 +54,19 @@ func getResourceSnapshotSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("expiration_time"),
 
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.SnapshotExpirationFormatValidation,
-			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire`,
 		},
 
 		"name": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Snapshot").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
 		},
 
 		"path": &schema.Schema{
@@ -187,6 +188,7 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceSnapshotRead] Calling Get Function : %v for resource Snapshot", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

@@ -54,7 +54,8 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the tenant`,
 		},
 
 		"use_smb_privileged_user": &schema.Schema{
@@ -577,6 +578,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("Tenant")
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceTenantRead] Calling Get Function : %v for resource Tenant", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

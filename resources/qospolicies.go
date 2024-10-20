@@ -54,7 +54,8 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
 		"mode": &schema.Schema{
@@ -783,6 +784,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("QosPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceQosPolicyRead] Calling Get Function : %v for resource QosPolicy", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

@@ -54,7 +54,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
 		},
 
 		"loanee_tenant_id": &schema.Schema{
@@ -64,35 +65,40 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			DiffSuppressOnRefresh: false,
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target`,
 		},
 
 		"loanee_root_path": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("loanee_root_path"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target`,
 		},
 
 		"remote_target_id": &schema.Schema{
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_id"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering id`,
 		},
 
 		"remote_target_guid": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_guid"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering guid`,
 		},
 
 		"remote_target_path": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_path"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster`,
 		},
 
 		"enabled": &schema.Schema{
@@ -109,7 +115,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("owner_root_snapshot"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -128,7 +135,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerRootSnapshot").GetConflictingFields("name"),
 
-						Required: true,
+						Required:    true,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remote Clone Name`,
 					},
 
 					"parent_handle_ehandle": &schema.Schema{
@@ -148,7 +156,8 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("owner_tenant"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -157,14 +166,16 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("name"),
 
-						Required: true,
+						Required:    true,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant`,
 					},
 
 					"guid": &schema.Schema{
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("guid"),
 
-						Required: true,
+						Required:    true,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant guid`,
 					},
 				},
 			},
@@ -309,6 +320,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("GlobalSnapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceGlobalSnapshotRead] Calling Get Function : %v for resource GlobalSnapshot", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

@@ -59,11 +59,11 @@ resource "vastdata_global_local_snapshot" "local_snapshot" {
 
 ### Required
 
-- `loanee_root_path` (String)
-- `loanee_snapshot_id` (Number)
-- `loanee_tenant_id` (Number)
-- `name` (String)
-- `owner_tenant` (Block List, Min: 1) (see [below for nested schema](#nestedblock--owner_tenant))
+- `loanee_root_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target
+- `loanee_snapshot_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the local snapshot
+- `loanee_tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot
+- `owner_tenant` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--owner_tenant))
 
 ### Optional
 
@@ -79,8 +79,8 @@ resource "vastdata_global_local_snapshot" "local_snapshot" {
 
 Required:
 
-- `guid` (String)
-- `name` (String)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant guid
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant
 
 ## Import
 

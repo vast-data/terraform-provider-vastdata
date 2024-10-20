@@ -54,8 +54,9 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("machine_account_name"),
 
-			Required: true,
-			ForceNew: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			ForceNew:    true,
 		},
 
 		"organizational_unit": &schema.Schema{
@@ -73,7 +74,8 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("ldap_id"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 	}
 }
@@ -141,6 +143,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("ActiveDirectory")
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceActiveDirectoryRead] Calling Get Function : %v for resource ActiveDirectory", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

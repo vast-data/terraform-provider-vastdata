@@ -61,11 +61,11 @@ resource "vastdata_snapshot" "snapshot" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot
 
 ### Optional
 
-- `expiration_time` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire
+- `expiration_time` (String)
 - `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable
 - `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from
 - `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use

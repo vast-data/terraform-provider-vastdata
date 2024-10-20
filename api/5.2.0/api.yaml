@@ -1892,7 +1892,7 @@ Also due to the lack of ability to configure vippool permissions using this atti
         clone_type:
           type: "string"
           description: "The type the replication"
-          enum: [NATIVE_REPLICATION]
+          enum: [NATIVE_REPLICATION,LOCAL]
         frames:
           type: "array"
           items:
@@ -2227,25 +2227,55 @@ Default: SIMPLE_PREFIX"
           type: "boolean"
           default: false
           description: "Should allow edit related to permissions associated with this realm"
-    # Manager:
-    #   type: "object"
-    #   properties:
-    #     realm_name:
-    #       type: "string"
-    #       description: "The name of the realm"
-    #     create:
-    #       type: "boolean"
-    #       default: false
-    #       description: "Should allow create related to permissions associated with this realm"
-    #     view:
-    #       type: "boolean"
-    #       default: false
-    #       description: "Should allow view related to permissions associated with this realm"
-    #     delete:
-    #       type: "boolean"
-    #       default: false
-    #       description: "Should allow delete related to permissions associated with this realm"
-    #     edit:
-    #       type: "boolean"
-    #       default: false
-    #       description: "Should allow edit related to permissions associated with this realm"
+    Manager:
+      type: "object"
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the manager"
+        username:
+          type: "string"
+          description: "The username of the manager"
+        password:
+          type: "string"
+          description: "The username of the manager"
+        first_name:
+          type: "string"
+          description: "The user firstname"
+        last_name:
+          type: "string"
+          description: "The user last name"
+        permissions_list:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of allowed permissions"
+          enum: [ create_support, create_settings, create_security, create_monitoring, create_logical, create_hardware, create_events, create_database, create_applications, view_support, view_settings, view_security, view_monitoring, view_logical, view_hardware, view_events, view_applications, view_database, edit_support, edit_settings, edit_security, edit_monitoring, edit_logical, edit_hardware, edit_events, edit_database, edit_applications, delete_support, delete_settings, delete_security, delete_monitoring, delete_logical, delete_hardware, delete_events, delete_applications, delete_database ]
+        roles:
+          type: "array"
+          items:
+            type: "int"
+            format: "int64"
+          description: "List of roles ids"
+        password_expiration_disabled:
+          type: "boolean"
+          default: true
+          description: "Disable apssword expiration"
+        is_temporary_password:
+          type: "boolean"
+          default: true
+          description: "Disable apssword expiration"
+        password_hash:
+          type: string
+          description: "password sha256 to be used to check for password updates"
+        realms_permissions:
+          type: "array"
+          items:
+            type: "object"
+            $ref: '#/components/schemas/RealmPermission'
+          description: "List of realms related permissions"
+        permissions:
+            type: "array"
+            items:
+              type: "string"
+            description: "List of allowed permissions returned from the VMS"

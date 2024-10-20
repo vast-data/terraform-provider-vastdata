@@ -26,7 +26,7 @@ resource "vastdata_dns" "dns1" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a name for the VAST DNS server configuration
 
 ### Optional
 

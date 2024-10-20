@@ -54,7 +54,8 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the vippool`,
 		},
 
 		"subnet_cidr": &schema.Schema{
@@ -167,14 +168,16 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("role"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Role`,
 		},
 
 		"ip_ranges": &schema.Schema{
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("ip_ranges"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges`,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -537,6 +540,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("VipPool")
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceVipPoolRead] Calling Get Function : %v for resource VipPool", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

@@ -42,9 +42,9 @@ resource "vastdata_tenant" "tenant1" {
 
 ### Required
 
-- `ip_ranges` (Block List, Min: 1) (see [below for nested schema](#nestedblock--ip_ranges))
-- `name` (String)
-- `role` (String)
+- `ip_ranges` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges (see [below for nested schema](#nestedblock--ip_ranges))
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the vippool
+- `role` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Role
 
 ### Optional
 

@@ -112,14 +112,14 @@ resource "vastdata_global_snapshot" "gsnap1" {
 
 ### Required
 
-- `loanee_root_path` (String)
-- `loanee_tenant_id` (Number)
-- `name` (String)
-- `owner_root_snapshot` (Block List, Min: 1) (see [below for nested schema](#nestedblock--owner_root_snapshot))
-- `owner_tenant` (Block List, Min: 1) (see [below for nested schema](#nestedblock--owner_tenant))
-- `remote_target_guid` (String)
-- `remote_target_id` (Number)
-- `remote_target_path` (String)
+- `loanee_root_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target
+- `loanee_tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot
+- `owner_root_snapshot` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--owner_root_snapshot))
+- `owner_tenant` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--owner_tenant))
+- `remote_target_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering guid
+- `remote_target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering id
+- `remote_target_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster
 
 ### Optional
 
@@ -135,7 +135,7 @@ resource "vastdata_global_snapshot" "gsnap1" {
 
 Required:
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Remote Clone Name
 
 Read-Only:
 
@@ -148,8 +148,8 @@ Read-Only:
 
 Required:
 
-- `guid` (String)
-- `name` (String)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant guid
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant
 
 ## Import
 

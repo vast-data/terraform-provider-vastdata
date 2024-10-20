@@ -54,7 +54,8 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name given to the view policy.                         `,
 		},
 
 		"gid_inheritance": &schema.Schema{
@@ -1811,6 +1812,7 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceViewPolicyRead] Calling Get Function : %v for resource ViewPolicy", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

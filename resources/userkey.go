@@ -37,8 +37,9 @@ func getResourceUserKeySchema() map[string]*schema.Schema {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("UserKey").GetConflictingFields("user_id"),
 
-			Required: true,
-			ForceNew: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user id to create the Key for`,
+			ForceNew:    true,
 		},
 
 		"access_key": &schema.Schema{
@@ -183,6 +184,7 @@ func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interfac
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("UserKey")
 	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceUserKeyRead] Calling Get Function : %v for resource UserKey", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

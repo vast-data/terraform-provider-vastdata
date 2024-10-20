@@ -25,8 +25,8 @@ resource "vastdata_group" "group1" {
 
 ### Required
 
-- `gid` (Number)
-- `name` (String)
+- `gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The group linux gid
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the group
 
 ### Optional
 

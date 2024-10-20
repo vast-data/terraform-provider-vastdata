@@ -3,7 +3,9 @@ package utils
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -40,4 +42,14 @@ func FieldsUpdate(ctx context.Context, fields []string, d *schema.ResourceData, 
 			(*m)[i] = new
 		}
 	}
+}
+
+func GetFuncName(i interface{}) string {
+	//Return the function name
+	p := runtime.FuncForPC(reflect.ValueOf(i).Pointer())
+	if p != nil {
+		return p.Name()
+	}
+	return "Unkown"
+
 }

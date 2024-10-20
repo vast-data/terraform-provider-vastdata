@@ -43,7 +43,7 @@ resource "vastdata_s3_replication_peers" "s3peer-aws" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the s3 replication peer configuration
 
 ### Optional
 

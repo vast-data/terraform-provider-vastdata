@@ -161,7 +161,8 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      {{ $cbl:="{" }}
      client:=m.(vast_client.JwtSession)
      resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
-     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}  
+     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
+     tflog.Debug(ctx,fmt.Sprintf("[resource{{ .ResourceName }}Read] Calling Get Function : %v for resource {{ .ResourceName }}",utils.GetFuncName(resource_config.GetFunc)))  
      response,err:=resource_config.GetFunc(ctx,client,attrs,d,map[string]string{})
      utils.VastVersionsWarn(ctx)
 
@@ -519,11 +520,11 @@ func ResourceBuildTemplateToTerrafromElem(r codegen_configs.ResourceElem, indent
 	     {{indent $I " "}}   Computed: {{.Attributes.computed}},
 	     {{indent $I " "}}   Optional: {{.Attributes.optional}},
 	     {{indent $I " "}}   Sensitive: {{.Attributes.sensitive}},
+             {{indent $I " "}} 
+             {{- end }}
              {{-  if  .Attributes.validator_func  }}
              {{indent $I " "}}  ValidateDiagFunc: {{.Attributes.validator_func}},
              {{ else }}
-             {{indent $I " "}} 
-             {{- end }}
              {{-  if  .Attributes.enum }}
              {{indent $I " "}}  ValidateDiagFunc: utils.OneOf({{.Attributes.enum}}),
              {{ end -}}

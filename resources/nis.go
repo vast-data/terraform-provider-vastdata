@@ -54,7 +54,8 @@ func getResourceNisSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Nis").GetConflictingFields("domain_name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The nis server domain name`,
 		},
 
 		"hosts": &schema.Schema{
@@ -124,6 +125,7 @@ func resourceNisRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("Nis")
 	attrs := map[string]interface{}{"path": utils.GenPath("nis"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceNisRead] Calling Get Function : %v for resource Nis", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

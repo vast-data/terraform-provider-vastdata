@@ -48,7 +48,7 @@ resource "vastdata_user" "user1" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the user
 
 ### Optional
 

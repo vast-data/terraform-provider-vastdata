@@ -54,7 +54,8 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the user`,
 		},
 
 		"uid": &schema.Schema{
@@ -450,6 +451,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("User")
 	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceUserRead] Calling Get Function : %v for resource User", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

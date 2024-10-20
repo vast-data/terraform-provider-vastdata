@@ -72,9 +72,9 @@ resource "vastdata_protection_policy" "protection-policy" {
 
 ### Required
 
-- `clone_type` (String)
-- `name` (String)
-- `prefix` (String)
+- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration
+- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data
 
 ### Optional
 
@@ -94,7 +94,7 @@ resource "vastdata_protection_policy" "protection-policy" {
 
 Optional:
 
-- `every` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day
+- `every` (String)
 - `keep_local` (String)
 - `keep_remote` (String)
 - `start_at` (String)

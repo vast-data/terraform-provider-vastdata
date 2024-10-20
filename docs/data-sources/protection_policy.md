@@ -27,7 +27,7 @@ data "vastdata_protection_policy" "policy1" {
 
 ### Read-Only
 
-- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION]
+- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]
 - `frames` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of snapshots schedules (see [below for nested schema](#nestedatt--frames))
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the replication peer configuration

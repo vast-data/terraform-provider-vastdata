@@ -17,7 +17,7 @@ description: |-
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.2.0) A uniqe name of the realm
 
 ### Optional
 

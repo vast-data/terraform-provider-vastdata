@@ -64,7 +64,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("path"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) File system path. Begin with '/'. Do not include a trailing slash`,
 		},
 
 		"create_dir": &schema.Schema{
@@ -104,7 +105,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("policy_id"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Associated view policy ID`,
 		},
 
 		"cluster": &schema.Schema{
@@ -405,7 +407,8 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("name"),
 
-									Required: true,
+									Required:    true,
+									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
 								"fqdn": &schema.Schema{
@@ -448,22 +451,22 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("max_retention_period"),
 
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.ValidateRetention,
-			Description:      `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).`,
 		},
 
 		"min_retention_period": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("min_retention_period"),
 
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.ValidateRetention,
-			Description:      `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).`,
 		},
 
 		"files_retention_mode": &schema.Schema{
@@ -482,22 +485,22 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("default_retention_period"),
 
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.ValidateRetention,
-			Description:      `(Valid for versions: 5.1.0,5.2.0) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.`,
 		},
 
 		"auto_commit": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("auto_commit"),
 
-			Computed:         true,
-			Optional:         true,
-			Sensitive:        false,
+			Computed:  true,
+			Optional:  true,
+			Sensitive: false,
+
 			ValidateDiagFunc: utils.ValidateRetention,
-			Description:      `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).`,
 		},
 
 		"s3_object_ownership_rule": &schema.Schema{
@@ -1144,6 +1147,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("View")
 	attrs := map[string]interface{}{"path": utils.GenPath("views"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceViewRead] Calling Get Function : %v for resource View", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

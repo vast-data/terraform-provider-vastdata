@@ -151,7 +151,7 @@ resource "vastdata_view_policy" "vpolicy1" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name given to the view policy.
 
 ### Optional
 

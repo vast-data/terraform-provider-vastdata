@@ -54,7 +54,8 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the s3 replication peer configuration`,
 		},
 
 		"url": &schema.Schema{
@@ -306,6 +307,7 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceS3replicationPeersRead] Calling Get Function : %v for resource S3replicationPeers", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

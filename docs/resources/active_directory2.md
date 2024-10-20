@@ -35,7 +35,7 @@ resource "vastdata_active_directory2" "ad1" {
 
 ### Required
 
-- `machine_account_name` (String)
+- `machine_account_name` (String) (Valid for versions: 5.1.0,5.2.0) Name of the computer object/machine account to add. Recommended to be the name of the cluster
 
 ### Optional
 

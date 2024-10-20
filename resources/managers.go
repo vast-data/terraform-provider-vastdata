@@ -21,39 +21,68 @@ import (
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
 )
 
-func ResourceRole() *schema.Resource {
+func ResourceManager() *schema.Resource {
 	return &schema.Resource{
-		ReadContext:   resourceRoleRead,
-		DeleteContext: resourceRoleDelete,
-		CreateContext: resourceRoleCreate,
-		UpdateContext: resourceRoleUpdate,
+		ReadContext:   resourceManagerRead,
+		DeleteContext: resourceManagerDelete,
+		CreateContext: resourceManagerCreate,
+		UpdateContext: resourceManagerUpdate,
 
 		Importer: &schema.ResourceImporter{
-			StateContext: resourceRoleImporter,
+			StateContext: resourceManagerImporter,
 		},
 
 		Description: ``,
-		Schema:      getResourceRoleSchema(),
+		Schema:      getResourceManagerSchema(),
 	}
 }
 
-func getResourceRoleSchema() map[string]*schema.Schema {
+func getResourceManagerSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"name": &schema.Schema{
+		"username": &schema.Schema{
 			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("name"),
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("username"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.2.0) A uniqe name of the role`,
+			Description: `(Valid for versions: 5.2.0) The username of the manager`,
+		},
+
+		"password": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password"),
+
+			Required: true,
+
+			ValidateDiagFunc: utils.ValidateManagerPassword,
+		},
+
+		"first_name": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("first_name"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) The user firstname`,
+		},
+
+		"last_name": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("last_name"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) The user last name`,
 		},
 
 		"permissions_list": &schema.Schema{
 			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("permissions_list"),
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("permissions_list"),
 
 			DiffSuppressOnRefresh: false,
-			DiffSuppressFunc:      codegen_configs.GetResourceByName("Role").GetAttributeDiffFunc("permissions_list"),
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("Manager").GetAttributeDiffFunc("permissions_list"),
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
@@ -64,57 +93,57 @@ func getResourceRoleSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"permissions": &schema.Schema{
+		"roles": &schema.Schema{
 			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("permissions"),
-
-			Computed:    true,
-			Optional:    false,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of allowed permissions returned from the VMS`,
-
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
-		},
-
-		"tenants": &schema.Schema{
-			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("tenants"),
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("roles"),
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of tenants to which this role is associated with`,
+			Description: `(Valid for versions: 5.2.0) List of roles ids`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
 			},
 		},
 
-		"is_admin": &schema.Schema{
+		"password_expiration_disabled": &schema.Schema{
 			Type:          schema.TypeBool,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("is_admin"),
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password_expiration_disabled"),
 
-			Computed:    true,
+			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) Is the role is an admin role`,
+			Description: `(Valid for versions: 5.2.0) Disable apssword expiration`,
+
+			Default: true,
 		},
 
-		"is_default": &schema.Schema{
+		"is_temporary_password": &schema.Schema{
 			Type:          schema.TypeBool,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("is_default"),
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("is_temporary_password"),
+
+			Computed:    false,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) Disable apssword expiration`,
+
+			Default: true,
+		},
+
+		"password_hash": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password_hash"),
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) Is the role is a default role`,
+			Description: `(Valid for versions: 5.2.0) password sha256 to be used to check for password updates`,
 		},
 
 		"realms_permissions": &schema.Schema{
 			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("realms_permissions"),
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("realms_permissions"),
 
 			Computed:    true,
 			Optional:    true,
@@ -184,23 +213,73 @@ func getResourceRoleSchema() map[string]*schema.Schema {
 				},
 			},
 		},
+
+		"permissions": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("permissions"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) List of allowed permissions returned from the VMS`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
 	}
 }
 
-var Role_names_mapping map[string][]string = map[string][]string{}
+var Manager_names_mapping map[string][]string = map[string][]string{}
 
-func ResourceRoleReadStructIntoSchema(ctx context.Context, resource api_latest.Role, d *schema.ResourceData) diag.Diagnostics {
+func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_latest.Manager, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Username", resource.Username))
 
-	err = d.Set("name", resource.Name)
+	err = d.Set("username", resource.Username)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occured setting value to \"username\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Password", resource.Password))
+
+	err = d.Set("password", resource.Password)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"password\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "FirstName", resource.FirstName))
+
+	err = d.Set("first_name", resource.FirstName)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"first_name\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LastName", resource.LastName))
+
+	err = d.Set("last_name", resource.LastName)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"last_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -217,50 +296,50 @@ func ResourceRoleReadStructIntoSchema(ctx context.Context, resource api_latest.R
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Permissions", resource.Permissions))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Roles", resource.Roles))
 
-	err = d.Set("permissions", utils.FlattenListOfPrimitives(&resource.Permissions))
+	err = d.Set("roles", utils.FlattenListOfPrimitives(&resource.Roles))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"permissions\"",
+			Summary:  "Error occured setting value to \"roles\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Tenants", resource.Tenants))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PasswordExpirationDisabled", resource.PasswordExpirationDisabled))
 
-	err = d.Set("tenants", utils.FlattenListOfPrimitives(&resource.Tenants))
+	err = d.Set("password_expiration_disabled", resource.PasswordExpirationDisabled)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenants\"",
+			Summary:  "Error occured setting value to \"password_expiration_disabled\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsAdmin", resource.IsAdmin))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsTemporaryPassword", resource.IsTemporaryPassword))
 
-	err = d.Set("is_admin", resource.IsAdmin)
+	err = d.Set("is_temporary_password", resource.IsTemporaryPassword)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_admin\"",
+			Summary:  "Error occured setting value to \"is_temporary_password\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsDefault", resource.IsDefault))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PasswordHash", resource.PasswordHash))
 
-	err = d.Set("is_default", resource.IsDefault)
+	err = d.Set("password_hash", resource.PasswordHash)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_default\"",
+			Summary:  "Error occured setting value to \"password_hash\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -277,16 +356,28 @@ func ResourceRoleReadStructIntoSchema(ctx context.Context, resource api_latest.R
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Permissions", resource.Permissions))
+
+	err = d.Set("permissions", utils.FlattenListOfPrimitives(&resource.Permissions))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"permissions\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	return diags
 
 }
-func resourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceManagerRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Role")
-	attrs := map[string]interface{}{"path": utils.GenPath("roles"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceRoleRead] Calling Get Function : %v for resource Role", utils.GetFuncName(resource_config.GetFunc)))
+	resource_config := codegen_configs.GetResourceByName("Manager")
+	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceManagerRead] Calling Get Function : %v for resource Manager", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -300,7 +391,7 @@ func resourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diags
 
 	}
-	resource := api_latest.Role{}
+	resource := api_latest.Manager{}
 	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -322,22 +413,16 @@ func resourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diags
 
 	}
-	diags = ResourceRoleReadStructIntoSchema(ctx, resource, d)
-
-	var after_read_error error
-	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
-	if after_read_error != nil {
-		return diag.FromErr(after_read_error)
-	}
+	diags = ResourceManagerReadStructIntoSchema(ctx, resource, d)
 
 	return diags
 }
 
-func resourceRoleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceManagerDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Role")
-	attrs := map[string]interface{}{"path": utils.GenPath("roles"), "id": d.Id()}
+	resource_config := codegen_configs.GetResourceByName("Manager")
+	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
 
 	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -358,22 +443,22 @@ func resourceRoleDelete(ctx context.Context, d *schema.ResourceData, m interface
 
 }
 
-func resourceRoleCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Role_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, Manager_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Role")
-	tflog.Info(ctx, fmt.Sprintf("Creating Resource Role"))
-	reflect_Role := reflect.TypeOf((*api_latest.Role)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Role.Elem(), d, &data, "", false)
+	resource_config := codegen_configs.GetResourceByName("Manager")
+	tflog.Info(ctx, fmt.Sprintf("Creating Resource Manager"))
+	reflect_Manager := reflect.TypeOf((*api_latest.Manager)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_Manager.Elem(), d, &data, "", false)
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Role")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Manager")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -390,7 +475,7 @@ func resourceRoleCreate(ctx context.Context, d *schema.ResourceData, m interface
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Role", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Manager", cluster_version))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -404,9 +489,9 @@ func resourceRoleCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("roles")}
+	attrs := map[string]interface{}{"path": utils.GenPath("managers")}
 	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Role %v", create_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Manager %v", create_err))
 
 	if create_err != nil {
 		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -419,12 +504,12 @@ func resourceRoleCreate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	response_body, _ := io.ReadAll(response.Body)
 	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
-	resource := api_latest.Role{}
+	resource := api_latest.Manager{}
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Failed to convert response body into Role",
+			Summary:  "Failed to convert response body into Manager",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -440,21 +525,21 @@ func resourceRoleCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceRoleRead(ctx_with_resource, d, m)
+	resourceManagerRead(ctx_with_resource, d, m)
 
 	return diags
 }
 
-func resourceRoleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceManagerUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Role_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, Manager_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("Role")
+	resource_config := codegen_configs.GetResourceByName("Manager")
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Role")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Manager")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -471,14 +556,14 @@ func resourceRoleUpdate(ctx context.Context, d *schema.ResourceData, m interface
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Role", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Manager", cluster_version))
 		}
 	}
 
 	client := m.(vast_client.JwtSession)
-	tflog.Info(ctx, fmt.Sprintf("Updating Resource Role"))
-	reflect_Role := reflect.TypeOf((*api_latest.Role)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Role.Elem(), d, &data, "", false)
+	tflog.Info(ctx, fmt.Sprintf("Updating Resource Manager"))
+	reflect_Manager := reflect.TypeOf((*api_latest.Manager)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_Manager.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -491,9 +576,9 @@ func resourceRoleUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("roles"), "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
 	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Role %v", patch_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Manager %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
@@ -503,25 +588,25 @@ func resourceRoleUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		})
 		return diags
 	}
-	resourceRoleRead(ctx, d, m)
+	resourceManagerRead(ctx, d, m)
 
 	return diags
 
 }
 
-func resourceRoleImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+func resourceManagerImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Role")
-	attrs := map[string]interface{}{"path": utils.GenPath("roles")}
+	resource_config := codegen_configs.GetResourceByName("Manager")
+	attrs := map[string]interface{}{"path": utils.GenPath("managers")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.Role{}
+	resource_l := []api_latest.Manager{}
 	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -542,7 +627,7 @@ func resourceRoleImporter(ctx context.Context, d *schema.ResourceData, m interfa
 		return result, id_err
 	}
 
-	diags := ResourceRoleReadStructIntoSchema(ctx, resource, d)
+	diags := ResourceManagerReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
 		all_errors := "Errors occured while importing:\n"
 		for _, dig := range diags {

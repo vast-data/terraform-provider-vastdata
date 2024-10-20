@@ -115,3 +115,23 @@ func ValidateStringListMembers(s []string, allow_duplicates bool) schema.SchemaV
 func ValidateAbeProtocols(i interface{}, c cty.Path) diag.Diagnostics {
 	return ValidateStringListMembers([]string{"NFS", "SMB", "NFS4", "S3"}, false)(i, c)
 }
+
+func ValidateManagerPassword(i interface{}, c cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+	s := fmt.Sprintf("%v", i)
+	if len(s) < 8 {
+		return diag.Errorf("Password length should be larger than 8 characters")
+	}
+	for k, v := range map[string]string{
+		`[A-Z]`:                                "Password should contain at least one upper case character",
+		`[a-z]`:                                "Password should contain at least one lower case character",
+		`[0-9]`:                                "Password should contain at least one number",
+		`[\!\@\#\$\%\^\&\*\(\)\~\{\}\[\]\.\?]`: "Password should contain at least one special character"} {
+		o, _ := regexp.Match(k, []byte(s))
+		if !o {
+			return diag.Errorf(v)
+		}
+
+	}
+	return diags
+}

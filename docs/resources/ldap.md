@@ -33,7 +33,7 @@ resource "vastdata_ldap" "ldap1" {
 
 ### Required
 
-- `domain_name` (String)
+- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) FQDN of the domain.
 
 ### Optional
 

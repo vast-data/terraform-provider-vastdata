@@ -54,7 +54,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration`,
 		},
 
 		"url": &schema.Schema{
@@ -91,7 +92,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("prefix"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data`,
 		},
 
 		"clone_type": &schema.Schema{
@@ -99,6 +101,9 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("clone_type"),
 
 			Required: true,
+
+			ValidateDiagFunc: utils.OneOf([]string{"NATIVE_REPLICATION", "LOCAL"}),
+			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]`,
 		},
 
 		"frames": &schema.Schema{
@@ -122,19 +127,19 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Computed:              true,
 						Optional:              true,
 						Sensitive:             false,
-						ValidateDiagFunc:      utils.ProtectionPolicyTimeIntervalValidation,
-						Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day`,
+
+						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 					},
 
 					"start_at": &schema.Schema{
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("start_at"),
 
-						Computed:         true,
-						Optional:         true,
-						Sensitive:        false,
+						Computed:  true,
+						Optional:  true,
+						Sensitive: false,
+
 						ValidateDiagFunc: utils.ProtectionPolicyStartAt,
-						Description:      ``,
 					},
 
 					"keep_local": &schema.Schema{
@@ -146,8 +151,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Computed:              true,
 						Optional:              true,
 						Sensitive:             false,
-						ValidateDiagFunc:      utils.ProtectionPolicyTimeIntervalValidation,
-						Description:           ``,
+
+						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 					},
 
 					"keep_remote": &schema.Schema{
@@ -159,8 +164,8 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						Computed:              true,
 						Optional:              true,
 						Sensitive:             false,
-						ValidateDiagFunc:      utils.ProtectionPolicyTimeIntervalValidation,
-						Description:           ``,
+
+						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 					},
 				},
 			},
@@ -301,6 +306,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceProtectionPolicyRead] Calling Get Function : %v for resource ProtectionPolicy", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

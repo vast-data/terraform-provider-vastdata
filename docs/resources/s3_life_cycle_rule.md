@@ -49,9 +49,9 @@ resource "vastdata_s3_life_cycle_rule" "s3-bucket-view-lifecycle-rule" {
 
 ### Required
 
-- `enabled` (Boolean)
-- `name` (String)
-- `prefix` (String)
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name
+- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.
 
 ### Optional
 

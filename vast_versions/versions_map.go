@@ -167,6 +167,7 @@ var vast_versions map[string]map[string]reflect.Type = map[string]map[string]ref
 		"GlobalSnapshotOwnerTenant":       reflect.TypeOf((*version_5_2_0.GlobalSnapshotOwnerTenant)(nil)).Elem(),
 		"Group":                           reflect.TypeOf((*version_5_2_0.Group)(nil)).Elem(),
 		"Ldap":                            reflect.TypeOf((*version_5_2_0.Ldap)(nil)).Elem(),
+		"Manager":                         reflect.TypeOf((*version_5_2_0.Manager)(nil)).Elem(),
 		"Nis":                             reflect.TypeOf((*version_5_2_0.Nis)(nil)).Elem(),
 		"PermissionsPerVipPool":           reflect.TypeOf((*version_5_2_0.PermissionsPerVipPool)(nil)).Elem(),
 		"ProtectedPath":                   reflect.TypeOf((*version_5_2_0.ProtectedPath)(nil)).Elem(),

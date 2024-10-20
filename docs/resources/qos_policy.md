@@ -32,7 +32,7 @@ resource "vastdata_qos_policy" "qos1" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 
 ### Optional
 

@@ -49,7 +49,7 @@ resource "vastdata_user_key" "key2" {
 
 ### Required
 
-- `user_id` (Number)
+- `user_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user id to create the Key for
 
 ### Optional
 

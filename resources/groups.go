@@ -54,14 +54,16 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("name"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the group`,
 		},
 
 		"gid": &schema.Schema{
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("gid"),
 
-			Required: true,
+			Required:    true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The group linux gid`,
 		},
 
 		"sid": &schema.Schema{
@@ -165,6 +167,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 	client := m.(vast_client.JwtSession)
 	resource_config := codegen_configs.GetResourceByName("Group")
 	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceGroupRead] Calling Get Function : %v for resource Group", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 

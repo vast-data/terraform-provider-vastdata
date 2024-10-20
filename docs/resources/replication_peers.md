@@ -57,7 +57,7 @@ resource "vastdata_replication_peers" "clusterA-clusterB-peer" {
 
 ### Required
 
-- `name` (String)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration
 
 ### Optional
 
