@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/go-cty/cty"
@@ -18,12 +20,39 @@ const (
 	start_at_format     = "2006-01-02 15:04:05"
 )
 
+func validTime(s string) error {
+	_, err := time.Parse(grace_period_format, s)
+	return err
+
+}
+
 func GracePeriodFormatValidation(i interface{}, c cty.Path) diag.Diagnostics {
+	//Old sytle quota is composed on of only time like 12:01:23 , while new style is at the format of DD HH:MM:SS
 	var diags diag.Diagnostics
-	_, e := time.Parse(grace_period_format, i.(string))
-	if e != nil {
-		return diag.FromErr(e)
+	gp := i.(string)
+	s := strings.SplitN(gp, " ", 2)
+	if len(s) == 2 {
+		// in this case the format must be <N HH:MM:SS> where N is an interger larget than 0
+		n, err := strconv.Atoi(s[0])
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Given number of days %v is not an integer", s[0]))
+		}
+		if n <= 0 {
+			return diag.Errorf("The number of days must be larger than 0")
+		}
+		err = validTime(s[1])
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Wrong time format %v provided  %v", s[1], err))
+		}
+
+	} else if len(s) == 1 {
+		err := validTime(s[0])
+		if err != nil {
+			return diag.FromErr(fmt.Errorf("Wrong time format %v provided  %v", s[0], err))
+		}
+
 	}
+
 	return diags
 
 }

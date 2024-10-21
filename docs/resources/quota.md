@@ -83,7 +83,7 @@ resource "vastdata_quota" "quota2" {
 - `default_user_quota` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--default_user_quota))
 - `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable alarms when users or groups are exceeding their limit
 - `enable_email_providers` (Boolean) (Valid for versions: 5.0.0,5.1.0)
-- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days at the for mat of DD HH:MM:SS or HH:MM:SS
 - `group_quotas` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--group_quotas))
 - `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
 - `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Hard inodes quota limit
@@ -119,7 +119,7 @@ resource "vastdata_quota" "quota2" {
 
 Optional:
 
-- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS
 - `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) The size hard limit in bytes
 - `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) The hard limit in inode number
 - `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0) The system ID of the quota
@@ -132,7 +132,7 @@ Optional:
 
 Optional:
 
-- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS
 - `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) The size hard limit in bytes
 - `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) The hard limit in inode number
 - `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0) The system ID of the quota
@@ -146,7 +146,7 @@ Optional:
 Optional:
 
 - `entity` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--group_quotas--entity))
-- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS
 - `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
 - `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Hard inodes quota limit
 - `is_accountable` (Boolean) (Valid for versions: 5.0.0,5.1.0)
@@ -180,7 +180,7 @@ Optional:
 Optional:
 
 - `entity` (Block List) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedblock--user_quotas--entity))
-- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS
 - `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
 - `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0) Hard inodes quota limit
 - `is_accountable` (Boolean) (Valid for versions: 5.0.0,5.1.0)

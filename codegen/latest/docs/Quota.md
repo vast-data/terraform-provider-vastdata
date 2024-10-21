@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **PrettyState** | **string** |  | [optional] [default to null]
 **Path** | **string** | Directory path | [optional] [default to null]
 **PrettyGracePeriod** | **string** | Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m | [optional] [default to null]
-**GracePeriod** | **string** | Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m | [optional] [default to null]
+**GracePeriod** | **string** | Quota enforcement grace period in seconds, minutes, hours or days at the for mat of DD HH:MM:SS or HH:MM:SS | [optional] [default to null]
 **TimeToBlock** | **string** | Grace period expiration time | [optional] [default to null]
 **SoftLimit** | **int64** | Soft quota limit | [optional] [default to null]
 **HardLimit** | **int64** | Hard quota limit | [optional] [default to null]

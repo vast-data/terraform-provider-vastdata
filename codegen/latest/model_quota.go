@@ -21,7 +21,7 @@ type Quota struct {
 	Path string `json:"path,omitempty"`
 	// Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
 	PrettyGracePeriod string `json:"pretty_grace_period,omitempty"`
-	// Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+	// Quota enforcement grace period in seconds, minutes, hours or days at the for mat of DD HH:MM:SS or HH:MM:SS
 	GracePeriod string `json:"grace_period,omitempty"`
 	// Grace period expiration time
 	TimeToBlock string `json:"time_to_block,omitempty"`

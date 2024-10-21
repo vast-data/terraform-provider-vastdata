@@ -82,7 +82,7 @@ func DataSourceQuota() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m`,
+				Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days at the for mat of DD HH:MM:SS or HH:MM:SS`,
 			},
 
 			"time_to_block": &schema.Schema{
@@ -324,7 +324,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS`,
+							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS`,
 						},
 					},
 				},
@@ -385,7 +385,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS`,
+							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS`,
 						},
 					},
 				},
@@ -406,7 +406,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS`,
+							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS`,
 						},
 
 						"time_to_block": &schema.Schema{
@@ -560,7 +560,7 @@ func DataSourceQuota() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of HH:MM:SS`,
+							Description: `(Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS`,
 						},
 
 						"time_to_block": &schema.Schema{

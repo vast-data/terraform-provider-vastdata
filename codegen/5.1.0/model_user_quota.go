@@ -9,7 +9,7 @@
 package swagger
 
 type UserQuota struct {
-	// Quota enforcement grace period at the format of HH:MM:SS
+	// Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS
 	GracePeriod string `json:"grace_period,omitempty"`
 	// Grace period expiration time
 	TimeToBlock string `json:"time_to_block,omitempty"`

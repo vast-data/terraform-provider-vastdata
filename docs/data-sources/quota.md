@@ -56,7 +56,7 @@ data "vastdata_quota" "quota3" {
 - `default_user_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--default_user_quota))
 - `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0) Enable alarms when users or groups are exceeding their limit
 - `enable_email_providers` (Boolean) (Valid for versions: 5.0.0,5.1.0)
-- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `grace_period` (String) (Valid for versions: 5.0.0,5.1.0) Quota enforcement grace period in seconds, minutes, hours or days at the for mat of DD HH:MM:SS or HH:MM:SS
 - `group_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0) (see [below for nested schema](#nestedatt--group_quotas))
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0) Quota guid
 - `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0) Hard quota limit
