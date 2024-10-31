@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **HardLimit** | **int64** | The size hard limit in bytes | [optional] [default to null]
 **SofLimitInodes** | **int64** | The sof limit of inodes number | [optional] [default to null]
 **HardLimitInodes** | **int64** | The hard limit in inode number | [optional] [default to null]
-**GracePeriod** | **string** | Quota enforcement grace period at the format of HH:MM:SS | [optional] [default to null]
+**GracePeriod** | **string** | Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

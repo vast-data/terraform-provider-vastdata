@@ -19,6 +19,6 @@ type DefaultQuota struct {
 	SofLimitInodes int64 `json:"sof_limit_inodes,omitempty"`
 	// The hard limit in inode number
 	HardLimitInodes int64 `json:"hard_limit_inodes,omitempty"`
-	// Quota enforcement grace period at the format of HH:MM:SS
+	// Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS
 	GracePeriod string `json:"grace_period,omitempty"`
 }

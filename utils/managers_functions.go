@@ -78,23 +78,25 @@ func ManagerCreateFunc(ctx context.Context, _client interface{}, attr map[string
 
 }
 
-func ManagerUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
-	tflog.Debug(ctx, fmt.Sprintf("[ManagerUpdateFunc] Data recive %v , data map %v", d.Get("realms_permissions"), data))
-	l, e := d.GetOkExists("permissions_list")
-	if e {
-		p, z := l.([]interface{})
-		if z {
-			data["permissions_list"] = p
-		}
-	}
-	a, b := d.GetOkExists("realms_permissions")
-	if b {
-		p, z := a.([]interface{})
-		if z {
-			data["realms_permissions"] = p
-		}
-	}
-}
+// func ManagerUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
+// 	tflog.Debug(ctx, fmt.Sprintf("[ManagerUpdateFunc] Data recive %v , data map %v", d.Get("realms_permissions"), data))
+// 	l, e := d.GetOkExists("permissions_list")
+// 	if e {
+// 		p, z := l.([]interface{})
+// 		if z {
+// 			data["permissions_list"] = p
+// 		}
+// 	}
+// 	a, b := d.GetOkExists("realms_permissions")
+// 	if b {
+// 		p, z := a.([]interface{})
+// 		if z {
+// 			data["realms_permissions"] = p
+// 		}
+// 	}
+// 	return FakeHttpResponse(r, b)
+
+// }
 
 func ManagersGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	tflog.Debug(ctx, fmt.Sprintf("[ManagersGetFunc] Calling Default Get Func"))

@@ -967,7 +967,7 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: "Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m"
         grace_period:
           type: "string"
-          description: "Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m"
+          description: "Quota enforcement grace period in seconds, minutes, hours or days at the for mat of DD HH:MM:SS or HH:MM:SS"
         time_to_block:
           type: "string"
           description: "Grace period expiration time"
@@ -1079,13 +1079,13 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: "The hard limit in inode number"
         grace_period:
           type: "string"
-          description: "Quota enforcement grace period at the format of HH:MM:SS"
+          description: "Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS"
     UserQuota:
       type: "object"
       properties:
         grace_period:
           type: "string"
-          description: "Quota enforcement grace period at the format of HH:MM:SS"
+          description: "Quota enforcement grace period at the format of DD HH:MM:SS or HH:MM:SS"
         time_to_block:
           type: "string"
           description: "Grace period expiration time"
