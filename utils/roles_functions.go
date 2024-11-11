@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
+	"slices"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -28,7 +30,7 @@ func realms_permissions_to_list(m interface{}) []interface{} {
 			continue
 		}
 		realm_name := fmt.Sprintf("%v", _realm_name)
-		for _, x := range []string{"create", "view", "realm_name", "edit"} {
+		for _, x := range []string{"create", "view", "realm_name", "edit", "delete"} {
 			v, exists := o[x]
 			if !exists {
 				continue
@@ -145,6 +147,7 @@ func RoleUpdateFunc(ctx context.Context, _client interface{}, attr map[string]in
 		}
 	}
 	a, b := d.GetOkExists("realms_permissions")
+	tflog.Debug(ctx, fmt.Sprintf("[RoleUpdateFunc] Realms permissions exists: %v , value: %v", a, b))
 	if b {
 		p, z := a.([]interface{})
 		if z {
@@ -156,18 +159,51 @@ func RoleUpdateFunc(ctx context.Context, _client interface{}, attr map[string]in
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
 }
 
+// func RoleAfterReadFunc(i interface{}, ctx context.Context, d *schema.ResourceData) error {
+// 	permissions, exists := d.GetOkExists("permissions")
+// 	r, realms_permissions_defined := d.GetOkExists("realms_permissions")
+// 	tflog.Debug(ctx, fmt.Sprintf("[RoleAfterReadFunc] permissions: %v, permissions_list: %v, reamls_permissions provided: %v, Reamls permissions: %v", permissions, d.Get("permissions_list"), realms_permissions_defined, r))
+// 	if exists {
+// 		l, islist := r.([]interface{})
+// 		s := d.GetRawConfig().Type().GoString()
+// 		tflog.Debug(ctx, fmt.Sprintf("[RoleAfterReadFunc] Realms Permission length %v, raw reams permissions %v", len(l), s))
+// 		if islist && len(l) > 0 {
+// 			d.Set("permissions_list", filterNativePermissions(ctx, permissions))
+// 		} else {
+// 			d.Set("permissions_list", permissions)
+// 		}
+// 		realm_permissions := readReamlsPermissions(ctx, permissions)
+// 		tflog.Debug(ctx, fmt.Sprintf("[RoleAfterReadFunc] Realms permissions found: %v", realm_permissions))
+// 		tflog.Debug(ctx, fmt.Sprintf("[RoleAfterReadFunc] Data recive %v , permissions %v, permissions_list %v, has change, %v", realm_permissions, permissions, d.Get("permissions_list"), d.HasChange("permissions_list")))
+// 		if len(realm_permissions) > 0 {
+// 			d.Set("realms_permissions", realm_permissions)
+// 			tflog.Debug(ctx, fmt.Sprintf("[RoleAfterReadFunc] Realms permissions added: %v, ", d.Get("realms_permissions")))
+
+// 		}
+// 	}
+
+// 	return nil
+// }
+
 func RoleAfterReadFunc(i interface{}, ctx context.Context, d *schema.ResourceData) error {
 	permissions, exists := d.GetOkExists("permissions")
-	tflog.Debug(ctx, fmt.Sprintf("[RoleAfterReadFunc] permissions: %v, permissions_list: %v", permissions, d.Get("permissions_list")))
 	if exists {
-		d.Set("permissions_list", removeRealmsPermissions(ctx, permissions))
-		realm_permissions := readReamlsPermissions(ctx, permissions)
-		tflog.Debug(ctx, fmt.Sprintf("[RoleAfterReadFunc] Data recive %v , permissions %v, permissions_list %v, has change, %v", realm_permissions, permissions, d.Get("permissions_list"), d.HasChange("permissions_list")))
-		if len(realm_permissions) > 0 {
-			d.Set("realms_permissions", realm_permissions)
+		e := d.Set("permissions_list", permissions)
+		if e != nil {
+			return e
 		}
 	}
-
 	return nil
+}
+func PermissionsListDiffFunc(k, oldValue, newValue string, d *schema.ResourceData) bool {
+	oldData, newData := d.GetChange("permissions")
 
+	if oldData == nil || newData == nil { // if any of them is nil it means new data was set so there can be no diff
+		return false
+	}
+	o := asStingsList(oldData.([]any))
+	slices.SortFunc(o, compareStrings)
+	n := asStingsList(newData.([]any))
+	slices.SortFunc(n, compareStrings)
+	return reflect.DeepEqual(o, n)
 }

@@ -415,6 +415,12 @@ func resourceManagerRead(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	diags = ResourceManagerReadStructIntoSchema(ctx, resource, d)
 
+	var after_read_error error
+	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
+	if after_read_error != nil {
+		return diag.FromErr(after_read_error)
+	}
+
 	return diags
 }
 

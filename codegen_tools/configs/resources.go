@@ -743,9 +743,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ForceNewFields:           NewStringSet(),
 		DisableAutoValidator:     NewStringSet("permissions_list"),
 		DataSourceName:           "vastdata_administators_roles",
-		CreateFunc:               utils.RoleCreateFunc,
-		UpdateFunc:               utils.RoleUpdateFunc,
-		AfterReadFunc:            utils.RoleAfterReadFunc,
+		//	CreateFunc:               utils.RoleCreateFunc,
+		//		UpdateFunc:               utils.RoleUpdateFunc,
+		AfterReadFunc: utils.RoleAfterReadFunc,
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"permissions_list": utils.ListsDiffSupress,
 		},
@@ -768,6 +768,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_administators_managers",
 		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"password": utils.ValidateManagerPassword},
 		CreateFunc:               utils.ManagerCreateFunc,
+		//		CreateFunc:               utils.ManagerCreateFunc,
+		UpdateFunc:    utils.ManagerUpdateFunc,
+		AfterReadFunc: utils.ManagerAfterReadFunc,
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"permissions_list": utils.ListsDiffSupress,
 		},
