@@ -1990,3 +1990,81 @@ The object class that defines a group entry on the AD server, if different from 
           description: "VIP pool permissions "
           default: "RW"
           enum: [RW,RO]
+    Role:
+      type: "object"
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the role"
+        name:
+          type: "string"
+          description: "A uniqe name of the role"
+        permissions_list:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of allowed permissions"
+          enum: [ create_support, create_settings, create_security, create_monitoring, create_logical, create_hardware, create_events, create_database, create_applications, view_support, view_settings, view_security, view_monitoring, view_logical, view_hardware, view_events, view_applications, view_database, edit_support, edit_settings, edit_security, edit_monitoring, edit_logical, edit_hardware, edit_events, edit_database, edit_applications, delete_support, delete_settings, delete_security, delete_monitoring, delete_logical, delete_hardware, delete_events, delete_applications, delete_database ]
+        permissions:
+            type: "array"
+            items:
+              type: "string"
+            description: "List of allowed permissions returned from the VMS"
+        ldap_groups:
+          type: "array"
+          items:
+            type: "string"
+          description: "LDAP group(s) associated with the role. Members of the specified groups on a connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles."
+        tenants:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          description: "List of tenants to which this role is associated with"
+        is_admin:
+          type: "boolean"
+          description: "Is the role is an admin role"
+        is_default:
+          type: "boolean"
+          description: "Is the role is a default role"
+    Manager:
+      type: "object"
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the manager"
+        username:
+          type: "string"
+          description: "The username of the manager"
+        password:
+          type: "string"
+          description: "The username of the manager"
+        first_name:
+          type: "string"
+          description: "The user firstname"
+        last_name:
+          type: "string"
+          description: "The user last name"
+        permissions_list:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of allowed permissions"
+          enum: [ create_support, create_settings, create_security, create_monitoring, create_logical, create_hardware, create_events, create_database, create_applications, view_support, view_settings, view_security, view_monitoring, view_logical, view_hardware, view_events, view_applications, view_database, edit_support, edit_settings, edit_security, edit_monitoring, edit_logical, edit_hardware, edit_events, edit_database, edit_applications, delete_support, delete_settings, delete_security, delete_monitoring, delete_logical, delete_hardware, delete_events, delete_applications, delete_database ]
+        roles:
+          type: "array"
+          items:
+            type: "int"
+            format: "int64"
+          description: "List of roles ids"
+        password_expiration_disabled:
+          type: "boolean"
+          description: "Disable password expiration"
+        is_temporary_password:
+          type: "boolean"
+          description: "If this set to true next time that a user will login he will be promped to replace his password"
+        permissions:
+            type: "array"
+            items:
+              type: "string"
+            description: "List of allowed permissions returned from the VMS"

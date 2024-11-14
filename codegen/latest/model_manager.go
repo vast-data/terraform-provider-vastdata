@@ -11,6 +11,8 @@ package swagger
 type Manager struct {
 	// A unique id given to the manager
 	Id int64 `json:"id,omitempty"`
+	// A uniqe GUID assigned to the manager
+	Guid string `json:"guid,omitempty"`
 	// The username of the manager
 	Username string `json:"username,omitempty"`
 	// The username of the manager
@@ -23,14 +25,10 @@ type Manager struct {
 	PermissionsList []string `json:"permissions_list,omitempty"`
 	// List of roles ids
 	Roles []int `json:"roles,omitempty"`
-	// Disable apssword expiration
+	// Disable password expiration
 	PasswordExpirationDisabled bool `json:"password_expiration_disabled,omitempty"`
-	// Disable apssword expiration
+	// If this set to true next time that a user will login he will be promped to replace his password
 	IsTemporaryPassword bool `json:"is_temporary_password,omitempty"`
-	// password sha256 to be used to check for password updates
-	PasswordHash string `json:"password_hash,omitempty"`
-	// List of realms related permissions
-	RealmsPermissions []RealmPermission `json:"realms_permissions,omitempty"`
 	// List of allowed permissions returned from the VMS
 	Permissions []string `json:"permissions,omitempty"`
 }

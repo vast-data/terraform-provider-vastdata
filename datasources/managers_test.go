@@ -30,7 +30,6 @@ var _ = Describe(" Manager", func() {
    "first_name": "string",
    "last_name": "string",
    "password": "string",
-   "password_hash": "string",
    "permissions": [
       "A",
       "B",
@@ -44,11 +43,6 @@ var _ = Describe(" Manager", func() {
       "C",
       "D",
       "E"
-   ],
-   "realms_permissions": [
-      {
-         "realm_name": "string"
-      }
    ],
    "roles": [
       1,

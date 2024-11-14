@@ -11,8 +11,6 @@ package swagger
 type Role struct {
 	// A unique id given to the role
 	Id int64 `json:"id,omitempty"`
-	// A uniqe GUID assigned to the role
-	Guid string `json:"guid,omitempty"`
 	// A uniqe name of the role
 	Name string `json:"name,omitempty"`
 	// List of allowed permissions

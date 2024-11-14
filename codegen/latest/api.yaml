@@ -2158,6 +2158,9 @@ Default: SIMPLE_PREFIX"
         id:
           type: "int64"
           description: "A unique id given to the realm"
+        guid:
+          type: "string"
+          description: "A uniqe GUID assigned to the realm"
         name:
           type: "string"
           description: "A uniqe name of the realm"
@@ -2173,6 +2176,9 @@ Default: SIMPLE_PREFIX"
         id:
           type: "int64"
           description: "A unique id given to the role"
+        guid:
+          type: "string"
+          description: "A uniqe GUID assigned to the role"
         name:
           type: "string"
           description: "A uniqe name of the role"
@@ -2199,40 +2205,20 @@ Default: SIMPLE_PREFIX"
         is_default:
           type: "boolean"
           description: "Is the role is a default role"
-        realms_permissions:
+        ldap_groups:
           type: "array"
           items:
-            type: "object"
-            $ref: '#/components/schemas/RealmPermission'
-          description: "List of realms related permissions"
-    RealmPermission:
-      type: "object"
-      properties:
-        realm_name:
-          type: "string"
-          description: "The name of the realm"
-        create:
-          type: "boolean"
-          default: false
-          description: "Should allow create related to permissions associated with this realm"
-        view:
-          type: "boolean"
-          default: false
-          description: "Should allow view related to permissions associated with this realm"
-        delete:
-          type: "boolean"
-          default: false
-          description: "Should allow delete related to permissions associated with this realm"
-        edit:
-          type: "boolean"
-          default: false
-          description: "Should allow edit related to permissions associated with this realm"
+            type: "string"
+          description: "LDAP group(s) associated with the role. Members of the specified groups on a connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles."
     Manager:
       type: "object"
       properties:
         id:
           type: "int64"
           description: "A unique id given to the manager"
+        guid:
+          type: "string"
+          description: "A uniqe GUID assigned to the manager"
         username:
           type: "string"
           description: "The username of the manager"
@@ -2259,21 +2245,10 @@ Default: SIMPLE_PREFIX"
           description: "List of roles ids"
         password_expiration_disabled:
           type: "boolean"
-          default: true
-          description: "Disable apssword expiration"
+          description: "Disable password expiration"
         is_temporary_password:
           type: "boolean"
-          default: true
-          description: "Disable apssword expiration"
-        password_hash:
-          type: string
-          description: "password sha256 to be used to check for password updates"
-        realms_permissions:
-          type: "array"
-          items:
-            type: "object"
-            $ref: '#/components/schemas/RealmPermission'
-          description: "List of realms related permissions"
+          description: "If this set to true next time that a user will login he will be promped to replace his password"
         permissions:
             type: "array"
             items:

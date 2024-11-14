@@ -27,6 +27,14 @@ var _ = Describe(" Role", func() {
 	var RoleDataSourceData *schema.ResourceData
 	var model_json = `
                          {
+   "guid": "string",
+   "ldap_groups": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+   ],
    "name": "string",
    "permissions": [
       "A",
@@ -41,11 +49,6 @@ var _ = Describe(" Role", func() {
       "C",
       "D",
       "E"
-   ],
-   "realms_permissions": [
-      {
-         "realm_name": "string"
-      }
    ],
    "tenants": [
       1,

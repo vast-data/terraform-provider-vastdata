@@ -26,7 +26,7 @@ func DataSourceManager() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) The username of the manager`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager`,
 			},
 
 			"password": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceManager() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) The username of the manager`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager`,
 			},
 
 			"first_name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceManager() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) The user firstname`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user firstname`,
 			},
 
 			"last_name": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceManager() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) The user last name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user last name`,
 			},
 
 			"permissions_list": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceManager() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -70,7 +70,7 @@ func DataSourceManager() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) List of roles ids`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of roles ids`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -79,79 +79,18 @@ func DataSourceManager() *schema.Resource {
 
 			"password_expiration_disabled": &schema.Schema{
 				Type:        schema.TypeBool,
-				Computed:    false,
+				Computed:    true,
 				Required:    false,
-				Optional:    true,
-				Description: `(Valid for versions: 5.2.0) Disable apssword expiration`,
+				Optional:    false,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Disable password expiration`,
 			},
 
 			"is_temporary_password": &schema.Schema{
 				Type:        schema.TypeBool,
-				Computed:    false,
-				Required:    false,
-				Optional:    true,
-				Description: `(Valid for versions: 5.2.0) Disable apssword expiration`,
-			},
-
-			"password_hash": &schema.Schema{
-				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) password sha256 to be used to check for password updates`,
-			},
-
-			"realms_permissions": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) List of realms related permissions`,
-
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-
-						"realm_name": &schema.Schema{
-							Type:        schema.TypeString,
-							Computed:    true,
-							Required:    false,
-							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The name of the realm`,
-						},
-
-						"create": &schema.Schema{
-							Type:        schema.TypeBool,
-							Computed:    false,
-							Required:    false,
-							Optional:    true,
-							Description: `(Valid for versions: 5.2.0) Should allow create related to permissions associated with this realm`,
-						},
-
-						"view": &schema.Schema{
-							Type:        schema.TypeBool,
-							Computed:    false,
-							Required:    false,
-							Optional:    true,
-							Description: `(Valid for versions: 5.2.0) Should allow view related to permissions associated with this realm`,
-						},
-
-						"delete": &schema.Schema{
-							Type:        schema.TypeBool,
-							Computed:    false,
-							Required:    false,
-							Optional:    true,
-							Description: `(Valid for versions: 5.2.0) Should allow delete related to permissions associated with this realm`,
-						},
-
-						"edit": &schema.Schema{
-							Type:        schema.TypeBool,
-							Computed:    false,
-							Required:    false,
-							Optional:    true,
-							Description: `(Valid for versions: 5.2.0) Should allow edit related to permissions associated with this realm`,
-						},
-					},
-				},
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If this set to true next time that a user will login he will be promped to replace his password`,
 			},
 
 			"permissions": &schema.Schema{
@@ -159,7 +98,7 @@ func DataSourceManager() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) List of allowed permissions returned from the VMS`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -325,30 +264,6 @@ func dataSourceManagerRead(ctx context.Context, d *schema.ResourceData, m interf
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"is_temporary_password\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PasswordHash", resource.PasswordHash))
-
-	err = d.Set("password_hash", resource.PasswordHash)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"password_hash\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RealmsPermissions", resource.RealmsPermissions))
-
-	err = d.Set("realms_permissions", utils.FlattenListOfModelsToList(ctx, resource.RealmsPermissions))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"realms_permissions\"",
 			Detail:   err.Error(),
 		})
 	}

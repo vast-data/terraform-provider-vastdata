@@ -4,7 +4,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Id** | **int64** | A unique id given to the manager | [optional] [default to null]
-**Guid** | **string** | A uniqe GUID assigned to the manager | [optional] [default to null]
 **Username** | **string** | The username of the manager | [optional] [default to null]
 **Password** | **string** | The username of the manager | [optional] [default to null]
 **FirstName** | **string** | The user firstname | [optional] [default to null]

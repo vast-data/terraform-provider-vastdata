@@ -11,8 +11,6 @@ package swagger
 type Manager struct {
 	// A unique id given to the manager
 	Id int64 `json:"id,omitempty"`
-	// A uniqe GUID assigned to the manager
-	Guid string `json:"guid,omitempty"`
 	// The username of the manager
 	Username string `json:"username,omitempty"`
 	// The username of the manager

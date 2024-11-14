@@ -40,6 +40,16 @@ func ResourceRealm() *schema.Resource {
 func getResourceRealmSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
+		"guid": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Realm").GetConflictingFields("guid"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the realm`,
+		},
+
 		"name": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Realm").GetConflictingFields("name"),
@@ -69,6 +79,18 @@ var Realm_names_mapping map[string][]string = map[string][]string{}
 func ResourceRealmReadStructIntoSchema(ctx context.Context, resource api_latest.Realm, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+
+	err = d.Set("guid", resource.Guid)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"guid\"",
+			Detail:   err.Error(),
+		})
+	}
 
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
 

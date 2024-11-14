@@ -40,19 +40,33 @@ func ResourceManager() *schema.Resource {
 func getResourceManagerSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
+		"guid": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("guid"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the manager`,
+		},
+
 		"username": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("username"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.2.0) The username of the manager`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager`,
 		},
 
 		"password": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password"),
 
-			Required: true,
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("Manager").GetAttributeDiffFunc("password"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             true,
 
 			ValidateDiagFunc: utils.ValidateManagerPassword,
 		},
@@ -64,7 +78,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) The user firstname`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user firstname`,
 		},
 
 		"last_name": &schema.Schema{
@@ -74,7 +88,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) The user last name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user last name`,
 		},
 
 		"permissions_list": &schema.Schema{
@@ -86,7 +100,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -100,7 +114,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of roles ids`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of roles ids`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -111,107 +125,20 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password_expiration_disabled"),
 
-			Computed:    false,
+			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) Disable apssword expiration`,
-
-			Default: true,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Disable password expiration`,
 		},
 
 		"is_temporary_password": &schema.Schema{
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("is_temporary_password"),
 
-			Computed:    false,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) Disable apssword expiration`,
-
-			Default: true,
-		},
-
-		"password_hash": &schema.Schema{
-			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password_hash"),
-
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) password sha256 to be used to check for password updates`,
-		},
-
-		"realms_permissions": &schema.Schema{
-			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("realms_permissions"),
-
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of realms related permissions`,
-
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-
-					"realm_name": &schema.Schema{
-						Type:          schema.TypeString,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("realm_name"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The name of the realm`,
-					},
-
-					"create": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("create"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow create related to permissions associated with this realm`,
-
-						Default: false,
-					},
-
-					"view": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("view"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow view related to permissions associated with this realm`,
-
-						Default: false,
-					},
-
-					"delete": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("delete"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow delete related to permissions associated with this realm`,
-
-						Default: false,
-					},
-
-					"edit": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("edit"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow edit related to permissions associated with this realm`,
-
-						Default: false,
-					},
-				},
-			},
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If this set to true next time that a user will login he will be promped to replace his password`,
 		},
 
 		"permissions": &schema.Schema{
@@ -221,7 +148,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of allowed permissions returned from the VMS`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -235,6 +162,18 @@ var Manager_names_mapping map[string][]string = map[string][]string{}
 func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_latest.Manager, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+
+	err = d.Set("guid", resource.Guid)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"guid\"",
+			Detail:   err.Error(),
+		})
+	}
 
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Username", resource.Username))
 
@@ -328,30 +267,6 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"is_temporary_password\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "PasswordHash", resource.PasswordHash))
-
-	err = d.Set("password_hash", resource.PasswordHash)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"password_hash\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RealmsPermissions", resource.RealmsPermissions))
-
-	err = d.Set("realms_permissions", utils.FlattenListOfModelsToList(ctx, resource.RealmsPermissions))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"realms_permissions\"",
 			Detail:   err.Error(),
 		})
 	}

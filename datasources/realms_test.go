@@ -27,6 +27,7 @@ var _ = Describe(" Realm", func() {
 	var RealmDataSourceData *schema.ResourceData
 	var model_json = `
                          {
+   "guid": "string",
    "name": "string",
    "object_types": [
       "A",

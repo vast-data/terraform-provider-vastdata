@@ -11,6 +11,8 @@ package swagger
 type Realm struct {
 	// A unique id given to the realm
 	Id int64 `json:"id,omitempty"`
+	// A uniqe GUID assigned to the realm
+	Guid string `json:"guid,omitempty"`
 	// A uniqe name of the realm
 	Name string `json:"name,omitempty"`
 	// List of allowed permissions

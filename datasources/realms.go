@@ -21,6 +21,14 @@ func DataSourceRealm() *schema.Resource {
 		Description: ``,
 		Schema: map[string]*schema.Schema{
 
+			"guid": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the realm`,
+			},
+
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    false,
@@ -107,6 +115,18 @@ func dataSourceRealmRead(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 
 	resource := resource_l[0]
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+
+	err = d.Set("guid", resource.Guid)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"guid\"",
+			Detail:   err.Error(),
+		})
+	}
 
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
 

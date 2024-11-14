@@ -40,12 +40,22 @@ func ResourceRole() *schema.Resource {
 func getResourceRoleSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
+		"guid": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("guid"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the role`,
+		},
+
 		"name": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.2.0) A uniqe name of the role`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name of the role`,
 		},
 
 		"permissions_list": &schema.Schema{
@@ -57,7 +67,7 @@ func getResourceRoleSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -71,7 +81,7 @@ func getResourceRoleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of allowed permissions returned from the VMS`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -83,9 +93,9 @@ func getResourceRoleSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("tenants"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of tenants to which this role is associated with`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of tenants to which this role is associated with`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -97,9 +107,9 @@ func getResourceRoleSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("is_admin"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) Is the role is an admin role`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is an admin role`,
 		},
 
 		"is_default": &schema.Schema{
@@ -107,81 +117,22 @@ func getResourceRoleSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("is_default"),
 
 			Computed:    true,
-			Optional:    true,
+			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) Is the role is a default role`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is a default role`,
 		},
 
-		"realms_permissions": &schema.Schema{
+		"ldap_groups": &schema.Schema{
 			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("realms_permissions"),
+			ConflictsWith: codegen_configs.GetResourceByName("Role").GetConflictingFields("ldap_groups"),
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of realms related permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP group(s) associated with the role. Members of the specified groups on a connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.`,
 
-			Elem: &schema.Resource{
-				Schema: map[string]*schema.Schema{
-
-					"realm_name": &schema.Schema{
-						Type:          schema.TypeString,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("realm_name"),
-
-						Computed:    true,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The name of the realm`,
-					},
-
-					"create": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("create"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow create related to permissions associated with this realm`,
-
-						Default: false,
-					},
-
-					"view": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("view"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow view related to permissions associated with this realm`,
-
-						Default: false,
-					},
-
-					"delete": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("delete"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow delete related to permissions associated with this realm`,
-
-						Default: false,
-					},
-
-					"edit": &schema.Schema{
-						Type:          schema.TypeBool,
-						ConflictsWith: codegen_configs.GetResourceByName("RealmPermission").GetConflictingFields("edit"),
-
-						Computed:    false,
-						Optional:    true,
-						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Should allow edit related to permissions associated with this realm`,
-
-						Default: false,
-					},
-				},
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
 			},
 		},
 	}
@@ -192,6 +143,18 @@ var Role_names_mapping map[string][]string = map[string][]string{}
 func ResourceRoleReadStructIntoSchema(ctx context.Context, resource api_latest.Role, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+
+	err = d.Set("guid", resource.Guid)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"guid\"",
+			Detail:   err.Error(),
+		})
+	}
 
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
 
@@ -265,14 +228,14 @@ func ResourceRoleReadStructIntoSchema(ctx context.Context, resource api_latest.R
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RealmsPermissions", resource.RealmsPermissions))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "LdapGroups", resource.LdapGroups))
 
-	err = d.Set("realms_permissions", utils.FlattenListOfModelsToList(ctx, resource.RealmsPermissions))
+	err = d.Set("ldap_groups", utils.FlattenListOfPrimitives(&resource.LdapGroups))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"realms_permissions\"",
+			Summary:  "Error occured setting value to \"ldap_groups\"",
 			Detail:   err.Error(),
 		})
 	}
