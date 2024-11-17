@@ -276,7 +276,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) The Tenant id to which this Vip Pool is assigned to , if not set it means all tenants`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants `,
 		},
 	}
 }

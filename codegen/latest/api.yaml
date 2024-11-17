@@ -44,7 +44,7 @@ components:
         sid_str:
           type: "string"
         uid_or_gid:
-          type: "int"
+          type: "string"
         name:
           type: "string"
         fqdn:
@@ -896,7 +896,7 @@ Also due to the lack of ability to configure vippool permissions using this atti
         tenant_id:
           type: "integer"
           format: "int64"
-          description: "The Tenant id to which this Vip Pool is assigned to , if not set it means all tenants"
+          description: "The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants "
     Dns:
       type: "object"
       properties:
@@ -1720,7 +1720,7 @@ Also due to the lack of ability to configure vippool permissions using this atti
           enum: [ASYNC_REPLICATION]
         enabled:
           type: "boolean"
-          description: "Enable/Disable the protected path"
+          description: "Is the protected path enabled"
     Snapshot:
       type: "object"
       properties:

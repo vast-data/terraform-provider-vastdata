@@ -27,6 +27,6 @@ type ProtectedPath struct {
 	TargetId int32 `json:"target_id,omitempty"`
 	// Replication capabilities which define , avaliable only for cluster from version 5.1
 	Capabilities string `json:"capabilities,omitempty"`
-	// Enable/Disable the protected path
+	// Is the protected path enabled
 	Enabled bool `json:"enabled,omitempty"`
 }

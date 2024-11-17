@@ -114,7 +114,7 @@ Optional:
 - `grantee` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)  Allowed Values are [users groups]
 - `permissions` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)  Allowed Values are [FULL CHANGE READ]
 - `sid_str` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `uid_or_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `uid_or_gid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 
 ## Import
 

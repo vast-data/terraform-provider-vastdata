@@ -114,4 +114,4 @@ Read-Only:
 - `name` (String)
 - `permissions` (String)
 - `sid_str` (String)
-- `uid_or_gid` (Number)
+- `uid_or_gid` (String)

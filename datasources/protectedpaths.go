@@ -106,7 +106,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enable/Disable the protected path`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the protected path enabled`,
 			},
 		},
 	}

@@ -50,4 +50,6 @@ type VipPool struct {
 	VastAsn int32 `json:"vast_asn,omitempty"`
 	// Peer ASN
 	PeerAsn int32 `json:"peer_asn,omitempty"`
+	// The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants
+	TenantId int64 `json:"tenant_id,omitempty"`
 }
