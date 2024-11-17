@@ -63,6 +63,8 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_vip_pool",
+		BeforePostFunc:           utils.VipPoolBeforePostPatch,
+		BeforePatchFunc:          utils.VipPoolBeforePostPatch,
 		Importer: utils.NewImportByHttpFields(false,
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},

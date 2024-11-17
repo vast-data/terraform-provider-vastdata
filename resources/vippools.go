@@ -268,6 +268,16 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN`,
 		},
+
+		"tenant_id": &schema.Schema{
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("tenant_id"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.2.0) The Tenant id to which this Vip Pool is assigned to , if not set it means all tenants`,
+		},
 	}
 }
 
@@ -531,6 +541,18 @@ func ResourceVipPoolReadStructIntoSchema(ctx context.Context, resource api_lates
 		})
 	}
 
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
+
+	err = d.Set("tenant_id", resource.TenantId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"tenant_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
 	return diags
 
 }
@@ -616,6 +638,12 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource VipPool"))
 	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_VipPool.Elem(), d, &data, "", false)
+
+	var before_post_error error
+	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	if before_post_error != nil {
+		return diag.FromErr(before_post_error)
+	}
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
@@ -727,6 +755,12 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource VipPool"))
 	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_VipPool.Elem(), d, &data, "", false)
+
+	var before_patch_error error
+	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")

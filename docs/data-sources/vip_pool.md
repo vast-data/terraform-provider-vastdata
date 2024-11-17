@@ -44,6 +44,7 @@ data "vastdata_vip_pool" "pool1" {
 - `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)
 - `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)
+- `tenant_id` (Number) (Valid for versions: 5.2.0) The Tenant id to which this Vip Pool is assigned to , if not set it means all tenants
 - `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN
 - `vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN

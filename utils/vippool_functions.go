@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"slices"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -38,4 +40,18 @@ func VippoolCnodeIdsDiffSupress(k, oldValue, newValue string, d *schema.Resource
 	slices.SortFunc(n, compareStrings)
 	cnode_ids_cache[_d] = reflect.DeepEqual(o, n)
 	return cnode_ids_cache[_d]
+}
+
+func VipPoolBeforePostPatch(m map[string]interface{}, client interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
+	tenant_id, tenant_id_exists := d.GetOkExists("tenant_id")
+	tflog.Debug(ctx, fmt.Sprintf("[VipPoolBeforePostPatch] Checking Tenant ID provided : Tenant ID Exists: %v , Teant ID Value: %v", tenant_id_exists, tenant_id))
+	if tenant_id_exists {
+		t := tenant_id.(int)
+		tflog.Debug(ctx, fmt.Sprintf("[VipPoolBeforePostPatch] Tenant ID is number at the value of %v", t))
+		if t == 0 { // 0 means all tenants to we are sending null
+			m["tenant_id"] = nil
+		}
+
+	}
+	return m, nil
 }

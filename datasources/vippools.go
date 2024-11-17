@@ -217,6 +217,14 @@ func DataSourceVipPool() *schema.Resource {
 				Optional:    false,
 				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN`,
 			},
+
+			"tenant_id": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.2.0) The Tenant id to which this Vip Pool is assigned to , if not set it means all tenants`,
+			},
 		},
 	}
 }
@@ -545,6 +553,18 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"peer_asn\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
+
+	err = d.Set("tenant_id", resource.TenantId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}

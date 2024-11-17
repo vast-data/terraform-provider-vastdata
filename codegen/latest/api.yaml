@@ -893,6 +893,10 @@ Also due to the lack of ability to configure vippool permissions using this atti
         peer_asn:
           type: "integer"
           description: "Peer ASN"
+        tenant_id:
+          type: "integer"
+          format: "int64"
+          description: "The Tenant id to which this Vip Pool is assigned to , if not set it means all tenants"
     Dns:
       type: "object"
       properties:
