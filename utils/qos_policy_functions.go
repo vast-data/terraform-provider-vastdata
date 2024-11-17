@@ -20,6 +20,11 @@ func always_send_policy_type(data *map[string]interface{}, d *schema.ResourceDat
 	(*data)["policy_type"] = policy_type
 }
 
+func always_send_mode(data *map[string]interface{}, d *schema.ResourceData) {
+	mode := d.Get("mode")
+	(*data)["mode"] = mode
+}
+
 func set_use_total_limits(m *map[string]interface{}, ctx context.Context, d *schema.ResourceData) {
 	policy_type, policy_type_exists := d.GetOkExists("policy_type")
 	if policy_type_exists && fmt.Sprintf("%v", policy_type) == "USER" { // When policy type is USER we should not send use_totla_limits
@@ -35,6 +40,7 @@ func policy_type_validation(ctx context.Context, data map[string]interface{}) er
 	v := metadata.GetClusterVersion()
 	min, _ := version.NewVersion("5.1.0")
 	if v.GreaterThanOrEqual(min) {
+		tflog.Debug(ctx, fmt.Sprintf("[policy_type_validation] Cluster Version >= 5.1.0 going verifying QOS policy with the following data: %v", data))
 		policy_type, exists := data["policy_type"]
 		if !exists {
 			return fmt.Errorf("policy_type , must be provided")
@@ -105,9 +111,11 @@ func QosCreateFunc(ctx context.Context, _client interface{}, attr map[string]int
 
 func QosUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	always_send_policy_type(&data, d)
+	always_send_mode(&data, d)
 	if e := policy_type_validation(ctx, data); e != nil {
 		return nil, e
 	}
+
 	attached_users, exists := data["attached_users_identifiers"]
 	if exists {
 		p, e := populate_users(ctx, attached_users.([]interface{}), _client)
