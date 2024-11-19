@@ -26,7 +26,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A unique id given to the replication peer configuration`,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A unique guid given to the  replication peer configuration`,
 			},
 
 			"name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The name of the replication peer configuration`,
 			},
 
 			"url": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the replication policy`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Direct link to the replication policy`,
 			},
 
 			"target_name": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The target peer name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The target peer name`,
 			},
 
 			"target_object_id": &schema.Schema{
@@ -66,7 +66,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the target peer`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The id of the target peer`,
 			},
 
 			"prefix": &schema.Schema{
@@ -74,7 +74,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The prefix to be given to the replicated data`,
 			},
 
 			"clone_type": &schema.Schema{
@@ -82,7 +82,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]`,
 			},
 
 			"frames": &schema.Schema{
@@ -90,7 +90,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of snapshots schedules`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of snapshots schedules`,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -100,7 +100,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day`,
 						},
 
 						"start_at": &schema.Schema{
@@ -135,7 +135,7 @@ func DataSourceProtectionPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot indestructable`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Is the snapshot indestructable`,
 			},
 		},
 	}

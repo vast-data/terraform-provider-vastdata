@@ -767,6 +767,32 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		},
 		Importer: &utils.ManagerImporter{},
 	},
+	ResourceTemplateV2{
+		ResourceName:             "Kafkabroker",
+		Path:                     ToStringPointer("kafkabrokers"),
+		Model:                    api_latest.Kafkabroker{},
+		DestFile:                 ToStringPointer("kafkabrokers.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("name"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		ForceNewFields:           NewStringSet(),
+		DataSourceName:           "vastdata_kafka_brokers",
+	},
+	ResourceTemplateV2{
+		ResourceName:             "KafkaBrokerAddressParams",
+		Path:                     ToStringPointer("kafkabrokers"),
+		Model:                    api_latest.KafkaBrokerAddressParams{},
+		DestFile:                 ToStringPointer("kafkabrokers.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("host", "port"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 false,
+		ForceNewFields:           NewStringSet(),
+		DataSourceName:           "",
+	},
 }
 
 func init() {

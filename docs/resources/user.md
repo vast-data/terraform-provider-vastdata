@@ -48,30 +48,30 @@ resource "vastdata_user" "user1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the user
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq name given to the user
 
 ### Optional
 
-- `allow_create_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow create bucket
-- `allow_delete_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow delete bucket
-- `gids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary GID list
-- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary Group list
-- `leading_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user leading unix GID
-- `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user primary group SID
-- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List S3 policies IDs
-- `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is S3 superuser
-- `uid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user unix UID
+- `allow_create_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Allow create bucket
+- `allow_delete_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Allow delete bucket
+- `gids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of supplementary GID list
+- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of supplementary Group list
+- `leading_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user leading unix GID
+- `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user primary group SID
+- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List S3 policies IDs
+- `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Is S3 superuser
+- `uid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user unix UID
 
 ### Read-Only
 
-- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Group Count
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the user
+- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Group Count
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq guid given to the user
 - `id` (String) The ID of this resource.
-- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group GID
-- `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group Name
-- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) IS this a local user
-- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user SID
-- `sids` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) supplementary SID list
+- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Leading Group GID
+- `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Leading Group Name
+- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) IS this a local user
+- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user SID
+- `sids` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) supplementary SID list
 
 ## Import
 

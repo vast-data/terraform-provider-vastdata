@@ -32,26 +32,26 @@ resource "vastdata_qos_policy" "qos1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 
 ### Optional
 
-- `attached_users_identifiers` (List of String) (Valid for versions: 5.2.0) List of local user IDs to which this QoS Policy is affective.
-- `capacity_limits` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--capacity_limits))
-- `capacity_total_limits` (Block List) (Valid for versions: 5.2.0) (see [below for nested schema](#nestedblock--capacity_total_limits))
-- `io_size_bytes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
-- `is_default` (Boolean) (Valid for versions: 5.2.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute
-- `limit_by` (String) (Valid for versions: 5.2.0) What attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]
-- `mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]
-- `policy_type` (String) (Valid for versions: 5.2.0) The QoS type Allowed Values are [VIEW USER]
-- `static_limits` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--static_limits))
-- `static_total_limits` (Block List) (Valid for versions: 5.2.0) (see [below for nested schema](#nestedblock--static_total_limits))
-- `tenant_id` (Number) (Valid for versions: 5.2.0) When setting is_default this is the tenant which will take affect
+- `attached_users_identifiers` (List of String) (Valid for versions: 5.2.0,5.3.0) List of local user IDs to which this QoS Policy is affective.
+- `capacity_limits` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) (see [below for nested schema](#nestedblock--capacity_limits))
+- `capacity_total_limits` (Block List) (Valid for versions: 5.2.0,5.3.0) (see [below for nested schema](#nestedblock--capacity_total_limits))
+- `io_size_bytes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
+- `is_default` (Boolean) (Valid for versions: 5.2.0,5.3.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute
+- `limit_by` (String) (Valid for versions: 5.2.0,5.3.0) What attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]
+- `mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]
+- `policy_type` (String) (Valid for versions: 5.2.0,5.3.0) The QoS type Allowed Values are [VIEW USER]
+- `static_limits` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) (see [below for nested schema](#nestedblock--static_limits))
+- `static_total_limits` (Block List) (Valid for versions: 5.2.0,5.3.0) (see [below for nested schema](#nestedblock--static_total_limits))
+- `tenant_id` (Number) (Valid for versions: 5.2.0,5.3.0) When setting is_default this is the tenant which will take affect
 
 ### Read-Only
 
-- `attached_users` (List of Object) (Valid for versions: 5.2.0) (see [below for nested schema](#nestedatt--attached_users))
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) QoS Policy guid
+- `attached_users` (List of Object) (Valid for versions: 5.2.0,5.3.0) (see [below for nested schema](#nestedatt--attached_users))
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) QoS Policy guid
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--capacity_limits"></a>
@@ -59,10 +59,10 @@ resource "vastdata_qos_policy" "qos1" {
 
 Optional:
 
-- `max_reads_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_reads_iops_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_writes_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_writes_iops_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_reads_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_reads_iops_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_writes_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_writes_iops_per_gb_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention
 
 
 <a id="nestedblock--capacity_total_limits"></a>
@@ -70,8 +70,8 @@ Optional:
 
 Optional:
 
-- `max_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention
-- `max_iops_per_gb_capacity` (Number) (Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_bw_mbps_per_gb_capacity` (Number) (Valid for versions: 5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention
+- `max_iops_per_gb_capacity` (Number) (Valid for versions: 5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention
 
 
 <a id="nestedblock--static_limits"></a>
@@ -79,22 +79,22 @@ Optional:
 
 Optional:
 
-- `burst_reads_bw_mb` (Number) (Valid for versions: 5.2.0) Burst reads BW Mb
-- `burst_reads_iops` (Number) (Valid for versions: 5.2.0) Burst reads IOPS
-- `burst_reads_loan_iops` (Number) (Valid for versions: 5.2.0) Burst reads loan IOPS
-- `burst_reads_loan_mb` (Number) (Valid for versions: 5.2.0) Burst reads loan Mb
-- `burst_writes_bw_mb` (Number) (Valid for versions: 5.2.0) Burst writes BW Mb
-- `burst_writes_iops` (Number) (Valid for versions: 5.2.0) Burst writes IOPS
-- `burst_writes_loan_iops` (Number) (Valid for versions: 5.2.0) Burst writes loan IOPS
-- `burst_writes_loan_mb` (Number) (Valid for versions: 5.2.0) Burst writes loan Mb
-- `max_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention
-- `max_reads_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention
-- `max_writes_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention
-- `max_writes_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention
-- `min_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention
-- `min_reads_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention
-- `min_writes_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention
-- `min_writes_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention
+- `burst_reads_bw_mb` (Number) (Valid for versions: 5.2.0,5.3.0) Burst reads BW Mb
+- `burst_reads_iops` (Number) (Valid for versions: 5.2.0,5.3.0) Burst reads IOPS
+- `burst_reads_loan_iops` (Number) (Valid for versions: 5.2.0,5.3.0) Burst reads loan IOPS
+- `burst_reads_loan_mb` (Number) (Valid for versions: 5.2.0,5.3.0) Burst reads loan Mb
+- `burst_writes_bw_mb` (Number) (Valid for versions: 5.2.0,5.3.0) Burst writes BW Mb
+- `burst_writes_iops` (Number) (Valid for versions: 5.2.0,5.3.0) Burst writes IOPS
+- `burst_writes_loan_iops` (Number) (Valid for versions: 5.2.0,5.3.0) Burst writes loan IOPS
+- `burst_writes_loan_mb` (Number) (Valid for versions: 5.2.0,5.3.0) Burst writes loan Mb
+- `max_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention
+- `max_reads_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention
+- `min_reads_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention
+- `min_reads_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention
+- `min_writes_bw_mbps` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention
+- `min_writes_iops` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention
 
 
 <a id="nestedblock--static_total_limits"></a>
@@ -102,12 +102,12 @@ Optional:
 
 Optional:
 
-- `burst_bw_mb` (Number) (Valid for versions: 5.2.0) Burst BW Mb
-- `burst_iops` (Number) (Valid for versions: 5.2.0) Burst IOPS
-- `burst_loan_iops` (Number) (Valid for versions: 5.2.0) Burst loan IOPS
-- `burst_loan_mb` (Number) (Valid for versions: 5.2.0) Burst loan Mb
-- `max_bw_mbps` (Number) (Valid for versions: 5.2.0) Maximal BW Mb/s
-- `max_iops` (Number) (Valid for versions: 5.2.0) Maximal IOPS
+- `burst_bw_mb` (Number) (Valid for versions: 5.2.0,5.3.0) Burst BW Mb
+- `burst_iops` (Number) (Valid for versions: 5.2.0,5.3.0) Burst IOPS
+- `burst_loan_iops` (Number) (Valid for versions: 5.2.0,5.3.0) Burst loan IOPS
+- `burst_loan_mb` (Number) (Valid for versions: 5.2.0,5.3.0) Burst loan Mb
+- `max_bw_mbps` (Number) (Valid for versions: 5.2.0,5.3.0) Maximal BW Mb/s
+- `max_iops` (Number) (Valid for versions: 5.2.0,5.3.0) Maximal IOPS
 
 
 <a id="nestedatt--attached_users"></a>

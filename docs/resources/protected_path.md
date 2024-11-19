@@ -84,23 +84,23 @@ resource "vastdata_protected_path" "protected-path-view" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 
 ### Optional
 
-- `capabilities` (String) (Valid for versions: 5.1.0,5.2.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the protected path enabled
-- `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) protection policy id
-- `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The Remote tenant guid
-- `source_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) path to replicate
-- `target_exported_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) where to replicate on the remote
-- `target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote target object id
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Local Tenant ID
+- `capabilities` (String) (Valid for versions: 5.1.0,5.2.0,5.3.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Is the protected path enabled
+- `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) protection policy id
+- `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The Remote tenant guid
+- `source_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) path to replicate
+- `target_exported_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) where to replicate on the remote
+- `target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The remote target object id
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Local Tenant ID
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) guid
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) guid
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--timeouts"></a>

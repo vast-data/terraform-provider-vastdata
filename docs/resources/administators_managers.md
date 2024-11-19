@@ -57,23 +57,23 @@ resource "vastdata_administators_managers" "managerc" {
 
 ### Required
 
-- `username` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager
+- `username` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The username of the manager
 
 ### Optional
 
-- `first_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user firstname
-- `is_temporary_password` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If this set to true next time that a user will login he will be promped to replace his password
-- `last_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user last name
+- `first_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user firstname
+- `is_temporary_password` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) If this set to true next time that a user will login he will be promped to replace his password
+- `last_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user last name
 - `password` (String, Sensitive)
-- `password_expiration_disabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Disable password expiration
-- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
-- `roles` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of roles ids
+- `password_expiration_disabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Disable password expiration
+- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
+- `roles` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of roles ids
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.2.0) A uniqe GUID assigned to the manager
+- `guid` (String) (Valid for versions: 5.2.0,5.3.0) A uniqe GUID assigned to the manager
 - `id` (String) The ID of this resource.
-- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS
+- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of allowed permissions returned from the VMS
 
 ## Import
 

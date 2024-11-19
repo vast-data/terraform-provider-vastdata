@@ -47,7 +47,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 		},
 
 		"machine_account_name": &schema.Schema{
@@ -55,7 +55,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("machine_account_name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			ForceNew:    true,
 		},
 
@@ -66,7 +66,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			ForceNew:    true,
 		},
 
@@ -75,7 +75,7 @@ func getResourceActiveDirectorySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory").GetConflictingFields("ldap_id"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 		},
 	}
 }

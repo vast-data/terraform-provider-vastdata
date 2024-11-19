@@ -43,23 +43,23 @@ resource "vastdata_s3_replication_peers" "s3peer-aws" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the s3 replication peer configuration
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The name of the s3 replication peer configuration
 
 ### Optional
 
-- `access_key` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 access key
-- `aws_region` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The Bucket AWS region, Valid only when type is AWS_S3
-- `bucket_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer bucket to replicate to
-- `custom_bucket_url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3
-- `http_protocol` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The http protocol user http/https
-- `proxies` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of http procies
-- `secret_key` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 secret key
+- `access_key` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The S3 access key
+- `aws_region` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The Bucket AWS region, Valid only when type is AWS_S3
+- `bucket_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The name of the peer bucket to replicate to
+- `custom_bucket_url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3
+- `http_protocol` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The http protocol user http/https
+- `proxies` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of http procies
+- `secret_key` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The S3 secret key
 - `type_` (String)
-- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the s3 replication peer configurations
+- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Direct link to the s3 replication peer configurations
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the s3 replication peer configuration
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A unique guid given to the s3 replication peer configuration
 - `id` (String) The ID of this resource.
 
 ## Import

@@ -39,16 +39,16 @@ resource "vastdata_active_directory" "ad1" {
 
 ### Required
 
-- `ldap_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `machine_account_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `ldap_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `machine_account_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 
 ### Optional
 
-- `organizational_unit` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `organizational_unit` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 - `id` (String) The ID of this resource.
 
 ## Import

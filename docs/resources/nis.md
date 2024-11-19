@@ -25,15 +25,15 @@ resource "vastdata_nis" "nis1" {
 
 ### Required
 
-- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The nis server domain name
+- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The nis server domain name
 
 ### Optional
 
-- `hosts` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of ip addresses/hostnames of nis servers
+- `hosts` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of ip addresses/hostnames of nis servers
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the nis server configuration
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq guid given to the nis server configuration
 - `id` (String) The ID of this resource.
 
 ## Import

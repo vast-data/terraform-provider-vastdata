@@ -104,7 +104,7 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 		})
 		return client, diags
 	}
-	cluster_version, _, version_get_error := client.ClusterVersion(ctx)
+	_version, _, version_get_error := client.ClusterVersion(ctx)
 	if version_get_error != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -113,6 +113,16 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 		})
 
 	}
+	cluster_version, version_err := metadata.VastVersionToSemVer(_version)
+	if version_get_error != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured parsing vast version",
+			Detail:   version_err.Error(),
+		})
+
+	}
+
 	tflog.Info(ctx, fmt.Sprintf("Cluster version found %s", cluster_version))
 
 	err = metadata.UpdateClusterVersion(cluster_version)

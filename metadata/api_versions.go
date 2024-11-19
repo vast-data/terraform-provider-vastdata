@@ -1,12 +1,14 @@
 package metadata
 
 import (
+	"fmt"
+
 	version "github.com/hashicorp/go-version"
 )
 
 func extractVersion(v *version.Version, e error) version.Version {
 	if e != nil {
-		panic("Broken version")
+		panic(fmt.Sprintf("Broken version: %v", e))
 	}
 	return *v
 }
@@ -29,7 +31,8 @@ var api_verions []VastVersionStruct = []VastVersionStruct{
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("4.7.0")), Vast_ver: "v3"},
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.0.0")), Vast_ver: "v4"},
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.1.0")), Vast_ver: "v5"},
-	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.2.0")), Vast_ver: "v5"}}
+	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.2.0")), Vast_ver: "v5"},
+	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.3.0")), Vast_ver: "v6"}}
 
 func MaxVastVerion() string {
 	/*

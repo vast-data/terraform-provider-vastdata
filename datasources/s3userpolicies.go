@@ -26,7 +26,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GUID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) GUID`,
 			},
 
 			"name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			},
 
 			"policy": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			},
 
 			"users": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -70,7 +70,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -82,7 +82,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			},
 
 			"enabled": &schema.Schema{
@@ -90,7 +90,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -98,7 +98,7 @@ func DataSourceS3Policy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) `,
 			},
 		},
 	}

@@ -47,7 +47,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS Policy guid`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) QoS Policy guid`,
 		},
 
 		"name": &schema.Schema{
@@ -55,7 +55,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 		},
 
 		"mode": &schema.Schema{
@@ -67,7 +67,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"STATIC", "USED_CAPACITY", "PROVISIONED_CAPACITY"}),
-			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 		},
 
 		"policy_type": &schema.Schema{
@@ -79,7 +79,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"VIEW", "USER"}),
-			Description:      `(Valid for versions: 5.2.0) The QoS type Allowed Values are [VIEW USER]`,
+			Description:      `(Valid for versions: 5.2.0,5.3.0) The QoS type Allowed Values are [VIEW USER]`,
 		},
 
 		"limit_by": &schema.Schema{
@@ -91,7 +91,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"BW_IOPS", "BW", "IOPS"}),
-			Description:      `(Valid for versions: 5.2.0) What attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]`,
+			Description:      `(Valid for versions: 5.2.0,5.3.0) What attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]`,
 
 			Default: "BW_IOPS",
 		},
@@ -103,7 +103,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) When setting is_default this is the tenant which will take affect`,
+			Description: `(Valid for versions: 5.2.0,5.3.0) When setting is_default this is the tenant which will take affect`,
 		},
 
 		"attached_users_identifiers": &schema.Schema{
@@ -113,7 +113,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) List of local user IDs to which this QoS Policy is affective.`,
+			Description: `(Valid for versions: 5.2.0,5.3.0) List of local user IDs to which this QoS Policy is affective.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -127,7 +127,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute`,
+			Description: `(Valid for versions: 5.2.0,5.3.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute`,
 		},
 
 		"io_size_bytes": &schema.Schema{
@@ -137,7 +137,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M`,
 		},
 
 		"static_limits": &schema.Schema{
@@ -147,7 +147,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -159,7 +159,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_reads_bw_mbps": &schema.Schema{
@@ -169,7 +169,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"min_writes_bw_mbps": &schema.Schema{
@@ -179,7 +179,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_writes_bw_mbps": &schema.Schema{
@@ -189,7 +189,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"min_reads_iops": &schema.Schema{
@@ -199,7 +199,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_reads_iops": &schema.Schema{
@@ -209,7 +209,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"min_writes_iops": &schema.Schema{
@@ -219,7 +219,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
 					"max_writes_iops": &schema.Schema{
@@ -229,7 +229,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
 					"burst_reads_bw_mb": &schema.Schema{
@@ -239,7 +239,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst reads BW Mb`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst reads BW Mb`,
 					},
 
 					"burst_reads_loan_mb": &schema.Schema{
@@ -249,7 +249,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst reads loan Mb`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst reads loan Mb`,
 					},
 
 					"burst_writes_bw_mb": &schema.Schema{
@@ -259,7 +259,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst writes BW Mb`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst writes BW Mb`,
 					},
 
 					"burst_writes_loan_mb": &schema.Schema{
@@ -269,7 +269,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst writes loan Mb`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst writes loan Mb`,
 					},
 
 					"burst_reads_iops": &schema.Schema{
@@ -279,7 +279,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst reads IOPS`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst reads IOPS`,
 					},
 
 					"burst_reads_loan_iops": &schema.Schema{
@@ -289,7 +289,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst reads loan IOPS`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst reads loan IOPS`,
 					},
 
 					"burst_writes_iops": &schema.Schema{
@@ -299,7 +299,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst writes IOPS`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst writes IOPS`,
 					},
 
 					"burst_writes_loan_iops": &schema.Schema{
@@ -309,7 +309,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst writes loan IOPS`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst writes loan IOPS`,
 					},
 				},
 			},
@@ -322,7 +322,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -334,7 +334,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_writes_bw_mbps_per_gb_capacity": &schema.Schema{
@@ -344,7 +344,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_reads_iops_per_gb_capacity": &schema.Schema{
@@ -354,7 +354,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_writes_iops_per_gb_capacity": &schema.Schema{
@@ -364,7 +364,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 				},
 			},
@@ -377,7 +377,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) `,
+			Description: `(Valid for versions: 5.2.0,5.3.0) `,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -389,7 +389,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Maximal BW Mb/s`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Maximal BW Mb/s`,
 					},
 
 					"burst_bw_mb": &schema.Schema{
@@ -399,7 +399,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst BW Mb`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst BW Mb`,
 					},
 
 					"burst_loan_mb": &schema.Schema{
@@ -409,7 +409,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst loan Mb`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst loan Mb`,
 					},
 
 					"max_iops": &schema.Schema{
@@ -419,7 +419,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Maximal IOPS`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Maximal IOPS`,
 					},
 
 					"burst_iops": &schema.Schema{
@@ -429,7 +429,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst IOPS`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst IOPS`,
 					},
 
 					"burst_loan_iops": &schema.Schema{
@@ -439,7 +439,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Burst loan IOPS`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Burst loan IOPS`,
 					},
 				},
 			},
@@ -452,7 +452,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) `,
+			Description: `(Valid for versions: 5.2.0,5.3.0) `,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -464,7 +464,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
 					"max_iops_per_gb_capacity": &schema.Schema{
@@ -474,7 +474,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 				},
 			},
@@ -487,7 +487,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) `,
+			Description: `(Valid for versions: 5.2.0,5.3.0) `,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -499,7 +499,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) User FQDN`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) User FQDN`,
 					},
 
 					"is_sid": &schema.Schema{
@@ -509,7 +509,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) `,
+						Description: `(Valid for versions: 5.2.0,5.3.0) `,
 					},
 
 					"sid_str": &schema.Schema{
@@ -519,7 +519,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The user SID`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) The user SID`,
 					},
 
 					"uid_or_gid": &schema.Schema{
@@ -529,7 +529,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) `,
+						Description: `(Valid for versions: 5.2.0,5.3.0) `,
 					},
 
 					"label": &schema.Schema{
@@ -539,7 +539,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) How to display the user`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) How to display the user`,
 					},
 
 					"value": &schema.Schema{
@@ -549,7 +549,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The user name`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) The user name`,
 					},
 
 					"login_name": &schema.Schema{
@@ -559,7 +559,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The user login name`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) The user login name`,
 					},
 
 					"name": &schema.Schema{
@@ -569,7 +569,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The user name`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) The user name`,
 					},
 
 					"identifier_type": &schema.Schema{
@@ -579,7 +579,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The user type of idetify`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) The user type of idetify`,
 					},
 
 					"identifier_value": &schema.Schema{
@@ -589,7 +589,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.2.0) The value to use fo the identifier_type`,
+						Description: `(Valid for versions: 5.2.0,5.3.0) The value to use fo the identifier_type`,
 					},
 				},
 			},

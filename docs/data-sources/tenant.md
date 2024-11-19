@@ -24,35 +24,35 @@ data "vastdata_tenant" "tenant1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the tenant
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq name given to the tenant
 
 ### Optional
 
-- `allow_disabled_users` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow IO from users whose Active Directory accounts are explicitly disabled.
-- `allow_locked_users` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.
+- `allow_disabled_users` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Allow IO from users whose Active Directory accounts are explicitly disabled.
+- `allow_locked_users` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.
 
 ### Read-Only
 
-- `ad_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) AD provider ID
-- `client_ip_ranges` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) Array of source IP ranges to allow for the tenant. (see [below for nested schema](#nestedatt--client_ip_ranges))
-- `default_others_share_level_perm` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]
-- `encryption_crn` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant's encryption group unique identifier
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the tenant
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq id given to the tenant
-- `is_nfsv42_supported` (Boolean) (Valid for versions: 5.1.0,5.2.0) Enable NFSv4.2
-- `ldap_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Open-LDAP provider ID specified separately by the user
-- `nis_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) NIS provider ID
-- `posix_primary_provider` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]
-- `smb_administrators_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.
-- `smb_privileged_group_full_access` (Boolean) (Valid for versions: 5.1.0,5.2.0) True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.
-- `smb_privileged_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.
-- `smb_privileged_user_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'
-- `trash_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) GID with permissions to the trash folder
-- `use_smb_native` (Boolean) (Valid for versions: 5.1.0,5.2.0) Use native SMB authentication
-- `use_smb_privileged_group` (Boolean) (Valid for versions: 5.1.0,5.2.0) Enables SMB privileged user group
-- `use_smb_privileged_user` (Boolean) (Valid for versions: 5.1.0,5.2.0) Enables SMB privileged user
-- `vippool_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) An array of VIP Pool ids to attach to tenant.
-- `vippool_names` (List of String) (Valid for versions: 5.1.0,5.2.0) An array of VIP Pool names attached to this tenant.
+- `ad_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) AD provider ID
+- `client_ip_ranges` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Array of source IP ranges to allow for the tenant. (see [below for nested schema](#nestedatt--client_ip_ranges))
+- `default_others_share_level_perm` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]
+- `encryption_crn` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Tenant's encryption group unique identifier
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq guid given to the tenant
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq id given to the tenant
+- `is_nfsv42_supported` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Enable NFSv4.2
+- `ldap_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Open-LDAP provider ID specified separately by the user
+- `nis_provider_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) NIS provider ID
+- `posix_primary_provider` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]
+- `smb_administrators_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.
+- `smb_privileged_group_full_access` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.
+- `smb_privileged_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.
+- `smb_privileged_user_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'
+- `trash_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) GID with permissions to the trash folder
+- `use_smb_native` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Use native SMB authentication
+- `use_smb_privileged_group` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Enables SMB privileged user group
+- `use_smb_privileged_user` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Enables SMB privileged user
+- `vippool_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0,5.3.0) An array of VIP Pool ids to attach to tenant.
+- `vippool_names` (List of String) (Valid for versions: 5.1.0,5.2.0,5.3.0) An array of VIP Pool names attached to this tenant.
 
 <a id="nestedatt--client_ip_ranges"></a>
 ### Nested Schema for `client_ip_ranges`

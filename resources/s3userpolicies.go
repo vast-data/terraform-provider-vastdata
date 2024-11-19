@@ -47,7 +47,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GUID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) GUID`,
 		},
 
 		"name": &schema.Schema{
@@ -55,7 +55,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 		},
 
 		"policy": &schema.Schema{
@@ -63,7 +63,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("policy"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 		},
 
 		"enabled": &schema.Schema{
@@ -71,7 +71,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("enabled"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 		},
 
 		"tenant_id": &schema.Schema{
@@ -81,7 +81,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) `,
+			Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) `,
 			ForceNew:    true,
 		},
 	}

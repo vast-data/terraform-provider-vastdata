@@ -31,4 +31,5 @@ var Resources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_administators_realms":   ResourceRealm(),
 	"vastdata_administators_roles":    ResourceRole(),
 	"vastdata_administators_managers": ResourceManager(),
+	"vastdata_kafka_brokers":          ResourceKafkabroker(),
 }

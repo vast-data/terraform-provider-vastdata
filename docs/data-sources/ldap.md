@@ -23,44 +23,44 @@ data "vastdata_ldap" "ldap1" {
 
 ### Required
 
-- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) FQDN of the domain.
+- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) FQDN of the domain.
 
 ### Optional
 
-- `gid_number` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for gid number
-- `group_login_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.
-- `is_vms_auth_provider` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.
-- `mail_property_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `match_user` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for user matching
-- `port` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP server port. 389 (LDAP)  636 (LDAPS)
-- `posix_account` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for posix account
-- `posix_attributes_source` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `posix_group` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for posix account
-- `query_posix_attributes_from_gc` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) When set to True - users/groups from non-joined domain POSIX attributes are supported,
+- `gid_number` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Attrirbute mapping for gid number
+- `group_login_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.
+- `is_vms_auth_provider` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.
+- `mail_property_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `match_user` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Attribute mapping for user matching
+- `port` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) LDAP server port. 389 (LDAP)  636 (LDAPS)
+- `posix_account` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Attrirbute mapping for posix account
+- `posix_attributes_source` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `posix_group` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Attrirbute mapping for posix account
+- `query_posix_attributes_from_gc` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) When set to True - users/groups from non-joined domain POSIX attributes are supported,
 when set to False - Posix attributes of users/groups from non-joined domain are not supported.
 As a condition Global catalog needs to be configured to support Posix attributes.
-- `reverse_lookup` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `uid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for uid
-- `uid_member` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for uid member
-- `uid_member_value_property_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `uid_number` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for uid number
-- `use_tls` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) configure LDAP with TLS
-- `user_login_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.
-- `username_property_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Username property name
+- `reverse_lookup` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `uid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Attrirbute mapping for uid
+- `uid_member` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Attrirbute mapping for uid member
+- `uid_member_value_property_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `uid_number` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Attrirbute mapping for uid number
+- `use_tls` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) configure LDAP with TLS
+- `user_login_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.
+- `username_property_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Username property name
 
 ### Read-Only
 
-- `active_directory` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `binddn` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Distinguished name of LDAP superuser
-- `bindpw` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Password for the LDAP superuser
-- `group_searchbase` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `method` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Bind Authentication Method Allowed Values are [simple sasl anonymous]
-- `posix_primary_provider` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) POSIX primary provider
-- `query_groups_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Query group mode Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]
-- `searchbase` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only
-- `tls_certificate` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `urls` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
-- `use_auto_discovery` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
-- `use_ldaps` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Use LDAPS for Auto-Discovery
+- `active_directory` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `binddn` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Distinguished name of LDAP superuser
+- `bindpw` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Password for the LDAP superuser
+- `group_searchbase` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `method` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Bind Authentication Method Allowed Values are [simple sasl anonymous]
+- `posix_primary_provider` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) POSIX primary provider
+- `query_groups_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Query group mode Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]
+- `searchbase` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only
+- `tls_certificate` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `urls` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
+- `use_auto_discovery` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
+- `use_ldaps` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Use LDAPS for Auto-Discovery

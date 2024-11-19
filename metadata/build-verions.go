@@ -4,7 +4,7 @@ import (
 	version "github.com/hashicorp/go-version"
 )
 
-var build_version, _ = version.NewVersion("5.2.0")
+var build_version, _ = version.NewVersion("5.3.0")
 var min_version, _ = version.NewVersion("5.0.0")
 
 const (

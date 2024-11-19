@@ -26,7 +26,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq id given to user`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq id given to user`,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the user`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq guid given to the user`,
 			},
 
 			"name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the user`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq name given to the user`,
 			},
 
 			"uid": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user unix UID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user unix UID`,
 			},
 
 			"leading_gid": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user leading unix GID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user leading unix GID`,
 			},
 
 			"gids": &schema.Schema{
@@ -66,7 +66,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary GID list`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of supplementary GID list`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -78,7 +78,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary Group list`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of supplementary Group list`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -90,7 +90,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Group Count`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Group Count`,
 			},
 
 			"leading_group_name": &schema.Schema{
@@ -98,7 +98,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group Name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Leading Group Name`,
 			},
 
 			"leading_group_gid": &schema.Schema{
@@ -106,7 +106,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group GID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Leading Group GID`,
 			},
 
 			"sid": &schema.Schema{
@@ -114,7 +114,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user SID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user SID`,
 			},
 
 			"primary_group_sid": &schema.Schema{
@@ -122,7 +122,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user primary group SID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The user primary group SID`,
 			},
 
 			"sids": &schema.Schema{
@@ -130,7 +130,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) supplementary SID list`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) supplementary SID list`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -142,7 +142,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IS this a local user`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) IS this a local user`,
 			},
 
 			"allow_create_bucket": &schema.Schema{
@@ -150,7 +150,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow create bucket`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Allow create bucket`,
 			},
 
 			"allow_delete_bucket": &schema.Schema{
@@ -158,7 +158,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow delete bucket`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Allow delete bucket`,
 			},
 
 			"s3_superuser": &schema.Schema{
@@ -166,7 +166,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is S3 superuser`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Is S3 superuser`,
 			},
 
 			"s3_policies_ids": &schema.Schema{
@@ -174,7 +174,7 @@ func DataSourceUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List S3 policies IDs`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List S3 policies IDs`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,

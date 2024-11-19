@@ -72,21 +72,21 @@ resource "vastdata_protection_policy" "protection-policy" {
 
 ### Required
 
-- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration
-- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data
+- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The name of the replication peer configuration
+- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The prefix to be given to the replicated data
 
 ### Optional
 
-- `frames` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of snapshots schedules (see [below for nested schema](#nestedblock--frames))
-- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot indestructable
-- `target_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The target peer name
-- `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the target peer
-- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the replication policy
+- `frames` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of snapshots schedules (see [below for nested schema](#nestedblock--frames))
+- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Is the snapshot indestructable
+- `target_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The target peer name
+- `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The id of the target peer
+- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Direct link to the replication policy
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A unique guid given to the  replication peer configuration
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--frames"></a>

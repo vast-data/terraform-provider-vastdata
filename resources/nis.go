@@ -47,7 +47,7 @@ func getResourceNisSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the nis server configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq guid given to the nis server configuration`,
 		},
 
 		"domain_name": &schema.Schema{
@@ -55,7 +55,7 @@ func getResourceNisSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("Nis").GetConflictingFields("domain_name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The nis server domain name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The nis server domain name`,
 		},
 
 		"hosts": &schema.Schema{
@@ -65,7 +65,7 @@ func getResourceNisSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of ip addresses/hostnames of nis servers`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of ip addresses/hostnames of nis servers`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,

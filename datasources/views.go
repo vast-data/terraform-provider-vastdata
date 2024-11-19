@@ -26,7 +26,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe ID used to identify the View`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniqe ID used to identify the View`,
 			},
 
 			"guid": &schema.Schema{
@@ -34,7 +34,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the View`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniqe GUID assigned to the View`,
 			},
 
 			"name": &schema.Schema{
@@ -42,7 +42,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the view`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniq name given to the view`,
 			},
 
 			"path": &schema.Schema{
@@ -50,7 +50,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) File system path. Begin with '/'. Do not include a trailing slash`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) File system path. Begin with '/'. Do not include a trailing slash`,
 			},
 
 			"create_dir": &schema.Schema{
@@ -58,7 +58,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Creates the directory specified by the path`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Creates the directory specified by the path`,
 			},
 
 			"alias": &schema.Schema{
@@ -66,7 +66,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path`,
 			},
 
 			"bucket": &schema.Schema{
@@ -74,7 +74,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Bucket name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) S3 Bucket name`,
 			},
 
 			"policy_id": &schema.Schema{
@@ -82,7 +82,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Associated view policy ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Associated view policy ID`,
 			},
 
 			"cluster": &schema.Schema{
@@ -90,7 +90,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Parent Cluster`,
 			},
 
 			"cluster_id": &schema.Schema{
@@ -98,7 +98,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Parent Cluster ID`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -106,7 +106,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID related to this view`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) The tenant ID related to this view`,
 			},
 
 			"directory": &schema.Schema{
@@ -114,7 +114,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Create the directory if it does not exist`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Create the directory if it does not exist`,
 			},
 
 			"s3_versioning": &schema.Schema{
@@ -122,7 +122,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Trun on S3 Versioning`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Trun on S3 Versioning`,
 			},
 
 			"s3_unverified_lookup": &schema.Schema{
@@ -130,7 +130,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 Unverified Lookup`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Allow S3 Unverified Lookup`,
 			},
 
 			"allow_anonymous_access": &schema.Schema{
@@ -138,7 +138,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Allow S3 anonymous access`,
 			},
 
 			"allow_s3_anonymous_access": &schema.Schema{
@@ -146,7 +146,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Allow S3 anonymous access`,
 			},
 
 			"protocols": &schema.Schema{
@@ -154,7 +154,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Protocols exposed by this view`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Protocols exposed by this view`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -166,7 +166,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
 			},
 
 			"bucket_owner": &schema.Schema{
@@ -174,7 +174,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Bucket owner`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) S3 Bucket owner`,
 			},
 
 			"bucket_creators": &schema.Schema{
@@ -182,7 +182,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of bucket creators users`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of bucket creators users`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -194,7 +194,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of bucket creators groups`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) List of bucket creators groups`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -206,7 +206,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Object Lock`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) S3 Object Lock`,
 			},
 
 			"s3_locks_retention_mode": &schema.Schema{
@@ -214,7 +214,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Locks retention mode`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) S3 Locks retention mode`,
 			},
 
 			"s3_locks_retention_period": &schema.Schema{
@@ -222,7 +222,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Period should be positive in format like 0d|2d|1y|2y`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Period should be positive in format like 0d|2d|1y|2y`,
 			},
 
 			"physical_capacity": &schema.Schema{
@@ -230,7 +230,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Physical Capacity`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Physical Capacity`,
 			},
 
 			"logical_capacity": &schema.Schema{
@@ -238,7 +238,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Logical Capacity`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Logical Capacity`,
 			},
 
 			"nfs_interop_flags": &schema.Schema{
@@ -246,7 +246,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]`,
 			},
 
 			"is_remote": &schema.Schema{
@@ -254,7 +254,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 			},
 
 			"share_acl": &schema.Schema{
@@ -262,7 +262,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Share-level ACL details`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Share-level ACL details`,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -290,7 +290,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
-										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0)  Allowed Values are [users groups]`,
+										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)  Allowed Values are [users groups]`,
 									},
 
 									"permissions": &schema.Schema{
@@ -298,7 +298,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
-										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0)  Allowed Values are [FULL CHANGE READ]`,
+										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)  Allowed Values are [FULL CHANGE READ]`,
 									},
 
 									"sid_str": &schema.Schema{
@@ -306,7 +306,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
-										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 									},
 
 									"uid_or_gid": &schema.Schema{
@@ -314,7 +314,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
-										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 									},
 
 									"name": &schema.Schema{
@@ -322,7 +322,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    false,
 										Required:    true,
 										Optional:    false,
-										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 									},
 
 									"fqdn": &schema.Schema{
@@ -330,7 +330,7 @@ func DataSourceView() *schema.Resource {
 										Computed:    true,
 										Required:    false,
 										Optional:    false,
-										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
+										Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 									},
 								},
 							},
@@ -344,7 +344,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS Policy ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) QoS Policy ID`,
 			},
 
 			"is_seamless": &schema.Schema{
@@ -352,7 +352,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.`,
 			},
 
 			"max_retention_period": &schema.Schema{
@@ -360,7 +360,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).`,
 			},
 
 			"min_retention_period": &schema.Schema{
@@ -368,7 +368,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).`,
 			},
 
 			"files_retention_mode": &schema.Schema{
@@ -376,7 +376,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]`,
 			},
 
 			"default_retention_period": &schema.Schema{
@@ -384,7 +384,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.`,
 			},
 
 			"auto_commit": &schema.Schema{
@@ -392,7 +392,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).`,
 			},
 
 			"s3_object_ownership_rule": &schema.Schema{
@@ -400,7 +400,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: BucketOwnerEnforced - The bucket owner has full control over any object in the bucket ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. None - S3 Object Ownership is disabled for the bucket.  Allowed Values are [None BucketOwnerPreferred ObjectWriter BucketOwnerEnforced]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: BucketOwnerEnforced - The bucket owner has full control over any object in the bucket ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. None - S3 Object Ownership is disabled for the bucket.  Allowed Values are [None BucketOwnerPreferred ObjectWriter BucketOwnerEnforced]`,
 			},
 
 			"locking": &schema.Schema{
@@ -408,7 +408,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Write Once Read Many (WORM) locking enabled`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Write Once Read Many (WORM) locking enabled`,
 			},
 
 			"ignore_oos": &schema.Schema{
@@ -416,7 +416,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Ignore oos`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) Ignore oos`,
 			},
 
 			"bucket_logging": &schema.Schema{
@@ -424,7 +424,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) `,
+				Description: `(Valid for versions: 5.2.0,5.3.0) `,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -434,7 +434,7 @@ func DataSourceView() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The Logging bucket ID`,
+							Description: `(Valid for versions: 5.2.0,5.3.0) The Logging bucket ID`,
 						},
 
 						"prefix": &schema.Schema{
@@ -442,7 +442,7 @@ func DataSourceView() *schema.Resource {
 							Computed:    false,
 							Required:    false,
 							Optional:    true,
-							Description: `(Valid for versions: 5.2.0) Log line prefix to add`,
+							Description: `(Valid for versions: 5.2.0,5.3.0) Log line prefix to add`,
 						},
 
 						"key_format": &schema.Schema{
@@ -450,7 +450,7 @@ func DataSourceView() *schema.Resource {
 							Computed:    false,
 							Required:    false,
 							Optional:    true,
-							Description: `(Valid for versions: 5.2.0) The format for log object keys. SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString], PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the logged events occurred, PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: SIMPLE_PREFIX Allowed Values are [SIMPLE_PREFIX PARTITIONED_PREFIX_EVENT_TIME PARTITIONED_PREFIX_DELIVERY_TIME]`,
+							Description: `(Valid for versions: 5.2.0,5.3.0) The format for log object keys. SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString], PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the logged events occurred, PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: SIMPLE_PREFIX Allowed Values are [SIMPLE_PREFIX PARTITIONED_PREFIX_EVENT_TIME PARTITIONED_PREFIX_DELIVERY_TIME]`,
 						},
 					},
 				},
@@ -461,7 +461,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols`,
+				Description: `(Valid for versions: 5.1.0,5.2.0,5.3.0) List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -473,7 +473,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.`,
+				Description: `(Valid for versions: 5.2.0,5.3.0) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.`,
 			},
 
 			"abe_protocols": &schema.Schema{
@@ -481,7 +481,7 @@ func DataSourceView() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]`,
+				Description: `(Valid for versions: 5.2.0,5.3.0) The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
