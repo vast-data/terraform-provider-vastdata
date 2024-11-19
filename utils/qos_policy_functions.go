@@ -111,7 +111,9 @@ func QosCreateFunc(ctx context.Context, _client interface{}, attr map[string]int
 
 func QosUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	always_send_policy_type(&data, d)
-	always_send_mode(&data, d)
+	if fmt.Sprintf("%v", data["policy_type"]) != "USER" {
+		always_send_mode(&data, d)
+	}
 	if e := policy_type_validation(ctx, data); e != nil {
 		return nil, e
 	}
