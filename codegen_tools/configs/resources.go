@@ -779,6 +779,10 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ForceNewFields:           NewStringSet(),
 		DataSourceName:           "vastdata_kafka_brokers",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "KafkaBrokerAddressParams",
