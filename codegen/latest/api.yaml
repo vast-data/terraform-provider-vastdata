@@ -1578,12 +1578,12 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "array"
           items:
             type: "string"
-          description: ""
+          description: "List of group names associated with this policy"
         groups:
           type: "array"
           items:
             type: "string"
-          description: ""
+          description: "List of group names associated with this policy"
         is_replicated:
           type: "boolean"
         enabled:

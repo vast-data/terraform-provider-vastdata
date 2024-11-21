@@ -14,7 +14,9 @@ type S3Policy struct {
 	Guid string `json:"guid,omitempty"`
 	Name string `json:"name,omitempty"`
 	Policy string `json:"policy,omitempty"`
+	// List of group names associated with this policy
 	Users []string `json:"users,omitempty"`
+	// List of group names associated with this policy
 	Groups []string `json:"groups,omitempty"`
 	IsReplicated bool `json:"is_replicated,omitempty"`
 	Enabled bool `json:"enabled"`
