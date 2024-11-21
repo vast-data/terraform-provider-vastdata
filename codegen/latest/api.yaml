@@ -203,6 +203,10 @@ None - S3 Object Ownership is disabled for the bucket.
         bucket_logging:
           type: "object"
           $ref: "#/components/schemas/BucketLogging"
+        has_bucket_logging_destination:
+          type: "boolean"
+        has_bucket_logging_sources:
+          type: "boolean"
         abac_tags:
           type: "array"
           items:
@@ -2146,7 +2150,6 @@ The object class that defines a group entry on the AD server, if different from 
         prefix:
           type: "string"
           description: "Log line prefix to add"
-          default: ""
         key_format:
           type: "string"
           description: "The format for log object keys. 

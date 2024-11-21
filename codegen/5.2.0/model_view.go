@@ -85,6 +85,8 @@ type View struct {
 	// Ignore oos
 	IgnoreOos bool `json:"ignore_oos,omitempty"`
 	BucketLogging *BucketLogging `json:"bucket_logging,omitempty"`
+	HasBucketLoggingDestination bool `json:"has_bucket_logging_destination,omitempty"`
+	HasBucketLoggingSources bool `json:"has_bucket_logging_sources,omitempty"`
 	// List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols
 	AbacTags []string `json:"abac_tags,omitempty"`
 	// Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.

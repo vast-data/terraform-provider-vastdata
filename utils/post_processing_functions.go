@@ -187,6 +187,20 @@ func UpdateStreamInfo(m map[string]interface{}, i interface{}, ctx context.Conte
 func AlwaysSendCreateDir(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	create_dir := d.Get("create_dir")
 	m["create_dir"] = create_dir
+	b, be := d.GetOkExists("has_bucket_logging_destination")
+	tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] has_bucket_logging_destination Exists: %v , Value: %v", be, b))
+	if be {
+		if fmt.Sprintf("%v", b) == "false" {
+			tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] has_bucket_logging_destination is false removing configurations fromdata to update"))
+			_, e := m["bucket_logging"]
+			if e {
+				tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] bucket_logging found but has_bucket_logging_destination is false removing it"))
+				delete(m, "bucket_logging")
+			}
+
+		}
+	}
+	//Due to some VMS issue it return a broken configurations of bucket logging , this causes the update to fail
 	//in the case of shared ACL set , but the acl is missing ,we must set it to an empty list
 	share_acl, share_acl_exists := m["share_acl"]
 	if share_acl_exists {
