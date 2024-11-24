@@ -184,24 +184,51 @@ func UpdateStreamInfo(m map[string]interface{}, i interface{}, ctx context.Conte
 
 }
 
+func has_bucket_logging(ctx context.Context, d *schema.ResourceData) bool {
+	l, exists := d.GetOkExists("bucket_logging")
+	tflog.Debug(ctx, fmt.Sprintf("[has_bucket_logging] bucket_logging %v", l))
+	if !exists {
+		tflog.Debug(ctx, "bucket_logging is not defined")
+		return false
+	}
+	o, is_list := l.([]interface{})
+	if is_list && len(o) > 0 {
+		m, is_map := o[0].(map[string]interface{})
+		if is_map {
+			dest_id, has_dest_id := m["destination_id"]
+			if has_dest_id && fmt.Sprintf("%v", dest_id) != "0" {
+				return true
+			} else {
+				tflog.Debug(ctx, fmt.Sprintf("bucket_logging first array element , does not have a key called destination_id or it's value is 0 %v", m))
+				return false
+			}
+		} else {
+			tflog.Debug(ctx, fmt.Sprintf("bucket_logging first element is not a map from the type of map[string]interface{}, %v", l))
+			return false
+		}
+	} else {
+		tflog.Debug(ctx, fmt.Sprintf("bucket_logging is not from the type of []interface{} but %v, or has 0 length", l))
+		return false
+
+	}
+	return false
+}
+
 func AlwaysSendCreateDir(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
 	create_dir := d.Get("create_dir")
 	m["create_dir"] = create_dir
-	b, be := d.GetOkExists("has_bucket_logging_destination")
-	tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] has_bucket_logging_destination Exists: %v , Value: %v", be, b))
-	if be {
-		if fmt.Sprintf("%v", b) == "false" {
-			tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] has_bucket_logging_destination is false removing configurations fromdata to update"))
-			_, e := m["bucket_logging"]
-			if e {
-				tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] bucket_logging found but has_bucket_logging_destination is false removing it"))
-				delete(m, "bucket_logging")
-			}
-
-		}
-	}
 	//Due to some VMS issue it return a broken configurations of bucket logging , this causes the update to fail
 	//in the case of shared ACL set , but the acl is missing ,we must set it to an empty list
+	bucket_logging_configured := has_bucket_logging(ctx, d)
+	tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] has_bucket_logging bucket: %v Bucket logging configured: %v", d.Get("bucket"), bucket_logging_configured))
+	if !bucket_logging_configured {
+		_, e := m["bucket_logging"]
+		if e {
+			tflog.Debug(ctx, fmt.Sprintf("[AlwaysSendCreateDir] bucket_logging is not configured setting it to nil"))
+			m["bucket_logging"] = nil
+		}
+
+	}
 	share_acl, share_acl_exists := m["share_acl"]
 	if share_acl_exists {
 		qos_policy_id, qos_policy_id_exists := d.GetOkExists("qos_policy_id")
@@ -244,6 +271,9 @@ type SchemaManipulationFunc func(interface{}, context.Context, *schema.ResourceD
 func KeepCreateDirState(i interface{}, ctx context.Context, d *schema.ResourceData) error {
 	_, exists := d.GetOkExists("create_dir")
 	o, n := d.GetChange("create_dir")
+	if has_bucket_logging(ctx, d) {
+
+	}
 	tflog.Debug(ctx, fmt.Sprintf("OLD: %v, NEW: %v", o, n))
 	if !exists {
 		return nil

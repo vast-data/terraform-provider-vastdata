@@ -63,8 +63,6 @@ data "vastdata_view" "view1" {
 - `directory` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Create the directory if it does not exist
 - `files_retention_mode` (String) (Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the View
-- `has_bucket_logging_destination` (Boolean) (Valid for versions: 5.2.0)
-- `has_bucket_logging_sources` (Boolean) (Valid for versions: 5.2.0)
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe ID used to identify the View
 - `ignore_oos` (Boolean) (Valid for versions: 5.1.0,5.2.0) Ignore oos
 - `is_remote` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)

@@ -203,10 +203,6 @@ None - S3 Object Ownership is disabled for the bucket.
         bucket_logging:
           type: "object"
           $ref: "#/components/schemas/BucketLogging"
-        has_bucket_logging_destination:
-          type: "boolean"
-        has_bucket_logging_sources:
-          type: "boolean"
         abac_tags:
           type: "array"
           items:

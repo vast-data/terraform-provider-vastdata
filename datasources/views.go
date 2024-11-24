@@ -456,22 +456,6 @@ func DataSourceView() *schema.Resource {
 				},
 			},
 
-			"has_bucket_logging_destination": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) `,
-			},
-
-			"has_bucket_logging_sources": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) `,
-			},
-
 			"abac_tags": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
@@ -1055,30 +1039,6 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"bucket_logging\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "HasBucketLoggingDestination", resource.HasBucketLoggingDestination))
-
-	err = d.Set("has_bucket_logging_destination", resource.HasBucketLoggingDestination)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"has_bucket_logging_destination\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "HasBucketLoggingSources", resource.HasBucketLoggingSources))
-
-	err = d.Set("has_bucket_logging_sources", resource.HasBucketLoggingSources)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"has_bucket_logging_sources\"",
 			Detail:   err.Error(),
 		})
 	}

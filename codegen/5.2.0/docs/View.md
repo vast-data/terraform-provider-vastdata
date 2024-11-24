@@ -43,8 +43,6 @@ Name | Type | Description | Notes
 **Locking** | **bool** | Write Once Read Many (WORM) locking enabled | [optional] [default to null]
 **IgnoreOos** | **bool** | Ignore oos | [optional] [default to null]
 **BucketLogging** | [***BucketLogging**](BucketLogging.md) |  | [optional] [default to null]
-**HasBucketLoggingDestination** | **bool** |  | [optional] [default to null]
-**HasBucketLoggingSources** | **bool** |  | [optional] [default to null]
 **AbacTags** | **[]string** | List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols | [optional] [default to null]
 **AbeMaxDepth** | **int32** | Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths. | [optional] [default to null]
 **AbeProtocols** | **[]string** | The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ] | [optional] [default to null]
