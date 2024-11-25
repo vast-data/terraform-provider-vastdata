@@ -44,7 +44,7 @@ components:
         sid_str:
           type: "string"
         uid_or_gid:
-          type: "int"
+          type: "integer"
         name:
           type: "string"
         fqdn:
