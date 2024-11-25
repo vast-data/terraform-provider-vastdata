@@ -797,6 +797,23 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ForceNewFields:           NewStringSet(),
 		DataSourceName:           "",
 	},
+	ResourceTemplateV2{
+		ResourceName:             "Volume",
+		Path:                     ToStringPointer("volumes"),
+		Model:                    api_latest.Volume{},
+		DestFile:                 ToStringPointer("volume.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("name"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		ForceNewFields:           NewStringSet(),
+		DataSourceName:           "vastdata_volume",
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
+	},
 }
 
 func init() {

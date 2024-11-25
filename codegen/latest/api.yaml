@@ -106,7 +106,7 @@ components:
           type: "array"
           items:
             type: "string"
-            enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4]
+            enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4,BLOCK]
           description: "Protocols exposed by this view"
         share:
           type: "string"
@@ -216,6 +216,9 @@ None - S3 Object Ownership is disabled for the bucket.
           items:
             type: "string"
           description: "The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]"
+        is_default_subsystem:
+          type: "boolean"
+          description: "Set as the default subsystem view for block devices (sub-system)"
     ViewCreate:
       type: "object"
       required:
@@ -2289,4 +2292,25 @@ Default: SIMPLE_PREFIX"
         port:
           type: "integer"
           description: "Port of a Kafka broker server"
+    Volume:
+      type: object
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the manager"
+        guid:
+          type: "string"
+          description: "A uniqe GUID assigned to the manager"
+        name:
+          type: "string"
+          description: "A uniqe name given to the volume"
+        size:
+          type: "integer"
+          format: "int64"
+          description: "The volume size of the volume in bytes"
+        view_id:
+          type: "integer"
+          format: "int64"
+          description: "The View ID to relate this volume with , must be a View with protocol defined as BLOCK"
+      
       

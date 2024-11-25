@@ -487,6 +487,14 @@ func DataSourceView() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+
+			"is_default_subsystem": &schema.Schema{
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.3.0) Set as the default subsystem view for block devices (sub-system)`,
+			},
 		},
 	}
 }
@@ -1075,6 +1083,18 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"abe_protocols\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsDefaultSubsystem", resource.IsDefaultSubsystem))
+
+	err = d.Set("is_default_subsystem", resource.IsDefaultSubsystem)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"is_default_subsystem\"",
 			Detail:   err.Error(),
 		})
 	}

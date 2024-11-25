@@ -623,6 +623,16 @@ func getResourceViewSchema() map[string]*schema.Schema {
 				Type: schema.TypeString,
 			},
 		},
+
+		"is_default_subsystem": &schema.Schema{
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("is_default_subsystem"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.3.0) Set as the default subsystem view for block devices (sub-system)`,
+		},
 	}
 }
 
@@ -1134,6 +1144,18 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"abe_protocols\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsDefaultSubsystem", resource.IsDefaultSubsystem))
+
+	err = d.Set("is_default_subsystem", resource.IsDefaultSubsystem)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"is_default_subsystem\"",
 			Detail:   err.Error(),
 		})
 	}

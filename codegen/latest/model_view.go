@@ -91,4 +91,6 @@ type View struct {
 	AbeMaxDepth int32 `json:"abe_max_depth,omitempty"`
 	// The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]
 	AbeProtocols []string `json:"abe_protocols,omitempty"`
+	// Set as the default subsystem view for block devices (sub-system)
+	IsDefaultSubsystem bool `json:"is_default_subsystem,omitempty"`
 }

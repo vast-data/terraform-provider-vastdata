@@ -252,5 +252,6 @@ var vast_versions map[string]map[string]reflect.Type = map[string]map[string]ref
 		"ViewPolicy":                      reflect.TypeOf((*version_5_3_0.ViewPolicy)(nil)).Elem(),
 		"ViewShareAcl":                    reflect.TypeOf((*version_5_3_0.ViewShareAcl)(nil)).Elem(),
 		"VipPool":                         reflect.TypeOf((*version_5_3_0.VipPool)(nil)).Elem(),
+		"Volume":                          reflect.TypeOf((*version_5_3_0.Volume)(nil)).Elem(),
 	},
 }

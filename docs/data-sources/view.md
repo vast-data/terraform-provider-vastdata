@@ -65,6 +65,7 @@ data "vastdata_view" "view1" {
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniqe GUID assigned to the View
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniqe ID used to identify the View
 - `ignore_oos` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Ignore oos
+- `is_default_subsystem` (Boolean) (Valid for versions: 5.3.0) Set as the default subsystem view for block devices (sub-system)
 - `is_remote` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 - `is_seamless` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
 - `locking` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Write Once Read Many (WORM) locking enabled
