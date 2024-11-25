@@ -62,8 +62,11 @@ resource "vastdata_s3_policy" "s3policy" {
 
 ### Read-Only
 
+- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) GUID
 - `id` (String) The ID of this resource.
+- `is_replicated` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
+- `users` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 
 ## Import
 

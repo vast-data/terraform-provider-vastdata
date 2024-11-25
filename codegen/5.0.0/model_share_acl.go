@@ -12,7 +12,7 @@ type ShareAcl struct {
 	Grantee string `json:"grantee,omitempty"`
 	Permissions string `json:"permissions,omitempty"`
 	SidStr string `json:"sid_str,omitempty"`
-	UidOrGid int `json:"uid_or_gid,omitempty"`
+	UidOrGid int32 `json:"uid_or_gid,omitempty"`
 	Name string `json:"name,omitempty"`
 	Fqdn string `json:"fqdn,omitempty"`
 }

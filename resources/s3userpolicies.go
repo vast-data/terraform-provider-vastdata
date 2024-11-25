@@ -66,6 +66,44 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
 		},
 
+		"users": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("users"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+
+		"groups": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("groups"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+
+		"is_replicated": &schema.Schema{
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("is_replicated"),
+
+			Computed:    true,
+			Optional:    false,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) `,
+		},
+
 		"enabled": &schema.Schema{
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("S3Policy").GetConflictingFields("enabled"),
@@ -125,6 +163,42 @@ func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_late
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"policy\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Users", resource.Users))
+
+	err = d.Set("users", utils.FlattenListOfPrimitives(&resource.Users))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"users\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Groups", resource.Groups))
+
+	err = d.Set("groups", utils.FlattenListOfPrimitives(&resource.Groups))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"groups\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "IsReplicated", resource.IsReplicated))
+
+	err = d.Set("is_replicated", resource.IsReplicated)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"is_replicated\"",
 			Detail:   err.Error(),
 		})
 	}
