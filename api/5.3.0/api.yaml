@@ -2312,5 +2312,9 @@ Default: SIMPLE_PREFIX"
           type: "integer"
           format: "int64"
           description: "The View ID to relate this volume with , must be a View with protocol defined as BLOCK"
-      
+        volume_tags:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of tags at the key:value format"
       

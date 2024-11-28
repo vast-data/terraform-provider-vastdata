@@ -19,4 +19,6 @@ type Volume struct {
 	Size int64 `json:"size,omitempty"`
 	// The View ID to relate this volume with , must be a View with protocol defined as BLOCK
 	ViewId int64 `json:"view_id,omitempty"`
+	// List of tags at the key:value format
+	VolumeTags []string `json:"volume_tags,omitempty"`
 }

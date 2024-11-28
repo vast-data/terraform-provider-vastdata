@@ -809,6 +809,14 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ForceNewFields:           NewStringSet(),
 		DataSourceName:           "vastdata_volume",
+		GetFunc:                  utils.VolumeGetFunc,
+		CreateFunc:               utils.VolumeCreateFunc,
+		UpdateFunc:               utils.VolumeUpdateFunc,
+		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"name": utils.ValidateVolumeNameStartsWithSlash},
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"volume_tags": utils.ListsDiffSupress,
+		},
+
 		Importer: utils.NewImportByHttpFields(false,
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},

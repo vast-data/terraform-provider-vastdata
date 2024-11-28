@@ -17,12 +17,13 @@ description: |-
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.3.0) A uniqe name given to the volume
+- `name` (String)
 
 ### Optional
 
 - `size` (Number) (Valid for versions: 5.3.0) The volume size of the volume in bytes
 - `view_id` (Number) (Valid for versions: 5.3.0) The View ID to relate this volume with , must be a View with protocol defined as BLOCK
+- `volume_tags` (List of String) (Valid for versions: 5.3.0) List of tags at the key:value format
 
 ### Read-Only
 

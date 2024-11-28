@@ -54,8 +54,9 @@ func getResourceVolumeSchema() map[string]*schema.Schema {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("name"),
 
-			Required:    true,
-			Description: `(Valid for versions: 5.3.0) A uniqe name given to the volume`,
+			Required: true,
+
+			ValidateDiagFunc: utils.ValidateVolumeNameStartsWithSlash,
 		},
 
 		"size": &schema.Schema{
@@ -76,6 +77,22 @@ func getResourceVolumeSchema() map[string]*schema.Schema {
 			Optional:    true,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.3.0) The View ID to relate this volume with , must be a View with protocol defined as BLOCK`,
+		},
+
+		"volume_tags": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("volume_tags"),
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("Volume").GetAttributeDiffFunc("volume_tags"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `(Valid for versions: 5.3.0) List of tags at the key:value format`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
 		},
 	}
 }
@@ -130,6 +147,18 @@ func ResourceVolumeReadStructIntoSchema(ctx context.Context, resource api_latest
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"view_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VolumeTags", resource.VolumeTags))
+
+	err = d.Set("volume_tags", utils.FlattenListOfPrimitives(&resource.VolumeTags))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"volume_tags\"",
 			Detail:   err.Error(),
 		})
 	}

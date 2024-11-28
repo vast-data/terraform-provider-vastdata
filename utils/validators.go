@@ -164,3 +164,12 @@ func ValidateManagerPassword(i interface{}, c cty.Path) diag.Diagnostics {
 	}
 	return diags
 }
+
+func ValidateVolumeNameStartsWithSlash(i interface{}, c cty.Path) diag.Diagnostics {
+	var diags diag.Diagnostics
+	if !strings.HasPrefix(i.(string), "/") {
+		return diag.Errorf("Volume name should start with \"/\" , %v does not apply to this restriction", i)
+	}
+	return diags
+
+}

@@ -34,7 +34,14 @@ var _ = Describe(" Volume", func() {
    "guid": "string",
    "name": "string",
    "size": 100,
-   "view_id": 100
+   "view_id": 100,
+   "volume_tags": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+   ]
 }
                          `
 	var server *ghttp.Server
