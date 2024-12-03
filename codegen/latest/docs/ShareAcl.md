@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 **Grantee** | **string** |  | [optional] [default to null]
 **Permissions** | **string** |  | [optional] [default to null]
 **SidStr** | **string** |  | [optional] [default to null]
-**UidOrGid** | **string** |  | [optional] [default to null]
+**UidOrGid** | **int32** |  | [optional] [default to null]
 **Name** | **string** |  | [optional] [default to null]
 **Fqdn** | **string** |  | [optional] [default to null]
 

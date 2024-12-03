@@ -99,7 +99,7 @@ var _ = Describe(" View", func() {
             "name": "string",
             "permissions": "string",
             "sid_str": "string",
-            "uid_or_gid": "string"
+            "uid_or_gid": 100
          }
       ]
    },
