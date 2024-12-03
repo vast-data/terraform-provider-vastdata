@@ -47,6 +47,7 @@ Name | Type | Description | Notes
 **AbeMaxDepth** | **int32** | Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths. | [optional] [default to null]
 **AbeProtocols** | **[]string** | The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ] | [optional] [default to null]
 **IsDefaultSubsystem** | **bool** | Set as the default subsystem view for block devices (sub-system) | [optional] [default to null]
+**EventNotifications** | [**[]ViewEventNotification**](ViewEventNotification.md) | List of S3 event notifications defentions | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -55,6 +55,7 @@ resource "vastdata_view" "example-view" {
 - `create_dir` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Creates the directory specified by the path
 - `default_retention_period` (String)
 - `directory` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Create the directory if it does not exist
+- `event_notifications` (Block List) (Valid for versions: 5.3.0) List of S3 event notifications defentions (see [below for nested schema](#nestedblock--event_notifications))
 - `files_retention_mode` (String) (Valid for versions: 5.1.0,5.2.0,5.3.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]
 - `ignore_oos` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Ignore oos
 - `is_default_subsystem` (Boolean) (Valid for versions: 5.3.0) Set as the default subsystem view for block devices (sub-system)
@@ -92,6 +93,19 @@ Optional:
 - `destination_id` (Number) (Valid for versions: 5.2.0,5.3.0) The Logging bucket ID
 - `key_format` (String) (Valid for versions: 5.2.0,5.3.0) The format for log object keys. SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString], PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the logged events occurred, PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: SIMPLE_PREFIX Allowed Values are [SIMPLE_PREFIX PARTITIONED_PREFIX_EVENT_TIME PARTITIONED_PREFIX_DELIVERY_TIME]
 - `prefix` (String) (Valid for versions: 5.2.0,5.3.0) Log line prefix to add
+
+
+<a id="nestedblock--event_notifications"></a>
+### Nested Schema for `event_notifications`
+
+Optional:
+
+- `broker_id` (Number) (Valid for versions: 5.3.0) The id of the external kafka broker
+- `name` (String) (Valid for versions: 5.3.0) A unique name of an event among all other events related to the view holding this event
+- `prefix_filter` (String) (Valid for versions: 5.3.0) Event prefix filter
+- `suffix_filter` (String) (Valid for versions: 5.3.0) Event suffix filter
+- `topic` (String) (Valid for versions: 5.3.0) The name of the kafka topic to send alert to
+- `triggers` (List of String) (Valid for versions: 5.3.0) List of S3 triggers which will trigger event notification, The following events are supported: - S3_OBJECT_CREATED_ALL - S3_OBJECT_CREATED_PUT - S3_OBJECT_CREATED_POST - S3_OBJECT_CREATED_COPY - S3_OBJECT_CREATED_COMPLETE_MULTIPART_UPLOAD - S3_OBJECT_REMOVED_ALL - S3_OBJECT_REMOVED_DELETE - S3_OBJECT_REMOVED_DELETE_MARKER_CREATED
 
 
 <a id="nestedblock--share_acl"></a>

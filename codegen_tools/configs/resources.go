@@ -822,6 +822,19 @@ var ResourcesTemplates = []ResourceTemplateV2{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
 	},
+	ResourceTemplateV2{
+		ResourceName:             "ViewEventNotification",
+		Path:                     ToStringPointer(""),
+		Model:                    api_latest.ViewEventNotification{},
+		DestFile:                 ToStringPointer("eventnotifications.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet(""),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 false,
+		ForceNewFields:           NewStringSet(),
+		DataSourceName:           "",
+	},
 }
 
 func init() {

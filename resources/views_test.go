@@ -72,6 +72,22 @@ var _ = Describe(" View", func() {
    "cluster": "string",
    "cluster_id": 100,
    "default_retention_period": "string",
+   "event_notifications": [
+      {
+         "broker_id": 100,
+         "name": "string",
+         "prefix_filter": "string",
+         "suffix_filter": "string",
+         "topic": "string",
+         "triggers": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+         ]
+      }
+   ],
    "files_retention_mode": "string",
    "guid": "string",
    "logical_capacity": 100,

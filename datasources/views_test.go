@@ -68,6 +68,9 @@ var _ = Describe(" View", func() {
    "cluster": "string",
    "cluster_id": 100,
    "default_retention_period": "string",
+   "event_notifications": [
+      {}
+   ],
    "files_retention_mode": "string",
    "guid": "string",
    "id": 100,

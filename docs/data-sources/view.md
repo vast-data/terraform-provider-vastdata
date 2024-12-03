@@ -61,6 +61,7 @@ data "vastdata_view" "view1" {
 - `create_dir` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Creates the directory specified by the path
 - `default_retention_period` (String) (Valid for versions: 5.1.0,5.2.0,5.3.0) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
 - `directory` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Create the directory if it does not exist
+- `event_notifications` (List of Object) (Valid for versions: 5.3.0) List of S3 event notifications defentions (see [below for nested schema](#nestedatt--event_notifications))
 - `files_retention_mode` (String) (Valid for versions: 5.1.0,5.2.0,5.3.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]
 - `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniqe GUID assigned to the View
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) A uniqe ID used to identify the View
@@ -95,6 +96,13 @@ Read-Only:
 - `destination_id` (Number)
 - `key_format` (String)
 - `prefix` (String)
+
+
+<a id="nestedatt--event_notifications"></a>
+### Nested Schema for `event_notifications`
+
+Read-Only:
+
 
 
 <a id="nestedatt--share_acl"></a>

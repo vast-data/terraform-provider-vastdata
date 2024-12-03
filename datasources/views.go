@@ -495,6 +495,18 @@ func DataSourceView() *schema.Resource {
 				Optional:    false,
 				Description: `(Valid for versions: 5.3.0) Set as the default subsystem view for block devices (sub-system)`,
 			},
+
+			"event_notifications": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.3.0) List of S3 event notifications defentions`,
+
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{},
+				},
+			},
 		},
 	}
 }
@@ -1095,6 +1107,18 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"is_default_subsystem\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "EventNotifications", resource.EventNotifications))
+
+	err = d.Set("event_notifications", utils.FlattenListOfModelsToList(ctx, resource.EventNotifications))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"event_notifications\"",
 			Detail:   err.Error(),
 		})
 	}

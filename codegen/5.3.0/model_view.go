@@ -93,4 +93,6 @@ type View struct {
 	AbeProtocols []string `json:"abe_protocols,omitempty"`
 	// Set as the default subsystem view for block devices (sub-system)
 	IsDefaultSubsystem bool `json:"is_default_subsystem,omitempty"`
+	// List of S3 event notifications defentions
+	EventNotifications []ViewEventNotification `json:"event_notifications,omitempty"`
 }

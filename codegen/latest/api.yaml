@@ -219,6 +219,12 @@ None - S3 Object Ownership is disabled for the bucket.
         is_default_subsystem:
           type: "boolean"
           description: "Set as the default subsystem view for block devices (sub-system)"
+        event_notifications:
+          type: "array"
+          items:
+            type: "object"
+            $ref: "#/components/schemas/ViewEventNotification"
+          description: "List of S3 event notifications defentions"
     ViewCreate:
       type: "object"
       required:
@@ -2317,4 +2323,38 @@ Default: SIMPLE_PREFIX"
           items:
             type: "string"
           description: "List of tags at the key:value format"
+    ViewEventNotification:
+      type: object
+      properties:
+        name:
+          type: "string"
+          description: "A unique name of an event among all other events related to the view holding this event"
+        topic:
+          type: "string"
+          description: "The name of the kafka topic to send alert to"
+        broker_id:
+          type: "int"
+          format: "int64"
+          description: "The id of the external kafka broker"
+        triggers:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of S3 triggers which will trigger event notification, The following events are supported:
+- S3_OBJECT_CREATED_ALL
+- S3_OBJECT_CREATED_PUT
+- S3_OBJECT_CREATED_POST
+- S3_OBJECT_CREATED_COPY
+- S3_OBJECT_CREATED_COMPLETE_MULTIPART_UPLOAD
+- S3_OBJECT_REMOVED_ALL
+- S3_OBJECT_REMOVED_DELETE
+- S3_OBJECT_REMOVED_DELETE_MARKER_CREATED"
+        prefix_filter:
+          type: "string"
+          description: "Event prefix filter"
+        suffix_filter:
+          type: "string"
+          description: "Event suffix filter"
+        
+        
       

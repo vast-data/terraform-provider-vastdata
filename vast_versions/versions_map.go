@@ -249,6 +249,7 @@ var vast_versions map[string]map[string]reflect.Type = map[string]map[string]ref
 		"UserQuota":                       reflect.TypeOf((*version_5_3_0.UserQuota)(nil)).Elem(),
 		"View":                            reflect.TypeOf((*version_5_3_0.View)(nil)).Elem(),
 		"ViewCreate":                      reflect.TypeOf((*version_5_3_0.ViewCreate)(nil)).Elem(),
+		"ViewEventNotification":           reflect.TypeOf((*version_5_3_0.ViewEventNotification)(nil)).Elem(),
 		"ViewPolicy":                      reflect.TypeOf((*version_5_3_0.ViewPolicy)(nil)).Elem(),
 		"ViewShareAcl":                    reflect.TypeOf((*version_5_3_0.ViewShareAcl)(nil)).Elem(),
 		"VipPool":                         reflect.TypeOf((*version_5_3_0.VipPool)(nil)).Elem(),

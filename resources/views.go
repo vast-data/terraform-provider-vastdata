@@ -633,6 +633,85 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.3.0) Set as the default subsystem view for block devices (sub-system)`,
 		},
+
+		"event_notifications": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("event_notifications"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.3.0) List of S3 event notifications defentions`,
+
+			Elem: &schema.Resource{
+				Schema: map[string]*schema.Schema{
+
+					"name": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ViewEventNotification").GetConflictingFields("name"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.3.0) A unique name of an event among all other events related to the view holding this event`,
+					},
+
+					"topic": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ViewEventNotification").GetConflictingFields("topic"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.3.0) The name of the kafka topic to send alert to`,
+					},
+
+					"broker_id": &schema.Schema{
+						Type:          schema.TypeInt,
+						ConflictsWith: codegen_configs.GetResourceByName("ViewEventNotification").GetConflictingFields("broker_id"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.3.0) The id of the external kafka broker`,
+					},
+
+					"triggers": &schema.Schema{
+						Type:          schema.TypeList,
+						ConflictsWith: codegen_configs.GetResourceByName("ViewEventNotification").GetConflictingFields("triggers"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.3.0) List of S3 triggers which will trigger event notification, The following events are supported: - S3_OBJECT_CREATED_ALL - S3_OBJECT_CREATED_PUT - S3_OBJECT_CREATED_POST - S3_OBJECT_CREATED_COPY - S3_OBJECT_CREATED_COMPLETE_MULTIPART_UPLOAD - S3_OBJECT_REMOVED_ALL - S3_OBJECT_REMOVED_DELETE - S3_OBJECT_REMOVED_DELETE_MARKER_CREATED`,
+
+						Elem: &schema.Schema{
+							Type: schema.TypeString,
+						},
+					},
+
+					"prefix_filter": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ViewEventNotification").GetConflictingFields("prefix_filter"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.3.0) Event prefix filter`,
+					},
+
+					"suffix_filter": &schema.Schema{
+						Type:          schema.TypeString,
+						ConflictsWith: codegen_configs.GetResourceByName("ViewEventNotification").GetConflictingFields("suffix_filter"),
+
+						Computed:    true,
+						Optional:    true,
+						Sensitive:   false,
+						Description: `(Valid for versions: 5.3.0) Event suffix filter`,
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -1156,6 +1235,18 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"is_default_subsystem\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "EventNotifications", resource.EventNotifications))
+
+	err = d.Set("event_notifications", utils.FlattenListOfModelsToList(ctx, resource.EventNotifications))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"event_notifications\"",
 			Detail:   err.Error(),
 		})
 	}
