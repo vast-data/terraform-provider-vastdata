@@ -814,7 +814,8 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		UpdateFunc:               utils.VolumeUpdateFunc,
 		FieldsValidators:         map[string]schema.SchemaValidateDiagFunc{"name": utils.ValidateVolumeNameStartsWithSlash},
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"volume_tags": utils.ListsDiffSupress,
+			"volume_tags":    utils.ListsDiffSupress,
+			"block_host_ids": utils.ListsDiffSupress,
 		},
 
 		Importer: utils.NewImportByHttpFields(false,
@@ -834,6 +835,47 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 false,
 		ForceNewFields:           NewStringSet(),
 		DataSourceName:           "",
+	},
+	ResourceTemplateV2{
+		ResourceName:             "BlockHost",
+		Path:                     ToStringPointer("blockhosts"),
+		Model:                    api_latest.BlockHost{},
+		DestFile:                 ToStringPointer("blockhost.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("name", "nqn"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		ForceNewFields:           NewStringSet(),
+		DataSourceName:           "vastdata_blockhost",
+		GetFunc:                  utils.BlockHostGetFunc,
+		CreateFunc:               utils.BlockHostCreateFunc,
+		UpdateFunc:               utils.BlockHostUpdateFunc,
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"blockhost_tags": utils.ListsDiffSupress,
+		},
+
+		Importer: utils.NewImportByHttpFields(false,
+			[]utils.HttpFieldTuple{
+				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+			}),
+	},
+	ResourceTemplateV2{
+		ResourceName:             "BlockMapping",
+		Path:                     ToStringPointer("blockmappings"),
+		Model:                    api_latest.BlockMapping{},
+		DestFile:                 ToStringPointer("blockmappings.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("volume_id", "host_id"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		ForceNewFields:           NewStringSet(),
+		DataSourceName:           "vastdata_block_mapping",
+		// Importer: utils.NewImportByHttpFields(false,
+		// 	[]utils.HttpFieldTuple{
+		// 		utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
+		// 	}),
 	},
 }
 

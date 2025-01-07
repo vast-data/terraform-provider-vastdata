@@ -712,6 +712,20 @@ func getResourceViewSchema() map[string]*schema.Schema {
 				},
 			},
 		},
+
+		"kafka_vip_pools": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("kafka_vip_pools"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.3.0) When setting view protocol to KAKFA at least on one vippool from the type of protocols should be defined`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeInt,
+			},
+		},
 	}
 }
 
@@ -1247,6 +1261,18 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"event_notifications\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "KafkaVipPools", resource.KafkaVipPools))
+
+	err = d.Set("kafka_vip_pools", utils.FlattenListOfPrimitives(&resource.KafkaVipPools))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"kafka_vip_pools\"",
 			Detail:   err.Error(),
 		})
 	}

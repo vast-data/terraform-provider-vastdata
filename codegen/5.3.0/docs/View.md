@@ -48,6 +48,7 @@ Name | Type | Description | Notes
 **AbeProtocols** | **[]string** | The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ] | [optional] [default to null]
 **IsDefaultSubsystem** | **bool** | Set as the default subsystem view for block devices (sub-system) | [optional] [default to null]
 **EventNotifications** | [**[]ViewEventNotification**](ViewEventNotification.md) | List of S3 event notifications defentions | [optional] [default to null]
+**KafkaVipPools** | **[]int64** | When setting view protocol to KAKFA at least on one vippool from the type of protocols should be defined | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

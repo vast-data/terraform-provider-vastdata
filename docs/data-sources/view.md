@@ -69,6 +69,7 @@ data "vastdata_view" "view1" {
 - `is_default_subsystem` (Boolean) (Valid for versions: 5.3.0) Set as the default subsystem view for block devices (sub-system)
 - `is_remote` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0)
 - `is_seamless` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
+- `kafka_vip_pools` (List of Number) (Valid for versions: 5.3.0) When setting view protocol to KAKFA at least on one vippool from the type of protocols should be defined
 - `locking` (Boolean) (Valid for versions: 5.1.0,5.2.0,5.3.0) Write Once Read Many (WORM) locking enabled
 - `logical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0,5.3.0) Logical Capacity
 - `max_retention_period` (String) (Valid for versions: 5.1.0,5.2.0,5.3.0) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
@@ -103,6 +104,12 @@ Read-Only:
 
 Read-Only:
 
+- `broker_id` (Number)
+- `name` (String)
+- `prefix_filter` (String)
+- `suffix_filter` (String)
+- `topic` (String)
+- `triggers` (List of String)
 
 
 <a id="nestedatt--share_acl"></a>

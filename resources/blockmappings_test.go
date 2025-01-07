@@ -20,7 +20,7 @@ import (
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
-var _ = Describe(" View", func() {
+var _ = Describe(" BlockMapping", func() {
 	var ReadContext schema.ReadContextFunc
 	var DeleteContext schema.DeleteContextFunc
 	var CreateContext schema.CreateContextFunc
@@ -28,124 +28,28 @@ var _ = Describe(" View", func() {
 	var Importer schema.ResourceImporter
 	//	var ResourceSchema map[string]*schema.Schema
 	//An empty resource data to be populated per test
-	var ViewResourceData *schema.ResourceData
+	var BlockMappingResourceData *schema.ResourceData
 	var model_json = `
                          {
-   "abac_tags": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "abe_max_depth": 100,
-   "abe_protocols": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "alias": "string",
-   "auto_commit": "string",
-   "bucket": "string",
-   "bucket_creators": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "bucket_creators_groups": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "bucket_logging": {
-      "destination_id": 100,
-      "key_format": "string",
-      "prefix": "string"
-   },
-   "bucket_owner": "string",
-   "cluster": "string",
-   "cluster_id": 100,
-   "default_retention_period": "string",
-   "event_notifications": [
-      {
-         "broker_id": 100,
-         "name": "string",
-         "prefix_filter": "string",
-         "suffix_filter": "string",
-         "topic": "string",
-         "triggers": [
-            "A",
-            "B",
-            "C",
-            "D",
-            "E"
-         ]
-      }
-   ],
-   "files_retention_mode": "string",
+   "block_host": "string",
    "guid": "string",
-   "kafka_vip_pools": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6
-   ],
-   "logical_capacity": 100,
-   "max_retention_period": "string",
-   "min_retention_period": "string",
-   "name": "string",
-   "nfs_interop_flags": "string",
-   "path": "string",
-   "physical_capacity": 100,
-   "policy_id": 100,
-   "protocols": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "qos_policy_id": 100,
-   "s3_locks_retention_mode": "string",
-   "s3_locks_retention_period": "string",
-   "s3_object_ownership_rule": "string",
-   "share": "string",
-   "share_acl": {
-      "acl": [
-         {
-            "fqdn": "string",
-            "grantee": "string",
-            "name": "string",
-            "permissions": "string",
-            "sid_str": "string",
-            "uid_or_gid": "string"
-         }
-      ]
-   },
-   "tenant_id": 100
+   "snapshot_id": 100,
+   "volume": "string"
 }
                          `
 	var server *ghttp.Server
 	var client vast_client.JwtSession
-	ViewResource := resources.ResourceView()
-	ReadContext = ViewResource.ReadContext
-	DeleteContext = ViewResource.DeleteContext
-	CreateContext = ViewResource.CreateContext
-	UpdateContext = ViewResource.UpdateContext
-	Importer = *ViewResource.Importer
-	//	ResourceSchema = ViewResource.Schema
+	BlockMappingResource := resources.ResourceBlockMapping()
+	ReadContext = BlockMappingResource.ReadContext
+	DeleteContext = BlockMappingResource.DeleteContext
+	CreateContext = BlockMappingResource.CreateContext
+	UpdateContext = BlockMappingResource.UpdateContext
+	Importer = *BlockMappingResource.Importer
+	//	ResourceSchema = BlockMappingResource.Schema
 
 	BeforeEach(func() {
-		ViewResourceData = ViewResource.TestResourceData()
-		ViewResourceData.SetId("100")
+		BlockMappingResourceData = BlockMappingResource.TestResourceData()
+		BlockMappingResourceData.SetId("100")
 		server = ghttp.NewTLSServer()
 		host_port := strings.Split(server.Addr(), ":")
 		host := host_port[0]
@@ -162,13 +66,13 @@ var _ = Describe(" View", func() {
 	)
 	Describe("Validating Resource Read Context", func() {
 		Context("Read Data into a ResourceData", func() {
-			It("Resource:View ,Reads Data", func() {
+			It("Resource:BlockMapping ,Reads Data", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "views100"),
+					ghttp.VerifyRequest("GET", "blockmappings100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -179,9 +83,9 @@ var _ = Describe(" View", func() {
 
 				z := make(map[string]string)
 				utils.MapToTFSchema(*o, &z, "")
-				d := ReadContext(ctx, ViewResourceData, client)
+				d := ReadContext(ctx, BlockMappingResourceData, client)
 				Expect(d).To(BeNil())
-				attributes := ViewResourceData.State().Attributes
+				attributes := BlockMappingResourceData.State().Attributes
 				for k, v := range z {
 					Expect(attributes).To(HaveKeyWithValue(k, v))
 				}
@@ -192,19 +96,19 @@ var _ = Describe(" View", func() {
 	)
 	Describe("Validating Resource Delete Context", func() {
 		Context("Delete A resource", func() {
-			It("Resource:View ,Deletes the resource", func() {
+			It("Resource:BlockMapping ,Deletes the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "views100//"),
+					ghttp.VerifyRequest("DELETE", "blockmappings100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
 				e := client.Start()
 				Expect(e).To(BeNil())
-				d := DeleteContext(ctx, ViewResourceData, client)
+				d := DeleteContext(ctx, BlockMappingResourceData, client)
 				Expect(d).To(BeNil())
 			})
 		})
@@ -212,29 +116,29 @@ var _ = Describe(" View", func() {
 	)
 	Describe("Validating Resource Creation Context", func() {
 		Context("Create A resource", func() {
-			It("Resource:View ,Creates the resource", func() {
+			It("Resource:BlockMapping ,Creates the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "views"),
+					ghttp.VerifyRequest("POST", "blockmappings"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "views0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "blockmappings0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				e := client.Start()
 				Expect(e).To(BeNil())
-				resource := api_latest.View{}
+				resource := api_latest.BlockMapping{}
 				json.Unmarshal([]byte(model_json), &resource)
-				resources.ResourceViewReadStructIntoSchema(ctx, resource, ViewResourceData)
-				ViewResourceData.SetId("100")
-				d := CreateContext(ctx, ViewResourceData, client)
+				resources.ResourceBlockMappingReadStructIntoSchema(ctx, resource, BlockMappingResourceData)
+				BlockMappingResourceData.SetId("100")
+				d := CreateContext(ctx, BlockMappingResourceData, client)
 				Expect(d).To(BeNil())
 
 			})
@@ -243,25 +147,25 @@ var _ = Describe(" View", func() {
 	)
 	Describe("Validating Resource Update Context", func() {
 		Context("Update A resource", func() {
-			It("Resource:View ,Update the resource", func() {
+			It("Resource:BlockMapping ,Update the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 				var new_guid = "11111-11111-11111-11111-11111"
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "views"),
+					ghttp.VerifyRequest("POST", "blockmappings"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "views0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "blockmappings0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "views/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "blockmappings/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -269,10 +173,10 @@ var _ = Describe(" View", func() {
 				e := client.Start()
 				Expect(e).To(BeNil())
 				//First we create a resource than we change it and see if it was updated
-				resource := api_latest.View{}
+				resource := api_latest.BlockMapping{}
 				json.Unmarshal([]byte(model_json), &resource)
-				resources.ResourceViewReadStructIntoSchema(ctx, resource, ViewResourceData)
-				d := CreateContext(ctx, ViewResourceData, client)
+				resources.ResourceBlockMappingReadStructIntoSchema(ctx, resource, BlockMappingResourceData)
+				d := CreateContext(ctx, BlockMappingResourceData, client)
 				Expect(d).To(BeNil())
 				//We update the guid as this is a fieled that always exists
 				resource.Guid = new_guid
@@ -280,14 +184,14 @@ var _ = Describe(" View", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "views0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "blockmappings0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
 
-				d = UpdateContext(ctx, ViewResourceData, client)
+				d = UpdateContext(ctx, BlockMappingResourceData, client)
 				Expect(d).To(BeNil())
-				Expect(ViewResourceData.Get("guid")).To(Equal(new_guid))
+				Expect(BlockMappingResourceData.Get("guid")).To(Equal(new_guid))
 
 			})
 		})
@@ -295,20 +199,20 @@ var _ = Describe(" View", func() {
 	)
 	Describe("Validating Resource Importer", func() {
 		Context("Import A resource", func() {
-			It("Resource:View ,Imports the resource", func() {
+			It("Resource:BlockMapping ,Imports the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 				var guid = "11111-11111-11111-11111-11111"
 
-				resource := api_latest.View{}
+				resource := api_latest.BlockMapping{}
 				json.Unmarshal([]byte(model_json), &resource)
-				ViewResourceData.SetId(guid)
+				BlockMappingResourceData.SetId(guid)
 				resource.Guid = guid
 				b, err := json.Marshal(&resource)
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "views", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "blockmappings", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)
@@ -316,14 +220,14 @@ var _ = Describe(" View", func() {
 				ctx = tflogtest.RootLogger(ctx, &output)
 				e := client.Start()
 				Expect(e).To(BeNil())
-				Importer.StateContext(ctx, ViewResourceData, client)
+				Importer.StateContext(ctx, BlockMappingResourceData, client)
 				//				Expect(d).To(BeNil())
 
 				o := new(map[string]interface{})
 				json.Unmarshal(b, o)
 				z := make(map[string]string)
 				utils.MapToTFSchema(*o, &z, "")
-				attributes := ViewResourceData.State().Attributes
+				attributes := BlockMappingResourceData.State().Attributes
 				for k, v := range z {
 					Expect(attributes).To(HaveKeyWithValue(k, v))
 				}

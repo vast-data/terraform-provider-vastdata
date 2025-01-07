@@ -95,4 +95,6 @@ type View struct {
 	IsDefaultSubsystem bool `json:"is_default_subsystem,omitempty"`
 	// List of S3 event notifications defentions
 	EventNotifications []ViewEventNotification `json:"event_notifications,omitempty"`
+	// When setting view protocol to KAKFA at least on one vippool from the type of protocols should be defined
+	KafkaVipPools []int64 `json:"kafka_vip_pools,omitempty"`
 }

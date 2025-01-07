@@ -21,101 +21,70 @@ import (
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
 )
 
-func ResourceVolume() *schema.Resource {
+func ResourceBlockMapping() *schema.Resource {
 	return &schema.Resource{
-		ReadContext:   resourceVolumeRead,
-		DeleteContext: resourceVolumeDelete,
-		CreateContext: resourceVolumeCreate,
-		UpdateContext: resourceVolumeUpdate,
+		ReadContext:   resourceBlockMappingRead,
+		DeleteContext: resourceBlockMappingDelete,
+		CreateContext: resourceBlockMappingCreate,
+		UpdateContext: resourceBlockMappingUpdate,
 
 		Importer: &schema.ResourceImporter{
-			StateContext: resourceVolumeImporter,
+			StateContext: resourceBlockMappingImporter,
 		},
 
 		Description: ``,
-		Schema:      getResourceVolumeSchema(),
+		Schema:      getResourceBlockMappingSchema(),
 	}
 }
 
-func getResourceVolumeSchema() map[string]*schema.Schema {
+func getResourceBlockMappingSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
 		"guid": &schema.Schema{
 			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("guid"),
+			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("guid"),
 
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.3.0) A uniqe GUID assigned to the manager`,
+			Description: `(Valid for versions: 5.3.0) A uniqe GUID assigned to the blockhost`,
 		},
 
-		"name": &schema.Schema{
+		"volume": &schema.Schema{
 			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("name"),
-
-			Required: true,
-
-			ValidateDiagFunc: utils.ValidateVolumeNameStartsWithSlash,
-		},
-
-		"size": &schema.Schema{
-			Type:          schema.TypeInt,
-			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("size"),
+			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("volume"),
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.3.0) The volume size of the volume in bytes`,
+			Description: `(Valid for versions: 5.3.0) The Volume ID to map the blockhost to`,
 		},
 
-		"view_id": &schema.Schema{
-			Type:          schema.TypeInt,
-			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("view_id"),
+		"block_host": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("block_host"),
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.3.0) The View ID to relate this volume with , must be a View with protocol defined as BLOCK`,
+			Description: `(Valid for versions: 5.3.0) The blockhost id to map to this volume`,
 		},
 
-		"block_host_ids": &schema.Schema{
-			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("block_host_ids"),
+		"snapshot_id": &schema.Schema{
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("snapshot_id"),
 
-			DiffSuppressOnRefresh: false,
-			DiffSuppressFunc:      codegen_configs.GetResourceByName("Volume").GetAttributeDiffFunc("block_host_ids"),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             false,
-			Description:           `(Valid for versions: 5.3.0) List of blockhosts associated with this volume`,
-
-			Elem: &schema.Schema{
-				Type: schema.TypeInt,
-			},
-		},
-
-		"volume_tags": &schema.Schema{
-			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("volume_tags"),
-
-			DiffSuppressOnRefresh: false,
-			DiffSuppressFunc:      codegen_configs.GetResourceByName("Volume").GetAttributeDiffFunc("volume_tags"),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             false,
-			Description:           `(Valid for versions: 5.3.0) List of tags at the key:value format`,
-
-			Elem: &schema.Schema{
-				Type: schema.TypeString,
-			},
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.3.0) If configured with a snapshot of the volume than the blockhost will be mapped to this snapshot`,
 		},
 	}
 }
 
-var Volume_names_mapping map[string][]string = map[string][]string{}
+var BlockMapping_names_mapping map[string][]string = map[string][]string{}
 
-func ResourceVolumeReadStructIntoSchema(ctx context.Context, resource api_latest.Volume, d *schema.ResourceData) diag.Diagnostics {
+func ResourceBlockMappingReadStructIntoSchema(ctx context.Context, resource api_latest.BlockMapping, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
 
@@ -131,62 +100,38 @@ func ResourceVolumeReadStructIntoSchema(ctx context.Context, resource api_latest
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Volume", resource.Volume))
 
-	err = d.Set("name", resource.Name)
+	err = d.Set("volume", resource.Volume)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occured setting value to \"volume\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Size", resource.Size))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "BlockHost", resource.BlockHost))
 
-	err = d.Set("size", resource.Size)
+	err = d.Set("block_host", resource.BlockHost)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"size\"",
+			Summary:  "Error occured setting value to \"block_host\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ViewId", resource.ViewId))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SnapshotId", resource.SnapshotId))
 
-	err = d.Set("view_id", resource.ViewId)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"view_id\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "BlockHostIds", resource.BlockHostIds))
-
-	err = d.Set("block_host_ids", utils.FlattenListOfPrimitives(&resource.BlockHostIds))
+	err = d.Set("snapshot_id", resource.SnapshotId)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"block_host_ids\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VolumeTags", resource.VolumeTags))
-
-	err = d.Set("volume_tags", utils.FlattenListOfPrimitives(&resource.VolumeTags))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"volume_tags\"",
+			Summary:  "Error occured setting value to \"snapshot_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -194,13 +139,13 @@ func ResourceVolumeReadStructIntoSchema(ctx context.Context, resource api_latest
 	return diags
 
 }
-func resourceVolumeRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceBlockMappingRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Volume")
-	attrs := map[string]interface{}{"path": utils.GenPath("volumes"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceVolumeRead] Calling Get Function : %v for resource Volume", utils.GetFuncName(resource_config.GetFunc)))
+	resource_config := codegen_configs.GetResourceByName("BlockMapping")
+	attrs := map[string]interface{}{"path": utils.GenPath("blockmappings"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceBlockMappingRead] Calling Get Function : %v for resource BlockMapping", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -214,7 +159,7 @@ func resourceVolumeRead(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 
 	}
-	resource := api_latest.Volume{}
+	resource := api_latest.BlockMapping{}
 	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -236,16 +181,16 @@ func resourceVolumeRead(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 
 	}
-	diags = ResourceVolumeReadStructIntoSchema(ctx, resource, d)
+	diags = ResourceBlockMappingReadStructIntoSchema(ctx, resource, d)
 
 	return diags
 }
 
-func resourceVolumeDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceBlockMappingDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Volume")
-	attrs := map[string]interface{}{"path": utils.GenPath("volumes"), "id": d.Id()}
+	resource_config := codegen_configs.GetResourceByName("BlockMapping")
+	attrs := map[string]interface{}{"path": utils.GenPath("blockmappings"), "id": d.Id()}
 
 	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -266,22 +211,22 @@ func resourceVolumeDelete(ctx context.Context, d *schema.ResourceData, m interfa
 
 }
 
-func resourceVolumeCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceBlockMappingCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Volume_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, BlockMapping_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Volume")
-	tflog.Info(ctx, fmt.Sprintf("Creating Resource Volume"))
-	reflect_Volume := reflect.TypeOf((*api_latest.Volume)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Volume.Elem(), d, &data, "", false)
+	resource_config := codegen_configs.GetResourceByName("BlockMapping")
+	tflog.Info(ctx, fmt.Sprintf("Creating Resource BlockMapping"))
+	reflect_BlockMapping := reflect.TypeOf((*api_latest.BlockMapping)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_BlockMapping.Elem(), d, &data, "", false)
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Volume")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "BlockMapping")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -298,7 +243,7 @@ func resourceVolumeCreate(ctx context.Context, d *schema.ResourceData, m interfa
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Volume", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "BlockMapping", cluster_version))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -312,9 +257,9 @@ func resourceVolumeCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("volumes")}
+	attrs := map[string]interface{}{"path": utils.GenPath("blockmappings")}
 	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Volume %v", create_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  BlockMapping %v", create_err))
 
 	if create_err != nil {
 		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -327,12 +272,12 @@ func resourceVolumeCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 	response_body, _ := io.ReadAll(response.Body)
 	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
-	resource := api_latest.Volume{}
+	resource := api_latest.BlockMapping{}
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Failed to convert response body into Volume",
+			Summary:  "Failed to convert response body into BlockMapping",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -348,21 +293,21 @@ func resourceVolumeCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceVolumeRead(ctx_with_resource, d, m)
+	resourceBlockMappingRead(ctx_with_resource, d, m)
 
 	return diags
 }
 
-func resourceVolumeUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceBlockMappingUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Volume_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, BlockMapping_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("Volume")
+	resource_config := codegen_configs.GetResourceByName("BlockMapping")
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Volume")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "BlockMapping")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -379,14 +324,14 @@ func resourceVolumeUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Volume", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "BlockMapping", cluster_version))
 		}
 	}
 
 	client := m.(vast_client.JwtSession)
-	tflog.Info(ctx, fmt.Sprintf("Updating Resource Volume"))
-	reflect_Volume := reflect.TypeOf((*api_latest.Volume)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Volume.Elem(), d, &data, "", false)
+	tflog.Info(ctx, fmt.Sprintf("Updating Resource BlockMapping"))
+	reflect_BlockMapping := reflect.TypeOf((*api_latest.BlockMapping)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_BlockMapping.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -399,9 +344,9 @@ func resourceVolumeUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("volumes"), "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("blockmappings"), "id": d.Id()}
 	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Volume %v", patch_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  BlockMapping %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
@@ -411,25 +356,25 @@ func resourceVolumeUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		})
 		return diags
 	}
-	resourceVolumeRead(ctx, d, m)
+	resourceBlockMappingRead(ctx, d, m)
 
 	return diags
 
 }
 
-func resourceVolumeImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+func resourceBlockMappingImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Volume")
-	attrs := map[string]interface{}{"path": utils.GenPath("volumes")}
+	resource_config := codegen_configs.GetResourceByName("BlockMapping")
+	attrs := map[string]interface{}{"path": utils.GenPath("blockmappings")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.Volume{}
+	resource_l := []api_latest.BlockMapping{}
 	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -450,7 +395,7 @@ func resourceVolumeImporter(ctx context.Context, d *schema.ResourceData, m inter
 		return result, id_err
 	}
 
-	diags := ResourceVolumeReadStructIntoSchema(ctx, resource, d)
+	diags := ResourceBlockMappingReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
 		all_errors := "Errors occured while importing:\n"
 		for _, dig := range diags {

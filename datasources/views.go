@@ -504,7 +504,72 @@ func DataSourceView() *schema.Resource {
 				Description: `(Valid for versions: 5.3.0) List of S3 event notifications defentions`,
 
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{},
+					Schema: map[string]*schema.Schema{
+
+						"name": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.3.0) A unique name of an event among all other events related to the view holding this event`,
+						},
+
+						"topic": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.3.0) The name of the kafka topic to send alert to`,
+						},
+
+						"broker_id": &schema.Schema{
+							Type:        schema.TypeInt,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.3.0) The id of the external kafka broker`,
+						},
+
+						"triggers": &schema.Schema{
+							Type:        schema.TypeList,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.3.0) List of S3 triggers which will trigger event notification, The following events are supported: - S3_OBJECT_CREATED_ALL - S3_OBJECT_CREATED_PUT - S3_OBJECT_CREATED_POST - S3_OBJECT_CREATED_COPY - S3_OBJECT_CREATED_COMPLETE_MULTIPART_UPLOAD - S3_OBJECT_REMOVED_ALL - S3_OBJECT_REMOVED_DELETE - S3_OBJECT_REMOVED_DELETE_MARKER_CREATED`,
+
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
+							},
+						},
+
+						"prefix_filter": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.3.0) Event prefix filter`,
+						},
+
+						"suffix_filter": &schema.Schema{
+							Type:        schema.TypeString,
+							Computed:    true,
+							Required:    false,
+							Optional:    false,
+							Description: `(Valid for versions: 5.3.0) Event suffix filter`,
+						},
+					},
+				},
+			},
+
+			"kafka_vip_pools": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.3.0) When setting view protocol to KAKFA at least on one vippool from the type of protocols should be defined`,
+
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
 				},
 			},
 		},
@@ -1119,6 +1184,18 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"event_notifications\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "KafkaVipPools", resource.KafkaVipPools))
+
+	err = d.Set("kafka_vip_pools", utils.FlattenListOfPrimitives(&resource.KafkaVipPools))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"kafka_vip_pools\"",
 			Detail:   err.Error(),
 		})
 	}

@@ -30,4 +30,6 @@ var DataSources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_administators_realms": DataSourceRealm(),
 	"vastdata_administators_roles":  DataSourceRole(),
 	"vastdata_kafka_brokers":        DataSourceKafkabroker(),
+	"vastdata_volume":               DataSourceVolume(),
+	"vastdata_blockhost":            DataSourceBlockHost(),
 }

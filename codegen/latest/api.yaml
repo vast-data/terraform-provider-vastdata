@@ -106,7 +106,7 @@ components:
           type: "array"
           items:
             type: "string"
-            enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4,BLOCK]
+            enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4,BLOCK,KAFKA]
           description: "Protocols exposed by this view"
         share:
           type: "string"
@@ -225,6 +225,12 @@ None - S3 Object Ownership is disabled for the bucket.
             type: "object"
             $ref: "#/components/schemas/ViewEventNotification"
           description: "List of S3 event notifications defentions"
+        kafka_vip_pools:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          description: "When setting view protocol to KAKFA at least on one vippool from the type of protocols should be defined"
     ViewCreate:
       type: "object"
       required:
@@ -2318,11 +2324,63 @@ Default: SIMPLE_PREFIX"
           type: "integer"
           format: "int64"
           description: "The View ID to relate this volume with , must be a View with protocol defined as BLOCK"
+        block_host_ids:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
+          description: "List of blockhosts associated with this volume"
         volume_tags:
           type: "array"
           items:
             type: "string"
           description: "List of tags at the key:value format"
+    BlockHost:
+      type: object
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the blockhost"
+        guid:
+          type: "string"
+          description: "A uniqe GUID assigned to the blockhost"
+        name:
+          type: "string"
+          description: "A uniqe name given to the blockhost"
+        tenant_id:
+          type: "integer"
+          format: "int64"
+          description: "The tenant id of which this blockhost belongs to"
+        connection_type:
+          type: "string"
+          enum: [TCP]
+        nqn:
+          type: "string"
+          description: "The blockhost NQN (NVMe Qualified Name)"
+        blockhost_tags:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of tags at the key:value format"
+    BlockMapping:
+      type: object
+      properties:
+        id:
+          type: "int64"
+          description: "A unique id given to the blockhost"
+        guid:
+          type: "string"
+          description: "A uniqe GUID assigned to the blockhost"
+        volume:
+          type: "string"
+          description: "The Volume ID to map the blockhost to"
+        block_host:
+          type: "string"
+          description: "The blockhost id to map to this volume"
+        snapshot_id:
+          type: "integer"
+          format: "int64"
+          description: "If configured with a snapshot of the volume than the blockhost will be mapped to this snapshot"
     ViewEventNotification:
       type: object
       properties:

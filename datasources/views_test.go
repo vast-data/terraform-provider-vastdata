@@ -69,11 +69,32 @@ var _ = Describe(" View", func() {
    "cluster_id": 100,
    "default_retention_period": "string",
    "event_notifications": [
-      {}
+      {
+         "broker_id": 100,
+         "name": "string",
+         "prefix_filter": "string",
+         "suffix_filter": "string",
+         "topic": "string",
+         "triggers": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E"
+         ]
+      }
    ],
    "files_retention_mode": "string",
    "guid": "string",
    "id": 100,
+   "kafka_vip_pools": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+   ],
    "logical_capacity": 100,
    "max_retention_period": "string",
    "min_retention_period": "string",

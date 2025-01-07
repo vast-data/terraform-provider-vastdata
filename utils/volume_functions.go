@@ -13,18 +13,18 @@ import (
 
 var re = regexp.MustCompile(`\w+:\w+`)
 
-func listToKVmap(ctx context.Context, n map[string]interface{}) (map[string]interface{}, error) {
+func listToKVmap(ctx context.Context, n map[string]interface{}, a string) (map[string]interface{}, error) {
 	m := map[string]string{}
-	volume_tags, volume_tags_exists := n["volume_tags"]
-	if volume_tags_exists {
-		tflog.Debug(ctx, fmt.Sprintf("[listToKVmap] volume_tags attribute exists , %v", volume_tags))
-		l, volume_tags_is_list := volume_tags.([]interface{})
+	tags, tags_exists := n[a]
+	if tags_exists {
+		tflog.Debug(ctx, fmt.Sprintf("[listToKVmap] %v attribute exists , %v", a, tags))
+		l, volume_tags_is_list := tags.([]interface{})
 		if volume_tags_is_list {
-			tflog.Debug(ctx, fmt.Sprintf("[listToKVmap] volume_tags is list , %v", volume_tags))
+			tflog.Debug(ctx, fmt.Sprintf("[listToKVmap] %v is list , %v", a, tags))
 			for _, i := range l {
 				j := fmt.Sprintf("%v", i)
 				if re.Match([]byte(j)) {
-					tflog.Debug(ctx, fmt.Sprintf(`[listToKVmap] volume tag %v matches \w+:\w+`, i))
+					tflog.Debug(ctx, fmt.Sprintf(`[listToKVmap] tag %v matches \w+:\w+`, i))
 					o := strings.SplitN(j, ":", 2)
 					m[o[0]] = o[1]
 				}
@@ -36,7 +36,7 @@ func listToKVmap(ctx context.Context, n map[string]interface{}) (map[string]inte
 	return n, nil
 }
 
-func kvMapToList(ctx context.Context, r *http.Response) (map[string]interface{}, error) {
+func kvMapToList(ctx context.Context, r *http.Response, a string) (map[string]interface{}, error) {
 	m := []string{}
 	n := map[string]interface{}{}
 	e := UnmarshelBodyToMap(r, &n)
@@ -60,12 +60,12 @@ func kvMapToList(ctx context.Context, r *http.Response) (map[string]interface{},
 			tflog.Debug(ctx, fmt.Sprintf("[TagstoKVList] list of key:value maps created %v", m))
 		}
 	}
-	n["volume_tags"] = m
+	n[a] = m
 	return n, nil
 }
 
 func VolumeCreateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
-	data, err := listToKVmap(ctx, data)
+	data, err := listToKVmap(ctx, data, "volume_tags")
 	if err != nil {
 		return nil, err
 	}
@@ -73,10 +73,17 @@ func VolumeCreateFunc(ctx context.Context, _client interface{}, attr map[string]
 }
 
 func VolumeUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
-	data, err := listToKVmap(ctx, data)
+	data, err := listToKVmap(ctx, data, "volume_tags")
 	if err != nil {
 		return nil, err
 	}
+	block_host_ids, exists := d.GetOkExists("block_host_ids")
+	if !exists {
+		data["block_host_ids"] = []int64{}
+	} else {
+		data["block_host_ids"] = block_host_ids
+	}
+
 	return DefaultUpdateFunc(ctx, _client, attr, data, d, headers)
 }
 
@@ -85,7 +92,7 @@ func VolumeGetFunc(ctx context.Context, _client interface{}, attr map[string]int
 	if err != nil {
 		return response, err
 	}
-	data_with_tags, tags_err := kvMapToList(ctx, response)
+	data_with_tags, tags_err := kvMapToList(ctx, response, "volume_tags")
 	if tags_err != nil {
 		return response, tags_err
 	}
