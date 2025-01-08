@@ -31,10 +31,16 @@ var _ = Describe(" BlockMapping", func() {
 	var BlockMappingResourceData *schema.ResourceData
 	var model_json = `
                          {
-   "block_host": "string",
-   "guid": "string",
+   "hosts_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+   ],
    "snapshot_id": 100,
-   "volume": "string"
+   "volume_id": 100
 }
                          `
 	var server *ghttp.Server

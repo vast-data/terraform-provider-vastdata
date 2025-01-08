@@ -2366,16 +2366,17 @@ Default: SIMPLE_PREFIX"
       type: object
       properties:
         id:
-          type: "int64"
+          type: "string"
           description: "A unique id given to the blockhost"
-        guid:
-          type: "string"
-          description: "A uniqe GUID assigned to the blockhost"
-        volume:
-          type: "string"
+        volume_id:
+          type: "integer"
+          format: "int64"
           description: "The Volume ID to map the blockhost to"
-        block_host:
-          type: "string"
+        hosts_ids:
+          type: "array"
+          items:
+            type: "integer"
+            format: "int64"
           description: "The blockhost id to map to this volume"
         snapshot_id:
           type: "integer"

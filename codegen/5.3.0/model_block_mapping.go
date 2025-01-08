@@ -10,13 +10,11 @@ package swagger
 
 type BlockMapping struct {
 	// A unique id given to the blockhost
-	Id int64 `json:"id,omitempty"`
-	// A uniqe GUID assigned to the blockhost
-	Guid string `json:"guid,omitempty"`
+	Id string `json:"id,omitempty"`
 	// The Volume ID to map the blockhost to
-	Volume string `json:"volume,omitempty"`
+	VolumeId int64 `json:"volume_id,omitempty"`
 	// The blockhost id to map to this volume
-	BlockHost string `json:"block_host,omitempty"`
+	HostsIds []int64 `json:"hosts_ids,omitempty"`
 	// If configured with a snapshot of the volume than the blockhost will be mapped to this snapshot
 	SnapshotId int64 `json:"snapshot_id,omitempty"`
 }

@@ -872,6 +872,12 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		ForceNewFields:           NewStringSet(),
 		DataSourceName:           "vastdata_block_mapping",
+		GetFunc:                  utils.BlockMappingGetFunc,
+		CreateFunc:               utils.BlockMappingCreateFunc,
+		UpdateFunc:               utils.BlockMappingUpdateFunc,
+		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
+			"hosts_ids": utils.ListsDiffSupress,
+		},
 		// Importer: utils.NewImportByHttpFields(false,
 		// 	[]utils.HttpFieldTuple{
 		// 		utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},

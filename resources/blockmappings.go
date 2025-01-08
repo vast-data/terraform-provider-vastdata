@@ -40,34 +40,28 @@ func ResourceBlockMapping() *schema.Resource {
 func getResourceBlockMappingSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
-			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("guid"),
+		"volume_id": &schema.Schema{
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("volume_id"),
 
-			Computed:    true,
-			Optional:    false,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.3.0) A uniqe GUID assigned to the blockhost`,
-		},
-
-		"volume": &schema.Schema{
-			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("volume"),
-
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
+			Required:    true,
 			Description: `(Valid for versions: 5.3.0) The Volume ID to map the blockhost to`,
 		},
 
-		"block_host": &schema.Schema{
-			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("block_host"),
+		"hosts_ids": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("BlockMapping").GetConflictingFields("hosts_ids"),
 
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.3.0) The blockhost id to map to this volume`,
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("BlockMapping").GetAttributeDiffFunc("hosts_ids"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `(Valid for versions: 5.3.0) The blockhost id to map to this volume`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeInt,
+			},
 		},
 
 		"snapshot_id": &schema.Schema{
@@ -88,38 +82,26 @@ func ResourceBlockMappingReadStructIntoSchema(ctx context.Context, resource api_
 	var diags diag.Diagnostics
 	var err error
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "VolumeId", resource.VolumeId))
 
-	err = d.Set("guid", resource.Guid)
+	err = d.Set("volume_id", resource.VolumeId)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occured setting value to \"volume_id\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Volume", resource.Volume))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "HostsIds", resource.HostsIds))
 
-	err = d.Set("volume", resource.Volume)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"volume\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "BlockHost", resource.BlockHost))
-
-	err = d.Set("block_host", resource.BlockHost)
+	err = d.Set("hosts_ids", utils.FlattenListOfPrimitives(&resource.HostsIds))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"block_host\"",
+			Summary:  "Error occured setting value to \"hosts_ids\"",
 			Detail:   err.Error(),
 		})
 	}
