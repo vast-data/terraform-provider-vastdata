@@ -53,18 +53,6 @@ func DataSourceVolume() *schema.Resource {
 				Description: `(Valid for versions: 5.3.0) The View ID to relate this volume with , must be a View with protocol defined as BLOCK`,
 			},
 
-			"block_host_ids": &schema.Schema{
-				Type:        schema.TypeList,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.3.0) List of blockhosts associated with this volume`,
-
-				Elem: &schema.Schema{
-					Type: schema.TypeInt,
-				},
-			},
-
 			"volume_tags": &schema.Schema{
 				Type:        schema.TypeList,
 				Computed:    true,
@@ -188,18 +176,6 @@ func dataSourceVolumeRead(ctx context.Context, d *schema.ResourceData, m interfa
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"view_id\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "BlockHostIds", resource.BlockHostIds))
-
-	err = d.Set("block_host_ids", utils.FlattenListOfPrimitives(&resource.BlockHostIds))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"block_host_ids\"",
 			Detail:   err.Error(),
 		})
 	}

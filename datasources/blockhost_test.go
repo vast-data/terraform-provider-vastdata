@@ -78,11 +78,11 @@ var _ = Describe(" BlockHost", func() {
 				Expect(err).To(BeNil())
 				values := url.Values{}
 
-				values.Add("nqn", fmt.Sprintf("%v", resource.Nqn))
-				BlockHostDataSourceData.Set("nqn", resource.Nqn)
-
 				values.Add("name", fmt.Sprintf("%v", resource.Name))
 				BlockHostDataSourceData.Set("name", resource.Name)
+
+				values.Add("nqn", fmt.Sprintf("%v", resource.Nqn))
+				BlockHostDataSourceData.Set("nqn", resource.Nqn)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "blockhosts", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value

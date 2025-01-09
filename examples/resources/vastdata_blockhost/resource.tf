@@ -20,11 +20,15 @@ resource "vastdata_blockhost" "hostA" {
 
 
 resource "vastdata_volume" "volume01" {
-  name           = "/volume1"
-  size           = 150000000000
-  view_id        = vastdata_view.blockA-view.id
-  volume_tags    = ["key1:value1", "key2:value2"]
-  block_host_ids = [vastdata_blockhost.hostA.id]
+  name        = "/volume1"
+  size        = 150000000000
+  view_id     = vastdata_view.blockA-view.id
+  volume_tags = ["key1:value1", "key2:value2"]
+}
+
+resource "vastdata_block_mapping" "volume1-block-mapping" {
+  volume_id = vastdata_volume.volume01.id
+  hosts_ids = [vastdata_blockhost.hostA.id]
 }
 
 #### Mapping multiple blockhosts to a volume generate byt terraform count (will also work for for_each) #####
@@ -50,9 +54,13 @@ resource "vastdata_blockhost" "blockhost" {
 }
 
 resource "vastdata_volume" "volume01" {
-  name           = "/volume1"
-  size           = 150000000000
-  view_id        = vastdata_view.blockA-view.id
-  volume_tags    = ["key1:value1", "key2:value2"]
-  block_host_ids = vastdata_blockhost.blockhost[*].id
+  name        = "/volume1"
+  size        = 150000000000
+  view_id     = vastdata_view.blockA-view.id
+  volume_tags = ["key1:value1", "key2:value2"]
+}
+
+resource "vastdata_block_mapping" "volume1-block-mapping" {
+  volume_id = vastdata_volume.volume01.id
+  hosts_ids = vastdata_blockhost.blockhost[*].id
 }

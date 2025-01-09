@@ -31,14 +31,6 @@ var _ = Describe(" Volume", func() {
 	var VolumeResourceData *schema.ResourceData
 	var model_json = `
                          {
-   "block_host_ids": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6
-   ],
    "guid": "string",
    "name": "string",
    "size": 100,

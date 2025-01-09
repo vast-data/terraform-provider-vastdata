@@ -1,24 +1,3 @@
-###Creating A 150 GB Volume####
-
-data "vastdata_view_policy" "default" {
-  name = "default"
-}
-
-resource "vastdata_view" "blockA-view" {
-  path                 = "/blockA"
-  name                 = "blockA"
-  is_default_subsystem = false
-  policy_id            = data.vastdata_view_policy.default.id
-  create_dir           = "true"
-  protocols            = ["BLOCK"]
-}
-
-resource "vastdata_volume" "volume01" {
-  name        = "/volume1"
-  size        = 150000000000
-  view_id     = vastdata_view.blockA-view.id
-  volume_tags = ["key1:value1", "key2:value2"]
-}
 
 #### Mapping blockhosts to a volume #####
 resource "vastdata_blockhost" "hostA" {

@@ -79,22 +79,6 @@ func getResourceVolumeSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.3.0) The View ID to relate this volume with , must be a View with protocol defined as BLOCK`,
 		},
 
-		"block_host_ids": &schema.Schema{
-			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("block_host_ids"),
-
-			DiffSuppressOnRefresh: false,
-			DiffSuppressFunc:      codegen_configs.GetResourceByName("Volume").GetAttributeDiffFunc("block_host_ids"),
-			Computed:              true,
-			Optional:              true,
-			Sensitive:             false,
-			Description:           `(Valid for versions: 5.3.0) List of blockhosts associated with this volume`,
-
-			Elem: &schema.Schema{
-				Type: schema.TypeInt,
-			},
-		},
-
 		"volume_tags": &schema.Schema{
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Volume").GetConflictingFields("volume_tags"),
@@ -163,18 +147,6 @@ func ResourceVolumeReadStructIntoSchema(ctx context.Context, resource api_latest
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"view_id\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "BlockHostIds", resource.BlockHostIds))
-
-	err = d.Set("block_host_ids", utils.FlattenListOfPrimitives(&resource.BlockHostIds))
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"block_host_ids\"",
 			Detail:   err.Error(),
 		})
 	}

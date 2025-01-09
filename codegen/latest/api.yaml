@@ -2324,12 +2324,6 @@ Default: SIMPLE_PREFIX"
           type: "integer"
           format: "int64"
           description: "The View ID to relate this volume with , must be a View with protocol defined as BLOCK"
-        block_host_ids:
-          type: "array"
-          items:
-            type: "integer"
-            format: "int64"
-          description: "List of blockhosts associated with this volume"
         volume_tags:
           type: "array"
           items:

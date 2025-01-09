@@ -7,9 +7,6 @@ import (
 	"io"
 	"reflect"
 
-	//        "net/url"
-	"errors"
-
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -28,10 +25,6 @@ func ResourceBlockMapping() *schema.Resource {
 		CreateContext: resourceBlockMappingCreate,
 		UpdateContext: resourceBlockMappingUpdate,
 
-		Importer: &schema.ResourceImporter{
-			StateContext: resourceBlockMappingImporter,
-		},
-
 		Description: ``,
 		Schema:      getResourceBlockMappingSchema(),
 	}
@@ -46,6 +39,7 @@ func getResourceBlockMappingSchema() map[string]*schema.Schema {
 
 			Required:    true,
 			Description: `(Valid for versions: 5.3.0) The Volume ID to map the blockhost to`,
+			ForceNew:    true,
 		},
 
 		"hosts_ids": &schema.Schema{
@@ -72,6 +66,7 @@ func getResourceBlockMappingSchema() map[string]*schema.Schema {
 			Optional:    true,
 			Sensitive:   false,
 			Description: `(Valid for versions: 5.3.0) If configured with a snapshot of the volume than the blockhost will be mapped to this snapshot`,
+			ForceNew:    true,
 		},
 	}
 }
@@ -341,52 +336,5 @@ func resourceBlockMappingUpdate(ctx context.Context, d *schema.ResourceData, m i
 	resourceBlockMappingRead(ctx, d, m)
 
 	return diags
-
-}
-
-func resourceBlockMappingImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-
-	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("BlockMapping")
-	attrs := map[string]interface{}{"path": utils.GenPath("blockmappings")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
-
-	if err != nil {
-		return result, err
-	}
-
-	resource_l := []api_latest.BlockMapping{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		return result, err
-	}
-	err = json.Unmarshal(body, &resource_l)
-	if err != nil {
-		return result, err
-	}
-
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
-	}
-
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
-	}
-
-	diags := ResourceBlockMappingReadStructIntoSchema(ctx, resource, d)
-	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
-		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
-		}
-		return result, errors.New(all_errors)
-	}
-	result = append(result, d)
-
-	return result, err
 
 }

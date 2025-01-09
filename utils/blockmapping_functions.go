@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -78,6 +80,29 @@ func BlockMappingCreateFunc(ctx context.Context, _client interface{}, attr map[s
 
 }
 
+func getCurrentBlockMapping(ctx context.Context, _client interface{}, volume_id, snapshot_id int) (*http.Response, []int, error) {
+	i := []int{}
+	client := _client.(vast_client.JwtSession)
+	u := url.Values{}
+	u.Add("volume__id__in", fmt.Sprintf("%v", volume_id))
+	h, err := client.Get(ctx, GenPath("blockmappings"), u.Encode(), map[string]string{})
+	if err != nil {
+		return h, i, err
+	}
+	b, err := io.ReadAll(h.Body)
+	if err != nil {
+		return h, i, err
+	}
+	t := []blockMappingObject{}
+	err = json.Unmarshal(b, &t)
+	if err != nil {
+		return nil, i, err
+	}
+	for _, q := range t {
+		i = append(i, q.Block_host.Id)
+	}
+	return h, i, nil
+}
 func BlockMappingGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	volume_id := d.Get("volume_id").(int)
 	_snapshot_id, snapshot_id_exists := d.GetOkExists("snapshot_id")
@@ -85,25 +110,9 @@ func BlockMappingGetFunc(ctx context.Context, _client interface{}, attr map[stri
 	if snapshot_id_exists {
 		snapshot_id = _snapshot_id.(int)
 	}
-	client := _client.(vast_client.JwtSession)
-	u := url.Values{}
-	u.Add("volume__id__in", fmt.Sprintf("%v", volume_id))
-	h, err := client.Get(ctx, GenPath("blockmappings"), u.Encode(), map[string]string{})
-	if err != nil {
-		return h, err
-	}
-	b, err := io.ReadAll(h.Body)
-	if err != nil {
-		return h, err
-	}
-	t := []blockMappingObject{}
-	err = json.Unmarshal(b, &t)
-	if err != nil {
-		return nil, err
-	}
-	i := []int{}
-	for _, q := range t {
-		i = append(i, q.Block_host.Id)
+	h, i, e := getCurrentBlockMapping(ctx, _client, volume_id, snapshot_id)
+	if e != nil {
+		return h, e
 	}
 	data := map[string]interface{}{}
 	data["volume_id"] = volume_id
@@ -159,6 +168,40 @@ func BlockMappingUpdateFunc(ctx context.Context, _client interface{}, attr map[s
 		return nil, marshal_error
 	}
 	tflog.Debug(ctx, fmt.Sprintf("[BlockMappingUpdateFunc] Calling PATCH with payload: %v", string(b)))
+	h, err := client.Patch(ctx, GenPath("blockmappings/bulk"), "application/json", bytes.NewReader(b), map[string]string{})
+	return h, err
+
+}
+
+func BlockMappingDeleteFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
+	rgx := `blockmappings-volume-(?P<volume_id>\d+)-snapshot-(?P<snapshot_id>\d+)`
+	client := _client.(vast_client.JwtSession)
+	re := regexp.MustCompile(rgx)
+	_id, id_exists := attr["id"]
+	if !id_exists {
+		return nil, fmt.Errorf("attributes provided does not hold the id")
+	}
+	m := re.FindStringSubmatch(fmt.Sprintf("%v", _id))
+	if m == nil {
+		return nil, fmt.Errorf("Id: %v , does not matches regular expression , %v", _id, rgx)
+	}
+	volume_id, _ := strconv.Atoi(m[1])
+	snapshot_id, _ := strconv.Atoi(m[2])
+	h, i, e := getCurrentBlockMapping(ctx, _client, volume_id, snapshot_id)
+	if e != nil {
+		return h, e
+	}
+
+	pairs_to_remove := []map[string]int{}
+	for _, r := range i {
+		pairs_to_remove = append(pairs_to_remove, map[string]int{"host_id": r, "volume_id": volume_id})
+	}
+	blk := NewBlockMappingRequest([]map[string]int{}, pairs_to_remove, snapshot_id)
+	b, marshal_error := json.Marshal(blk)
+	if marshal_error != nil {
+		return nil, marshal_error
+	}
+	tflog.Debug(ctx, fmt.Sprintf("[BlockMappingDeleteFunc] Calling PATCH with payload: %v", string(b)))
 	h, err := client.Patch(ctx, GenPath("blockmappings/bulk"), "application/json", bytes.NewReader(b), map[string]string{})
 	return h, err
 

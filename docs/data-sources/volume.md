@@ -21,7 +21,6 @@ description: |-
 
 ### Read-Only
 
-- `block_host_ids` (List of Number) (Valid for versions: 5.3.0) List of blockhosts associated with this volume
 - `guid` (String) (Valid for versions: 5.3.0) A uniqe GUID assigned to the manager
 - `id` (String) The ID of this resource.
 - `size` (Number) (Valid for versions: 5.3.0) The volume size of the volume in bytes
