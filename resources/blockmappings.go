@@ -25,6 +25,8 @@ func ResourceBlockMapping() *schema.Resource {
 		CreateContext: resourceBlockMappingCreate,
 		UpdateContext: resourceBlockMappingUpdate,
 
+		Timeouts: codegen_configs.GetResourceByName("BlockMapping").GetResourceTimeouts(),
+
 		Description: ``,
 		Schema:      getResourceBlockMappingSchema(),
 	}

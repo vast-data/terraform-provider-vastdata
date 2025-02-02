@@ -65,7 +65,15 @@ resource "vastdata_block_mapping" "volume1-block-mapping" {
 
 - `hosts_ids` (List of Number) (Valid for versions: 5.3.0) The blockhost id to map to this volume
 - `snapshot_id` (Number) (Valid for versions: 5.3.0) If configured with a snapshot of the volume than the blockhost will be mapped to this snapshot
+- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- `delete` (String)

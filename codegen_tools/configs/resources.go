@@ -880,6 +880,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"hosts_ids": utils.ListsDiffSupress,
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Delete: MinToDuration(12),
+		},
 	},
 }
 

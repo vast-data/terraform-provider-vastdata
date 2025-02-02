@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -201,8 +202,35 @@ func BlockMappingDeleteFunc(ctx context.Context, _client interface{}, attr map[s
 	if marshal_error != nil {
 		return nil, marshal_error
 	}
+
 	tflog.Debug(ctx, fmt.Sprintf("[BlockMappingDeleteFunc] Calling PATCH with payload: %v", string(b)))
 	h, err := client.Patch(ctx, GenPath("blockmappings/bulk"), "application/json", bytes.NewReader(b), map[string]string{})
+	if err != nil {
+		return h, err
+	}
+
+	/*
+	   We are goting to add some wait + check for those cases where we want to remove the volume just after
+	   we remove the host_ids in some cases since this action is asynchronous actual removal might take time
+	*/
+	no_blocks := false
+	for c := 0; (c <= 300) && (!no_blocks); c += 10 {
+		h, i, e := getCurrentBlockMapping(ctx, _client, volume_id, snapshot_id)
+		if e != nil {
+			tflog.Error(ctx, fmt.Sprintf("[BlockMappingDeleteFunc], Error occured while wating for complease removal of all host_is from volume with id :%v", volume_id))
+			return h, e
+		}
+		if len(i) > 0 {
+			time.Sleep(10 * time.Second)
+			continue
+		} else {
+			no_blocks = true
+		}
+	}
+	if !no_blocks {
+		return h, fmt.Errorf("Failed to remove all all blocks from volumeid :%v", volume_id)
+	}
+
 	return h, err
 
 }
