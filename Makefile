@@ -114,6 +114,7 @@ build-linux-amd64:   $(BUILD_DEST)/linux_amd64/terraform-provider-vastdata
 $(BUILD_DEST)/linux_arm64/terraform-provider-vastdata:
 	export GOOS="linux" ;\
 	export GOARCH="arm64" ;\
+	export CGO_ENABLED=0 ;\
 	mkdir -p $(BUILD_DEST)/$${GOOS}_$${GOARCH} ;\
 	go build $${GOFLAGS} -o $(BUILD_DEST)/$${GOOS}_$${GOARCH}/terraform-provider-vastdata
 
