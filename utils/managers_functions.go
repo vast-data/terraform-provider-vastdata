@@ -134,7 +134,7 @@ func convertRoleIdsMapToList(ctx context.Context, b map[string]interface{}) (map
 
 func collectRolesIds(ctx context.Context, r *http.Response, m map[string]interface{}) (map[string]interface{}, error) {
 	b := map[string]interface{}{}
-	e := UnmarshelBodyToMap(r, &b)
+	e := UnmarshalBodyToMap(r, &b)
 	if e != nil {
 		return b, e
 	}
@@ -249,7 +249,7 @@ func ManagerImportGetFunc(ctx context.Context, _client interface{}, attr map[str
 	}
 
 	m := []map[string]interface{}{}
-	e = UnmarshelBodyToMapsList(r, &m)
+	e = UnmarshalBodyToMapsList(r, &m)
 	tflog.Debug(ctx, fmt.Sprintf("[ManagerImportGetFunc] Umarshel response %v", m))
 	if len(m) < 1 {
 		return r, fmt.Errorf("[ManagerImportGetFunc] The value returned for data %v is not a map", attr)

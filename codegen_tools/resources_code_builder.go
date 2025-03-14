@@ -227,8 +227,10 @@ func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceDa
      response,err:=resource_config.DeleteFunc(ctx,client,attrs,nil,map[string]string{});
      {{end}}
      tflog.Info(ctx,fmt.Sprintf("Removing Resource"))
-     tflog.Info(ctx,response.Request.URL.String())
-     tflog.Info(ctx,utils.GetResponseBodyAsStr(response))
+     if response != nil {
+		 tflog.Info(ctx,response.Request.URL.String())
+		 tflog.Info(ctx,utils.GetResponseBodyAsStr(response))
+	}
 
      if err!=nil {
         diags = append(diags, diag.Diagnostic {
@@ -321,7 +323,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
         return diags
     }
    
-   id_err:=resource_config.IdFunc(ctx,client,resource.Id,d)
+   id_err:=resource_config.IdFunc(ctx,client,resource.{{ .IdParameter }},d)
    if id_err!=nil {
         diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
@@ -458,7 +460,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
      }
      
     resource:=resource_l[0]
-    id_err:=resource_config.IdFunc(ctx,client,resource.Id,d)
+    id_err:=resource_config.IdFunc(ctx,client,resource.{{ .IdParameter }},d)
     if id_err!=nil {
 	 return result,id_err
      }

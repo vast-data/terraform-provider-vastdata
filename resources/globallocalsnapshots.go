@@ -275,8 +275,10 @@ func resourceGlobalLocalSnapshotDelete(ctx context.Context, d *schema.ResourceDa
 	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
-	tflog.Info(ctx, response.Request.URL.String())
-	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))
+	if response != nil {
+		tflog.Info(ctx, response.Request.URL.String())
+		tflog.Info(ctx, utils.GetResponseBodyAsStr(response))
+	}
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

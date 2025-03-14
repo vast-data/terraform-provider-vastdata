@@ -268,7 +268,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
           }
 
      {{ end }}
-     Id:=(int64)(resource.Id)
+     Id:=(int64)(resource.{{ .IdParameter }})
      d.SetId(strconv.FormatInt(Id,10))
      return diags
 }
