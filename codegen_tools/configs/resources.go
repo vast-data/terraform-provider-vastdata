@@ -49,7 +49,6 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		GetFunc:                  utils.NonLocalUserGetFunc,
 		UpdateFunc:               utils.NonLocalUserUpdateFunc,
 		DeleteFunc:               utils.NonLocalUserDeleteFunc,
-		IdParameter:              "Uid",
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_non_local_user",
 		Importer: utils.NewImportByHttpFields(false,

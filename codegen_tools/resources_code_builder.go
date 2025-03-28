@@ -323,7 +323,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
         return diags
     }
    
-   id_err:=resource_config.IdFunc(ctx,client,resource.{{ .IdParameter }},d)
+   id_err:=resource_config.IdFunc(ctx,client,resource.Id,d)
    if id_err!=nil {
         diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
@@ -460,7 +460,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
      }
      
     resource:=resource_l[0]
-    id_err:=resource_config.IdFunc(ctx,client,resource.{{ .IdParameter }},d)
+    id_err:=resource_config.IdFunc(ctx,client,resource.Id,d)
     if id_err!=nil {
 	 return result,id_err
      }

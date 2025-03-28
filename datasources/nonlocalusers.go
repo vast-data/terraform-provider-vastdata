@@ -21,6 +21,14 @@ func DataSourceNonLocalUser() *schema.Resource {
 		Description: ``,
 		Schema: map[string]*schema.Schema{
 
+			"id": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier`,
+			},
+
 			"uid": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    false,
@@ -142,6 +150,18 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 
 	resource := resource_l[0]
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Id", resource.Id))
+
+	err = d.Set("id", resource.Id)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"id\"",
+			Detail:   err.Error(),
+		})
+	}
 
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Uid", resource.Uid))
 

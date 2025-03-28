@@ -163,7 +163,6 @@ type ResourceTemplateV2 struct {
 	DeleteFunc               utils.DeleteFuncType
 	GetFunc                  utils.GetFuncType
 	IdFunc                   utils.IdFuncType
-	IdParameter              string
 	ImportFunc               utils.ImportFunc
 	Importer                 utils.ImportInterface
 	AttributesDiffFuncs      map[string]schema.SchemaDiffSuppressFunc
@@ -215,9 +214,6 @@ func (r *ResourceTemplateV2) SetFunctions() {
 	}
 	if r.ResponseProcessingFunc == nil {
 		r.ResponseProcessingFunc = utils.DefaultProcessingFunc
-	}
-	if r.IdParameter == "" {
-		r.IdParameter = "Id"
 	}
 }
 

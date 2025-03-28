@@ -385,6 +385,9 @@ None - S3 Object Ownership is disabled for the bucket.
     NonLocalUser:
       type: "object"
       properties:
+        id:
+          type: "string"
+          description: "The NonLocalUser identifier"
         uid:
           type: "integer"
           description: "The user unix UID"

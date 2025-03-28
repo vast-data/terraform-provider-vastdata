@@ -40,6 +40,16 @@ func ResourceNonLocalUser() *schema.Resource {
 func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
+		"id": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("id"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier`,
+		},
+
 		"uid": &schema.Schema{
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("uid"),
@@ -109,6 +119,18 @@ var NonLocalUser_names_mapping map[string][]string = map[string][]string{}
 func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_latest.NonLocalUser, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Id", resource.Id))
+
+	err = d.Set("id", resource.Id)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"id\"",
+			Detail:   err.Error(),
+		})
+	}
 
 	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Uid", resource.Uid))
 
@@ -331,7 +353,7 @@ func resourceNonLocalUserCreate(ctx context.Context, d *schema.ResourceData, m i
 		return diags
 	}
 
-	id_err := resource_config.IdFunc(ctx, client, resource.Uid, d)
+	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
 	if id_err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -444,7 +466,7 @@ func resourceNonLocalUserImporter(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Uid, d)
+	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
 	if id_err != nil {
 		return result, id_err
 	}
