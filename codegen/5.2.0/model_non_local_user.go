@@ -13,8 +13,6 @@ type NonLocalUser struct {
 	Id string `json:"id,omitempty"`
 	// The user unix UID
 	Uid int32 `json:"uid,omitempty"`
-	// A uniq name given to the user
-	Name string `json:"name,omitempty"`
 	// Allow create bucket
 	AllowCreateBucket bool `json:"allow_create_bucket,omitempty"`
 	// Allow delete bucket

@@ -40,7 +40,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DestFile:                 ToStringPointer("nonlocaluser.go"),
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("uid", "tenant_id"),
-		ComputedFields:           NewStringSet(),
+		ComputedFields:           NewStringSet("id"),
 		OptionalIdentifierFields: NewStringSet(),
 		BeforePatchFunc:          utils.NonLocalUserBeforePatchFunc,
 		ListsNamesMap:            map[string][]string{"access_keys": {"key", "status"}},
@@ -50,11 +50,8 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		UpdateFunc:               utils.NonLocalUserUpdateFunc,
 		DeleteFunc:               utils.NonLocalUserDeleteFunc,
 		ResponseGetByURL:         false,
+		DisableImport:            true,
 		DataSourceName:           "vastdata_non_local_user",
-		Importer: utils.NewImportByHttpFields(false,
-			[]utils.HttpFieldTuple{
-				{DisplayName: "Name", FieldName: "name"},
-			}),
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"s3_policies_ids": utils.ListsDiffSupress,
 		},

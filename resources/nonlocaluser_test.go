@@ -32,7 +32,6 @@ var _ = Describe(" NonLocalUser", func() {
 	var model_json = `
                          {
    "id": "string",
-   "name": "string",
    "s3_policies_ids": [
       1,
       2,

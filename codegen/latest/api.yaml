@@ -401,9 +401,6 @@ None - S3 Object Ownership is disabled for the bucket.
         uid:
           type: "integer"
           description: "The user unix UID"
-        name:
-          type: "string"
-          description: "A uniq name given to the user"
         allow_create_bucket:
           type: "boolean"
           description: "Allow create bucket"

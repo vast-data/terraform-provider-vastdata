@@ -8,17 +8,19 @@ description: |-
 
 # vastdata_non_local_user (Resource)
 
+
+
 ## Example Usage
 
 ```terraform
 resource "vastdata_non_local_user" "ExternalUser" {
-    uid = 1097416930
-    tenant_id = 1
+    uid                 = 1097416930
+    tenant_id           = 1
     allow_create_bucket = true
     allow_delete_bucket = false
-    s3_policies_ids = [
-        resource.vastdata_s3_policy.s3policy.id
-        ]
+    s3_policies_ids     = [
+        1
+    ]
 }
 ```
 
@@ -34,5 +36,8 @@ resource "vastdata_non_local_user" "ExternalUser" {
 
 - `allow_create_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow create bucket
 - `allow_delete_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow delete bucket
-- `name` (String) (Valid for versions: 5.2.0) A uniq name given to the user
 - `s3_policies_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) List S3 policies IDs
+
+### Read-Only
+
+- `id` (String) (Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier
