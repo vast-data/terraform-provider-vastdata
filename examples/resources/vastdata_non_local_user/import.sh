@@ -1,0 +1,2 @@
+terraform import vastdata_non_local_user.example UID
+terraform import vastdata_non_local_user.example tenantID

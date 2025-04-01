@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	vastclient "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -108,4 +109,26 @@ func NonLocalUserUpdateFunc(ctx context.Context, _client interface{}, attr map[s
 func NonLocalUserDeleteFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
 	tflog.Info(ctx, "Doing nothing. We cannot delete non-local user.")
 	return nil, nil
+}
+
+type NonLocalUserImportByUidAndTenantId struct{}
+
+func (*NonLocalUserImportByUidAndTenantId) getFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
+	providedId := fmt.Sprintf("%v", d.Id())
+	uid, tenantId, err := getNonLocalUserUidAndTenantId(providedId)
+	if err != nil {
+		return nil, err
+	}
+	urlValues := url.Values{}
+	urlValues.Add("uid", fmt.Sprintf("%v", uid))
+	urlValues.Add("tenant_id", fmt.Sprintf("%v", tenantId))
+	encodedValues := urlValues.Encode()
+	attr["query"] = encodedValues
+	return DefaultGetFunc(ctx, _client, attr, d, headers)
+}
+func (i *NonLocalUserImportByUidAndTenantId) GetFunc() GetFuncType { return i.getFunc }
+func (i *NonLocalUserImportByUidAndTenantId) GetDoc() []string     { return []string{"UID-tenantID"} }
+
+func NewNonLocalUserImporter() *NonLocalUserImportByUidAndTenantId {
+	return &NonLocalUserImportByUidAndTenantId{}
 }

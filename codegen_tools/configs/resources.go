@@ -50,11 +50,11 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		UpdateFunc:               utils.NonLocalUserUpdateFunc,
 		DeleteFunc:               utils.NonLocalUserDeleteFunc,
 		ResponseGetByURL:         false,
-		DisableImport:            true,
 		DataSourceName:           "vastdata_non_local_user",
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"s3_policies_ids": utils.ListsDiffSupress,
 		},
+		Importer: utils.NewNonLocalUserImporter(),
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Group",

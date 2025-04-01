@@ -7,6 +7,9 @@ import (
 	"io"
 	"reflect"
 
+	//        "net/url"
+	"errors"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -24,6 +27,10 @@ func ResourceNonLocalUser() *schema.Resource {
 		DeleteContext: resourceNonLocalUserDelete,
 		CreateContext: resourceNonLocalUserCreate,
 		UpdateContext: resourceNonLocalUserUpdate,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceNonLocalUserImporter,
+		},
 
 		Description: ``,
 		Schema:      getResourceNonLocalUserSchema(),
@@ -406,5 +413,52 @@ func resourceNonLocalUserUpdate(ctx context.Context, d *schema.ResourceData, m i
 	resourceNonLocalUserRead(ctx, d, m)
 
 	return diags
+
+}
+
+func resourceNonLocalUserImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+
+	result := []*schema.ResourceData{}
+	client := m.(vast_client.JwtSession)
+	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
+	attrs := map[string]interface{}{"path": utils.GenPath("users/query")}
+	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+
+	if err != nil {
+		return result, err
+	}
+
+	resource := api_latest.NonLocalUser{}
+	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+
+	if err != nil {
+		return result, err
+	}
+	err = json.Unmarshal(body, &resource)
+	if err != nil {
+		return result, err
+	}
+
+	//if len(resource_l) == 0 {
+	//	return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	//}
+
+	//resource := resource_l[0]
+	id_err := resource_config.IdFunc(ctx, client, d.Id(), d)
+	if id_err != nil {
+		return result, id_err
+	}
+
+	diags := ResourceNonLocalUserReadStructIntoSchema(ctx, resource, d)
+	if diags.HasError() {
+		all_errors := "Errors occured while importing:\n"
+		for _, dig := range diags {
+			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+		}
+		return result, errors.New(all_errors)
+	}
+	result = append(result, d)
+
+	return result, err
 
 }
