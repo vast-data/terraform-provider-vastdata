@@ -7,9 +7,6 @@ import (
 	"io"
 	"reflect"
 
-	//        "net/url"
-	"errors"
-
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -21,69 +18,77 @@ import (
 	vast_versions "github.com/vast-data/terraform-provider-vastdata/vast_versions"
 )
 
-func ResourceGroup() *schema.Resource {
+func ResourceNonLocalUser() *schema.Resource {
 	return &schema.Resource{
-		ReadContext:   resourceGroupRead,
-		DeleteContext: resourceGroupDelete,
-		CreateContext: resourceGroupCreate,
-		UpdateContext: resourceGroupUpdate,
-
-		Importer: &schema.ResourceImporter{
-			StateContext: resourceGroupImporter,
-		},
+		ReadContext:   resourceNonLocalUserRead,
+		DeleteContext: resourceNonLocalUserDelete,
+		CreateContext: resourceNonLocalUserCreate,
+		UpdateContext: resourceNonLocalUserUpdate,
 
 		Description: ``,
-		Schema:      getResourceGroupSchema(),
+		Schema:      getResourceNonLocalUserSchema(),
 	}
 }
 
-func getResourceGroupSchema() map[string]*schema.Schema {
+func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"id": &schema.Schema{
 			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("guid"),
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("id"),
 
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the group`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier`,
 		},
 
-		"name": &schema.Schema{
-			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("name"),
-
-			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the group`,
-		},
-
-		"gid": &schema.Schema{
+		"uid": &schema.Schema{
 			Type:          schema.TypeInt,
-			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("gid"),
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("uid"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The group linux gid`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
 		},
 
-		"sid": &schema.Schema{
-			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("sid"),
-
-			Computed:    true,
-			Optional:    false,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The group SID`,
-		},
-
-		"s3_policies_ids": &schema.Schema{
-			Type:          schema.TypeList,
-			ConflictsWith: codegen_configs.GetResourceByName("Group").GetConflictingFields("s3_policies_ids"),
+		"allow_create_bucket": &schema.Schema{
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("allow_create_bucket"),
 
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of S3 policies IDs`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Allow create bucket`,
+		},
+
+		"allow_delete_bucket": &schema.Schema{
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("allow_delete_bucket"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Allow delete bucket`,
+		},
+
+		"tenant_id": &schema.Schema{
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("tenant_id"),
+
+			Required:    true,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
+		},
+
+		"s3_policies_ids": &schema.Schema{
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("s3_policies_ids"),
+
+			DiffSuppressOnRefresh: false,
+			DiffSuppressFunc:      codegen_configs.GetResourceByName("NonLocalUser").GetAttributeDiffFunc("s3_policies_ids"),
+			Computed:              true,
+			Optional:              true,
+			Sensitive:             false,
+			Description:           `(Valid for versions: 5.1.0,5.2.0) List S3 policies IDs`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -92,56 +97,68 @@ func getResourceGroupSchema() map[string]*schema.Schema {
 	}
 }
 
-var Group_names_mapping map[string][]string = map[string][]string{}
+var NonLocalUser_names_mapping map[string][]string = map[string][]string{}
 
-func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.Group, d *schema.ResourceData) diag.Diagnostics {
+func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_latest.NonLocalUser, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
 	var err error
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Id", resource.Id))
 
-	err = d.Set("guid", resource.Guid)
+	err = d.Set("id", resource.Id)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occured setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Uid", resource.Uid))
 
-	err = d.Set("name", resource.Name)
+	err = d.Set("uid", resource.Uid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occured setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Gid", resource.Gid))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowCreateBucket", resource.AllowCreateBucket))
 
-	err = d.Set("gid", resource.Gid)
+	err = d.Set("allow_create_bucket", resource.AllowCreateBucket)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gid\"",
+			Summary:  "Error occured setting value to \"allow_create_bucket\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sid", resource.Sid))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowDeleteBucket", resource.AllowDeleteBucket))
 
-	err = d.Set("sid", resource.Sid)
+	err = d.Set("allow_delete_bucket", resource.AllowDeleteBucket)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sid\"",
+			Summary:  "Error occured setting value to \"allow_delete_bucket\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantId", resource.TenantId))
+
+	err = d.Set("tenant_id", resource.TenantId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -161,13 +178,13 @@ func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.
 	return diags
 
 }
-func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Group")
-	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceGroupRead] Calling Get Function : %v for resource Group", utils.GetFuncName(resource_config.GetFunc)))
+	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
+	attrs := map[string]interface{}{"path": utils.GenPath("users/query"), "id": d.Id()}
+	tflog.Debug(ctx, fmt.Sprintf("[resourceNonLocalUserRead] Calling Get Function : %v for resource NonLocalUser", utils.GetFuncName(resource_config.GetFunc)))
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
@@ -181,7 +198,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 
 	}
-	resource := api_latest.Group{}
+	resource := api_latest.NonLocalUser{}
 	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -203,16 +220,16 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 
 	}
-	diags = ResourceGroupReadStructIntoSchema(ctx, resource, d)
+	diags = ResourceNonLocalUserReadStructIntoSchema(ctx, resource, d)
 
 	return diags
 }
 
-func resourceGroupDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceNonLocalUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Group")
-	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
+	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
+	attrs := map[string]interface{}{"path": utils.GenPath("users/query"), "id": d.Id()}
 
 	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
@@ -235,22 +252,22 @@ func resourceGroupDelete(ctx context.Context, d *schema.ResourceData, m interfac
 
 }
 
-func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceNonLocalUserCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Group_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, NonLocalUser_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Group")
-	tflog.Info(ctx, fmt.Sprintf("Creating Resource Group"))
-	reflect_Group := reflect.TypeOf((*api_latest.Group)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Group.Elem(), d, &data, "", false)
+	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
+	tflog.Info(ctx, fmt.Sprintf("Creating Resource NonLocalUser"))
+	reflect_NonLocalUser := reflect.TypeOf((*api_latest.NonLocalUser)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_NonLocalUser.Elem(), d, &data, "", false)
 
 	version_compare := utils.VastVersionsWarn(ctx)
 
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Group")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "NonLocalUser")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -267,7 +284,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Group", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "NonLocalUser", cluster_version))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -281,9 +298,9 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("groups")}
+	attrs := map[string]interface{}{"path": utils.GenPath("users/query")}
 	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Group %v", create_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  NonLocalUser %v", create_err))
 
 	if create_err != nil {
 		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
@@ -296,12 +313,12 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	response_body, _ := io.ReadAll(response.Body)
 	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
-	resource := api_latest.Group{}
+	resource := api_latest.NonLocalUser{}
 	err = json.Unmarshal(response_body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Failed to convert response body into Group",
+			Summary:  "Failed to convert response body into NonLocalUser",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -317,21 +334,21 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceGroupRead(ctx_with_resource, d, m)
+	resourceNonLocalUserRead(ctx_with_resource, d, m)
 
 	return diags
 }
 
-func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceNonLocalUserUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Group_names_mapping)
+	new_ctx := context.WithValue(ctx, names_mapping, NonLocalUser_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("Group")
+	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
 	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
 		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Group")
+		t, t_exists := vast_versions.GetVersionedType(cluster_version, "NonLocalUser")
 		if t_exists {
 			versions_error := utils.VersionMatch(t, data)
 			if versions_error != nil {
@@ -348,14 +365,20 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Group", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "NonLocalUser", cluster_version))
 		}
 	}
 
 	client := m.(vast_client.JwtSession)
-	tflog.Info(ctx, fmt.Sprintf("Updating Resource Group"))
-	reflect_Group := reflect.TypeOf((*api_latest.Group)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Group.Elem(), d, &data, "", false)
+	tflog.Info(ctx, fmt.Sprintf("Updating Resource NonLocalUser"))
+	reflect_NonLocalUser := reflect.TypeOf((*api_latest.NonLocalUser)(nil))
+	utils.PopulateResourceMap(new_ctx, reflect_NonLocalUser.Elem(), d, &data, "", false)
+
+	var before_patch_error error
+	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
+	if before_patch_error != nil {
+		return diag.FromErr(before_patch_error)
+	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -368,9 +391,9 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
-	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
+	attrs := map[string]interface{}{"path": utils.GenPath("users/query"), "id": d.Id()}
 	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Group %v", patch_err))
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  NonLocalUser %v", patch_err))
 	if patch_err != nil {
 		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
@@ -380,55 +403,8 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		})
 		return diags
 	}
-	resourceGroupRead(ctx, d, m)
+	resourceNonLocalUserRead(ctx, d, m)
 
 	return diags
-
-}
-
-func resourceGroupImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-
-	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
-	resource_config := codegen_configs.GetResourceByName("Group")
-	attrs := map[string]interface{}{"path": utils.GenPath("groups")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
-
-	if err != nil {
-		return result, err
-	}
-
-	resource_l := []api_latest.Group{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		return result, err
-	}
-	err = json.Unmarshal(body, &resource_l)
-	if err != nil {
-		return result, err
-	}
-
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
-	}
-
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
-	}
-
-	diags := ResourceGroupReadStructIntoSchema(ctx, resource, d)
-	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
-		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
-		}
-		return result, errors.New(all_errors)
-	}
-	result = append(result, d)
-
-	return result, err
 
 }
