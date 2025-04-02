@@ -28,6 +28,7 @@ type jwt_token struct {
 
 type JwtSession struct {
 	token                      *jwt_token
+	apiToken                   string
 	valid                      bool
 	server, username, password string
 	port                       uint64
@@ -58,14 +59,14 @@ func parseToken(rsp *http.Response) (*jwt_token, error) {
 
 func (s *JwtSession) getJwtAccessToken() (string, error) {
 	/*This function will return the access token
-	/if the time duration between the token creation time & current time greated or equal to
+	/if the time duration between the token creation time & current time greater or equal to
 	TOKEN_REFRESH_TIME_IN_SECONDS we try refresh it
 	*/
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	if !s.IsValid() {
 		return "", errors.New("Session has not been in initialized")
 	}
-	defer s.mu.Unlock()
 	if time.Now().Sub(s.token.Created) >= TOKEN_REFRESH_TIME_IN_SECONDS {
 		//Refresh the token
 		path := url.URL{
@@ -92,15 +93,29 @@ func (s *JwtSession) getJwtAccessToken() (string, error) {
 	return s.token.Access, nil
 }
 
-func NewJwtSession(server, username, password string, port uint64, no_ssl_verify bool) JwtSession {
+func (s *JwtSession) setAuthorizationHeader(headers *http.Header) error {
+	if s.apiToken != "" {
+		headers.Add("Authorization", "Api-Token "+s.apiToken)
+		return nil
+	}
+	jwtAccessToken, err := s.getJwtAccessToken()
+	if err != nil {
+		return err
+	}
+	headers.Add("Authorization", "Bearer "+jwtAccessToken)
+	return nil
+}
+
+func NewJwtSession(server string, username string, password string, apiToken string, port uint64, noSslVerify bool) JwtSession {
 	//Create a new session object
 	return JwtSession{token: nil,
 		valid:         false,
 		server:        server,
 		username:      username,
 		password:      password,
+		apiToken:      apiToken,
 		port:          port,
-		no_ssl_verify: no_ssl_verify,
+		no_ssl_verify: noSslVerify,
 		client:        nil,
 	}
 }
@@ -143,13 +158,11 @@ func (s *JwtSession) Start() error {
 }
 
 func setupHeaders(s *JwtSession, r *http.Request, headers map[string]string) error {
-	t, e := s.getJwtAccessToken()
-	if e != nil {
-		return e
+	if err := s.setAuthorizationHeader(&r.Header); err != nil {
+		return err
 	}
-	r.Header.Add("authorization", "Bearer "+t)
-	r.Header.Add("accept", "application/json")
-	r.Header.Add("content-type", "application/json")
+	r.Header.Add("Accept", "application/json")
+	r.Header.Add("Content-type", "application/json")
 	for k, v := range headers {
 		r.Header.Add(k, v)
 	}

@@ -21,54 +21,69 @@ func Provider() *schema.Provider {
 		ResourcesMap:   resources.Resources,
 		DataSourcesMap: datasources.DataSources,
 		Schema: map[string]*schema.Schema{
-			"host": &schema.Schema{
+			"host": {
 				Type:        schema.TypeString,
-				Optional:    false,
 				Required:    true,
+				Optional:    false,
 				Description: `The VastData Cluster hostname/address , if environment variable VASTDATA_HOST exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_HOST", nil),
 			},
-			"port": &schema.Schema{
+			"port": {
 				Type:        schema.TypeInt,
-				Optional:    true,
 				Required:    false,
+				Optional:    true,
 				Description: `The server API port (Default is 443) ,if environment variable VASTDATA_PORT exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_PORT", 443),
 			},
-			"skip_ssl_verify": &schema.Schema{
+			"skip_ssl_verify": {
 				Type:        schema.TypeBool,
-				Optional:    true,
 				Required:    false,
-				Description: `A boolean representing should SSL certificate be verified (Default is False) , if environment variable VASTDATA_VERIFY_SSL exists it will be used`,
+				Optional:    true,
+				Description: `A boolean representing should SSL certificate be verified (Default is False) , if environmnet variable VASTDATA_VERIFY_SSL exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_VERIFY_SSL", false),
 			},
 
-			"username": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    false,
-				Required:    true,
-				Sensitive:   true,
-				Description: `The VastData Cluster username, if environment variable VASTDATA_CLUSTER_USERNAME exists it will be used`,
-				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_CLUSTER_USERNAME", nil),
+			"username": {
+				Type:          schema.TypeString,
+				Required:      false,
+				Optional:      true,
+				Sensitive:     true,
+				Description:   `The VastData Cluster username, if environment variable VASTDATA_CLUSTER_USERNAME exists it will be used`,
+				DefaultFunc:   schema.EnvDefaultFunc("VASTDATA_CLUSTER_USERNAME", nil),
+				ConflictsWith: []string{"api_token"},
+				RequiredWith:  []string{"password"},
+				AtLeastOneOf:  []string{"api_token", "username"},
 			},
-			"password": &schema.Schema{
-				Type:        schema.TypeString,
-				Optional:    false,
-				Required:    true,
-				Sensitive:   true,
-				Description: `The VastData Cluster password, if environment variable VASTDATA_CLUSTER_PASSWORD exists it will be used`,
-				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_CLUSTER_PASSWORD", nil),
+			"password": {
+				Type:          schema.TypeString,
+				Required:      false,
+				Optional:      true,
+				Sensitive:     true,
+				Description:   `The VastData Cluster password, if environment variable VASTDATA_CLUSTER_PASSWORD exists it will be used`,
+				DefaultFunc:   schema.EnvDefaultFunc("VASTDATA_CLUSTER_PASSWORD", nil),
+				ConflictsWith: []string{"api_token"},
+				RequiredWith:  []string{"username"},
 			},
-			"version_validation_mode": &schema.Schema{
+			"api_token": {
+				Type:          schema.TypeString,
+				Required:      false,
+				Optional:      true,
+				Sensitive:     true,
+				Description:   `The VastData Cluster API token. If environment variable VASTDATA_API_TOKEN exists it will be used`,
+				DefaultFunc:   schema.EnvDefaultFunc("VASTDATA_API_TOKEN", nil),
+				ConflictsWith: []string{"username", "password"},
+				AtLeastOneOf:  []string{"api_token", "username"},
+			},
+			"version_validation_mode": {
 				Type:      schema.TypeString,
-				Optional:  true,
 				Required:  false,
+				Optional:  true,
 				Sensitive: false,
 				Description: `The version validation mode to use , version validation checks if a resource request will work with the current cluster version
-Depending on the value the operation will abort from happening if according to the version the operation might not work.
-2 options are valid for this attribute:
-1. strict - abort the operation before it starts
-2. warn - Just issue a warning`,
+			Depending on the value the operation will abort from happening if according to the version the operation might not work.
+			2 options are valid for this attribute
+			1. strict - abort the operation before it starts
+			2. warn - Just issue a warnning `,
 				DefaultFunc:  schema.EnvDefaultFunc("VERSION_VALIDATION_MODE", "warn"),
 				ValidateFunc: validation.StringInSlice([]string{"warn", "strict"}, true),
 			},
@@ -92,6 +107,7 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 		r.Get("host").(string),
 		r.Get("username").(string),
 		r.Get("password").(string),
+		r.Get("api_token").(string),
 		uint64(r.Get("port").(int)),
 		r.Get("skip_ssl_verify").(bool))
 	err := client.Start()

@@ -12,5 +12,5 @@ func init() {
 }
 
 func GetUserAgent() string {
-	return fmt.Sprintf("Terraform Provider VastData ,OS:%s, Arch:%s , Version:%s", runtime.GOOS, runtime.GOARCH, user_agent_version)
+	return fmt.Sprintf("Terraform Provider VASTData ,OS:%s, Arch:%s , Version:%s", runtime.GOOS, runtime.GOARCH, user_agent_version)
 }
