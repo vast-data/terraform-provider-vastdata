@@ -24,7 +24,7 @@ func GetResponseBodyAsStr(r *http.Response) string {
 	return string(body)
 }
 
-func UnmarshalBodyToMap(r *http.Response, i *map[string]interface{}) error {
+func UnmarshelBodyToMap(r *http.Response, i *map[string]interface{}) error {
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func UnmarshalBodyToMap(r *http.Response, i *map[string]interface{}) error {
 	return nil
 }
 
-func UnmarshalBodyToMapsList(r *http.Response, i *[]map[string]interface{}) error {
+func UnmarshelBodyToMapsList(r *http.Response, i *[]map[string]interface{}) error {
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		return err
