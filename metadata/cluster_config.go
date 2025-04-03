@@ -1,12 +1,12 @@
 package metadata
 
-var cluster_config map[string]string = map[string]string{}
+var clusterConfig = map[string]string{}
 
 func SetClusterConfig(key, value string) {
-	cluster_config[key] = value
+	clusterConfig[key] = value
 }
 
 func GetClusterConfig(key string) (string, bool) {
-	value, exists := cluster_config[key]
+	value, exists := clusterConfig[key]
 	return value, exists
 }
