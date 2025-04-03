@@ -116,9 +116,8 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 	tflog.Info(ctx, fmt.Sprintf("Cluster version found %s", clusterVersion))
 	clusterVersion, truncated := metadata.SanitizeVersion(clusterVersion)
 	if truncated {
-		tflog.Info(ctx, fmt.Sprintf("Cluster version truncated (from the left) to: %s", clusterVersion))
+		tflog.Info(ctx, fmt.Sprintf("Cluster version truncated to: %s", clusterVersion))
 	}
-
 	err = metadata.UpdateClusterVersion(clusterVersion)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
