@@ -104,18 +104,22 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 		})
 		return client, diags
 	}
-	cluster_version, _, version_get_error := client.ClusterVersion(ctx)
-	if version_get_error != nil {
+	clusterVersion, _, err := client.ClusterVersion(ctx)
+	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error obtaning cluster version",
-			Detail:   version_get_error.Error(),
+			Detail:   err.Error(),
 		})
 
 	}
-	tflog.Info(ctx, fmt.Sprintf("Cluster version found %s", cluster_version))
+	tflog.Info(ctx, fmt.Sprintf("Cluster version found %s", clusterVersion))
+	clusterVersion, truncated := metadata.SanitizeVersion(clusterVersion)
+	if truncated {
+		tflog.Info(ctx, fmt.Sprintf("Cluster version truncated (from the left) to: %s", clusterVersion))
+	}
 
-	err = metadata.UpdateClusterVersion(cluster_version)
+	err = metadata.UpdateClusterVersion(clusterVersion)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -125,10 +129,10 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 		return client, diags
 	}
 	if metadata.ClusterVersionCompare() != metadata.CLUSTER_VERSION_EQUALS {
-		tflog.Warn(ctx, "Cluster Version & Build Version are not matching ,some actions might fail")
+		tflog.Warn(ctx, "Cluster Version & Build Version are not matching, some actions might fail")
 	}
 	metadata.SetClusterConfig("version_validation_mode", r.Get("version_validation_mode").(string))
-	v := metadata.FindVastVersion(cluster_version)
+	v := metadata.FindVastVersion(clusterVersion)
 	metadata.SetClusterConfig("vast_version", v)
 	tflog.Debug(ctx, fmt.Sprintf("API Version than will be used %v", v))
 	return client, diags

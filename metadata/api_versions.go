@@ -41,7 +41,7 @@ func MaxVastVerion() string {
 	return last.GetVastVersion()
 }
 
-func MinVastVerion() string {
+func MinVastVersion() string {
 	/*
 	   This will return minimal version , however unlike max where we know that at least
 	   the latest the build_version is supported , we can never know the version, so we simply return
@@ -59,8 +59,8 @@ func FindVastVersion(ver string) string {
 			return api_verions[i].GetVastVersion()
 		} else if c == -1 {
 			if i == 0 {
-				//Version is smaller than the miniaml version
-				return MinVastVerion()
+				//Version is smaller than the minimal version
+				return MinVastVersion()
 			}
 			/*
 			   If current version is smaller than this version and the index is not 0
