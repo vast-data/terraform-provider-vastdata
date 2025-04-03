@@ -48,7 +48,7 @@ func ActiveDirectory2GetFunc(ctx context.Context, _client interface{}, attr map[
 		return response, err
 	}
 
-	err = UnmarshalBodyToMap(response, &temp)
+	err = UnmarshelBodyToMap(response, &temp)
 	if err != nil {
 		return response, err
 	}

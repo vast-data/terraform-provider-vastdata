@@ -15,14 +15,14 @@ import (
 )
 
 func getAttributeOrDefault(name string, attribute_default *string, attrs map[string]interface{}) *string {
-	_attr, attributeExists := attrs[name]
+	_attr, attr_exists := attrs[name]
 	var value *string = new(string)
-	if !attributeExists {
+	if !attr_exists {
 		value = attribute_default
 		return value
 	}
-	attr, isString := _attr.(string)
-	if !isString {
+	attr, is_string := _attr.(string)
+	if !is_string {
 		value = attribute_default
 		return value
 	}
@@ -31,13 +31,13 @@ func getAttributeOrDefault(name string, attribute_default *string, attrs map[str
 
 }
 
-func getAttributeAsString(name string, attrs map[string]interface{}) (string, error) {
-	_attr, attributeExists := attrs[name]
-	if !attributeExists {
+func getArrtibuteAsString(name string, attrs map[string]interface{}) (string, error) {
+	_attr, attr_exists := attrs[name]
+	if !attr_exists {
 		return "", errors.New(fmt.Sprintf("Attribute with the name \"%v\" does not exists", name))
 	}
-	attr, isString := _attr.(string)
-	if !isString {
+	attr, is_string := _attr.(string)
+	if !is_string {
 		return "", errors.New(fmt.Sprintf("Attribute with the name \"%v\" is not a string %v", name, _attr))
 	}
 	return attr, nil
@@ -46,7 +46,7 @@ func getAttributeAsString(name string, attrs map[string]interface{}) (string, er
 func getAttributesAsString(names []string, attrs map[string]interface{}) (*map[string]string, error) {
 	var m map[string]string = make(map[string]string)
 	for _, name := range names {
-		attr, err := getAttributeAsString(name, attrs)
+		attr, err := getArrtibuteAsString(name, attrs)
 		if err != nil {
 			return nil, err
 		}
@@ -63,9 +63,9 @@ func DefaultCreateFunc(ctx context.Context, _client interface{}, attr map[string
 	if err != nil {
 		return nil, err
 	}
-	b, marshallingError := json.Marshal(data)
-	if marshallingError != nil {
-		return nil, marshallingError
+	b, marshal_error := json.Marshal(data)
+	if marshal_error != nil {
+		return nil, marshal_error
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling POST to path \"%v\"", (*attributes)["path"]))
 	return client.Post(ctx, (*attributes)["path"], bytes.NewReader(b), map[string]string{})
@@ -79,14 +79,14 @@ func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string
 	if err != nil {
 		return nil, err
 	}
-	updatePath := fmt.Sprintf("%v/%v", (*attributes)["path"], (*attributes)["id"])
-	b, marshallingError := json.Marshal(data)
-	if marshallingError != nil {
-		return nil, marshallingError
+	update_path := fmt.Sprintf("%v/%v", (*attributes)["path"], (*attributes)["id"])
+	b, marshal_error := json.Marshal(data)
+	if marshal_error != nil {
+		return nil, marshal_error
 	}
-	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH to path \"%v\"", updatePath))
+	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH to path \"%v\"", update_path))
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH with payload: %v", string(b)))
-	return client.Patch(ctx, updatePath, "application/json", bytes.NewReader(b), map[string]string{})
+	return client.Patch(ctx, update_path, "application/json", bytes.NewReader(b), map[string]string{})
 }
 
 type DeleteFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, map[string]string) (*http.Response, error)
@@ -97,7 +97,7 @@ func DefaultDeleteFunc(ctx context.Context, _client interface{}, attr map[string
 	if err != nil {
 		return nil, err
 	}
-	deletePath := fmt.Sprintf("%v%v", (*attributes)["path"], (*attributes)["id"])
+	delete_path := fmt.Sprintf("%v%v", (*attributes)["path"], (*attributes)["id"])
 	query := ""
 	_query := getAttributeOrDefault("query", nil, attr)
 	if _query != nil {
@@ -106,14 +106,14 @@ func DefaultDeleteFunc(ctx context.Context, _client interface{}, attr map[string
 	var r *bytes.Reader = nil
 	if !reflect.DeepEqual(data, map[string]interface{}{}) {
 
-		b, marshallingError := json.Marshal(data)
-		if marshallingError != nil {
-			return nil, marshallingError
+		b, marshal_error := json.Marshal(data)
+		if marshal_error != nil {
+			return nil, marshal_error
 		}
 		r = bytes.NewReader(b)
 	}
-	tflog.Debug(ctx, fmt.Sprintf("Calling Delete to path \"%v\"", deletePath))
-	return client.Delete(ctx, deletePath, query, r, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("Calling Delete to path \"%v\"", delete_path))
+	return client.Delete(ctx, delete_path, query, r, map[string]string{})
 }
 
 type GetFuncType func(context.Context, interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
