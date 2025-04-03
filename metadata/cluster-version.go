@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var cluster_version, _ = version.NewVersion("0.0.0")
+var clusterVersion, _ = version.NewVersion("0.0.0")
 
 // SanitizeVersion truncates segments of Cluster Version so that each segment can fit within int64.
 // This is needed, because hashicorp's go-version package parses each segment into int64.
@@ -27,17 +27,17 @@ func SanitizeVersion(version string) (string, bool) {
 }
 
 func UpdateClusterVersion(v string) error {
-	_cluster_version, err := version.NewVersion(v)
+	newVersion, err := version.NewVersion(v)
 	if err != nil {
 		return err
 	}
 	//We only work with core version//
-	cluster_version = _cluster_version.Core()
+	clusterVersion = newVersion.Core()
 	return nil
 }
 
 func GetClusterVersion() version.Version {
-	return *cluster_version
+	return *clusterVersion
 }
 
 func ClusterVersionString() string {

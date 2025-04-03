@@ -24,20 +24,21 @@ func (v *VastVersionStruct) GetVastVersion() string {
 	return v.Vast_ver
 }
 
-var api_verions []VastVersionStruct = []VastVersionStruct{
+var api_versions []VastVersionStruct = []VastVersionStruct{
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("4.6.0")), Vast_ver: "v2"},
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("4.7.0")), Vast_ver: "v3"},
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.0.0")), Vast_ver: "v4"},
 	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.1.0")), Vast_ver: "v5"},
-	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.2.0")), Vast_ver: "v5"}}
+	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.2.0")), Vast_ver: "v5"},
+	VastVersionStruct{Ver: extractVersion(version.NewVersion("5.3.0")), Vast_ver: "v6"}}
 
-func MaxVastVerion() string {
+func MaxVastVersion() string {
 	/*
-	   return the latest avaliable supported, vast version
+	   return the latest available supported, vast version
 	   This is for situations where we have a cluster version grater than our
 	   build version.
 	*/
-	last := api_verions[len(api_verions)-1]
+	last := api_versions[len(api_versions)-1]
 	return last.GetVastVersion()
 }
 
@@ -51,12 +52,12 @@ func MinVastVersion() string {
 }
 
 func FindVastVersion(ver string) string {
-	v, e := version.NewVersion(ver)
-	cluster_version := extractVersion(v, e)
-	for i := range api_verions {
-		c := cluster_version.Compare(api_verions[i].GetVersion())
+	newVersion, err := version.NewVersion(ver)
+	_clusterVersion := extractVersion(newVersion, err)
+	for i := range api_versions {
+		c := _clusterVersion.Compare(api_versions[i].GetVersion())
 		if c == 0 {
-			return api_verions[i].GetVastVersion()
+			return api_versions[i].GetVastVersion()
 		} else if c == -1 {
 			if i == 0 {
 				//Version is smaller than the minimal version
@@ -66,11 +67,11 @@ func FindVastVersion(ver string) string {
 			   If current version is smaller than this version and the index is not 0
 			   than the maxversion is the previous version
 			*/
-			return api_verions[i-1].GetVastVersion()
+			return api_versions[i-1].GetVastVersion()
 		}
 	}
 	/*
 	   Reaching to this stage means that the cluster version is bigger than out build (last) version
 	*/
-	return MaxVastVerion()
+	return MaxVastVersion()
 }
