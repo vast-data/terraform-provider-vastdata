@@ -249,7 +249,7 @@ func ViewPolicyGetFunc(ctx context.Context, _client interface{}, attr map[string
 		return response, err
 	}
 	u := map[string]interface{}{}
-	err = UnmarshelBodyToMap(response, &u)
+	err = UnmarshalBodyToMap(response, &u)
 	if err != nil {
 		return response, err
 	}

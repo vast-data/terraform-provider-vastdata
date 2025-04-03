@@ -582,7 +582,6 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -592,6 +591,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 
 	}
+	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.Tenant{}
 	body, err := resource_config.ResponseProcessingFunc(ctx, response)
 
@@ -634,8 +634,10 @@ func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interfa
 	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
-	tflog.Info(ctx, response.Request.URL.String())
-	tflog.Info(ctx, utils.GetResponseBodyAsStr(response))
+	if response != nil {
+		tflog.Info(ctx, response.Request.URL.String())
+		tflog.Info(ctx, utils.GetResponseBodyAsStr(response))
+	}
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
