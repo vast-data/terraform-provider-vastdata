@@ -414,7 +414,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Dns")
 	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceDnsRead] Calling Get Function : %v for resource Dns", utils.GetFuncName(resource_config.GetFunc)))
@@ -460,7 +460,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Dns")
 	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
 
@@ -488,7 +488,7 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 	new_ctx := context.WithValue(ctx, names_mapping, Dns_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Dns")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Dns"))
 	reflect_Dns := reflect.TypeOf((*api_latest.Dns)(nil))
@@ -600,7 +600,7 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Dns"))
 	reflect_Dns := reflect.TypeOf((*api_latest.Dns)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Dns.Elem(), d, &data, "", false)
@@ -637,7 +637,7 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceDnsImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Dns")
 	attrs := map[string]interface{}{"path": utils.GenPath("dns")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

@@ -150,7 +150,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      var diags diag.Diagnostics
      {{ $cbr:="}" }}
      {{ $cbl:="{" }}
-     client:=m.(vast_client.JwtSession)
+     client:=m.(*vast_client.VMSSession)
      values := url.Values{}
      datasource_config := codegen_configs.GetDataSourceByName("{{ .ResourceName }}")
      {{ range $i,$v := .RequiredIdentifierFields.ToArray }} 

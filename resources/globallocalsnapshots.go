@@ -222,7 +222,7 @@ func ResourceGlobalLocalSnapshotReadStructIntoSchema(ctx context.Context, resour
 func resourceGlobalLocalSnapshotRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("GlobalLocalSnapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceGlobalLocalSnapshotRead] Calling Get Function : %v for resource GlobalLocalSnapshot", utils.GetFuncName(resource_config.GetFunc)))
@@ -268,7 +268,7 @@ func resourceGlobalLocalSnapshotRead(ctx context.Context, d *schema.ResourceData
 
 func resourceGlobalLocalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("GlobalLocalSnapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
 
@@ -296,7 +296,7 @@ func resourceGlobalLocalSnapshotCreate(ctx context.Context, d *schema.ResourceDa
 	new_ctx := context.WithValue(ctx, names_mapping, GlobalLocalSnapshot_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("GlobalLocalSnapshot")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource GlobalLocalSnapshot"))
 	reflect_GlobalLocalSnapshot := reflect.TypeOf((*api_latest.GlobalLocalSnapshot)(nil))
@@ -408,7 +408,7 @@ func resourceGlobalLocalSnapshotUpdate(ctx context.Context, d *schema.ResourceDa
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource GlobalLocalSnapshot"))
 	reflect_GlobalLocalSnapshot := reflect.TypeOf((*api_latest.GlobalLocalSnapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_GlobalLocalSnapshot.Elem(), d, &data, "", false)
@@ -445,7 +445,7 @@ func resourceGlobalLocalSnapshotUpdate(ctx context.Context, d *schema.ResourceDa
 func resourceGlobalLocalSnapshotImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("GlobalLocalSnapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

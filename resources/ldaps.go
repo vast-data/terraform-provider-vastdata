@@ -806,7 +806,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Ldap")
 	attrs := map[string]interface{}{"path": utils.GenPath("ldaps"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceLdapRead] Calling Get Function : %v for resource Ldap", utils.GetFuncName(resource_config.GetFunc)))
@@ -852,7 +852,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceLdapDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Ldap")
 	attrs := map[string]interface{}{"path": utils.GenPath("ldaps"), "id": d.Id()}
 
@@ -880,7 +880,7 @@ func resourceLdapCreate(ctx context.Context, d *schema.ResourceData, m interface
 	new_ctx := context.WithValue(ctx, names_mapping, Ldap_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Ldap")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Ldap"))
 	reflect_Ldap := reflect.TypeOf((*api_latest.Ldap)(nil))
@@ -992,7 +992,7 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Ldap"))
 	reflect_Ldap := reflect.TypeOf((*api_latest.Ldap)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Ldap.Elem(), d, &data, "", false)
@@ -1029,7 +1029,7 @@ func resourceLdapUpdate(ctx context.Context, d *schema.ResourceData, m interface
 func resourceLdapImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Ldap")
 	attrs := map[string]interface{}{"path": utils.GenPath("ldaps")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

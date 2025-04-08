@@ -781,7 +781,7 @@ func ResourceQosPolicyReadStructIntoSchema(ctx context.Context, resource api_lat
 func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("QosPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceQosPolicyRead] Calling Get Function : %v for resource QosPolicy", utils.GetFuncName(resource_config.GetFunc)))
@@ -833,7 +833,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 
 func resourceQosPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("QosPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
 
@@ -861,7 +861,7 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 	new_ctx := context.WithValue(ctx, names_mapping, QosPolicy_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("QosPolicy")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource QosPolicy"))
 	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
@@ -979,7 +979,7 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource QosPolicy"))
 	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_QosPolicy.Elem(), d, &data, "", false)
@@ -1022,7 +1022,7 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 func resourceQosPolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("QosPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

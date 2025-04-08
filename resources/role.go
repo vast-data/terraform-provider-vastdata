@@ -246,7 +246,7 @@ func ResourceRoleReadStructIntoSchema(ctx context.Context, resource api_latest.R
 func resourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Role")
 	attrs := map[string]interface{}{"path": utils.GenPath("roles"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceRoleRead] Calling Get Function : %v for resource Role", utils.GetFuncName(resource_config.GetFunc)))
@@ -298,7 +298,7 @@ func resourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceRoleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Role")
 	attrs := map[string]interface{}{"path": utils.GenPath("roles"), "id": d.Id()}
 
@@ -326,7 +326,7 @@ func resourceRoleCreate(ctx context.Context, d *schema.ResourceData, m interface
 	new_ctx := context.WithValue(ctx, names_mapping, Role_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Role")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Role"))
 	reflect_Role := reflect.TypeOf((*api_latest.Role)(nil))
@@ -438,7 +438,7 @@ func resourceRoleUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Role"))
 	reflect_Role := reflect.TypeOf((*api_latest.Role)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Role.Elem(), d, &data, "", false)
@@ -475,7 +475,7 @@ func resourceRoleUpdate(ctx context.Context, d *schema.ResourceData, m interface
 func resourceRoleImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Role")
 	attrs := map[string]interface{}{"path": utils.GenPath("roles")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

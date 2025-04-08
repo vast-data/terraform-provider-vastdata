@@ -64,7 +64,7 @@ func list_snapshoted_paths_remote(remote_target_guid, remote_tenant_guid string,
 	if remote_tenant_guid != "" {
 		values.Add("remote_tenant_guid", remote_tenant_guid)
 	}
-	c := client.(vast_client.JwtSession)
+	c := client.(*vast_client.VMSSession)
 
 	r, err := c.Get(ctx, "/api/latest/clusters/list_snapshoted_paths_remote/", values.Encode(), map[string]string{})
 	if err != nil {
@@ -92,7 +92,7 @@ func list_clone_snapshoted_paths_remote(remote_target_guid, handle string, clien
 		values.Add("handle", handle)
 	}
 	values.Add("start_snapshot_id", "0")
-	c := client.(vast_client.JwtSession)
+	c := client.(*vast_client.VMSSession)
 
 	r, err := c.Get(ctx, "/api/latest/clusters/list_clone_snapshoted_paths_remote/", values.Encode(), map[string]string{})
 	if err != nil {
@@ -156,7 +156,7 @@ func AddStreamInfo(m map[string]interface{}, i interface{}, ctx context.Context,
 	remote_target_guid := m["remote_target_guid"].(string)
 	remote_target_path := m["remote_target_path"].(string)
 	snapshot_name := m["owner_root_snapshot"].(map[string]interface{})["name"].(string)
-	client := i.(vast_client.JwtSession)
+	client := i.(*vast_client.VMSSession)
 	handle, err := get_snapshot_handle(remote_tenant_guid, remote_target_guid, remote_target_path, client, ctx)
 	if err != nil {
 		return m, err

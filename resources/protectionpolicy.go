@@ -303,7 +303,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceProtectionPolicyRead] Calling Get Function : %v for resource ProtectionPolicy", utils.GetFuncName(resource_config.GetFunc)))
@@ -349,7 +349,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 
 func resourceProtectionPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies"), "id": d.Id()}
 
@@ -377,7 +377,7 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 	new_ctx := context.WithValue(ctx, names_mapping, ProtectionPolicy_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ProtectionPolicy"))
 	reflect_ProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
@@ -489,7 +489,7 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ProtectionPolicy"))
 	reflect_ProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectionPolicy.Elem(), d, &data, "", false)
@@ -532,7 +532,7 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 func resourceProtectionPolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

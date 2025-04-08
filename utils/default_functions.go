@@ -58,7 +58,7 @@ func getAttributesAsString(names []string, attrs map[string]interface{}) (*map[s
 type CreateFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, map[string]string) (*http.Response, error)
 
 func DefaultCreateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path"}, attr)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func DefaultCreateFunc(ctx context.Context, _client interface{}, attr map[string
 type UpdateFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
 
 func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
 	if err != nil {
 		return nil, err
@@ -86,13 +86,13 @@ func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH to path \"%v\"", update_path))
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH with payload: %v", string(b)))
-	return client.Patch(ctx, update_path, "application/json", bytes.NewReader(b), map[string]string{})
+	return client.Patch(ctx, update_path, bytes.NewReader(b), map[string]string{})
 }
 
 type DeleteFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, map[string]string) (*http.Response, error)
 
 func DefaultDeleteFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func DefaultDeleteFunc(ctx context.Context, _client interface{}, attr map[string
 type GetFuncType func(context.Context, interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
 
 func DefaultGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path"}, attr)
 	if err != nil {
 		return nil, err

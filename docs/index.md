@@ -61,4 +61,4 @@ alias = clusterB
 Depanding on the value the operation will abort from happening if according to the version the operation might not work.
 2 options are valid for this attribute
 1. strict - abort the operation before it starts
-2. warn - Just issue a warnning
+2. warn - Just issue a warning

@@ -83,7 +83,7 @@ func Provider() *schema.Provider {
 			Depending on the value the operation will abort from happening if according to the version the operation might not work.
 			2 options are valid for this attribute
 			1. strict - abort the operation before it starts
-			2. warn - Just issue a warnning `,
+			2. warn - Just issue a warning `,
 				DefaultFunc:  schema.EnvDefaultFunc("VERSION_VALIDATION_MODE", "warn"),
 				ValidateFunc: validation.StringInSlice([]string{"warn", "strict"}, true),
 			},
@@ -103,13 +103,15 @@ func Provider() *schema.Provider {
 func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
-	client := vast_client.NewJwtSession(
-		r.Get("host").(string),
-		r.Get("username").(string),
-		r.Get("password").(string),
-		r.Get("api_token").(string),
-		uint64(r.Get("port").(int)),
-		r.Get("skip_ssl_verify").(bool))
+	config := &vast_client.RestClientConfig{
+		Host:      r.Get("host").(string),
+		Port:      uint64(r.Get("port").(int)),
+		Username:  r.Get("username").(string),
+		Password:  r.Get("password").(string),
+		ApiToken:  r.Get("api_token").(string),
+		SslVerify: !r.Get("skip_ssl_verify").(bool),
+	}
+	client := vast_client.NewSession(ctx, config)
 	err := client.Start()
 
 	if err != nil {

@@ -356,7 +356,7 @@ func ResourceS3LifeCycleRuleReadStructIntoSchema(ctx context.Context, resource a
 func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceS3LifeCycleRuleRead] Calling Get Function : %v for resource S3LifeCycleRule", utils.GetFuncName(resource_config.GetFunc)))
@@ -402,7 +402,7 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 
 func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules"), "id": d.Id()}
 
@@ -430,7 +430,7 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 	new_ctx := context.WithValue(ctx, names_mapping, S3LifeCycleRule_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource S3LifeCycleRule"))
 	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
@@ -548,7 +548,7 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3LifeCycleRule"))
 	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
@@ -591,7 +591,7 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 func resourceS3LifeCycleRuleImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

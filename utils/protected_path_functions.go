@@ -36,7 +36,7 @@ func ProtectedPathDeleteFunc(ctx context.Context, _client interface{}, attr map[
 		return response, err
 	}
 	//Now we wait for the protected path deletion
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
 	if err != nil {
 		return nil, err
@@ -84,12 +84,12 @@ func ProtectedPathBeforeCreateFunc(m map[string]interface{}, i interface{}, ctx 
 		return m, nil
 	}
 
-	client := i.(vast_client.JwtSession)
+	client := i.(*vast_client.VMSSession)
 	tflog.Debug(ctx, fmt.Sprintf("[ProtectedPathBeforeCreateFunc] Setting the value of enabled to: %v ", enabled))
 	id := fmt.Sprintf("%v", d.Id())
 	z := map[string]interface{}{"enabled": enabled}
 	b, _ := json.Marshal(z)
-	_, err := client.Patch(ctx, GenPath(fmt.Sprintf("%v/%v", "protectedpaths", id)), "application/json", bytes.NewReader(b), map[string]string{})
+	_, err := client.Patch(ctx, GenPath(fmt.Sprintf("%v/%v", "protectedpaths", id)), bytes.NewReader(b), map[string]string{})
 	if err != nil {
 		return m, err
 	}

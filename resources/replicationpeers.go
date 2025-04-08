@@ -294,7 +294,7 @@ func ResourceReplicationPeersReadStructIntoSchema(ctx context.Context, resource 
 func resourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ReplicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("nativereplicationremotetargets"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceReplicationPeersRead] Calling Get Function : %v for resource ReplicationPeers", utils.GetFuncName(resource_config.GetFunc)))
@@ -340,7 +340,7 @@ func resourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData, m
 
 func resourceReplicationPeersDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ReplicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("nativereplicationremotetargets"), "id": d.Id()}
 
@@ -368,7 +368,7 @@ func resourceReplicationPeersCreate(ctx context.Context, d *schema.ResourceData,
 	new_ctx := context.WithValue(ctx, names_mapping, ReplicationPeers_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ReplicationPeers")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ReplicationPeers"))
 	reflect_ReplicationPeers := reflect.TypeOf((*api_latest.ReplicationPeers)(nil))
@@ -480,7 +480,7 @@ func resourceReplicationPeersUpdate(ctx context.Context, d *schema.ResourceData,
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ReplicationPeers"))
 	reflect_ReplicationPeers := reflect.TypeOf((*api_latest.ReplicationPeers)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ReplicationPeers.Elem(), d, &data, "", false)
@@ -517,7 +517,7 @@ func resourceReplicationPeersUpdate(ctx context.Context, d *schema.ResourceData,
 func resourceReplicationPeersImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ReplicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("nativereplicationremotetargets")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

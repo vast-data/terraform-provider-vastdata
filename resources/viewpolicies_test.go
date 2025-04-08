@@ -185,7 +185,7 @@ var _ = Describe(" ViewPolicy", func() {
 }
                          `
 	var server *ghttp.Server
-	var client vast_client.JwtSession
+	var client *vast_client.VMSSession
 	ViewPolicyResource := resources.ResourceViewPolicy()
 	ReadContext = ViewPolicyResource.ReadContext
 	DeleteContext = ViewPolicyResource.DeleteContext
@@ -202,7 +202,14 @@ var _ = Describe(" ViewPolicy", func() {
 		host := host_port[0]
 		_port := host_port[1]
 		port, _ := strconv.ParseUint(_port, 10, 64)
-		client = vast_client.NewJwtSession(host, "user", "pwd", port, true)
+		config := &vast_client.RestClientConfig{
+			Host:      host,
+			Port:      port,
+			Username:  "user",
+			Password:  "password",
+			SslVerify: false,
+		}
+		client = vast_client.NewSession(context.TODO(), config)
 		server.AppendHandlers(ghttp.CombineHandlers(
 			ghttp.VerifyRequest("POST", "/api/token/"),
 			ghttp.VerifyJSON("{\"username\":\"user\",\"password\":\"pwd\"}"),

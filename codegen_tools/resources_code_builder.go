@@ -159,7 +159,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      var diags diag.Diagnostics
      {{ $cbr:="}" }}
      {{ $cbl:="{" }}
-     client:=m.(vast_client.JwtSession)
+     client:=m.(*vast_client.VMSSession)
      resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
      attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
      tflog.Debug(ctx,fmt.Sprintf("[resource{{ .ResourceName }}Read] Calling Get Function : %v for resource {{ .ResourceName }}",utils.GetFuncName(resource_config.GetFunc)))  
@@ -211,7 +211,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
 
 func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
      var diags diag.Diagnostics
-     client:=m.(vast_client.JwtSession)
+     client:=m.(*vast_client.VMSSession)
      resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
      attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}"),"id":d.Id()}
      {{ if .BeforeDeleteFunc  }}
@@ -248,7 +248,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
     new_ctx := context.WithValue(ctx, names_mapping, {{ .ResourceName }}_names_mapping)
     var diags diag.Diagnostics
     data := make(map[string]interface{})
-    client:=m.(vast_client.JwtSession)
+    client:=m.(*vast_client.VMSSession)
     resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
     tflog.Info(ctx,fmt.Sprintf("Creating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
@@ -373,7 +373,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
           }
     }     
 
-    client:=m.(vast_client.JwtSession)
+    client:=m.(*vast_client.VMSSession)
     tflog.Info(ctx,fmt.Sprintf("Updating Resource {{.ResourceName}}"))
     reflect_{{.ResourceName}} := reflect.TypeOf((*api_latest.{{.ResourceName}})(nil))
     utils.PopulateResourceMap(new_ctx, reflect_{{.ResourceName}}.Elem(),d, &data,"",false)
@@ -426,7 +426,7 @@ func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceDa
 func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.ResourceData, m interface{})  ([]*schema.ResourceData, error) {
 
     result := []*schema.ResourceData{}
-    client := m.(vast_client.JwtSession)
+    client := m.(*vast_client.VMSSession)
     resource_config := codegen_configs.GetResourceByName("{{ .ResourceName }}")
     attrs:=map[string]interface{}{"path":utils.GenPath("{{.Path}}")}
     response,err:=resource_config.ImportFunc(ctx,client,attrs,d,resource_config.Importer.GetFunc())
