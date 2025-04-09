@@ -25,21 +25,21 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Optional:    false,
 				Required:    true,
-				Description: `The VastData Cluster hostname/address , if environmnet variable VASTDATA_HOST exists it will be used`,
+				Description: `The VastData Cluster hostname/address , if environment variable VASTDATA_HOST exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_HOST", nil),
 			},
 			"port": &schema.Schema{
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Required:    false,
-				Description: `The server API port (Default is 443) ,if environmnet variable VASTDATA_PORT exists it will be used`,
+				Description: `The server API port (Default is 443) ,if environment variable VASTDATA_PORT exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_PORT", 443),
 			},
 			"skip_ssl_verify": &schema.Schema{
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Required:    false,
-				Description: `A boolean representing should SSL certificate be verified (Default is False) , if environmnet variable VASTDATA_VERIFY_SSL exists it will be used`,
+				Description: `A boolean representing should SSL certificate be verified (Default is False) , if environment variable VASTDATA_VERIFY_SSL exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_VERIFY_SSL", false),
 			},
 
@@ -48,7 +48,7 @@ func Provider() *schema.Provider {
 				Optional:    false,
 				Required:    true,
 				Sensitive:   true,
-				Description: `The VastData Cluster username, if environmnet variable VASTDATA_CLUSTER_USERNAME exists it will be used`,
+				Description: `The VastData Cluster username, if environment variable VASTDATA_CLUSTER_USERNAME exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_CLUSTER_USERNAME", nil),
 			},
 			"password": &schema.Schema{
@@ -56,7 +56,7 @@ func Provider() *schema.Provider {
 				Optional:    false,
 				Required:    true,
 				Sensitive:   true,
-				Description: `The VastData Cluster password, if environmnet variable VASTDATA_CLUSTER_PASSWORD exists it will be used`,
+				Description: `The VastData Cluster password, if environment variable VASTDATA_CLUSTER_PASSWORD exists it will be used`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_CLUSTER_PASSWORD", nil),
 			},
 			"version_validation_mode": &schema.Schema{
@@ -65,10 +65,10 @@ func Provider() *schema.Provider {
 				Required:  false,
 				Sensitive: false,
 				Description: `The version validation mode to use , version validation checks if a resource request will work with the current cluster version
-Depanding on the value the operation will abort from happening if according to the version the operation might not work.
-2 options are valid for this attribute
+Depending on the value the operation will abort from happening if according to the version the operation might not work.
+2 options are valid for this attribute:
 1. strict - abort the operation before it starts
-2. warn - Just issue a warnning `,
+2. warn - Just issue a warning`,
 				DefaultFunc:  schema.EnvDefaultFunc("VERSION_VALIDATION_MODE", "warn"),
 				ValidateFunc: validation.StringInSlice([]string{"warn", "strict"}, true),
 			},
@@ -99,36 +99,39 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Unable to start a session to the vastdata cluser",
+			Summary:  "Unable to start a session to the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return client, diags
 	}
-	cluster_version, _, version_get_error := client.ClusterVersion(ctx)
-	if version_get_error != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error obtaning cluster version",
-			Detail:   version_get_error.Error(),
-		})
-
-	}
-	tflog.Info(ctx, fmt.Sprintf("Cluster version found %s", cluster_version))
-
-	err = metadata.UpdateClusterVersion(cluster_version)
+	clusterVersion, _, err := client.ClusterVersion(ctx)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while updating cluster version",
+			Summary:  "Error obtaning cluster version",
+			Detail:   err.Error(),
+		})
+
+	}
+	tflog.Info(ctx, fmt.Sprintf("Cluster version found %s", clusterVersion))
+	clusterVersion, truncated := metadata.SanitizeVersion(clusterVersion)
+	if truncated {
+		tflog.Info(ctx, fmt.Sprintf("Cluster version truncated to: %s", clusterVersion))
+	}
+	err = metadata.UpdateClusterVersion(clusterVersion)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred while updating cluster version",
 			Detail:   err.Error(),
 		})
 		return client, diags
 	}
 	if metadata.ClusterVersionCompare() != metadata.CLUSTER_VERSION_EQUALS {
-		tflog.Warn(ctx, "Cluster Version & Build Version are not matching ,some actions might fail")
+		tflog.Warn(ctx, "Cluster Version & Build Version are not matching, some actions might fail")
 	}
 	metadata.SetClusterConfig("version_validation_mode", r.Get("version_validation_mode").(string))
-	v := metadata.FindVastVersion(cluster_version)
+	v := metadata.FindVastVersion(clusterVersion)
 	metadata.SetClusterConfig("vast_version", v)
 	tflog.Debug(ctx, fmt.Sprintf("API Version than will be used %v", v))
 	return client, diags
