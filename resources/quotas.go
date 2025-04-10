@@ -1293,7 +1293,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Quota")
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceQuotaRead] Calling Get Function : %v for resource Quota", utils.GetFuncName(resource_config.GetFunc)))
@@ -1339,7 +1339,7 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Quota")
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
 
@@ -1369,7 +1369,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	new_ctx := context.WithValue(ctx, names_mapping, Quota_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Quota")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Quota"))
 	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
@@ -1487,7 +1487,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Quota"))
 	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
@@ -1530,7 +1530,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceQuotaImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Quota")
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

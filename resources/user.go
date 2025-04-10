@@ -448,7 +448,7 @@ func ResourceUserReadStructIntoSchema(ctx context.Context, resource api_latest.U
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("User")
 	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceUserRead] Calling Get Function : %v for resource User", utils.GetFuncName(resource_config.GetFunc)))
@@ -494,7 +494,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("User")
 	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
 
@@ -524,7 +524,7 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	new_ctx := context.WithValue(ctx, names_mapping, User_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("User")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource User"))
 	reflect_User := reflect.TypeOf((*api_latest.User)(nil))
@@ -636,7 +636,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource User"))
 	reflect_User := reflect.TypeOf((*api_latest.User)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_User.Elem(), d, &data, "", false)
@@ -679,7 +679,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("User")
 	attrs := map[string]interface{}{"path": utils.GenPath("users")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

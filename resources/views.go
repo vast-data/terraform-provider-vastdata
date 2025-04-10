@@ -1142,7 +1142,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("View")
 	attrs := map[string]interface{}{"path": utils.GenPath("views"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceViewRead] Calling Get Function : %v for resource View", utils.GetFuncName(resource_config.GetFunc)))
@@ -1194,7 +1194,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("View")
 	attrs := map[string]interface{}{"path": utils.GenPath("views"), "id": d.Id()}
 
@@ -1224,7 +1224,7 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 	new_ctx := context.WithValue(ctx, names_mapping, View_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("View")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource View"))
 	reflect_View := reflect.TypeOf((*api_latest.View)(nil))
@@ -1342,7 +1342,7 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource View"))
 	reflect_View := reflect.TypeOf((*api_latest.View)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_View.Elem(), d, &data, "", false)
@@ -1391,7 +1391,7 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 func resourceViewImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("View")
 	attrs := map[string]interface{}{"path": utils.GenPath("views")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

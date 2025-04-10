@@ -279,7 +279,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectedPath")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceProtectedPathRead] Calling Get Function : %v for resource ProtectedPath", utils.GetFuncName(resource_config.GetFunc)))
@@ -325,7 +325,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 
 func resourceProtectedPathDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectedPath")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths"), "id": d.Id()}
 
@@ -355,7 +355,7 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 	new_ctx := context.WithValue(ctx, names_mapping, ProtectedPath_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectedPath")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ProtectedPath"))
 	reflect_ProtectedPath := reflect.TypeOf((*api_latest.ProtectedPath)(nil))
@@ -479,7 +479,7 @@ func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m 
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ProtectedPath"))
 	reflect_ProtectedPath := reflect.TypeOf((*api_latest.ProtectedPath)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ProtectedPath.Elem(), d, &data, "", false)
@@ -522,7 +522,7 @@ func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m 
 func resourceProtectedPathImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ProtectedPath")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectedpaths")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

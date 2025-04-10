@@ -559,7 +559,7 @@ func ResourceVipPoolReadStructIntoSchema(ctx context.Context, resource api_lates
 func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("VipPool")
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceVipPoolRead] Calling Get Function : %v for resource VipPool", utils.GetFuncName(resource_config.GetFunc)))
@@ -605,7 +605,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 func resourceVipPoolDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("VipPool")
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
 
@@ -635,7 +635,7 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 	new_ctx := context.WithValue(ctx, names_mapping, VipPool_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("VipPool")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource VipPool"))
 	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
@@ -753,7 +753,7 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource VipPool"))
 	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_VipPool.Elem(), d, &data, "", false)
@@ -796,7 +796,7 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 func resourceVipPoolImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("VipPool")
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

@@ -185,7 +185,7 @@ func ResourceSnapshotReadStructIntoSchema(ctx context.Context, resource api_late
 func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceSnapshotRead] Calling Get Function : %v for resource Snapshot", utils.GetFuncName(resource_config.GetFunc)))
@@ -231,7 +231,7 @@ func resourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 func resourceSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots"), "id": d.Id()}
 
@@ -261,7 +261,7 @@ func resourceSnapshotCreate(ctx context.Context, d *schema.ResourceData, m inter
 	new_ctx := context.WithValue(ctx, names_mapping, Snapshot_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Snapshot"))
 	reflect_Snapshot := reflect.TypeOf((*api_latest.Snapshot)(nil))
@@ -373,7 +373,7 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Snapshot"))
 	reflect_Snapshot := reflect.TypeOf((*api_latest.Snapshot)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Snapshot.Elem(), d, &data, "", false)
@@ -410,7 +410,7 @@ func resourceSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m inter
 func resourceSnapshotImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Snapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("snapshots")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

@@ -140,7 +140,7 @@ func ResourceActiveDirectoryReadStructIntoSchema(ctx context.Context, resource a
 func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ActiveDirectory")
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceActiveDirectoryRead] Calling Get Function : %v for resource ActiveDirectory", utils.GetFuncName(resource_config.GetFunc)))
@@ -186,7 +186,7 @@ func resourceActiveDirectoryRead(ctx context.Context, d *schema.ResourceData, m 
 
 func resourceActiveDirectoryDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ActiveDirectory")
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
 
@@ -223,7 +223,7 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 	new_ctx := context.WithValue(ctx, names_mapping, ActiveDirectory_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ActiveDirectory")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ActiveDirectory"))
 	reflect_ActiveDirectory := reflect.TypeOf((*api_latest.ActiveDirectory)(nil))
@@ -335,7 +335,7 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ActiveDirectory"))
 	reflect_ActiveDirectory := reflect.TypeOf((*api_latest.ActiveDirectory)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ActiveDirectory.Elem(), d, &data, "", false)
@@ -372,7 +372,7 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 func resourceActiveDirectoryImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ActiveDirectory")
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

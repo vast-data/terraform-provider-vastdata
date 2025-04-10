@@ -181,7 +181,7 @@ func ResourceUserKeyReadStructIntoSchema(ctx context.Context, resource api_lates
 func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("UserKey")
 	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceUserKeyRead] Calling Get Function : %v for resource UserKey", utils.GetFuncName(resource_config.GetFunc)))
@@ -233,7 +233,7 @@ func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 func resourceUserKeyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("UserKey")
 	attrs := map[string]interface{}{"path": utils.GenPath("users"), "id": d.Id()}
 
@@ -263,7 +263,7 @@ func resourceUserKeyCreate(ctx context.Context, d *schema.ResourceData, m interf
 	new_ctx := context.WithValue(ctx, names_mapping, UserKey_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("UserKey")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource UserKey"))
 	reflect_UserKey := reflect.TypeOf((*api_latest.UserKey)(nil))
@@ -375,7 +375,7 @@ func resourceUserKeyUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource UserKey"))
 	reflect_UserKey := reflect.TypeOf((*api_latest.UserKey)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_UserKey.Elem(), d, &data, "", false)

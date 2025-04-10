@@ -233,7 +233,7 @@ func ResourceS3PolicyReadStructIntoSchema(ctx context.Context, resource api_late
 func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3Policy")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3policies"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceS3PolicyRead] Calling Get Function : %v for resource S3Policy", utils.GetFuncName(resource_config.GetFunc)))
@@ -279,7 +279,7 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 func resourceS3PolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3Policy")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3policies"), "id": d.Id()}
 
@@ -309,7 +309,7 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 	new_ctx := context.WithValue(ctx, names_mapping, S3Policy_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3Policy")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource S3Policy"))
 	reflect_S3Policy := reflect.TypeOf((*api_latest.S3Policy)(nil))
@@ -433,7 +433,7 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3Policy"))
 	reflect_S3Policy := reflect.TypeOf((*api_latest.S3Policy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3Policy.Elem(), d, &data, "", false)
@@ -476,7 +476,7 @@ func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m inter
 func resourceS3PolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3Policy")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3policies")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

@@ -575,7 +575,7 @@ func ResourceTenantReadStructIntoSchema(ctx context.Context, resource api_latest
 func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Tenant")
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceTenantRead] Calling Get Function : %v for resource Tenant", utils.GetFuncName(resource_config.GetFunc)))
@@ -627,7 +627,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 
 func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Tenant")
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants"), "id": d.Id()}
 
@@ -657,7 +657,7 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	new_ctx := context.WithValue(ctx, names_mapping, Tenant_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Tenant")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Tenant"))
 	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
@@ -775,7 +775,7 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Tenant"))
 	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Tenant.Elem(), d, &data, "", false)
@@ -818,7 +818,7 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 func resourceTenantImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Tenant")
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

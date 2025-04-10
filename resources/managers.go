@@ -289,7 +289,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 func resourceManagerRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Manager")
 	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceManagerRead] Calling Get Function : %v for resource Manager", utils.GetFuncName(resource_config.GetFunc)))
@@ -341,7 +341,7 @@ func resourceManagerRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 func resourceManagerDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Manager")
 	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
 
@@ -371,7 +371,7 @@ func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interf
 	new_ctx := context.WithValue(ctx, names_mapping, Manager_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Manager")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Manager"))
 	reflect_Manager := reflect.TypeOf((*api_latest.Manager)(nil))
@@ -483,7 +483,7 @@ func resourceManagerUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Manager"))
 	reflect_Manager := reflect.TypeOf((*api_latest.Manager)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Manager.Elem(), d, &data, "", false)
@@ -520,7 +520,7 @@ func resourceManagerUpdate(ctx context.Context, d *schema.ResourceData, m interf
 func resourceManagerImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Manager")
 	attrs := map[string]interface{}{"path": utils.GenPath("managers")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

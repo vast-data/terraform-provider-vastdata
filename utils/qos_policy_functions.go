@@ -55,7 +55,7 @@ func policy_type_validation(ctx context.Context, data map[string]interface{}) er
 }
 
 func populate_users(ctx context.Context, users_identifiers []interface{}, c interface{}) ([]interface{}, error) {
-	client := c.(vast_client.JwtSession)
+	client := c.(*vast_client.VMSSession)
 	users := []interface{}{}
 	for _, ind := range users_identifiers {
 		i := fmt.Sprintf("%v", ind)
@@ -132,7 +132,7 @@ func QosUpdateFunc(ctx context.Context, _client interface{}, attr map[string]int
 func QosAfterReadFunc(i interface{}, ctx context.Context, d *schema.ResourceData) error {
 	tflog.Debug(ctx, fmt.Sprintf("[QosAfterReadFunc] - Start"))
 	attached_users, exists := d.GetOkExists("attached_users")
-	client := i.(vast_client.JwtSession)
+	client := i.(*vast_client.VMSSession)
 	attached_users_identifiers := []interface{}{}
 	if !exists {
 		tflog.Debug(ctx, fmt.Sprintf("[QosAfterReadFunc] - attached_users was not found"))

@@ -122,7 +122,7 @@ func ResourceRealmReadStructIntoSchema(ctx context.Context, resource api_latest.
 func resourceRealmRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Realm")
 	attrs := map[string]interface{}{"path": utils.GenPath("realms"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceRealmRead] Calling Get Function : %v for resource Realm", utils.GetFuncName(resource_config.GetFunc)))
@@ -168,7 +168,7 @@ func resourceRealmRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 func resourceRealmDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Realm")
 	attrs := map[string]interface{}{"path": utils.GenPath("realms"), "id": d.Id()}
 
@@ -198,7 +198,7 @@ func resourceRealmCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	new_ctx := context.WithValue(ctx, names_mapping, Realm_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Realm")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Realm"))
 	reflect_Realm := reflect.TypeOf((*api_latest.Realm)(nil))
@@ -310,7 +310,7 @@ func resourceRealmUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Realm"))
 	reflect_Realm := reflect.TypeOf((*api_latest.Realm)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Realm.Elem(), d, &data, "", false)
@@ -347,7 +347,7 @@ func resourceRealmUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceRealmImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Realm")
 	attrs := map[string]interface{}{"path": utils.GenPath("realms")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

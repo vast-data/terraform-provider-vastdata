@@ -75,7 +75,7 @@ func ActiveDirectory2GetFunc(ctx context.Context, _client interface{}, attr map[
 }
 
 func ActiveDirectory2DeleteFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
 	if err != nil {
 		return nil, err

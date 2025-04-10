@@ -97,7 +97,7 @@ func disableKeyIfneeded(ctx context.Context, _client interface{}, path, access_k
 		tflog.Debug(ctx, "access_key is set to be enabled, nothign to do")
 		return nil, nil
 	}
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	payload := map[string]interface{}{}
 	payload["access_key"] = access_key
 	payload["enabled"] = enabled
@@ -107,13 +107,13 @@ func disableKeyIfneeded(ctx context.Context, _client interface{}, path, access_k
 		return nil, err
 	}
 	tflog.Debug(ctx, fmt.Sprintf("USERKEY: Disabling key with paylod %v", string(b)))
-	return client.Patch(ctx, path, "", bytes.NewReader(b), map[string]string{})
+	return client.Patch(ctx, path, bytes.NewReader(b), map[string]string{})
 }
 
 func CreateUserKeyFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
 	mu.Lock() //Multiple creations are not working well , we need to make sure only one key is created at one time
 	defer mu.Unlock()
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path"}, attr)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func CreateUserKeyFunc(ctx context.Context, _client interface{}, attr map[string
 }
 
 func DeleteUserKeyFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func DeleteUserKeyFunc(ctx context.Context, _client interface{}, attr map[string
 }
 
 func UpdateUserKeyFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	payload := map[string]interface{}{"access_key": d.Get("access_key"), "enabled": d.Get("enabled")}
 	attributes, err := getAttributesAsString([]string{"path"}, attr)
 	key_path := createUserKeyPath((*attributes)["path"], d.Get("user_id"))
@@ -156,13 +156,13 @@ func UpdateUserKeyFunc(ctx context.Context, _client interface{}, attr map[string
 		return nil, err
 	}
 	tflog.Debug(ctx, fmt.Sprintf("USERKEY: Update payload", string(b)))
-	return client.Patch(ctx, key_path, "", bytes.NewReader(b), headers)
+	return client.Patch(ctx, key_path, bytes.NewReader(b), headers)
 
 }
 
 func GetUserKeyFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	//There is not GET for a key we will have to iterate over all user keys to find this specific key
-	client := _client.(vast_client.JwtSession)
+	client := _client.(*vast_client.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path", "id"}, attr)
 	resource := ctx.Value(ContextKey("resource"))
 	tflog.Debug(ctx, fmt.Sprintf("USERKEY: Resource %v found", resource))

@@ -4,8 +4,8 @@ import (
 	version "github.com/hashicorp/go-version"
 )
 
-var build_version, _ = version.NewVersion("5.2.0")
-var min_version, _ = version.NewVersion("5.0.0")
+var buildVersion, _ = version.NewVersion("5.2.0")
+var minVersion, _ = version.NewVersion("5.0.0")
 
 const (
 	CLUSTER_VERSION_EQUALS int = 0
@@ -14,16 +14,16 @@ const (
 )
 
 func GetBuildVersion() version.Version {
-	return *build_version
+	return *buildVersion
 }
 
 func ClusterVersionCompare() int {
-	return build_version.Compare(cluster_version)
+	return buildVersion.Compare(clusterVersion)
 
 }
 
 func GetMinVersion() version.Version {
-	return *min_version
+	return *minVersion
 }
 
 func BuildVersionString() string {
@@ -33,6 +33,6 @@ func BuildVersionString() string {
 }
 
 func IsLowerThanMinVersion() bool {
-	return cluster_version.LessThan(min_version)
+	return clusterVersion.LessThan(minVersion)
 
 }
