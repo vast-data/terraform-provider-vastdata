@@ -92,7 +92,7 @@ This function will get a []byte response representing a json at the following fo
 	  ...
 	]
 */
-func ResponseGetByURL(ctx context.Context, body []byte, client vast_client.JwtSession) ([]byte, error) {
+func ResponseGetByURL(ctx context.Context, body []byte, client *vast_client.VMSSession) ([]byte, error) {
 	var marsheled []byte
 	responses := []map[string]interface{}{}
 	urls := []WithURL{}

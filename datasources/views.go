@@ -494,7 +494,7 @@ func DataSourceView() *schema.Resource {
 func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	values := url.Values{}
 	datasource_config := codegen_configs.GetDataSourceByName("View")
 

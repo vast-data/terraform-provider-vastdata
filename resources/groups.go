@@ -164,7 +164,7 @@ func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.
 func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Group")
 	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceGroupRead] Calling Get Function : %v for resource Group", utils.GetFuncName(resource_config.GetFunc)))
@@ -210,7 +210,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 
 func resourceGroupDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Group")
 	attrs := map[string]interface{}{"path": utils.GenPath("groups"), "id": d.Id()}
 
@@ -238,7 +238,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	new_ctx := context.WithValue(ctx, names_mapping, Group_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Group")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Group"))
 	reflect_Group := reflect.TypeOf((*api_latest.Group)(nil))
@@ -350,7 +350,7 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Group"))
 	reflect_Group := reflect.TypeOf((*api_latest.Group)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_Group.Elem(), d, &data, "", false)
@@ -387,7 +387,7 @@ func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceGroupImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("Group")
 	attrs := map[string]interface{}{"path": utils.GenPath("groups")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

@@ -29,7 +29,7 @@ func ConvertVippoolToIDs(i interface{}, ctx context.Context, d *schema.ResourceD
 	}
 	id := d.Id()
 	u := url.Values{"tenant_id": {id}}
-	client := i.(vast_client.JwtSession)
+	client := i.(*vast_client.VMSSession)
 	h, err := client.Get(ctx, GenPath("/vippools"), u.Encode(), map[string]string{})
 	if err != nil {
 		return err

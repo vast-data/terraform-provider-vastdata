@@ -304,7 +304,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceS3replicationPeersRead] Calling Get Function : %v for resource S3replicationPeers", utils.GetFuncName(resource_config.GetFunc)))
@@ -350,7 +350,7 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 
 func resourceS3replicationPeersDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets"), "id": d.Id()}
 
@@ -378,7 +378,7 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 	new_ctx := context.WithValue(ctx, names_mapping, S3replicationPeers_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource S3replicationPeers"))
 	reflect_S3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
@@ -490,7 +490,7 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3replicationPeers"))
 	reflect_S3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_S3replicationPeers.Elem(), d, &data, "", false)
@@ -527,7 +527,7 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 func resourceS3replicationPeersImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())

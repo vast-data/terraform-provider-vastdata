@@ -1809,7 +1809,7 @@ func ResourceViewPolicyReadStructIntoSchema(ctx context.Context, resource api_la
 func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceViewPolicyRead] Calling Get Function : %v for resource ViewPolicy", utils.GetFuncName(resource_config.GetFunc)))
@@ -1855,7 +1855,7 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 
 func resourceViewPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies"), "id": d.Id()}
 
@@ -1883,7 +1883,7 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 	new_ctx := context.WithValue(ctx, names_mapping, ViewPolicy_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ViewPolicy"))
 	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
@@ -2001,7 +2001,7 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ViewPolicy"))
 	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_ViewPolicy.Elem(), d, &data, "", false)
@@ -2044,7 +2044,7 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 func resourceViewPolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
 	result := []*schema.ResourceData{}
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies")}
 	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
