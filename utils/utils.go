@@ -19,8 +19,8 @@ func GetTFformatName(s string) string {
 }
 
 func FieldsUpdate(ctx context.Context, fields []string, d *schema.ResourceData, m *map[string]interface{}) {
-	/*While most of the functionality of this function is done by functions which are designed to pupulate
-	  data in preperation to POST/PATCH requests , when it comes to booleans there is a problem with TF assuming false is zero value
+	/*While most of the functionality of this function is done by functions which are designed to populate
+	  data in preparation to POST/PATCH requests , when it comes to booleans there is a problem with TF assuming false is zero value
 	  and json not populating them
 
 	  This function will  force the value to the map so it will be sent.

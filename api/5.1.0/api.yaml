@@ -382,6 +382,29 @@ None - S3 Object Ownership is disabled for the bucket.
           items:
             type: "integer"
           description: "List S3 policies IDs"
+    NonLocalUser:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "The NonLocalUser identifier"
+        uid:
+          type: "integer"
+          description: "The user unix UID"
+        allow_create_bucket:
+          type: "boolean"
+          description: "Allow create bucket"
+        allow_delete_bucket:
+          type: "boolean"
+          description: "Allow delete bucket"
+        tenant_id:
+          type: "integer"
+          description: "Tenant ID"
+        s3_policies_ids:
+          type: "array"
+          items:
+            type: "integer"
+          description: "List S3 policies IDs"
     UserKey:
       type: "object"
       properties:
