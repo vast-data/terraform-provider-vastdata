@@ -181,7 +181,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 func resourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
 	attrs := map[string]interface{}{"path": utils.GenPath("users/query"), "id": d.Id()}
 	tflog.Debug(ctx, fmt.Sprintf("[resourceNonLocalUserRead] Calling Get Function : %v for resource NonLocalUser", utils.GetFuncName(resource_config.GetFunc)))
@@ -227,7 +227,7 @@ func resourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m int
 
 func resourceNonLocalUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
 	attrs := map[string]interface{}{"path": utils.GenPath("users/query"), "id": d.Id()}
 
@@ -257,7 +257,7 @@ func resourceNonLocalUserCreate(ctx context.Context, d *schema.ResourceData, m i
 	new_ctx := context.WithValue(ctx, names_mapping, NonLocalUser_names_mapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource NonLocalUser"))
 	reflect_NonLocalUser := reflect.TypeOf((*api_latest.NonLocalUser)(nil))
@@ -369,7 +369,7 @@ func resourceNonLocalUserUpdate(ctx context.Context, d *schema.ResourceData, m i
 		}
 	}
 
-	client := m.(vast_client.JwtSession)
+	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource NonLocalUser"))
 	reflect_NonLocalUser := reflect.TypeOf((*api_latest.NonLocalUser)(nil))
 	utils.PopulateResourceMap(new_ctx, reflect_NonLocalUser.Elem(), d, &data, "", false)

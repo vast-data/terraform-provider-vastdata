@@ -43,7 +43,7 @@ func NonLocalUserBeforePatchFunc(m map[string]interface{}, i interface{}, ctx co
 }
 
 func NonLocalUserCreateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
-	client := _client.(vastclient.JwtSession)
+	client := _client.(*vastclient.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path"}, attr)
 	if err != nil {
 		return nil, err
@@ -53,7 +53,7 @@ func NonLocalUserCreateFunc(ctx context.Context, _client interface{}, attr map[s
 		return nil, marshallingError
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling POST to path \"%v\"", attr))
-	response, err := client.Patch(ctx, (*attributes)["path"], "application/json", bytes.NewReader(buffer), map[string]string{})
+	response, err := client.Patch(ctx, (*attributes)["path"], bytes.NewReader(buffer), map[string]string{})
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func NonLocalUserCreateFunc(ctx context.Context, _client interface{}, attr map[s
 }
 
 func NonLocalUserGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
-	client := _client.(vastclient.JwtSession)
+	client := _client.(*vastclient.VMSSession)
 	attributes, err := getAttributesAsString([]string{"path"}, attr)
 	if err != nil {
 		return nil, err
