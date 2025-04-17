@@ -55,7 +55,7 @@ func NonLocalUserCreateFunc(ctx context.Context, _client interface{}, attr map[s
 	tflog.Debug(ctx, fmt.Sprintf("Calling POST to path \"%v\"", attr))
 	response, err := client.Patch(ctx, (*attributes)["path"], bytes.NewReader(buffer), map[string]string{})
 	if err != nil {
-		return nil, err
+		return response, err
 	}
 	responseBody := map[string]interface{}{}
 	err = UnmarshalBodyToMap(response, &responseBody)

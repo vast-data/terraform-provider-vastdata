@@ -405,6 +405,26 @@ None - S3 Object Ownership is disabled for the bucket.
           items:
             type: "integer"
           description: "List S3 policies IDs"
+    NonLocalGroup:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "The NonLocalGroup identifier"
+        gid:
+          type: "integer"
+          description: "Group GID"
+        sid:
+          type: "string"
+          description: "Group SID"
+        groupname:
+          type: "string"
+          description: "Groupname"
+        s3_policies_ids:
+          type: "array"
+          items:
+            type: "integer"
+          description: "List S3 policies IDs"
     UserKey:
       type: "object"
       properties:
