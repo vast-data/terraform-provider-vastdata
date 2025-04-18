@@ -20,7 +20,7 @@ import (
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
-var _ = Describe(" NonLocalUser", func() {
+var _ = Describe(" NonLocalUserKey", func() {
 	var ReadContext schema.ReadContextFunc
 	var DeleteContext schema.DeleteContextFunc
 	var CreateContext schema.CreateContextFunc
@@ -28,35 +28,31 @@ var _ = Describe(" NonLocalUser", func() {
 	var Importer schema.ResourceImporter
 	//	var ResourceSchema map[string]*schema.Schema
 	//An empty resource data to be populated per test
-	var NonLocalUserResourceData *schema.ResourceData
+	var NonLocalUserKeyResourceData *schema.ResourceData
 	var model_json = `
                          {
+   "access_key": "string",
+   "encrypted_secret_key": "string",
    "id": "string",
-   "s3_policies_ids": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6
-   ],
+   "pgp_public_key": "string",
+   "secret_key": "string",
    "tenant_id": 100,
    "uid": 100
 }
                          `
 	var server *ghttp.Server
 	var client *vast_client.VMSSession
-	NonLocalUserResource := resources.ResourceNonLocalUser()
-	ReadContext = NonLocalUserResource.ReadContext
-	DeleteContext = NonLocalUserResource.DeleteContext
-	CreateContext = NonLocalUserResource.CreateContext
-	UpdateContext = NonLocalUserResource.UpdateContext
-	Importer = *NonLocalUserResource.Importer
-	//	ResourceSchema = NonLocalUserResource.Schema
+	NonLocalUserKeyResource := resources.ResourceNonLocalUserKey()
+	ReadContext = NonLocalUserKeyResource.ReadContext
+	DeleteContext = NonLocalUserKeyResource.DeleteContext
+	CreateContext = NonLocalUserKeyResource.CreateContext
+	UpdateContext = NonLocalUserKeyResource.UpdateContext
+	Importer = *NonLocalUserKeyResource.Importer
+	//	ResourceSchema = NonLocalUserKeyResource.Schema
 
 	BeforeEach(func() {
-		NonLocalUserResourceData = NonLocalUserResource.TestResourceData()
-		NonLocalUserResourceData.SetId("100")
+		NonLocalUserKeyResourceData = NonLocalUserKeyResource.TestResourceData()
+		NonLocalUserKeyResourceData.SetId("100")
 		server = ghttp.NewTLSServer()
 		host_port := strings.Split(server.Addr(), ":")
 		host := host_port[0]
@@ -80,13 +76,13 @@ var _ = Describe(" NonLocalUser", func() {
 	)
 	Describe("Validating Resource Read Context", func() {
 		Context("Read Data into a ResourceData", func() {
-			It("Resource:NonLocalUser ,Reads Data", func() {
+			It("Resource:NonLocalUserKey ,Reads Data", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "users/query100"),
+					ghttp.VerifyRequest("GET", "users/non_local_keys100"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -97,9 +93,9 @@ var _ = Describe(" NonLocalUser", func() {
 
 				z := make(map[string]string)
 				utils.MapToTFSchema(*o, &z, "")
-				d := ReadContext(ctx, NonLocalUserResourceData, client)
+				d := ReadContext(ctx, NonLocalUserKeyResourceData, client)
 				Expect(d).To(BeNil())
-				attributes := NonLocalUserResourceData.State().Attributes
+				attributes := NonLocalUserKeyResourceData.State().Attributes
 				for k, v := range z {
 					Expect(attributes).To(HaveKeyWithValue(k, v))
 				}
@@ -110,19 +106,19 @@ var _ = Describe(" NonLocalUser", func() {
 	)
 	Describe("Validating Resource Delete Context", func() {
 		Context("Delete A resource", func() {
-			It("Resource:NonLocalUser ,Deletes the resource", func() {
+			It("Resource:NonLocalUserKey ,Deletes the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("DELETE", "users/query100//"),
+					ghttp.VerifyRequest("DELETE", "users/non_local_keys100//"),
 					ghttp.RespondWith(200, "DELETED"),
 				),
 				)
 				e := client.Start()
 				Expect(e).To(BeNil())
-				d := DeleteContext(ctx, NonLocalUserResourceData, client)
+				d := DeleteContext(ctx, NonLocalUserKeyResourceData, client)
 				Expect(d).To(BeNil())
 			})
 		})
@@ -130,29 +126,29 @@ var _ = Describe(" NonLocalUser", func() {
 	)
 	Describe("Validating Resource Creation Context", func() {
 		Context("Create A resource", func() {
-			It("Resource:NonLocalUser ,Creates the resource", func() {
+			It("Resource:NonLocalUserKey ,Creates the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "users/query"),
+					ghttp.VerifyRequest("POST", "users/non_local_keys"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "users/query0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "users/non_local_keys0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				e := client.Start()
 				Expect(e).To(BeNil())
-				resource := api_latest.NonLocalUser{}
+				resource := api_latest.NonLocalUserKey{}
 				json.Unmarshal([]byte(model_json), &resource)
-				resources.ResourceNonLocalUserReadStructIntoSchema(ctx, resource, NonLocalUserResourceData)
-				NonLocalUserResourceData.SetId("100")
-				d := CreateContext(ctx, NonLocalUserResourceData, client)
+				resources.ResourceNonLocalUserKeyReadStructIntoSchema(ctx, resource, NonLocalUserKeyResourceData)
+				NonLocalUserKeyResourceData.SetId("100")
+				d := CreateContext(ctx, NonLocalUserKeyResourceData, client)
 				Expect(d).To(BeNil())
 
 			})
@@ -161,25 +157,25 @@ var _ = Describe(" NonLocalUser", func() {
 	)
 	Describe("Validating Resource Update Context", func() {
 		Context("Update A resource", func() {
-			It("Resource:NonLocalUser ,Update the resource", func() {
+			It("Resource:NonLocalUserKey ,Update the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 				var new_guid = "11111-11111-11111-11111-11111"
 
 				ctx = tflogtest.RootLogger(ctx, &output)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("POST", "users/query"),
+					ghttp.VerifyRequest("POST", "users/non_local_keys"),
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "users/query0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "users/non_local_keys0"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("PATCH", "users/query/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("PATCH", "users/non_local_keys/0/"), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, model_json),
 				),
 				)
@@ -187,10 +183,10 @@ var _ = Describe(" NonLocalUser", func() {
 				e := client.Start()
 				Expect(e).To(BeNil())
 				//First we create a resource than we change it and see if it was updated
-				resource := api_latest.NonLocalUser{}
+				resource := api_latest.NonLocalUserKey{}
 				json.Unmarshal([]byte(model_json), &resource)
-				resources.ResourceNonLocalUserReadStructIntoSchema(ctx, resource, NonLocalUserResourceData)
-				d := CreateContext(ctx, NonLocalUserResourceData, client)
+				resources.ResourceNonLocalUserKeyReadStructIntoSchema(ctx, resource, NonLocalUserKeyResourceData)
+				d := CreateContext(ctx, NonLocalUserKeyResourceData, client)
 				Expect(d).To(BeNil())
 				//We update the guid as this is a fieled that always exists
 				resource.Guid = new_guid
@@ -198,14 +194,14 @@ var _ = Describe(" NonLocalUser", func() {
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "users/query0"), //the new_guid is returned and it should change the value of the resource
+					ghttp.VerifyRequest("GET", "users/non_local_keys0"), //the new_guid is returned and it should change the value of the resource
 					ghttp.RespondWith(200, string(b)),
 				),
 				)
 
-				d = UpdateContext(ctx, NonLocalUserResourceData, client)
+				d = UpdateContext(ctx, NonLocalUserKeyResourceData, client)
 				Expect(d).To(BeNil())
-				Expect(NonLocalUserResourceData.Get("guid")).To(Equal(new_guid))
+				Expect(NonLocalUserKeyResourceData.Get("guid")).To(Equal(new_guid))
 
 			})
 		})
@@ -213,20 +209,20 @@ var _ = Describe(" NonLocalUser", func() {
 	)
 	Describe("Validating Resource Importer", func() {
 		Context("Import A resource", func() {
-			It("Resource:NonLocalUser ,Imports the resource", func() {
+			It("Resource:NonLocalUserKey ,Imports the resource", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 				var guid = "11111-11111-11111-11111-11111"
 
-				resource := api_latest.NonLocalUser{}
+				resource := api_latest.NonLocalUserKey{}
 				json.Unmarshal([]byte(model_json), &resource)
-				NonLocalUserResourceData.SetId(guid)
+				NonLocalUserKeyResourceData.SetId(guid)
 				resource.Guid = guid
 				b, err := json.Marshal(&resource)
 				Expect(err).To(BeNil())
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "users/query", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "users/non_local_keys", fmt.Sprintf("guid=%s", guid)), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)
@@ -234,14 +230,14 @@ var _ = Describe(" NonLocalUser", func() {
 				ctx = tflogtest.RootLogger(ctx, &output)
 				e := client.Start()
 				Expect(e).To(BeNil())
-				Importer.StateContext(ctx, NonLocalUserResourceData, client)
+				Importer.StateContext(ctx, NonLocalUserKeyResourceData, client)
 				//				Expect(d).To(BeNil())
 
 				o := new(map[string]interface{})
 				json.Unmarshal(b, o)
 				z := make(map[string]string)
 				utils.MapToTFSchema(*o, &z, "")
-				attributes := NonLocalUserResourceData.State().Attributes
+				attributes := NonLocalUserKeyResourceData.State().Attributes
 				for k, v := range z {
 					Expect(attributes).To(HaveKeyWithValue(k, v))
 				}
