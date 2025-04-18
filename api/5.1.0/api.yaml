@@ -430,7 +430,28 @@ None - S3 Object Ownership is disabled for the bucket.
           type: "boolean"
           description: "Should the key be enabled or disabled"
           default: true
-          
+    NonLocalUserKey:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "The Access key unique identifier"
+        uid:
+          type: "integer"
+          description: "The user unix UID"
+        access_key:
+          type: "string"
+          description: "The access id of the user key"
+        secret_key:
+          type: "string"
+          description: "The secret id of the user key"
+        tenant_id:
+          type: "integer"
+          description: "Tenant ID"
+        enabled:
+          type: "boolean"
+          description: "Should the key be enabled or disabled"
+          default: true
     Nis:
       type: "object"
       properties:
