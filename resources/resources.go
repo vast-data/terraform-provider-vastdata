@@ -7,6 +7,7 @@ import (
 var Resources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_user":                   ResourceUser(),
 	"vastdata_non_local_user":         ResourceNonLocalUser(),
+	"vastdata_non_local_group":        ResourceNonLocalGroup(),
 	"vastdata_group":                  ResourceGroup(),
 	"vastdata_vip_pool":               ResourceVipPool(),
 	"vastdata_tenant":                 ResourceTenant(),
