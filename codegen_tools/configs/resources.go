@@ -335,6 +335,8 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"vippool_permissions": utils.VippoolPermissionsIdsDiffSupress,
 			"vip_pools":           utils.ListsDiffSupress,
+			"nfs_no_squash":       utils.ListsDiffSupress,
+			"nfs_read_write":      utils.ListsDiffSupress,
 		},
 	},
 	ResourceTemplateV2{
