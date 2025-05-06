@@ -23,9 +23,16 @@ func CreateNonLocalUserKeyFunc(ctx context.Context, _client any, attr map[string
 	path := (*attributes)["path"]
 	uid := data["uid"]
 	tenantId := data["tenant_id"]
+	if pgpPublicKey, ok := data["pgp_public_key"]; ok {
+		if _, err := encryptSecretToken("Testing value", pgpPublicKey); err != nil {
+			tflog.Error(ctx, "Public GPG key is incorrect.")
+			return nil, err
+		}
+	}
+
 	enabled, ok := data["enabled"]
 	if !ok {
-		enabled = false
+		enabled = true
 	}
 	buffer, marshallingError := json.Marshal(data)
 	if marshallingError != nil {

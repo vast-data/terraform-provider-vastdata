@@ -12,7 +12,7 @@ resource "vastdata_user" "example-user" {
 resource "vastdata_user_key" "key1" {
   user_id        = vastdata_user.example-user.id
   enabled        = false
-  pgp_public_key = <<EOT
+  pgp_public_key = <<-EOT
   -----BEGIN PGP PUBLIC KEY BLOCK-----
   .
   .  <public pgp key content>

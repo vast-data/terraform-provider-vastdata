@@ -16,7 +16,7 @@ resource "vastdata_non_local_user_key" "EncryptedExternalUserKey" {
     uid                 = 1097416930
     tenant_id           = 1
     enabled             = true
-    pgp_public_key = <<EOT
+    pgp_public_key = <<-EOT
     -----BEGIN PGP PUBLIC KEY BLOCK-----
     .
     .  <public pgp key content>
