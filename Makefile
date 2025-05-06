@@ -24,6 +24,8 @@ TF_GPG_SIG = ""
 USER_AGENT_FILE=user_agent_version
 
 
+.PHONY: $(BUILD_DEST)/terraform-provider-vastdata
+
 document:
 	tfplugindocs $(TFPLUGIN_DOCS_OPTIONS) 
 
