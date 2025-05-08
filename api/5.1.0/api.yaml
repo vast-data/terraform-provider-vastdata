@@ -45,6 +45,7 @@ components:
           type: "string"
         uid_or_gid:
           type: "integer"
+          format: "int64"
         name:
           type: "string"
         fqdn:
