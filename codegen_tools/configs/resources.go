@@ -28,9 +28,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"gids":            utils.ListsDiffSupress,
-			"groups":          utils.ListsDiffSupress,
-			"s3_policies_ids": utils.ListsDiffSupress,
+			"gids":            utils.ListsDiffSuppress,
+			"groups":          utils.ListsDiffSuppress,
+			"s3_policies_ids": utils.ListsDiffSuppress,
 		},
 	},
 	ResourceTemplateV2{
@@ -53,8 +53,27 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DisableImport:            true,
 		DataSourceName:           "vastdata_non_local_user",
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"s3_policies_ids": utils.ListsDiffSupress,
+			"s3_policies_ids": utils.ListsDiffSuppress,
 		},
+	},
+	ResourceTemplateV2{
+		ResourceName:             "NonLocalGroup",
+		Path:                     ToStringPointer("groups/query"),
+		Model:                    api_latest.NonLocalGroup{},
+		DestFile:                 ToStringPointer("nonlocalgroup.go"),
+		IgnoreFields:             NewStringSet(),
+		RequiredIdentifierFields: NewStringSet("gid", "tenant_id"),
+		ComputedFields:           NewStringSet("id"),
+		OptionalIdentifierFields: NewStringSet(),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		CreateFunc:               utils.NonLocalGroupCreateFunc,
+		GetFunc:                  utils.NonLocalGroupGetFunc,
+		UpdateFunc:               utils.NonLocalGroupUpdateFunc,
+		DeleteFunc:               utils.NonLocalGroupDeleteFunc,
+		ResponseGetByURL:         false,
+		DisableImport:            true,
+		DataSourceName:           "vastdata_non_local_group",
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Group",
@@ -116,7 +135,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"vippool_ids": utils.ListsDiffSupress,
+			"vippool_ids": utils.ListsDiffSuppress,
 		},
 		BeforePostFunc:  utils.TenantBeforePostFunc,
 		BeforePatchFunc: utils.TenantBeforePatchFunc,
@@ -315,7 +334,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		ConflictingFields: map[string][]string{"vippool_permissions": []string{"vip_pools"}},
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"vippool_permissions": utils.VippoolPermissionsIdsDiffSupress,
-			"vip_pools":           utils.ListsDiffSupress,
+			"vip_pools":           utils.ListsDiffSuppress,
+			"nfs_no_squash":       utils.ListsDiffSuppress,
+			"nfs_read_write":      utils.ListsDiffSuppress,
 		},
 	},
 	ResourceTemplateV2{
@@ -347,7 +368,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			"auto_commit":              utils.ValidateRetention,
 		},
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"protocols": utils.ListsDiffSupress,
+			"protocols": utils.ListsDiffSuppress,
 		},
 	},
 	ResourceTemplateV2{
@@ -777,7 +798,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_administators_roles",
 		AfterReadFunc:            utils.RoleAfterReadFunc,
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"permissions_list": utils.ListsDiffSupress,
+			"permissions_list": utils.ListsDiffSuppress,
 		},
 		Importer: utils.NewImportByHttpFields(false,
 			[]utils.HttpFieldTuple{
@@ -805,7 +826,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		UpdateFunc:               utils.ManagerUpdateFunc,
 		AfterReadFunc:            utils.ManagerAfterReadFunc,
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"permissions_list": utils.ListsDiffSupress,
+			"permissions_list": utils.ListsDiffSuppress,
 			"password":         utils.ManagerPasswordChangedDiffSupress,
 		},
 		Importer: &utils.ManagerImporter{},

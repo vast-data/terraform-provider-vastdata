@@ -14,8 +14,8 @@ import (
 	metadata "github.com/vast-data/terraform-provider-vastdata/metadata"
 )
 
-var permissions_attributes []string = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
-var viewpolicy_boolean_attributes []string = []string{"smb_is_ca", "enable_access_to_snapshot_dir_in_subdirs", "enable_visibility_of_snapshot_dir", "nfs_enforce_tls", "nfs_case_insensitive"}
+var permissions_attributes = []string{"nfs_all_squash", "nfs_root_squash", "nfs_read_write", "nfs_read_only", "s3_read_only", "s3_read_write", "smb_read_only", "smb_read_write", "nfs_no_squash"}
+var viewpolicy_boolean_attributes = []string{"smb_is_ca", "enable_access_to_snapshot_dir_in_subdirs", "enable_visibility_of_snapshot_dir", "nfs_enforce_tls", "nfs_case_insensitive", "nfs_posix_acl"}
 var min_vippool_permission_version, _ = version.NewVersion("5.1.0")
 
 func _convert_vip_pools_to_permission_per_vip_pool(i interface{}, m *map[string]interface{}) {

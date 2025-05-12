@@ -24,6 +24,8 @@ TF_GPG_SIG = ""
 USER_AGENT_FILE=user_agent_version
 
 
+.PHONY: $(BUILD_DEST)/terraform-provider-vastdata
+
 document:
 	tfplugindocs $(TFPLUGIN_DOCS_OPTIONS) 
 
@@ -183,18 +185,14 @@ pack-archs: clean-releases is-tag
 	cd $(BUILD_DEST);\
 	shasum -a 256 *.zip > terraform-provider-vastdata_$${tf_tag}_SHA256SUMS;\
 	popd;\
-	gpg --detach-sign --local-user $${TF_GPG_SIG} build/terraform-provider-vastdata_$${tf_tag}_SHA256SUMS
-
-
-
+	gpg --detach-sign --local-user ${TF_GPG_SIG} build/terraform-provider-vastdata_$${tf_tag}_SHA256SUMS
 
 pack-all-archs: build-all-archs pack-archs
 
-
-github-pre-release: validate_user_agent_version_file_release_ready is-tag pack-all-archs
+github-pre-release: validate_user_agent_version_file_release_ready is-tag
 	tag=$$(git describe --tags); \
-	gh release create $${tag}   ./build/*.zip ./build/*.json ./build/*.sig  ./build/*_SHA256SUMS --prerelease --title "Release $${tag}" --generate-notes
+	gh release create $${tag}   ./build/*.zip ./build/*.sig  ./build/*_SHA256SUMS --prerelease --title "Release $${tag}" --generate-notes
 
-github-release: validate_user_agent_version_file_release_ready is-tag pack-all-archs
+github-release: validate_user_agent_version_file_release_ready is-tag
 	tag=$$(git describe --tags); \
 	gh release create $${tag} ./build/*.zip ./build/*.sig  ./build/*_SHA256SUMS --title "Release $${tag}" --generate-notes
