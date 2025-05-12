@@ -139,9 +139,9 @@ func GetNonLocalUserKeyFunc(ctx context.Context, _client any, attr map[string]an
 	secretKey := d.Get("secret_key").(string)
 	pgpKey := d.Get("pgp_public_key")
 	encryptedKey := d.Get("encrypted_secret_key")
-	query := fmt.Sprintf("uid=%v", uid)
+	query := fmt.Sprintf("uid=%v&tenant_id=%v", uid, tenantId)
 	path := GenPath("users/query")
-	tflog.Debug(ctx, fmt.Sprintf("Calling GET for uid %v to get user detail", uid))
+	tflog.Debug(ctx, fmt.Sprintf("Calling GET for uid %v & tenant_id %v to get user detail", uid, tenantId))
 	response, err := client.Get(ctx, path, query, headers)
 	if err != nil {
 		return nil, err
