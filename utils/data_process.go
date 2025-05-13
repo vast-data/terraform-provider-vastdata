@@ -291,6 +291,12 @@ func PopulateResourceMap(ctx context.Context, t reflect.Type, d *schema.Resource
 		tflog.Debug(ctx, fmt.Sprintf("Full Tag Name %s", full_tag))
 		value, value_exists := d.GetOk(full_tag)
 		if !value_exists {
+			if fld.Type.Kind() == reflect.Slice {
+				switch fld.Type.String() {
+				case "[]string", "[]int", "[]int32", "[]int64", "[]float", "[]float32", "[]float64":
+					(*m)[*tag] = value
+				}
+			}
 			continue
 		}
 		tflog.Debug(ctx, fmt.Sprintf("Tag %s Exists , %v", full_tag, value))
