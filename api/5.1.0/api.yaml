@@ -454,7 +454,34 @@ None - S3 Object Ownership is disabled for the bucket.
           type: "boolean"
           description: "Should the key be enabled or disabled"
           default: true
-          
+    NonLocalUserKey:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "The Access key unique identifier"
+        uid:
+          type: "integer"
+          description: "The user unix UID"
+        access_key:
+          type: "string"
+          description: "The access id of the user key"
+        secret_key:
+          type: "string"
+          description: "The secret id of the user key"
+        pgp_public_key:
+          type: "string"
+          description: "The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect"
+        encrypted_secret_key:
+          type: "string"
+          description: "The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key"
+        tenant_id:
+          type: "integer"
+          description: "Tenant ID"
+        enabled:
+          type: "boolean"
+          description: "Should the key be enabled or disabled"
+          default: true
     Nis:
       type: "object"
       properties:
