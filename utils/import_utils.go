@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -83,25 +82,37 @@ func (i *ImportByHttpFields) genNeededFieldsString() []string {
 
 func (i *ImportByHttpFields) genQuery(s string) (string, error) {
 	values := url.Values{}
+	availableFieldsCount := len(i.http_fields)
 	if !i.DisableGuidImport {
-		// we check if GUID was provided
+		// GUID import enabled
 		_, err := guid.FromString(s)
 		if err == nil {
-			//The given string is a GUID, query string will return guid=<GUID>
+			// The given string is a GUID, query string will return guid=<GUID>
 			values.Add("guid", s)
 			return values.Encode(), nil
-		} else if len(i.http_fields) == 1 && err != nil {
-			return "", err
+		}
+		// Remove GUID from the count
+		availableFieldsCount--
+	}
+	// GUID import is disabled
+	passedValues := strings.Split(s, "|")
+	if len(passedValues) != availableFieldsCount {
+		return "", fmt.Errorf(
+			"expected %d field values (%s), but got %d (%v)",
+			availableFieldsCount,
+			i.genNeededFieldsString(),
+			len(passedValues),
+			passedValues,
+		)
+	}
+	var fieldNamesWithoutGUID []string
+	for _, field := range i.http_fields {
+		if field.DisplayName != "guid" {
+			fieldNamesWithoutGUID = append(fieldNamesWithoutGUID, field.FieldName)
 		}
 	}
-	//If we got here wither importing by GUID is disabled or that the given string is not a valid GUID
-	l := len(i.http_fields) - 1
-	q := strings.Split(s, "|")
-	if len(q) != l {
-		return "", errors.New(fmt.Sprintf("No Enough Fields provider, needed fields are %s", i.genNeededFieldsString()))
-	}
-	for n, f := range q {
-		values.Add(i.http_fields[n+1].FieldName, f)
+	for n, f := range passedValues {
+		values.Add(fieldNamesWithoutGUID[n], f)
 	}
 	return values.Encode(), nil
 }
