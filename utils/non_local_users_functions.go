@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	vastclient "github.com/vast-data/terraform-provider-vastdata/vast-client"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -108,4 +109,37 @@ func NonLocalUserUpdateFunc(ctx context.Context, _client interface{}, attr map[s
 func NonLocalUserDeleteFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
 	tflog.Info(ctx, "Doing nothing. We cannot delete non-local user.")
 	return nil, nil
+}
+
+func mimicListResponseForSingularObject(ctx context.Context, response *http.Response) (*http.Response, error) {
+	unmarshalledBody := new(map[string]interface{})
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(body, unmarshalledBody)
+	if err != nil {
+		tflog.Error(ctx, fmt.Sprintf("Resonse From Cluster %v", string(body)))
+		return nil, err
+	}
+	uid := int((*unmarshalledBody)["uid"].(float64))
+	tenantId := int((*unmarshalledBody)["tenant_id"].(float64)) // TODO: tenant_id is not present in response
+	id := getNonLocalUserId(uid, tenantId)
+	(*unmarshalledBody)["id"] = id
+	var list []*map[string]interface{}
+	list = append(list, unmarshalledBody)
+	return FakeHttpResponseAny(response, list)
+}
+
+func NonLocalUserImportFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, g GetFuncType) (*http.Response, error) {
+	defaultResponse, err := DefaultImportFunc(ctx, _client, attr, d, g)
+	if err != nil {
+		return nil, err
+	}
+	mimickedResponse, err := mimicListResponseForSingularObject(ctx, defaultResponse)
+	if err != nil {
+		return nil, err
+	}
+	return mimickedResponse, nil
 }

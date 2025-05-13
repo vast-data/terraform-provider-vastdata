@@ -50,8 +50,13 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		UpdateFunc:               utils.NonLocalUserUpdateFunc,
 		DeleteFunc:               utils.NonLocalUserDeleteFunc,
 		ResponseGetByURL:         false,
-		DisableImport:            true,
-		DataSourceName:           "vastdata_non_local_user",
+		Importer: utils.NewImportByHttpFields(true, []utils.HttpFieldTuple{
+			{DisplayName: "Name", FieldName: "username"},
+			{DisplayName: "Context", FieldName: "context"},
+			{DisplayName: "Tenant ID", FieldName: "tenant_id"},
+		}),
+		ImportFunc:     utils.NonLocalUserImportFunc,
+		DataSourceName: "vastdata_non_local_user",
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"s3_policies_ids": utils.ListsDiffSuppress,
 		},
