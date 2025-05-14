@@ -124,9 +124,10 @@ func mimicListResponseForSingularObject(ctx context.Context, response *http.Resp
 		return nil, err
 	}
 	uid := int((*unmarshalledBody)["uid"].(float64))
-	tenantId := int((*unmarshalledBody)["tenant_id"].(float64)) // TODO: tenant_id is not present in response
+	tenantId, _ := strconv.Atoi(response.Request.URL.Query().Get("tenant_id"))
 	id := getNonLocalUserId(uid, tenantId)
 	(*unmarshalledBody)["id"] = id
+	(*unmarshalledBody)["tenant_id"] = tenantId
 	var list []*map[string]interface{}
 	list = append(list, unmarshalledBody)
 	return FakeHttpResponseAny(response, list)
