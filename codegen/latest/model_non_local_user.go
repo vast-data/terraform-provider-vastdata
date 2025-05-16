@@ -15,6 +15,8 @@ type NonLocalUser struct {
 	Uid int32 `json:"uid,omitempty"`
 	// Name/username of the Non-Local User
 	Name string `json:"name,omitempty"`
+	// Name/username of the Non-Local User
+	Username string `json:"username,omitempty"`
 	// Allow create bucket
 	AllowCreateBucket bool `json:"allow_create_bucket,omitempty"`
 	// Allow delete bucket
@@ -23,4 +25,6 @@ type NonLocalUser struct {
 	TenantId int32 `json:"tenant_id,omitempty"`
 	// List S3 policies IDs
 	S3PoliciesIds []int32 `json:"s3_policies_ids,omitempty"`
+	// Context from which the user originates. Available: 'ad', 'nis' and 'ldap'
+	Context string `json:"context,omitempty"`
 }

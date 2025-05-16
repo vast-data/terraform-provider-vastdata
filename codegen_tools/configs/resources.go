@@ -39,7 +39,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		Model:                    api_latest.NonLocalUser{},
 		DestFile:                 ToStringPointer("nonlocaluser.go"),
 		IgnoreFields:             NewStringSet(),
-		RequiredIdentifierFields: NewStringSet("uid", "tenant_id"),
+		RequiredIdentifierFields: NewStringSet("uid", "tenant_id", "context"),
 		ComputedFields:           NewStringSet("id"),
 		OptionalIdentifierFields: NewStringSet(),
 		BeforePatchFunc:          utils.NonLocalUserBeforePatchFunc,

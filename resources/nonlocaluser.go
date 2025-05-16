@@ -68,6 +68,16 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
 		},
 
+		"username": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("username"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
+		},
+
 		"allow_create_bucket": &schema.Schema{
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("allow_create_bucket"),
@@ -111,6 +121,14 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 				Type: schema.TypeInt,
 			},
 		},
+
+		"context": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("context"),
+
+			Required:    true,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
+		},
 	}
 }
 
@@ -152,6 +170,18 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"name\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Username", resource.Username))
+
+	err = d.Set("username", resource.Username)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"username\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -200,6 +230,18 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"s3_policies_ids\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Context", resource.Context))
+
+	err = d.Set("context", resource.Context)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"context\"",
 			Detail:   err.Error(),
 		})
 	}

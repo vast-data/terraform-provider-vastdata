@@ -395,6 +395,9 @@ None - S3 Object Ownership is disabled for the bucket.
         name:
           type: "string"
           description: "Name/username of the Non-Local User"
+        username:
+          type: "string"
+          description: "Name/username of the Non-Local User"
         allow_create_bucket:
           type: "boolean"
           description: "Allow create bucket"
@@ -409,6 +412,9 @@ None - S3 Object Ownership is disabled for the bucket.
           items:
             type: "integer"
           description: "List S3 policies IDs"
+        context:
+          type: "string"
+          description: "Context from which the user originates. Available: 'ad', 'nis' and 'ldap'"
     NonLocalGroup:
       type: "object"
       properties:

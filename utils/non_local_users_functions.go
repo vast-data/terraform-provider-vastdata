@@ -21,6 +21,22 @@ func getNonLocalUserId(uid int, tenantId int) string {
 	return fmt.Sprintf("%v-%v", uid, tenantId)
 }
 
+func fillMissingNonLocalUserAttributes(body *map[string]interface{}, id, context string) {
+	(*body)["id"] = id
+	contextFromBody := (*body)["context"]
+	if contextFromBody == nil {
+		(*body)["context"] = context
+	}
+	name := (*body)["name"]
+	username := (*body)["username"]
+	if username == nil && name != nil {
+		(*body)["username"] = name
+	}
+	if name == nil && username != nil {
+		(*body)["name"] = username
+	}
+}
+
 func getNonLocalUserUidAndTenantId(id string) (int, int, error) {
 	split := strings.Split(id, "-")
 	if len(split) != 2 {
@@ -58,15 +74,17 @@ func NonLocalUserCreateFunc(ctx context.Context, _client interface{}, attr map[s
 	if err != nil {
 		return response, err
 	}
-	responseBody := map[string]interface{}{}
-	err = UnmarshalBodyToMap(response, &responseBody)
+	unmarshalledBody := map[string]interface{}{}
+	err = UnmarshalBodyToMap(response, &unmarshalledBody)
 	if err != nil {
 		return nil, err
 	}
 	uid := data["uid"].(int)
 	tenantId := data["tenant_id"].(int)
-	responseBody["id"] = getNonLocalUserId(uid, tenantId)
-	return FakeHttpResponse(response, responseBody)
+	context := data["context"].(string)
+	id := getNonLocalUserId(uid, tenantId)
+	fillMissingNonLocalUserAttributes(&unmarshalledBody, id, context)
+	return FakeHttpResponse(response, unmarshalledBody)
 }
 
 func NonLocalUserGetFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
@@ -78,21 +96,23 @@ func NonLocalUserGetFunc(ctx context.Context, _client interface{}, attr map[stri
 	path := (*attributes)["path"]
 	uid := d.Get("uid").(int)
 	tenantId := d.Get("tenant_id").(int)
-	query := fmt.Sprintf("uid=%v&tenant_id=%v", uid, tenantId)
+	contextValue := d.Get("context").(string)
+	query := fmt.Sprintf("uid=%v&tenant_id=%v&context=%v", uid, tenantId, contextValue)
 	tflog.Debug(ctx, fmt.Sprintf("Calling GET to path \"%v\" , with Query %v", path, query))
 	response, err := client.Get(ctx, path, query, headers)
 	if err != nil {
 		return nil, err
 	}
 
-	responseBody := map[string]interface{}{}
-	err = UnmarshalBodyToMap(response, &responseBody)
+	unmarshalledBody := map[string]interface{}{}
+	err = UnmarshalBodyToMap(response, &unmarshalledBody)
 	if err != nil {
 		return nil, err
 	}
-	responseBody["tenant_id"] = tenantId // tenant_id is missing from the response
-	responseBody["id"] = getNonLocalUserId(uid, tenantId)
-	return FakeHttpResponse(response, responseBody)
+	unmarshalledBody["tenant_id"] = tenantId // tenant_id is missing from the response
+	id := getNonLocalUserId(uid, tenantId)
+	fillMissingNonLocalUserAttributes(&unmarshalledBody, id, contextValue)
+	return FakeHttpResponse(response, unmarshalledBody)
 }
 
 func NonLocalUserUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
@@ -125,7 +145,9 @@ func mimicListResponseForSingularObject(ctx context.Context, response *http.Resp
 	}
 	uid := int((*unmarshalledBody)["uid"].(float64))
 	tenantId, _ := strconv.Atoi(response.Request.URL.Query().Get("tenant_id"))
+	contextValue := response.Request.URL.Query().Get("context")
 	id := getNonLocalUserId(uid, tenantId)
+	fillMissingNonLocalUserAttributes(unmarshalledBody, id, contextValue)
 	(*unmarshalledBody)["id"] = id
 	(*unmarshalledBody)["tenant_id"] = tenantId
 	var list []*map[string]interface{}
@@ -143,4 +165,14 @@ func NonLocalUserImportFunc(ctx context.Context, _client interface{}, attr map[s
 		return nil, err
 	}
 	return mimickedResponse, nil
+}
+
+func NonLocalUserProcessingFunc(ctx context.Context, response *http.Response) ([]byte, error) {
+	mimickedResponse, err := mimicListResponseForSingularObject(ctx, response)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(mimickedResponse.Body)
+	tflog.Debug(ctx, fmt.Sprintf("HTTP Response body %s", string(body)))
+	return body, err
 }
