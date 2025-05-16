@@ -97,7 +97,10 @@ func NonLocalUserGetFunc(ctx context.Context, _client interface{}, attr map[stri
 	uid := d.Get("uid").(int)
 	tenantId := d.Get("tenant_id").(int)
 	contextValue := d.Get("context").(string)
-	query := fmt.Sprintf("uid=%v&tenant_id=%v&context=%v", uid, tenantId, contextValue)
+	query := fmt.Sprintf("uid=%v&tenant_id=%v", uid, tenantId)
+	if contextValue != "" {
+		query = fmt.Sprintf("%v&context=%v", query, contextValue)
+	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling GET to path \"%v\" , with Query %v", path, query))
 	response, err := client.Get(ctx, path, query, headers)
 	if err != nil {
