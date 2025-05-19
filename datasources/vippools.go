@@ -243,7 +243,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -255,7 +255,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -265,7 +265,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -299,7 +299,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -311,7 +311,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -323,7 +323,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -335,7 +335,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"subnet_cidr\"",
+			Summary:  "Error occurred setting value to \"subnet_cidr\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -347,7 +347,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"subnet_cidr_ipv6\"",
+			Summary:  "Error occurred setting value to \"subnet_cidr_ipv6\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -359,7 +359,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gw_ip\"",
+			Summary:  "Error occurred setting value to \"gw_ip\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -371,7 +371,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gw_ipv6\"",
+			Summary:  "Error occurred setting value to \"gw_ipv6\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -383,7 +383,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vlan\"",
+			Summary:  "Error occurred setting value to \"vlan\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -395,7 +395,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"state\"",
+			Summary:  "Error occurred setting value to \"state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -407,7 +407,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cnode_ids\"",
+			Summary:  "Error occurred setting value to \"cnode_ids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -419,7 +419,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster\"",
+			Summary:  "Error occurred setting value to \"cluster\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -431,7 +431,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
+			Summary:  "Error occurred setting value to \"url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -443,7 +443,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"domain_name\"",
+			Summary:  "Error occurred setting value to \"domain_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -455,7 +455,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"role\"",
+			Summary:  "Error occurred setting value to \"role\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -467,7 +467,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ip_ranges\"",
+			Summary:  "Error occurred setting value to \"ip_ranges\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -479,7 +479,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vms_preferred\"",
+			Summary:  "Error occurred setting value to \"vms_preferred\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -491,7 +491,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -503,7 +503,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"port_membership\"",
+			Summary:  "Error occurred setting value to \"port_membership\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -515,7 +515,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"active_interfaces\"",
+			Summary:  "Error occurred setting value to \"active_interfaces\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -527,7 +527,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enable_l3\"",
+			Summary:  "Error occurred setting value to \"enable_l3\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -539,7 +539,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vast_asn\"",
+			Summary:  "Error occurred setting value to \"vast_asn\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -551,7 +551,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"peer_asn\"",
+			Summary:  "Error occurred setting value to \"peer_asn\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -563,7 +563,7 @@ func dataSourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}

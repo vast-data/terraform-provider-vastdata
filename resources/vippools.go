@@ -661,7 +661,7 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags
@@ -742,7 +742,7 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags

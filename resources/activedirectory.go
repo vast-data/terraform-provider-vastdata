@@ -243,7 +243,7 @@ func resourceActiveDirectoryCreate(ctx context.Context, d *schema.ResourceData, 
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags
@@ -324,7 +324,7 @@ func resourceActiveDirectoryUpdate(ctx context.Context, d *schema.ResourceData, 
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags

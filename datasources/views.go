@@ -511,7 +511,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -523,7 +523,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -533,7 +533,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -567,7 +567,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -579,7 +579,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -591,7 +591,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -603,7 +603,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"path\"",
+			Summary:  "Error occurred setting value to \"path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -615,7 +615,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"create_dir\"",
+			Summary:  "Error occurred setting value to \"create_dir\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -627,7 +627,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"alias\"",
+			Summary:  "Error occurred setting value to \"alias\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -639,7 +639,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket\"",
+			Summary:  "Error occurred setting value to \"bucket\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -651,7 +651,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"policy_id\"",
+			Summary:  "Error occurred setting value to \"policy_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -663,7 +663,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster\"",
+			Summary:  "Error occurred setting value to \"cluster\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -675,7 +675,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster_id\"",
+			Summary:  "Error occurred setting value to \"cluster_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -687,7 +687,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -699,7 +699,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"directory\"",
+			Summary:  "Error occurred setting value to \"directory\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -711,7 +711,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_versioning\"",
+			Summary:  "Error occurred setting value to \"s3_versioning\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -723,7 +723,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_unverified_lookup\"",
+			Summary:  "Error occurred setting value to \"s3_unverified_lookup\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -735,7 +735,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_anonymous_access\"",
+			Summary:  "Error occurred setting value to \"allow_anonymous_access\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -747,7 +747,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_s3_anonymous_access\"",
+			Summary:  "Error occurred setting value to \"allow_s3_anonymous_access\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -759,7 +759,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"protocols\"",
+			Summary:  "Error occurred setting value to \"protocols\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -771,7 +771,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"share\"",
+			Summary:  "Error occurred setting value to \"share\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -783,7 +783,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_owner\"",
+			Summary:  "Error occurred setting value to \"bucket_owner\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -795,7 +795,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_creators\"",
+			Summary:  "Error occurred setting value to \"bucket_creators\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -807,7 +807,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_creators_groups\"",
+			Summary:  "Error occurred setting value to \"bucket_creators_groups\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -819,7 +819,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_locks\"",
+			Summary:  "Error occurred setting value to \"s3_locks\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -831,7 +831,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_locks_retention_mode\"",
+			Summary:  "Error occurred setting value to \"s3_locks_retention_mode\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -843,7 +843,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_locks_retention_period\"",
+			Summary:  "Error occurred setting value to \"s3_locks_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -855,7 +855,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"physical_capacity\"",
+			Summary:  "Error occurred setting value to \"physical_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -867,7 +867,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"logical_capacity\"",
+			Summary:  "Error occurred setting value to \"logical_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -879,7 +879,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"nfs_interop_flags\"",
+			Summary:  "Error occurred setting value to \"nfs_interop_flags\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -891,7 +891,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_remote\"",
+			Summary:  "Error occurred setting value to \"is_remote\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -904,7 +904,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"share_acl\"",
+			Summary:  "Error occurred setting value to \"share_acl\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -916,7 +916,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"qos_policy_id\"",
+			Summary:  "Error occurred setting value to \"qos_policy_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -928,7 +928,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_seamless\"",
+			Summary:  "Error occurred setting value to \"is_seamless\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -940,7 +940,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"max_retention_period\"",
+			Summary:  "Error occurred setting value to \"max_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -952,7 +952,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"min_retention_period\"",
+			Summary:  "Error occurred setting value to \"min_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -964,7 +964,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"files_retention_mode\"",
+			Summary:  "Error occurred setting value to \"files_retention_mode\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -976,7 +976,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_retention_period\"",
+			Summary:  "Error occurred setting value to \"default_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -988,7 +988,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"auto_commit\"",
+			Summary:  "Error occurred setting value to \"auto_commit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1000,7 +1000,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_object_ownership_rule\"",
+			Summary:  "Error occurred setting value to \"s3_object_ownership_rule\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1012,7 +1012,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"locking\"",
+			Summary:  "Error occurred setting value to \"locking\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1024,7 +1024,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ignore_oos\"",
+			Summary:  "Error occurred setting value to \"ignore_oos\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1037,7 +1037,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_logging\"",
+			Summary:  "Error occurred setting value to \"bucket_logging\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1049,7 +1049,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"abac_tags\"",
+			Summary:  "Error occurred setting value to \"abac_tags\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1061,7 +1061,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"abe_max_depth\"",
+			Summary:  "Error occurred setting value to \"abe_max_depth\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1073,7 +1073,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"abe_protocols\"",
+			Summary:  "Error occurred setting value to \"abe_protocols\"",
 			Detail:   err.Error(),
 		})
 	}

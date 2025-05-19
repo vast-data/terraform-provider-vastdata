@@ -270,7 +270,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -282,7 +282,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -292,7 +292,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -326,7 +326,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -338,7 +338,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -350,7 +350,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -362,7 +362,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"new_name\"",
+			Summary:  "Error occurred setting value to \"new_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -374,7 +374,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ip\"",
+			Summary:  "Error occurred setting value to \"ip\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -386,7 +386,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ip1\"",
+			Summary:  "Error occurred setting value to \"ip1\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -398,7 +398,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ip2\"",
+			Summary:  "Error occurred setting value to \"ip2\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -410,7 +410,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ipv6\"",
+			Summary:  "Error occurred setting value to \"ipv6\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -422,7 +422,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"host_label\"",
+			Summary:  "Error occurred setting value to \"host_label\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -434,7 +434,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sn\"",
+			Summary:  "Error occurred setting value to \"sn\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -446,7 +446,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"state\"",
+			Summary:  "Error occurred setting value to \"state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -458,7 +458,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"display_state\"",
+			Summary:  "Error occurred setting value to \"display_state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -470,7 +470,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"led_status\"",
+			Summary:  "Error occurred setting value to \"led_status\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -482,7 +482,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"platform_rdma_port\"",
+			Summary:  "Error occurred setting value to \"platform_rdma_port\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -494,7 +494,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"platform_tcp_port\"",
+			Summary:  "Error occurred setting value to \"platform_tcp_port\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -506,7 +506,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"data_rdma_port\"",
+			Summary:  "Error occurred setting value to \"data_rdma_port\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -518,7 +518,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"data_tcp_port\"",
+			Summary:  "Error occurred setting value to \"data_tcp_port\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -530,7 +530,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -542,7 +542,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_mgmt\"",
+			Summary:  "Error occurred setting value to \"is_mgmt\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -554,7 +554,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cbox\"",
+			Summary:  "Error occurred setting value to \"cbox\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -566,7 +566,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cbox_uid\"",
+			Summary:  "Error occurred setting value to \"cbox_uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -578,7 +578,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cbox_id\"",
+			Summary:  "Error occurred setting value to \"cbox_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -590,7 +590,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster\"",
+			Summary:  "Error occurred setting value to \"cluster\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -602,7 +602,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"os_version\"",
+			Summary:  "Error occurred setting value to \"os_version\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -614,7 +614,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bmc_fw_version\"",
+			Summary:  "Error occurred setting value to \"bmc_fw_version\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -626,7 +626,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vms_preferred\"",
+			Summary:  "Error occurred setting value to \"vms_preferred\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -638,7 +638,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
+			Summary:  "Error occurred setting value to \"url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -650,7 +650,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"mgmt_ip\"",
+			Summary:  "Error occurred setting value to \"mgmt_ip\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -662,7 +662,7 @@ func dataSourceCnodeRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"hostname\"",
+			Summary:  "Error occurred setting value to \"hostname\"",
 			Detail:   err.Error(),
 		})
 	}

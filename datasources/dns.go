@@ -178,7 +178,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -190,7 +190,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -200,7 +200,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -234,7 +234,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -246,7 +246,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -258,7 +258,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip\"",
+			Summary:  "Error occurred setting value to \"vip\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -270,7 +270,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"domain_suffix\"",
+			Summary:  "Error occurred setting value to \"domain_suffix\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -282,7 +282,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_gateway\"",
+			Summary:  "Error occurred setting value to \"vip_gateway\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -294,7 +294,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -306,7 +306,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -318,7 +318,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_subnet_cidr\"",
+			Summary:  "Error occurred setting value to \"vip_subnet_cidr\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -330,7 +330,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_vlan\"",
+			Summary:  "Error occurred setting value to \"vip_vlan\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -342,7 +342,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cnode_ids\"",
+			Summary:  "Error occurred setting value to \"cnode_ids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -354,7 +354,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_ipv6\"",
+			Summary:  "Error occurred setting value to \"vip_ipv6\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -366,7 +366,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_ipv6_subnet_cidr\"",
+			Summary:  "Error occurred setting value to \"vip_ipv6_subnet_cidr\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -378,7 +378,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_ipv6_gateway\"",
+			Summary:  "Error occurred setting value to \"vip_ipv6_gateway\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -390,7 +390,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"net_type\"",
+			Summary:  "Error occurred setting value to \"net_type\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -402,7 +402,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"invalid_name_response\"",
+			Summary:  "Error occurred setting value to \"invalid_name_response\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -414,7 +414,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"invalid_type_response\"",
+			Summary:  "Error occurred setting value to \"invalid_type_response\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -426,7 +426,7 @@ func dataSourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ttl\"",
+			Summary:  "Error occurred setting value to \"ttl\"",
 			Detail:   err.Error(),
 		})
 	}

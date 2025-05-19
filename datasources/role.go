@@ -118,7 +118,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -130,7 +130,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -140,7 +140,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -174,7 +174,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -186,7 +186,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -198,7 +198,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"permissions_list\"",
+			Summary:  "Error occurred setting value to \"permissions_list\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -210,7 +210,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"permissions\"",
+			Summary:  "Error occurred setting value to \"permissions\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -222,7 +222,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenants\"",
+			Summary:  "Error occurred setting value to \"tenants\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -234,7 +234,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_admin\"",
+			Summary:  "Error occurred setting value to \"is_admin\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -246,7 +246,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_default\"",
+			Summary:  "Error occurred setting value to \"is_default\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -258,7 +258,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ldap_groups\"",
+			Summary:  "Error occurred setting value to \"ldap_groups\"",
 			Detail:   err.Error(),
 		})
 	}

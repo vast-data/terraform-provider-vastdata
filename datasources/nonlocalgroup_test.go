@@ -21,15 +21,16 @@ import (
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
-var _ = Describe(" NonLocalUser", func() {
+var _ = Describe(" NonLocalGroup", func() {
 	var ReadContext schema.ReadContextFunc
 	//An empty resource data to be populated per test
-	var NonLocalUserDataSourceData *schema.ResourceData
+	var NonLocalGroupDataSourceData *schema.ResourceData
 	var model_json = `
                          {
    "context": "string",
+   "gid": 100,
+   "groupname": "string",
    "id": "string",
-   "name": "string",
    "s3_policies_ids": [
       1,
       2,
@@ -38,19 +39,18 @@ var _ = Describe(" NonLocalUser", func() {
       5,
       6
    ],
-   "tenant_id": 100,
-   "uid": 100,
-   "username": "string"
+   "sid": "string",
+   "tenant_id": 100
 }
                          `
 	var server *ghttp.Server
 	var client *vast_client.VMSSession
-	NonLocalUserDataSource := datasources.DataSourceNonLocalUser()
-	ReadContext = NonLocalUserDataSource.ReadContext
+	NonLocalGroupDataSource := datasources.DataSourceNonLocalGroup()
+	ReadContext = NonLocalGroupDataSource.ReadContext
 
 	BeforeEach(func() {
-		NonLocalUserDataSourceData = NonLocalUserDataSource.TestResourceData()
-		NonLocalUserDataSourceData.SetId("100")
+		NonLocalGroupDataSourceData = NonLocalGroupDataSource.TestResourceData()
+		NonLocalGroupDataSourceData.SetId("100")
 		server = ghttp.NewTLSServer()
 		host_port := strings.Split(server.Addr(), ":")
 		host := host_port[0]
@@ -74,30 +74,30 @@ var _ = Describe(" NonLocalUser", func() {
 	)
 	Describe("Validating Datasource Read", func() {
 		Context("Read A datasource", func() {
-			It("Datasource:NonLocalUser ,reads", func() {
+			It("Datasource:NonLocalGroup ,reads", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 				var guid = "11111-11111-11111-11111-11111"
 
-				resource := api_latest.NonLocalUser{}
+				resource := api_latest.NonLocalGroup{}
 				json.Unmarshal([]byte(model_json), &resource)
-				NonLocalUserDataSourceData.SetId(guid)
+				NonLocalGroupDataSourceData.SetId(guid)
 				resource.Guid = guid
 				b, err := json.Marshal(&resource)
 				Expect(err).To(BeNil())
 				values := url.Values{}
 
+				values.Add("groupname", fmt.Sprintf("%v", resource.Groupname))
+				NonLocalGroupDataSourceData.Set("groupname", resource.Groupname)
+
 				values.Add("context", fmt.Sprintf("%v", resource.Context))
-				NonLocalUserDataSourceData.Set("context", resource.Context)
+				NonLocalGroupDataSourceData.Set("context", resource.Context)
 
 				values.Add("tenant_id", fmt.Sprintf("%v", resource.TenantId))
-				NonLocalUserDataSourceData.Set("tenant_id", resource.TenantId)
-
-				values.Add("username", fmt.Sprintf("%v", resource.Username))
-				NonLocalUserDataSourceData.Set("username", resource.Username)
+				NonLocalGroupDataSourceData.Set("tenant_id", resource.TenantId)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "users/query", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "groups/query", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)
@@ -105,14 +105,14 @@ var _ = Describe(" NonLocalUser", func() {
 				ctx = tflogtest.RootLogger(ctx, &output)
 				e := client.Start()
 				Expect(e).To(BeNil())
-				d := ReadContext(ctx, NonLocalUserDataSourceData, client)
+				d := ReadContext(ctx, NonLocalGroupDataSourceData, client)
 				Expect(d).To(BeNil())
 
 				o := new(map[string]interface{})
 				json.Unmarshal(b, o)
 				z := make(map[string]string)
 				utils.MapToTFSchema(*o, &z, "")
-				attributes := NonLocalUserDataSourceData.State().Attributes
+				attributes := NonLocalGroupDataSourceData.State().Attributes
 				for k, v := range z {
 					Expect(attributes).To(HaveKeyWithValue(k, v))
 				}

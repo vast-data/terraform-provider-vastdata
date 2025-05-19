@@ -400,7 +400,7 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags
@@ -481,7 +481,7 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags

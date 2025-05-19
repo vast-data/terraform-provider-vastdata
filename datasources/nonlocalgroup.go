@@ -14,9 +14,9 @@ import (
 	"net/url"
 )
 
-func DataSourceNonLocalUser() *schema.Resource {
+func DataSourceNonLocalGroup() *schema.Resource {
 	return &schema.Resource{
-		ReadContext: dataSourceNonLocalUserRead,
+		ReadContext: dataSourceNonLocalGroupRead,
 		Description: ``,
 		Schema: map[string]*schema.Schema{
 
@@ -25,47 +25,31 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalGroup identifier`,
 			},
 
-			"uid": &schema.Schema{
+			"gid": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Group GID`,
 			},
 
-			"name": &schema.Schema{
+			"sid": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Group SID`,
 			},
 
-			"username": &schema.Schema{
+			"groupname": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
-			},
-
-			"allow_create_bucket": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Allow create bucket`,
-			},
-
-			"allow_delete_bucket": &schema.Schema{
-				Type:        schema.TypeBool,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Allow delete bucket`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Groupname`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -99,15 +83,15 @@ func DataSourceNonLocalUser() *schema.Resource {
 	}
 }
 
-func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func dataSourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
 	values := url.Values{}
-	datasource_config := codegen_configs.GetDataSourceByName("NonLocalUser")
+	datasource_config := codegen_configs.GetDataSourceByName("NonLocalGroup")
 
-	username := d.Get("username")
-	values.Add("username", fmt.Sprintf("%v", username))
+	groupname := d.Get("groupname")
+	values.Add("groupname", fmt.Sprintf("%v", groupname))
 
 	context := d.Get("context")
 	values.Add("context", fmt.Sprintf("%v", context))
@@ -115,7 +99,7 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 	tenant_id := d.Get("tenant_id")
 	values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
 
-	response, err := client.Get(ctx, utils.GenPath("users/query"), values.Encode(), map[string]string{})
+	response, err := client.Get(ctx, utils.GenPath("groups/query"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -126,7 +110,7 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 		return diags
 
 	}
-	resource_l := []api_latest.NonLocalUser{}
+	resource_l := []api_latest.NonLocalGroup{}
 	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -181,62 +165,38 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Uid", resource.Uid))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Gid", resource.Gid))
 
-	err = d.Set("uid", resource.Uid)
+	err = d.Set("gid", resource.Gid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"gid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sid", resource.Sid))
 
-	err = d.Set("name", resource.Name)
+	err = d.Set("sid", resource.Sid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"sid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Username", resource.Username))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Groupname", resource.Groupname))
 
-	err = d.Set("username", resource.Username)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"username\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowCreateBucket", resource.AllowCreateBucket))
-
-	err = d.Set("allow_create_bucket", resource.AllowCreateBucket)
+	err = d.Set("groupname", resource.Groupname)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"allow_create_bucket\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowDeleteBucket", resource.AllowDeleteBucket))
-
-	err = d.Set("allow_delete_bucket", resource.AllowDeleteBucket)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"allow_delete_bucket\"",
+			Summary:  "Error occurred setting value to \"groupname\"",
 			Detail:   err.Error(),
 		})
 	}
