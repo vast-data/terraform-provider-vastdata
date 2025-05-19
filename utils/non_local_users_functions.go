@@ -134,7 +134,7 @@ func NonLocalUserDeleteFunc(ctx context.Context, _client interface{}, attr map[s
 	return nil, nil
 }
 
-func mimicListResponseForSingularObject(ctx context.Context, response *http.Response) (*http.Response, error) {
+func mimicListResponseForSingularNonLocalUser(ctx context.Context, response *http.Response) (*http.Response, error) {
 	unmarshalledBody := new(map[string]interface{})
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -163,7 +163,7 @@ func NonLocalUserImportFunc(ctx context.Context, _client interface{}, attr map[s
 	if err != nil {
 		return nil, err
 	}
-	mimickedResponse, err := mimicListResponseForSingularObject(ctx, defaultResponse)
+	mimickedResponse, err := mimicListResponseForSingularNonLocalUser(ctx, defaultResponse)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func NonLocalUserImportFunc(ctx context.Context, _client interface{}, attr map[s
 }
 
 func NonLocalUserProcessingFunc(ctx context.Context, response *http.Response) ([]byte, error) {
-	mimickedResponse, err := mimicListResponseForSingularObject(ctx, response)
+	mimickedResponse, err := mimicListResponseForSingularNonLocalUser(ctx, response)
 	if err != nil {
 		return nil, err
 	}
