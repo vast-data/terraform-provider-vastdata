@@ -106,14 +106,14 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 	values := url.Values{}
 	datasource_config := codegen_configs.GetDataSourceByName("NonLocalUser")
 
-	username := d.Get("username")
-	values.Add("username", fmt.Sprintf("%v", username))
-
 	context := d.Get("context")
 	values.Add("context", fmt.Sprintf("%v", context))
 
 	tenant_id := d.Get("tenant_id")
 	values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
+
+	username := d.Get("username")
+	values.Add("username", fmt.Sprintf("%v", username))
 
 	response, err := client.Get(ctx, utils.GenPath("users/query"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
@@ -277,6 +277,14 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 		})
 	}
 
-	d.SetId(resource.Id)
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }
