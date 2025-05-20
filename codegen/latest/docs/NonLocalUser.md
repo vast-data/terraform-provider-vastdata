@@ -5,8 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Id** | **string** | The NonLocalUser identifier | [optional] [default to null]
 **Uid** | **int32** | The user unix UID | [optional] [default to null]
-**Name** | **string** | Name/username of the Non-Local User | [optional] [default to null]
-**Username** | **string** | Name/username of the Non-Local User | [optional] [default to null]
+**Username** | **string** | Username of the Non-Local User | [optional] [default to null]
 **AllowCreateBucket** | **bool** | Allow create bucket | [optional] [default to null]
 **AllowDeleteBucket** | **bool** | Allow delete bucket | [optional] [default to null]
 **TenantId** | **int32** | Tenant ID | [optional] [default to null]

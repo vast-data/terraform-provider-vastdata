@@ -58,16 +58,6 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
 		},
 
-		"name": &schema.Schema{
-			Type:          schema.TypeString,
-			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("name"),
-
-			Computed:    true,
-			Optional:    true,
-			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
-		},
-
 		"username": &schema.Schema{
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("username"),
@@ -75,7 +65,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Username of the Non-Local User`,
 		},
 
 		"allow_create_bucket": &schema.Schema{
@@ -158,18 +148,6 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"uid\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
-
-	err = d.Set("name", resource.Name)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}

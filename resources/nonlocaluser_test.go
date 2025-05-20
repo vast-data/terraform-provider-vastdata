@@ -33,7 +33,6 @@ var _ = Describe(" NonLocalUser", func() {
                          {
    "context": "string",
    "id": "string",
-   "name": "string",
    "s3_policies_ids": [
       1,
       2,

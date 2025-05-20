@@ -29,6 +29,7 @@ resource "vastdata_non_local_user" "ExternalUser" {
 
 ### Required
 
+- `context` (String) (Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'
 - `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID
 - `uid` (Number) (Valid for versions: 5.1.0,5.2.0) The user unix UID
 
@@ -37,7 +38,16 @@ resource "vastdata_non_local_user" "ExternalUser" {
 - `allow_create_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow create bucket
 - `allow_delete_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow delete bucket
 - `s3_policies_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) List S3 policies IDs
+- `username` (String) (Valid for versions: 5.1.0,5.2.0) Username of the Non-Local User
 
 ### Read-Only
 
 - `id` (String) (Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import vastdata_non_local_user.example <Username>|<Context>|<Tenant ID>
+```

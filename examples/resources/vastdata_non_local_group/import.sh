@@ -1,1 +1,1 @@
-terraform import vastdata_non_local_group.example <Name>|<Context>|<Tenant ID>
+terraform import vastdata_non_local_group.example <Groupname>|<Context>|<Tenant ID>

@@ -27,6 +27,7 @@ resource "vastdata_non_local_group" "ExternalGroup" {
 
 ### Required
 
+- `context` (String) (Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'
 - `gid` (Number) (Valid for versions: 5.1.0,5.2.0) Group GID
 - `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID
 
@@ -39,3 +40,11 @@ resource "vastdata_non_local_group" "ExternalGroup" {
 ### Read-Only
 
 - `id` (String) (Valid for versions: 5.1.0,5.2.0) The NonLocalGroup identifier
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import vastdata_non_local_group.example <Groupname>|<Context>|<Tenant ID>
+```

@@ -51,7 +51,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DeleteFunc:               utils.NonLocalUserDeleteFunc,
 		ResponseGetByURL:         false,
 		Importer: utils.NewImportByHttpFields(true, []utils.HttpFieldTuple{
-			{DisplayName: "Name", FieldName: "username"},
+			{DisplayName: "Username", FieldName: "username"},
 			{DisplayName: "Context", FieldName: "context"},
 			{DisplayName: "Tenant ID", FieldName: "tenant_id"},
 		}),
@@ -78,7 +78,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		DeleteFunc:               utils.NonLocalGroupDeleteFunc,
 		ResponseGetByURL:         false,
 		Importer: utils.NewImportByHttpFields(true, []utils.HttpFieldTuple{
-			{DisplayName: "Name", FieldName: "groupname"},
+			{DisplayName: "Groupname", FieldName: "groupname"},
 			{DisplayName: "Context", FieldName: "context"},
 			{DisplayName: "Tenant ID", FieldName: "tenant_id"},
 		}),

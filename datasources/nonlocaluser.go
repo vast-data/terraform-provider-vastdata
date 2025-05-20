@@ -36,20 +36,12 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
 			},
 
-			"name": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
-			},
-
 			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Name/username of the Non-Local User`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Username of the Non-Local User`,
 			},
 
 			"allow_create_bucket": &schema.Schema{
@@ -106,14 +98,14 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 	values := url.Values{}
 	datasource_config := codegen_configs.GetDataSourceByName("NonLocalUser")
 
-	username := d.Get("username")
-	values.Add("username", fmt.Sprintf("%v", username))
-
 	context := d.Get("context")
 	values.Add("context", fmt.Sprintf("%v", context))
 
 	tenant_id := d.Get("tenant_id")
 	values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
+
+	username := d.Get("username")
+	values.Add("username", fmt.Sprintf("%v", username))
 
 	response, err := client.Get(ctx, utils.GenPath("users/query"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
@@ -189,18 +181,6 @@ func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m i
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occurred setting value to \"uid\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
-
-	err = d.Set("name", resource.Name)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
