@@ -21,22 +21,6 @@ func getNonLocalUserId(uid int, tenantId int, contextValue string) string {
 	return fmt.Sprintf("%v-%v-%v", uid, tenantId, contextValue)
 }
 
-func fillMissingNonLocalUserAttributes(body *map[string]interface{}, id, context string) {
-	(*body)["id"] = id
-	contextFromBody := (*body)["context"]
-	if contextFromBody == nil {
-		(*body)["context"] = context
-	}
-	name := (*body)["name"]
-	username := (*body)["username"]
-	if username == nil && name != nil {
-		(*body)["username"] = name
-	}
-	if name == nil && username != nil {
-		(*body)["name"] = username
-	}
-}
-
 func decomposeNonLocalUserId(id string) (int, int, string, error) {
 	split := strings.Split(id, "-")
 	if len(split) != 3 {
@@ -84,7 +68,10 @@ func NonLocalUserCreateFunc(ctx context.Context, _client interface{}, attr map[s
 	tenantId := data["tenant_id"].(int)
 	contextValue := data["context"].(string)
 	id := getNonLocalUserId(uid, tenantId, contextValue)
-	fillMissingNonLocalUserAttributes(&unmarshalledBody, id, contextValue)
+	unmarshalledBody["id"] = id
+	unmarshalledBody["tenant_id"] = tenantId
+	unmarshalledBody["username"] = unmarshalledBody["name"]
+	unmarshalledBody["context"] = contextValue
 	return FakeHttpResponse(response, unmarshalledBody)
 }
 
@@ -113,9 +100,11 @@ func NonLocalUserGetFunc(ctx context.Context, _client interface{}, attr map[stri
 	if err != nil {
 		return nil, err
 	}
-	unmarshalledBody["tenant_id"] = tenantId // tenant_id is missing from the response
 	id := getNonLocalUserId(uid, tenantId, contextValue)
-	fillMissingNonLocalUserAttributes(&unmarshalledBody, id, contextValue)
+	unmarshalledBody["id"] = id
+	unmarshalledBody["tenant_id"] = tenantId
+	unmarshalledBody["username"] = unmarshalledBody["name"]
+	unmarshalledBody["context"] = contextValue
 	return FakeHttpResponse(response, unmarshalledBody)
 }
 
@@ -152,9 +141,10 @@ func mimicListResponseForSingularNonLocalUser(ctx context.Context, response *htt
 	tenantId, _ := strconv.Atoi(response.Request.URL.Query().Get("tenant_id"))
 	contextValue := response.Request.URL.Query().Get("context")
 	id := getNonLocalUserId(uid, tenantId, contextValue)
-	fillMissingNonLocalUserAttributes(unmarshalledBody, id, contextValue)
 	(*unmarshalledBody)["id"] = id
 	(*unmarshalledBody)["tenant_id"] = tenantId
+	(*unmarshalledBody)["username"] = (*unmarshalledBody)["name"]
+	(*unmarshalledBody)["context"] = contextValue
 	var list []*map[string]interface{}
 	list = append(list, unmarshalledBody)
 	return FakeHttpResponseAny(response, list)

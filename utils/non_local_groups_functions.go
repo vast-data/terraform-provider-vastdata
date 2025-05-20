@@ -59,8 +59,10 @@ func NonLocalGroupCreateFunc(ctx context.Context, _client interface{}, attr map[
 		return nil, err
 	}
 	gid := data["gid"].(int)
+	tenantId := data["tenant_id"].(int)
 	contextValue := data["context"].(string)
 	responseBody["id"] = getNonLocalGroupId(gid, data["tenant_id"].(int), contextValue)
+	responseBody["tenant_id"] = tenantId
 	responseBody["sid"] = fmt.Sprintf("%v", responseBody["sid"]) // Force string (can be int)
 	responseBody["groupname"] = responseBody["name"]
 	responseBody["context"] = contextValue
@@ -90,6 +92,7 @@ func NonLocalGroupGetFunc(ctx context.Context, _client interface{}, attr map[str
 		return nil, err
 	}
 	responseBody["id"] = getNonLocalGroupId(gid, tenantId, contextValue)
+	responseBody["tenant_id"] = tenantId
 	responseBody["sid"] = fmt.Sprintf("%v", responseBody["sid"]) // Force string (can be int)
 	responseBody["groupname"] = responseBody["name"]
 	responseBody["context"] = contextValue
@@ -125,10 +128,10 @@ func mimicListResponseForSingularNonLocalGroup(ctx context.Context, response *ht
 		tflog.Error(ctx, fmt.Sprintf("Resonse From Cluster %v", string(body)))
 		return nil, err
 	}
-	uid := int((*unmarshalledBody)["gid"].(float64))
+	gid := int((*unmarshalledBody)["gid"].(float64))
 	tenantId, _ := strconv.Atoi(response.Request.URL.Query().Get("tenant_id"))
 	contextValue := response.Request.URL.Query().Get("context")
-	id := getNonLocalGroupId(uid, tenantId, contextValue)
+	id := getNonLocalGroupId(gid, tenantId, contextValue)
 	(*unmarshalledBody)["id"] = id
 	(*unmarshalledBody)["tenant_id"] = tenantId
 	(*unmarshalledBody)["groupname"] = (*unmarshalledBody)["name"]
