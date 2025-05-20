@@ -17,8 +17,8 @@ import (
 var nonLocalUserListsAttributes = []string{"s3_policies_ids"}
 var nonLocalUserBooleanAttributes = []string{"allow_delete_bucket", "allow_create_bucket"}
 
-func getNonLocalUserId(uid int, tenantId int) string {
-	return fmt.Sprintf("%v-%v", uid, tenantId)
+func getNonLocalUserId(uid int, tenantId int, contextValue string) string {
+	return fmt.Sprintf("%v-%v-%v", uid, tenantId, contextValue)
 }
 
 func fillMissingNonLocalUserAttributes(body *map[string]interface{}, id, context string) {
@@ -37,20 +37,21 @@ func fillMissingNonLocalUserAttributes(body *map[string]interface{}, id, context
 	}
 }
 
-func getNonLocalUserUidAndTenantId(id string) (int, int, error) {
+func decomposeNonLocalUserId(id string) (int, int, string, error) {
 	split := strings.Split(id, "-")
-	if len(split) != 2 {
-		return 0, 0, fmt.Errorf("invalid NonLocalUser ID: %s", id)
+	if len(split) != 3 {
+		return 0, 0, "", fmt.Errorf("invalid NonLocalUser ID: %s", id)
 	}
 	uid, err := strconv.Atoi(split[0])
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, "", err
 	}
 	tenantId, err := strconv.Atoi(split[1])
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, "", err
 	}
-	return uid, tenantId, nil
+	contextValue := split[2]
+	return uid, tenantId, contextValue, nil
 }
 
 func NonLocalUserBeforePatchFunc(m map[string]interface{}, i interface{}, ctx context.Context, d *schema.ResourceData) (map[string]interface{}, error) {
@@ -81,9 +82,9 @@ func NonLocalUserCreateFunc(ctx context.Context, _client interface{}, attr map[s
 	}
 	uid := data["uid"].(int)
 	tenantId := data["tenant_id"].(int)
-	context := data["context"].(string)
-	id := getNonLocalUserId(uid, tenantId)
-	fillMissingNonLocalUserAttributes(&unmarshalledBody, id, context)
+	contextValue := data["context"].(string)
+	id := getNonLocalUserId(uid, tenantId, contextValue)
+	fillMissingNonLocalUserAttributes(&unmarshalledBody, id, contextValue)
 	return FakeHttpResponse(response, unmarshalledBody)
 }
 
@@ -113,19 +114,20 @@ func NonLocalUserGetFunc(ctx context.Context, _client interface{}, attr map[stri
 		return nil, err
 	}
 	unmarshalledBody["tenant_id"] = tenantId // tenant_id is missing from the response
-	id := getNonLocalUserId(uid, tenantId)
+	id := getNonLocalUserId(uid, tenantId, contextValue)
 	fillMissingNonLocalUserAttributes(&unmarshalledBody, id, contextValue)
 	return FakeHttpResponse(response, unmarshalledBody)
 }
 
 func NonLocalUserUpdateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
 	id := attr["id"].(string)
-	uid, tenantId, err := getNonLocalUserUidAndTenantId(id)
+	uid, tenantId, contextValue, err := decomposeNonLocalUserId(id)
 	if err != nil {
 		return nil, err
 	}
 	data["uid"] = uid
 	data["tenant_id"] = tenantId
+	data["context"] = contextValue
 	return NonLocalUserCreateFunc(ctx, _client, attr, data, headers)
 }
 
@@ -149,7 +151,7 @@ func mimicListResponseForSingularNonLocalUser(ctx context.Context, response *htt
 	uid := int((*unmarshalledBody)["uid"].(float64))
 	tenantId, _ := strconv.Atoi(response.Request.URL.Query().Get("tenant_id"))
 	contextValue := response.Request.URL.Query().Get("context")
-	id := getNonLocalUserId(uid, tenantId)
+	id := getNonLocalUserId(uid, tenantId, contextValue)
 	fillMissingNonLocalUserAttributes(unmarshalledBody, id, contextValue)
 	(*unmarshalledBody)["id"] = id
 	(*unmarshalledBody)["tenant_id"] = tenantId
