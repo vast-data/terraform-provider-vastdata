@@ -12,8 +12,9 @@ description: |-
 
 ## Example Usage
 
+To create a local global snapshot from a snapshot on the same tenant:
+
 ```terraform
-#Creating a local global snapshot from a snapshot on the same tenant
 resource "vastdata_tenant" "tenant" {
   name = "tenant1"
   client_ip_ranges {
@@ -59,19 +60,19 @@ resource "vastdata_global_local_snapshot" "local_snapshot" {
 
 ### Required
 
-- `loanee_root_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target
-- `loanee_snapshot_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the local snapshot
-- `loanee_tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot
-- `owner_tenant` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--owner_tenant))
+- `loanee_root_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on the destination peer.
+- `loanee_snapshot_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the local snapshot.
+- `loanee_tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID on the destination peer.
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.
+- `owner_tenant` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [nested schema](#nestedblock--owner_tenant) below)
 
 ### Optional
 
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the snapshot is enabled or disabled.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the global snapshot.
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--owner_tenant"></a>
@@ -79,13 +80,13 @@ resource "vastdata_global_local_snapshot" "local_snapshot" {
 
 Required:
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant guid
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant GUID.
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the remote tenant.
 
 ## Import
 
-Import is supported using the following syntax:
+To import by GUID:
 
 ```shell
-terraform import vastdata_global_local_snapshot.example <guid>
+terraform import vastdata_global_local_snapshot.example <GUID>
 ```

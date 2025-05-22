@@ -12,10 +12,12 @@ description: |-
 
 ## Example Usage
 
+Suppose that two providers are defined, each of which represents a cluster: cluster A and cluster B.
+Start with defining replication virtual IP pools for each cluster and setting the clusters to be replication peers.
+Then define a protection policy.
+
 ```terraform
-#We defined 2 porivders , each one represents a cluster , clusterA & clusterB.
-#We define vip pools for replication for each cluster & make them replication peers.
-#Than we define a protection policy
+
 resource "vastdata_vip_pool" "pool1-clusterB" {
   name        = "pool1"
   role        = "REPLICATION"
@@ -72,21 +74,21 @@ resource "vastdata_protection_policy" "protection-policy" {
 
 ### Required
 
-- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration
-- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data
+- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The replication type. Valid values: [NATIVE_REPLICATION LOCAL]
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the protection policy.
+- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to prepend the replicated data.
 
 ### Optional
 
-- `frames` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of snapshots schedules (see [below for nested schema](#nestedblock--frames))
-- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot indestructable
-- `target_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The target peer name
-- `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the target peer
-- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the replication policy
+- `frames` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of snapshot schedules (see [nested schema](#nestedblock--frames) below)
+- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the snapshots are indestructable.
+- `target_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the destination peer.
+- `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the destination peer.
+- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the protection policy.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the protection policy.
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--frames"></a>
@@ -101,9 +103,14 @@ Optional:
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_protection_policy.example <guid>
-terraform import vastdata_protection_policy.example <Name>
-```
+        ```shell
+        terraform import vastdata_protection_policy.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_protection_policy.example <name>
+        ```

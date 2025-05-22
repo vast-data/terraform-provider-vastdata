@@ -12,16 +12,17 @@ description: |-
 
 ## Example Usage
 
-```terraform
-#we have 2 providers defined for each cluster with the aliases clusterA & clusterB
-#we create the following resources in order to create a global snapshot
-#1. Replication vippool for ceach cluster
-#2. Define them as replication  peers
-#3. A tenant 
-#4. A view with the prefix /view1 whcih belongs to the previous tenant just created
-#5  A snapshot to the view called snapshot1 on clusterB
-#6  A Global Snapshot of snapshot1 from clusterB to clusterA
+Suppose there are two providers defined for each cluster with the aliases `clusterA` and `clusterB`.
+Create the following resources in order to create a global snapshot:
+1. Replication virtual IP pool for each cluster
+2. Define the clusters as replication  peers.
+3. A tenant 
+4. A view with the prefix `/view1` that belongs to the newly created tenant
+5. A snapshot to the view named `snapshot1` on cluster B
+6. A global snapshot of `snapshot1` from cluster B to cluster A
 
+
+```terraform
 
 resource "vastdata_vip_pool" "pool1-clusterA" {
   name        = "pool1"
@@ -112,22 +113,22 @@ resource "vastdata_global_snapshot" "gsnap1" {
 
 ### Required
 
-- `loanee_root_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target
-- `loanee_tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot
-- `owner_root_snapshot` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--owner_root_snapshot))
-- `owner_tenant` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--owner_tenant))
-- `remote_target_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering guid
-- `remote_target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering id
-- `remote_target_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster
+- `loanee_root_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on the destination peer.
+- `loanee_tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the destination peer.
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.
+- `owner_root_snapshot` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [nested schema](#nestedblock--owner_root_snapshot) below)
+- `owner_tenant` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [nested schema](#nestedblock--owner_tenant) below)
+- `remote_target_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering GUID.
+- `remote_target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering ID.
+- `remote_target_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster.
 
 ### Optional
 
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the snapshot is enabled or disabled.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the global snapshot.
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--owner_root_snapshot"></a>
@@ -135,12 +136,12 @@ resource "vastdata_global_snapshot" "gsnap1" {
 
 Required:
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Remote Clone Name
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote clone name.
 
 Read-Only:
 
-- `clone_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the clone
-- `parent_handle_ehandle` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote handle (inode)
+- `clone_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the clone.
+- `parent_handle_ehandle` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote handle (inode).
 
 
 <a id="nestedblock--owner_tenant"></a>
@@ -148,14 +149,19 @@ Read-Only:
 
 Required:
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant guid
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant GUID.
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the remote tenant.
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_global_snapshot.example <guid>
-terraform import vastdata_global_snapshot.example <Name>
-```
+        ```shell
+        terraform import vastdata_global_snapshot.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_global_snapshot.example <name>
+        ```

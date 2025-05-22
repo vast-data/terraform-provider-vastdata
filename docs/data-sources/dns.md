@@ -23,23 +23,23 @@ data "vastdata_dns" "dns1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a name for the VAST DNS server configuration
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A name for the VAST DNS server configuration.
 
 ### Read-Only
 
 - `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `domain_suffix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enable the VAST DNS server configurations
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe guid assigned to the VAST DNS server configurations
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe id given to the VAST DNS server configurations
-- `invalid_name_response` (String) (Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns name Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]
-- `invalid_type_response` (String) (Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns type Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]
-- `net_type` (String) (Valid for versions: 5.1.0,5.2.0) Select the interface, that listens for DNS service delegation requests Allowed Values are [NORTH_PORT SOUTH_PORT EXTERNAL_PORT]
-- `ttl` (Number) (Valid for versions: 5.1.0,5.2.0) The reposne TTL in seconds
-- `vip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.
-- `vip_gateway` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.
-- `vip_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns an IPv6 to the DNS service.
-- `vip_ipv6_gateway` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IPv6 to external DNS server if on different subnet.
-- `vip_ipv6_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]
-- `vip_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies the subnet, as a CIDR index, on which the DNS resides.
-- `vip_vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a VLAN if needed to enable communication with external DNS server(s).
+- `domain_suffix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A suffix to append to domain names of each virtual IP pool. The suffix should append each domain name to form a valid FQDN for DNS requests to target.
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables the VAST DNS server configuration.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the VAST DNS server configuration.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the VAST DNS server configuration.
+- `invalid_name_response` (String) (Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid DNS name. Valid values: [NXDOMAIN REFUSED SERVFAIL NOERROR]
+- `invalid_type_response` (String) (Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid DNS type. Valid values: [NXDOMAIN REFUSED SERVFAIL NOERROR]
+- `net_type` (String) (Valid for versions: 5.1.0,5.2.0) The interface that listens for DNS service delegation requests. Valid values: [NORTH_PORT SOUTH_PORT EXTERNAL_PORT]
+- `ttl` (Number) (Valid for versions: 5.1.0,5.2.0) The response TTL in seconds.
+- `vip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP for the DNS service. DNS requests from your external DNS server must be delegated to this IP.
+- `vip_gateway` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The IPv4 address of the gateway to the external DNS server if it is on a different subnet. Must be on the same subnet as the IP and reachable from the relevant network interface.
+- `vip_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The IPv6 address of the DNS service.
+- `vip_ipv6_gateway` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The IPv6 address of the gateway to the external DNS server if it is on a different subnet.
+- `vip_ipv6_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The subnet, in the CIDR format, on which the DNS resides. Valid values: [1..128]
+- `vip_subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The subnet, in the CIDR format, on which the DNS resides.
+- `vip_vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a VLAN if needed to enable communication with the external DNS server(s).

@@ -12,10 +12,11 @@ description: |-
 
 ## Example Usage
 
+Suppose that two clusters are defined, cluster A and cluster B. Start with defining all components that will be required to define a protected path.
+This will set up replication from the view with path `/view1` on cluster A to the remote path `/view1` on cluster B.
+
 ```terraform
-#We have defined 2 clusters called clusterA, clusterB.
-#We define all needed componants in order to define the proteced path
-# this will create a replication of view with path /view1 from clusterA to remote clusterB path /view1
+
 resource "vastdata_vip_pool" "pool" {
   provider    = vastdata.clusterA
   name        = "protocols-pool"
@@ -84,23 +85,23 @@ resource "vastdata_protected_path" "protected-path-view" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) 
 
 ### Optional
 
-- `capabilities` (String) (Valid for versions: 5.1.0,5.2.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the protected path enabled
-- `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) protection policy id
-- `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The Remote tenant guid
-- `source_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) path to replicate
-- `target_exported_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) where to replicate on the remote
-- `target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote target object id
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Local Tenant ID
-- `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- `capabilities` (String) (Valid for versions: 5.1.0,5.2.0) Allowed replication capabilities. This setting is available starting with VAST version 5.1.0. Valid values: [ASYNC_REPLICATION]
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the protected path as enabled or disabled.
+- `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The protection policy ID.
+- `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant GUID.
+- `source_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The source path to replicate from.
+- `target_exported_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The destination path to replicate to on the remote cluster.
+- `target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote target object ID.
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The local tenant ID.
+- `timeouts` (Block, Optional) (see [nested schema](#nestedblock--timeouts) below)
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) guid
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The GUID of the protected path.
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--timeouts"></a>
@@ -112,9 +113,14 @@ Optional:
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_protected_path.example <guid>
-terraform import vastdata_protected_path.example <Name>
-```
+        ```shell
+        terraform import vastdata_protected_path.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_protected_path.example <name>
+        ```

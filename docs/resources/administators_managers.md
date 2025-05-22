@@ -24,12 +24,12 @@ resource "vastdata_administators_managers" "managerC" {
   roles            = [vastdata_administators_roles.roleB.id]
   permissions_list = ["create_monitoring"]
 }
+```
 
-#Since version 5.2.0 reamls are supported and can be referanced by a manager
-#you can specify 4 types of actions refering to realms create,delete,view,edit
-#in order to cofigure the action specify <action>_<realm name>.
-#Ex: if the realm name is realm01 in order to configure edit for this realm add the following to the permissions_list attribute edit_realm01
+Starting with version 5.2.0, a role can reference one or more realms. You can specify 4 types of actions referring to realms: create, delete, view, edit. To configure the action, specify <action>_<realm name>.
+For example, to configure edit for a realm named `realm01`, add the following to the `permissions_list` attribute: `edit_realm01`
 
+```terraform
 resource "vastdata_administators_realms" "realmc" {
   name         = "realmc"
   object_types = ["nic", "viewpolicy"]
@@ -57,29 +57,34 @@ resource "vastdata_administators_managers" "managerc" {
 
 ### Required
 
-- `username` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager
+- `username` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A username for the manager.
 
 ### Optional
 
-- `first_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user firstname
-- `is_temporary_password` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If this set to true next time that a user will login he will be promped to replace his password
-- `last_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user last name
+- `first_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's first name.
+- `is_temporary_password` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, a password replacement prompt will appear next time when the user logs in.
+- `last_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's last name.
 - `password` (String, Sensitive)
-- `password_expiration_disabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Disable password expiration
-- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
-- `roles` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of roles ids
+- `password_expiration_disabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, password expiration is disabled.
+- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of allowed permissions. Valid values: [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
+- `roles` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of roles IDs.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.2.0) A uniqe GUID assigned to the manager
+- `guid` (String) (Valid for versions: 5.2.0) The unique GUID of the manager.
 - `id` (String) The ID of this resource.
-- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS
+- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The list of allowed permissions returned by the VMS.
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_administators_managers.example <guid>
-terraform import vastdata_administators_managers.example <Username>
-```
+        ```shell
+        terraform import vastdata_administators_managers.example <GUID>
+        ```
+- Import by username:
+
+        ```shell
+        terraform import vastdata_administators_managers.example <username>
+        ```

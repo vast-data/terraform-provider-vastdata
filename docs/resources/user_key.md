@@ -12,22 +12,26 @@ description: |-
 
 ## Example Usage
 
+To create a user for which keys will be created (each user can have up to two keys):
+
 ```terraform
-#Creating a user to create keys for.
-#!!! it is important to note that each user can have up to 2 keys.
+#Create a user for which keys will be created
+#Note that each user can have up to two keys.
 resource "vastdata_user" "example-user" {
   name = "example"
   uid  = 9000
 }
+```
 
-#Create Key and provide pgp public key so that the secret will be encrypted using this public key
-#The pgp public key should be provided at the ascii armor format, the encrypted secret_key retuend
-#will be set to the encrypted_secret_key field
-#This key will be created and set to be disabled.
+You can create the key and provide a PGP public key so that the secret will be encrypted using this public key.
+The PGP public key must be provided in the ASCII armor format. The encrypted secret key returned by the cluster will be set to the `encrypted_secret_key` field.
+This example creates a key and sets it to be disabled:
+
+```terraform
 resource "vastdata_user_key" "key1" {
   user_id        = vastdata_user.example-user.id
   enabled        = false
-  pgp_public_key = <<-EOT
+  pgp_public_key = <<EOT
   -----BEGIN PGP PUBLIC KEY BLOCK-----
   .
   .  <public pgp key content>
@@ -35,10 +39,11 @@ resource "vastdata_user_key" "key1" {
   -----END PGP PUBLIC KEY BLOCK-----
   EOT
 }
+```
 
-#This key is provided without setting the pgp public key this means that after key creation
-#The secret key returned will be stored set to the secret_key field, it is highly recomanded
-#not to use this option and if so please make sure that your terraform backend is secured.
+If you do not set the PGP public key during key creation, the returned secret key will be set to the `secret_key` field. It is highly recommended to avoid using this option. Otherwise, ensure that your Terraform backend is well secured.
+
+```
 resource "vastdata_user_key" "key2" {
   user_id = vastdata_user.example-user.id
 }
@@ -49,16 +54,16 @@ resource "vastdata_user_key" "key2" {
 
 ### Required
 
-- `user_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user id to create the Key for
+- `user_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the user for which the key is being created.
 
 ### Optional
 
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Should the key be enabled or disabled
-- `pgp_public_key` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the key to be enabled or disabled.
+- `pgp_public_key` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the `encrypted_secret_key` will be returned, while `secret_key` will be empty. Changing this after apply will have no effect.
 
 ### Read-Only
 
-- `access_key` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The access id of the user key
-- `encrypted_secret_key` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key
+- `access_key` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The access key of the user.
+- `encrypted_secret_key` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in `pgp_public_key`.
 - `id` (String) The ID of this resource.
-- `secret_key` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0,5.2.0) The secret id of the user key, please note that that the secret id is not encrypted and should be kept in an highly secure backend ,this field will only be returned if pgp_public_key is not provided
+- `secret_key` (String, Sensitive) (Valid for versions: 5.0.0,5.1.0,5.2.0) The secret key of the user. This secret key is not encrypted and should be kept in an highly secure backend. This field will only be returned if `pgp_public_key` is not provided.

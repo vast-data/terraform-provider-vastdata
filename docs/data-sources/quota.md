@@ -41,47 +41,47 @@ data "vastdata_quota" "quota3" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the quota.
 
 ### Optional
 
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID.
 
 ### Read-Only
 
-- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
-- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID
-- `default_email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The default Email if there is no suffix and no address in the providers
-- `default_group_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--default_group_quota))
-- `default_user_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--default_user_quota))
-- `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enable alarms when users or groups are exceeding their limit
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster
+- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster ID.
+- `default_email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The default email address used if there is no suffix specified and no address can be found in the providers.
+- `default_group_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [nested schema](#nestedatt--default_group_quota) below)
+- `default_user_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [nested schema](#nestedatt--default_user_quota) below)
+- `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables alarms when users or groups are exceeding their limits.
 - `enable_email_providers` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `grace_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
-- `group_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--group_quotas))
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota guid
-- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit
-- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit
+- `group_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [nested schema](#nestedatt--group_quotas) below)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota GUID.
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard limit for the capacity.
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard limit for the number of inodes.
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `is_user_quota` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `num_blocked_users` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `num_exceeded_users` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Directory path
-- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used capacity out of the hard limit
-- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used inodes out of the hard limit
+- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Directory path.
+- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percentage of used capacity out of the hard limit.
+- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percentage of used inodes out of the hard limit.
 - `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
 - `pretty_state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit
-- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft limit for the capacity.
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft limit for the number of inodes.
 - `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant Name
-- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time
-- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes
-- `used_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in TB
-- `used_effective_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in bytes
-- `used_effective_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in TB
-- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes
-- `user_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--user_quotas))
+- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant name.
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time.
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes.
+- `used_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in TB.
+- `used_effective_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in bytes.
+- `used_effective_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in TB.
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes.
+- `user_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [nested schema](#nestedatt--user_quotas) below)
 
 <a id="nestedatt--default_group_quota"></a>
 ### Nested Schema for `default_group_quota`
@@ -114,7 +114,7 @@ Read-Only:
 
 Read-Only:
 
-- `entity` (List of Object) (see [below for nested schema](#nestedobjatt--group_quotas--entity))
+- `entity` (List of Object) (see [nested schema](#nestedobjatt--group_quotas--entity) below)
 - `grace_period` (String)
 - `hard_limit` (Number)
 - `hard_limit_inodes` (Number)
@@ -145,7 +145,7 @@ Read-Only:
 
 Read-Only:
 
-- `entity` (List of Object) (see [below for nested schema](#nestedobjatt--user_quotas--entity))
+- `entity` (List of Object) (see [nested schema](#nestedobjatt--user_quotas--entity) below)
 - `grace_period` (String)
 - `hard_limit` (Number)
 - `hard_limit_inodes` (Number)

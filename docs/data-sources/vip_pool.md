@@ -23,32 +23,32 @@ data "vastdata_vip_pool" "pool1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the vippool
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name for the virtual IP pool.
 
 ### Read-Only
 
-- `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Numver of active interfaces
-- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
-- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of cnodes comprising cnode group
+- `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Number of active interfaces.
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.
+- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of CNodes comprising the CNode group.
 - `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables L3 CNode access
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) True for enable, False for disable
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the vippool
-- `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IP Address
-- `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) GW IPv6 Address
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq id given to the vippool
-- `ip_ranges` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges (see [below for nested schema](#nestedatt--ip_ranges))
-- `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN
-- `port_membership` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The port on the CNode this pool will use. Right, left or all
-- `role` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Role
+- `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Whether L3 CNode access is enabled or disabled.
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Whether the virtual IP pool is enabled or disabled.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the virtual IP pool.
+- `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IPv4 address.
+- `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IPv6 address.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the virtual IP pool.
+- `ip_ranges` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges (see [nested schema](#nestedatt--ip_ranges) below)
+- `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN.
+- `port_membership` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The port(s) on the CNode that this pool will use: `Right`, `Left` or `All`.
+- `role` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The role of the virtual IP pool.
 - `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)
-- `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)
-- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants
+- `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 subnet CIDR prefix (number of bits).
+- `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 subnet CIDR prefix (number of bits).
+- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) The ID of the tenant associated with the virtual IP pool. An ID of `0` (zero) means the virtual IP pool is available for all tenants.
 - `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN
-- `vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN
-- `vms_preferred` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, CNodes participating in the vip pool are preferred in VMS host election
+- `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN.
+- `vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Virtual IP pool VLAN.
+- `vms_preferred` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, the CNodes included in this virtual IP pool are handled as preferred CNodes during VMS host election.
 
 <a id="nestedatt--ip_ranges"></a>
 ### Nested Schema for `ip_ranges`

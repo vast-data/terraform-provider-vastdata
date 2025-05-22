@@ -12,15 +12,17 @@ description: |-
 
 ## Example Usage
 
+To create a view when there are only one view with that name in the entire cluster: 
+
 ```terraform
-#A view when there is only one view with that name at the entire cluster
 data "vastdata_view" "view1" {
   path = "/path"
 }
+```
 
-#When there is more than one view with the same path at differant tenant
-#If a tenant_id is not specfied ,error will be returned
+To create a view when there is more than view with the same path on different tenants (if the `tenant_id` is not specified, an error is returned):
 
+```terraform
 data "vastdata_tenant" "tenants1" {
   name = "tenant01"
 }
@@ -36,55 +38,55 @@ data "vastdata_view" "view1" {
 
 ### Required
 
-- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) File system path. Begin with '/'. Do not include a trailing slash
+- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) File system path. Begin with '/'. Do not include a trailing slash.
 
 ### Optional
 
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID related to this view
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the tenant associated with this view.
 
 ### Read-Only
 
-- `abac_tags` (List of String) (Valid for versions: 5.1.0,5.2.0) List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols
-- `abe_max_depth` (Number) (Valid for versions: 5.2.0) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.
-- `abe_protocols` (List of String) (Valid for versions: 5.2.0) The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]
-- `alias` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path
-- `allow_anonymous_access` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access
-- `allow_s3_anonymous_access` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access
-- `auto_commit` (String) (Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
-- `bucket` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Bucket name
-- `bucket_creators` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of bucket creators users
-- `bucket_creators_groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of bucket creators groups
-- `bucket_logging` (List of Object) (Valid for versions: 5.2.0) (see [below for nested schema](#nestedatt--bucket_logging))
-- `bucket_owner` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Bucket owner
-- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
-- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID
-- `create_dir` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Creates the directory specified by the path
-- `default_retention_period` (String) (Valid for versions: 5.1.0,5.2.0) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
-- `directory` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Create the directory if it does not exist
-- `files_retention_mode` (String) (Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the View
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe ID used to identify the View
+- `abac_tags` (List of String) (Valid for versions: 5.1.0,5.2.0) A list of Attribute-Based Access Control (ABAC) tags. This option can be used only when using SMB/NFSv4 protocols.
+- `abe_max_depth` (Number) (Valid for versions: 5.2.0) Restricts Access-Based Enumeration (ABE) to a specified path depth. For example, if `abe_max_depth` is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.
+- `abe_protocols` (List of String) (Valid for versions: 5.2.0) The protocols for which Access-Based Enumeration (ABE) is enabled. Valid values: [ NFS, SMB, NFS4, S3 ]
+- `alias` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Alias for NFS export. The alias must start with '/' and can include ASCII characters only. If configured, this setting supersedes the exposed NFS export path.
+- `allow_anonymous_access` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits S3 anonymous access.
+- `allow_s3_anonymous_access` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits S3 anonymous access.
+- `auto_commit` (String) (Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default retention period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
+- `bucket` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) S3 bucket name.
+- `bucket_creators` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of bucket creator users.
+- `bucket_creators_groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of bucket creator groups.
+- `bucket_logging` (List of Object) (Valid for versions: 5.2.0) (see [nested schema](#nestedatt--bucket_logging) below)
+- `bucket_owner` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) S3 bucket owner.
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.
+- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster ID.
+- `create_dir` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, creates the directory specified by the path.
+- `default_retention_period` (String) (Valid for versions: 5.1.0,5.2.0) Relevant if locking is enabled. Required if `s3_locks_retention_mode` is set to `governance` or `compliance`. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
+- `directory` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, creates the directory if it does not exist.
+- `files_retention_mode` (String) (Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, `files_retention_mode` must be set to `GOVERNANCE` or `COMPLIANCE`. If the view is enabled for S3 and not for NFSv3 or SMB, `files_retention_mode` can be set to `NONE`. If set to `GOVERNANCE`, locked files cannot be deleted or changed. The retention period can be shortened or extended by users with sufficient permissions. If set to `COMPLIANCE`, locked files cannot be deleted or changed. The retention period can be extended, but not shortened, by users with sufficient permissions. If set to `NONE` (S3 only), the retention mode is not set for the view; it is set individually for each object. Valid values: [GOVERNANCE COMPLIANCE NONE]
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID for the view.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID used to identify the view.
 - `ignore_oos` (Boolean) (Valid for versions: 5.1.0,5.2.0) Ignore oos
 - `is_remote` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `is_seamless` (Boolean) (Valid for versions: 5.1.0,5.2.0) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
-- `locking` (Boolean) (Valid for versions: 5.1.0,5.2.0) Write Once Read Many (WORM) locking enabled
-- `logical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Logical Capacity
+- `is_seamless` (Boolean) (Valid for versions: 5.1.0,5.2.0) Enables or disables support for  seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be done when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
+- `locking` (Boolean) (Valid for versions: 5.1.0,5.2.0) Enables or disables Write Once Read Many (WORM) locking.
+- `logical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Logical capacity.
 - `max_retention_period` (String) (Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
 - `min_retention_period` (String) (Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the view
-- `nfs_interop_flags` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]
-- `physical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Physical Capacity
-- `policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Associated view policy ID
-- `protocols` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Protocols exposed by this view
-- `qos_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) QoS Policy ID
-- `s3_locks` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Object Lock
-- `s3_locks_retention_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Locks retention mode
-- `s3_locks_retention_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Period should be positive in format like 0d|2d|1y|2y
-- `s3_object_ownership_rule` (String) (Valid for versions: 5.1.0,5.2.0) S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: BucketOwnerEnforced - The bucket owner has full control over any object in the bucket ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. None - S3 Object Ownership is disabled for the bucket.  Allowed Values are [None BucketOwnerPreferred ObjectWriter BucketOwnerEnforced]
-- `s3_unverified_lookup` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 Unverified Lookup
-- `s3_versioning` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Trun on S3 Versioning
-- `share` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?
-- `share_acl` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) Share-level ACL details (see [below for nested schema](#nestedatt--share_acl))
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name for the view.
+- `nfs_interop_flags` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Indicates whether the view supports simultaneous access using NFSv3/NFSv4/SMB protocols. Valid values: [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]
+- `physical_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Physical capacity.
+- `policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the associated view policy.
+- `protocols` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Protocols exposed by this view.
+- `qos_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) QoS policy ID.
+- `s3_locks` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables S3 object locks.
+- `s3_locks_retention_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) S3 locks retention mode.
+- `s3_locks_retention_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Retention period for S3 locks. The period is specified as a positive integer suffixed by a time unit of measure, for example: `0d`|`2d`|`1y`|`2y`
+- `s3_object_ownership_rule` (String) (Valid for versions: 5.1.0,5.2.0) S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: `BucketOwnerEnforced` - The bucket owner has full control over any object in the bucket. `ObjectWriter` - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. `BucketOwnerPreferred` - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. `None` - S3 Object Ownership is disabled for the bucket. Valid values: [None BucketOwnerPreferred ObjectWriter BucketOwnerEnforced]
+- `s3_unverified_lookup` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits S3 Unverified Lookup.
+- `s3_versioning` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables S3 versioning.
+- `share` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Name of the SMB share. The name cannot not include the following characters: " \ / [ ] : | < > + = ; , * ?
+- `share_acl` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) Share-level ACL details (see [nested schema](#nestedatt--share_acl) below)
 
 <a id="nestedatt--bucket_logging"></a>
 ### Nested Schema for `bucket_logging`
@@ -101,7 +103,7 @@ Read-Only:
 
 Read-Only:
 
-- `acl` (List of Object) (see [below for nested schema](#nestedobjatt--share_acl--acl))
+- `acl` (List of Object) (see [nested schema](#nestedobjatt--share_acl--acl) below)
 - `enabled` (Boolean)
 
 <a id="nestedobjatt--share_acl--acl"></a>
