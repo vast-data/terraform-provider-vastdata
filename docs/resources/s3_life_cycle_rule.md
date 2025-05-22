@@ -12,8 +12,9 @@ description: |-
 
 ## Example Usage
 
+Create a user, create a view with S3 protocol, and attach an S3 lifecycle rule:
+
 ```terraform
-#Create a view with S3 protocol + user , and attach an s3 lifecycle rul
 resource "vastdata_user" "s3user" {
   name = "s3user"
   uid  = 2000
@@ -50,32 +51,37 @@ resource "vastdata_s3_life_cycle_rule" "s3-bucket-view-lifecycle-rule" {
 ### Required
 
 - `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name for the lifecycle rule.
 - `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.
 
 ### Optional
 
-- `abort_mpu_days_after_initiation` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days until expiration after an incomplete multipart upload
-- `expiration_date` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The expiration date of the object
-- `expiration_days` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days from creation until an object expires
-- `expired_obj_delete_marker` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Remove expired objects delete markers
-- `max_size` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The maximum size of the object
-- `min_size` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The minimum size of the object
-- `newer_noncurrent_versions` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The number of newer versions to retain
-- `noncurrent_days` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Number of days after objects become noncurrent
-- `view_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the related View
-- `view_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path of the related View
+- `abort_mpu_days_after_initiation` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days until expiration after an incomplete multipart upload.
+- `expiration_date` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The object expiration date.
+- `expiration_days` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days from creation until an object expires.
+- `expired_obj_delete_marker` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, removes expired object delete markers.
+- `max_size` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The maximum size of the object.
+- `min_size` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The minimum size of the object.
+- `newer_noncurrent_versions` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The number of newer versions to retain.
+- `noncurrent_days` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days after objects become non-current.
+- `view_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the view to which the lifecycle rule applies.
+- `view_path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path of the view to which the lifecycle rule applies.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The GUID of the lifecycle rule.
 - `id` (String) The ID of this resource.
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_s3_life_cycle_rule.example <guid>
-terraform import vastdata_s3_life_cycle_rule.example <Name>
-```
+        ```shell
+        terraform import vastdata_s3_life_cycle_rule.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_s3_life_cycle_rule.example <name>
+        ```

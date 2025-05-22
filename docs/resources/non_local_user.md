@@ -29,15 +29,15 @@ resource "vastdata_non_local_user" "ExternalUser" {
 
 ### Required
 
-- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID
-- `uid` (Number) (Valid for versions: 5.1.0,5.2.0) The user unix UID
+- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID.
+- `uid` (Number) (Valid for versions: 5.1.0,5.2.0) The user Unix UID.
 
 ### Optional
 
-- `allow_create_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow create bucket
-- `allow_delete_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allow delete bucket
-- `s3_policies_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) List S3 policies IDs
+- `allow_create_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allows or prohibits the user to create buckets.
+- `allow_delete_bucket` (Boolean) (Valid for versions: 5.1.0,5.2.0) Allows or prohibits the user to delete buckets.
+- `s3_policies_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) A list of S3 policy IDs.
 
 ### Read-Only
 
-- `id` (String) (Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier
+- `id` (String) (Valid for versions: 5.1.0,5.2.0) The ID of the non-local user.

@@ -62,17 +62,22 @@ resource "vastdata_s3_policy" "s3policy" {
 
 ### Read-Only
 
-- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of group names associated with this policy
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) GUID
+- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of group names associated with this policy.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The GUID of the S3 policy.
 - `id` (String) The ID of this resource.
 - `is_replicated` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `users` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of group names associated with this policy
+- `users` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of user names associated with this policy.
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_s3_policy.example <guid>
-terraform import vastdata_s3_policy.example <Name>
-```
+        ```shell
+        terraform import vastdata_s3_policy.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_s3_policy.example <name>
+        ```

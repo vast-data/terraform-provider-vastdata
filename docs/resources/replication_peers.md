@@ -12,12 +12,13 @@ description: |-
 
 ## Example Usage
 
-```terraform
-#We defined 2 poviders 1 for each Vastdata cluster
-#1. a provider with the alias clusterA
-#2. a provider with the alia clusterB
+Suppose that two providers are defined, one for each VAST cluster:
+1. A provider with the alias `clusterA`
+2. A provider with the alias `clusterB`
 
-#Define replication Vippool for cluster A
+Define replication virtual IP pool for cluster A:
+
+```terraform
 resource "vastdata_vip_pool" "pool1-clusterA" {
   name        = "pool1"
   role        = "REPLICATION"
@@ -29,8 +30,10 @@ resource "vastdata_vip_pool" "pool1-clusterA" {
   }
 
 }
+```
 
-#Define replication Vippool for cluster B
+Define replication virtual IP pool for cluster B:
+```
 resource "vastdata_vip_pool" "pool1-clusterB" {
   name        = "pool1"
   role        = "REPLICATION"
@@ -42,7 +45,11 @@ resource "vastdata_vip_pool" "pool1-clusterB" {
   }
 
 }
-#Define a replication peering on clusterA using Vippool configurations from clusterB
+```
+
+Define a replication peer on cluster A using virtual IP pool settings from cluster B:
+
+```
 resource "vastdata_replication_peers" "clusterA-clusterB-peer" {
   name        = "peer-loop-b"
   leading_vip = vastdata_vip_pool.pool1-clusterB.ip_ranges[0].start_ip
@@ -57,30 +64,35 @@ resource "vastdata_replication_peers" "clusterA-clusterB-peer" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration.
 
 ### Optional
 
-- `is_local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the source of the replication local (this host is the source)
-- `leading_vip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The vip provided for the replication peer configuration
-- `peer_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer cluster
-- `pool_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The replication Vippool id
-- `remote_version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer
-- `remote_vip_range` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The vip range which were reported by the peer
-- `secure_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the connection secure
-- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct url of the replication peer configurations
-- `version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source
+- `is_local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the peer is the replication source.
+- `leading_vip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP provided for the replication peer.
+- `peer_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer cluster.
+- `pool_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the replication virtual IP pool.
+- `remote_version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer.
+- `remote_vip_range` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP range reported by the remote peer.
+- `secure_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the connection is secure.
+- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct URL of the replication peer configuration.
+- `version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the replication peer configuration.
 - `id` (String) The ID of this resource.
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_replication_peers.example <guid>
-terraform import vastdata_replication_peers.example <Name>
-```
+        ```shell
+        terraform import vastdata_replication_peers.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_replication_peers.example <name>
+        ```

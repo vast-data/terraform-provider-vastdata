@@ -12,14 +12,19 @@ description: |-
 
 ## Example Usage
 
+To create a user named `example` with a UID of 9000:
+
 ```terraform
-#Create a user named example with uid of 9000
+#Create a user named example with UID of 9000
 resource "vastdata_user" "example-user" {
   name = "example"
   uid  = 9000
 }
+```
 
-#Create a user named user1 with leading group & supplementary groups
+To create a user named `user1` with leading group and supplementary groups:
+
+```terraform
 resource "vastdata_group" "group2" {
   name = "group2"
   gid  = 2000
@@ -48,36 +53,42 @@ resource "vastdata_user" "user1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the user
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name for the user.
 
 ### Optional
 
-- `allow_create_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow create bucket
-- `allow_delete_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow delete bucket
-- `gids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary GID list
-- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary Group list
-- `leading_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user leading unix GID
-- `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user primary group SID
-- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List S3 policies IDs
-- `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is S3 superuser
-- `uid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user unix UID
+- `allow_create_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits bucket creation by the user.
+- `allow_delete_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits bucket deletion by the user.
+- `gids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary GIDs.
+- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary groups.
+- `leading_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's leading Unix GID.
+- `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's primary group SID.
+- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of S3 policies IDs.
+- `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, the user is an S3 superuser.
+- `uid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's Unix UID.
 
 ### Read-Only
 
-- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Group Count
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the user
+- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The group count.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the user.
 - `id` (String) The ID of this resource.
-- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group GID
-- `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group Name
-- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) IS this a local user
-- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user SID
-- `sids` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) supplementary SID list
+- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The leading group GID.
+- `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The  leading group name.
+- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, the user is a local user.
+- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's SID.
+- `sids` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary SIDs.
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_user.example <guid>
-terraform import vastdata_user.example <Name>
-```
+        ```shell
+        terraform import vastdata_user.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_user.example <name>
+        ```
+

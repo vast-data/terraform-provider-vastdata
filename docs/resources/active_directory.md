@@ -53,9 +53,14 @@ resource "vastdata_active_directory" "ad1" {
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_active_directory.example <guid>
-terraform import vastdata_active_directory.example <Machine Account Name>
-```
+        ```shell
+        terraform import vastdata_active_directory.example <GUID>
+        ```
+- Import by machine account name:
+
+        ```shell
+        terraform import vastdata_active_directory.example <machine account name>
+        ```

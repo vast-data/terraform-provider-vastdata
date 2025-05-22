@@ -61,25 +61,30 @@ resource "vastdata_snapshot" "snapshot" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.
 
 ### Optional
 
-- `expiration_time` (String)
-- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable
-- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use
+- `expiration_time` (String) The snapshot's expiration time.
+- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, the snapshot is indestructable.
+- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from.
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the tenant to use.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the snapshot
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the snapshot.
 - `id` (String) The ID of this resource.
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_snapshot.example <guid>
-terraform import vastdata_snapshot.example <Name>
-```
+        ```shell
+        terraform import vastdata_snapshot.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_snapshot.example <name>
+        ```

@@ -12,8 +12,9 @@ description: |-
 
 ## Example Usage
 
+Basic definition of a virtual IP pool:
+
 ```terraform
-#Basic defenition of VIP pool 
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"
@@ -28,11 +29,15 @@ resource "vastdata_vip_pool" "pool1" {
     end_ip   = "11.0.0.10"
   }
 }
+```
 
-#Setting up VIP pool related tenant can be done in 2 ways.
-#It is advisable to select only one method per tenant,vippool combination.
+A virtual IP pool can be associated with a tenant in two ways: by defining the `vastdata_tenant` resource, or by setting the `tenant_id` attribute on the virtual IP pool.
+It is recommended to use only one of these methods per tenant and pool combination.
 
-#Define VIP pool setting up the tenant_id of it using vastdata_tenant resource 
+To define a virtual IP pool and associate it with a tenant using the `vastdata_tenant` resource:
+
+```terraformm
+
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"
@@ -56,9 +61,12 @@ resource "vastdata_tenant" "tenant1" {
     end_ip   = "192.168.0.200"
   }
 }
+```
 
+To define a virtual IP pool and associate it with a tenant using the `tenant_id` attribute of the pool:
 
-#Define VIP pool setting up the tenant_id using the tenent_id attribute.
+```terraform
+
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"
@@ -82,8 +90,11 @@ resource "vastdata_tenant" "tenant1" {
     end_ip   = "192.168.0.200"
   }
 }
+```
 
-#Define a VIP pool for all tenants by setting tenant_id = 0
+To define a virtual IP pool for all tenants by setting `tenant_id = 0`:
+
+```terraform
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"
@@ -106,34 +117,34 @@ resource "vastdata_vip_pool" "pool1" {
 
 ### Required
 
-- `ip_ranges` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges (see [below for nested schema](#nestedblock--ip_ranges))
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the vippool
-- `role` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Role
+- `ip_ranges` (Block List, Min: 1) (Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges (see [nested schema](#nestedblock--ip_ranges) below).
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name for the virtual IP pool.
+- `role` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The role of the virtual IP pool.
 
 ### Optional
 
-- `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Numver of active interfaces
-- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
-- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of cnodes comprising cnode group
+- `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Number of active interfaces.
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.
+- `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of CNodes comprising the CNode group.
 - `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables L3 CNode access
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) True for enable, False for disable
-- `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IP Address
-- `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) GW IPv6 Address
-- `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN
-- `port_membership` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The port on the CNode this pool will use. Right, left or all
+- `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables L3 CNode access.
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables the virtual IP pool.
+- `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IPv4 address.
+- `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IPv6 address.
+- `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN (for L3 CNode access).
+- `port_membership` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The port(s) on the CNode that this pool will use: `Right`, `Left` or `All`.
 - `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)
-- `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)
-- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants
+- `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 subnet CIDR prefix (number of bits).
+- `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 subnet CIDR prefix (number of bits).
+- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) The ID of the tenant associated with the virtual IP pool. An ID of `0` (zero) means the virtual IP pool is available for all tenants.
 - `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN
-- `vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN
-- `vms_preferred` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, CNodes participating in the vip pool are preferred in VMS host election
+- `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN.
+- `vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Virtual IP pool VLAN.
+- `vms_preferred` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If `true`, the CNodes included in this virtual IP pool are handled as preferred CNodes during VMS host election.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the vippool
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the virtual IP pool.
 - `id` (String) The ID of this resource.
 
 <a id="nestedblock--ip_ranges"></a>
@@ -146,9 +157,14 @@ Optional:
 
 ## Import
 
-Import is supported using the following syntax:
+Use either of the following:
+- Import by GUID:
 
-```shell
-terraform import vastdata_vip_pool.example <guid>
-terraform import vastdata_vip_pool.example <Name>
-```
+        ```shell
+        terraform import vastdata_vip_pool.example <GUID>
+        ```
+- Import by name:
+
+        ```shell
+        terraform import vastdata_vip_pool.example <name>
+        ```
