@@ -23,19 +23,19 @@ data "vastdata_protection_policy" "policy1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the protection policy.
 
 ### Read-Only
 
-- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]
-- `frames` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of snapshots schedules (see [below for nested schema](#nestedatt--frames))
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the replication peer configuration
-- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot indestructable
-- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data
-- `target_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The target peer name
-- `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the target peer
-- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the replication policy
+- `clone_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The replication type. Valid values: [NATIVE_REPLICATION LOCAL]
+- `frames` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of snapshot schedules (see [nested schema](#nestedatt--frames) below)
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the protection policy.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the protection policy.
+- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the snapshots are indestructable.
+- `prefix` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)  The prefix to prepend the replicated data.
+- `target_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the destination peer.
+- `target_object_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the destination peer.
+- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the protection policy.
 
 <a id="nestedatt--frames"></a>
 ### Nested Schema for `frames`

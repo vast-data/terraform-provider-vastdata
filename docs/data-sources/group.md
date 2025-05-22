@@ -23,12 +23,12 @@ data "vastdata_group" "group1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the group
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name for the group.
 
 ### Read-Only
 
-- `gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The group linux gid
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the group
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe Identifier of a group
-- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of S3 policies IDs
-- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The group SID
+- `gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The group Unix GID.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the group.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the group.
+- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of S3 policies IDs.
+- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The group SID.

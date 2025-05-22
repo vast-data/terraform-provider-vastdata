@@ -23,18 +23,18 @@ data "vastdata_replication_peers" "peer1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the replication peer configuration
-- `is_local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the source of the replication local (this host is the source)
-- `leading_vip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The vip provided for the replication peer configuration
-- `peer_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer cluster
-- `pool_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The replication Vippool id
-- `remote_version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer
-- `remote_vip_range` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The vip range which were reported by the peer
-- `secure_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the connection secure
-- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct url of the replication peer configurations
-- `version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the replication peer configuration.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the replication peer configuration.
+- `is_local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the peer is the replication source.
+- `leading_vip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP provided for the replication peer.
+- `peer_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)  The name of the peer cluster.
+- `pool_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the replication virtual IP pool.
+- `remote_version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer.
+- `remote_vip_range` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP range reported by the remote peer.
+- `secure_mode` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the connection is secure.
+- `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Direct URL of the replication peer configuration.
+- `version` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source.
