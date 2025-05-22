@@ -13,7 +13,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-#A Simple provider with warn version validation level
+#A simple provider with warn version validation level
 provider vastdata {
   username = "<username>"
   port = 443
@@ -23,7 +23,7 @@ provider vastdata {
   version_validation_mode = "warn"
 }
 
-#Define 2 providers for 2 different cluster with alias one with port 443 and one with port 9443
+#Define 2 providers for 2 different clusters using aliases clusterA with port 443 and clusterB with port 9443
 
 provider vastdata {
   api_token = "<api_token>"
@@ -48,17 +48,13 @@ provider vastdata {
 
 ### Required
 
-- `host` (String) The VastData Cluster hostname/address , if environment variable VASTDATA_HOST exists it will be used
+- `host` (String) The VAST cluster hostname/address. If the `VASTDATA_HOST` environment variable exists, it will be used
 
 ### Optional
 
-- `api_token` (String, Sensitive) The VastData Cluster API token. If environment variable VASTDATA_API_TOKEN exists it will be used
-- `password` (String, Sensitive) The VastData Cluster password, if environment variable VASTDATA_CLUSTER_PASSWORD exists it will be used
-- `port` (Number) The server API port (Default is 443) ,if environment variable VASTDATA_PORT exists it will be used
-- `skip_ssl_verify` (Boolean) A boolean representing should SSL certificate be verified (Default is False) , if environmnet variable VASTDATA_VERIFY_SSL exists it will be used
-- `username` (String, Sensitive) The VastData Cluster username, if environment variable VASTDATA_CLUSTER_USERNAME exists it will be used
-- `version_validation_mode` (String) The version validation mode to use , version validation checks if a resource request will work with the current cluster version
-			Depending on the value the operation will abort from happening if according to the version the operation might not work.
-			2 options are valid for this attribute
-			1. strict - abort the operation before it starts
-			2. warn - Just issue a warning
+- `api_token` (String, Sensitive) The VAST cluster API token. If the `VASTDATA_API_TOKEN` environment variable exists, it will be used.
+- `password` (String, Sensitive) The VAST custer password. If the `VASTDATA_CLUSTER_PASSWORD` environment variable exists, it will be used.
+- `port` (Number) The server API port (default is 443). If the `VASTDATA_PORT` environment variable exists, it will be used.
+- `skip_ssl_verify` (Boolean) A boolean to determine whether the SSL certificate is to be verified (default is `False`). If the `VASTDATA_VERIFY_SSL` environment variable exists, it will be used.
+- `username` (String, Sensitive) The VAST cluster user name. If the `VASTDATA_CLUSTER_USERNAME` environment variable exists, it will be used.
+- `version_validation_mode` (String) The version validation mode to use. Version validation checks if a resource request will work with the current cluster version. Depending on the value, the operation will be aborted if it won't work with the current version. Valid values: `strict` to abort the operation before it starts, `warn` to issue a warning without aborting the operation.
