@@ -13,6 +13,8 @@ var DataSources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_view_policy":          DataSourceViewPolicy(),
 	"vastdata_group":                DataSourceGroup(),
 	"vastdata_user":                 DataSourceUser(),
+	"vastdata_non_local_user":       DataSourceNonLocalUser(),
+	"vastdata_non_local_group":      DataSourceNonLocalGroup(),
 	"vastdata_view":                 DataSourceView(),
 	"vastdata_nis":                  DataSourceNis(),
 	"vastdata_tenant":               DataSourceTenant(),

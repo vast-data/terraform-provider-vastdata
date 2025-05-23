@@ -17,7 +17,6 @@ import (
         "encoding/json"
         "fmt"
         "context"
-        "strconv"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
         "github.com/hashicorp/terraform-plugin-sdk/v2/diag"
         vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
@@ -169,7 +168,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      if err!=nil {
         diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured while obtaining data from the vastdata cluster",
+		Summary:  "Error occurred while obtaining data from the vastdata cluster",
 		Detail:   err.Error(),
 		})
        return diags
@@ -181,7 +180,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      if err!=nil {
          diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured reading data recived from VastData cluster",
+		Summary:  "Error occurred reading data received from VastData cluster",
 		Detail:   err.Error(),
 		})
        return diags
@@ -192,7 +191,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      if err!=nil {
          diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured reading urls from response",
+		Summary:  "Error occurred reading urls from response",
 		Detail:   err.Error(),
 		})
        return diags
@@ -202,7 +201,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      if err!=nil {
                 diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured while parsing data recived from VastData cluster",
+		Summary:  "Error occurred while parsing data received from VastData cluster",
 		Detail:   err.Error(),
 		})
        return diags
@@ -262,14 +261,21 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      if err!=nil {
           diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured setting value to \"{{.Attributes.name}}\"",
+		Summary:  "Error occurred setting value to \"{{.Attributes.name}}\"",
 		Detail:   err.Error(),
 		})
           }
 
      {{ end }}
-     Id:=(int64)(resource.Id)
-     d.SetId(strconv.FormatInt(Id,10))
+     err=datasource_config.IdFunc(ctx,client,resource.Id,d)
+     if err!=nil {
+	   diags = append(diags, diag.Diagnostic {
+	   Severity: diag.Error,
+	   Summary:  "Failed to set Id",
+	   Detail:   err.Error(),
+	   })
+	   return diags
+     }
      return diags
 }
 `

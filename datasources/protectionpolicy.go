@@ -12,7 +12,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
-	"strconv"
 )
 
 func DataSourceProtectionPolicy() *schema.Resource {
@@ -156,7 +155,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -168,7 +167,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -178,7 +177,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -212,7 +211,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -224,7 +223,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -236,7 +235,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -248,7 +247,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
+			Summary:  "Error occurred setting value to \"url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -260,7 +259,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_name\"",
+			Summary:  "Error occurred setting value to \"target_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -272,7 +271,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_object_id\"",
+			Summary:  "Error occurred setting value to \"target_object_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -284,7 +283,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"prefix\"",
+			Summary:  "Error occurred setting value to \"prefix\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -296,7 +295,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"clone_type\"",
+			Summary:  "Error occurred setting value to \"clone_type\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -308,7 +307,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"frames\"",
+			Summary:  "Error occurred setting value to \"frames\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -320,12 +319,19 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"indestructible\"",
+			Summary:  "Error occurred setting value to \"indestructible\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }

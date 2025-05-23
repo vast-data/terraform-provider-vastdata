@@ -390,7 +390,7 @@ func resourceReplicationPeersCreate(ctx context.Context, d *schema.ResourceData,
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags
@@ -437,8 +437,8 @@ func resourceReplicationPeersCreate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
+	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Failed to set Id",
@@ -471,7 +471,7 @@ func resourceReplicationPeersUpdate(ctx context.Context, d *schema.ResourceData,
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags

@@ -31,6 +31,7 @@ var _ = Describe(" NonLocalUser", func() {
 	var NonLocalUserResourceData *schema.ResourceData
 	var model_json = `
                          {
+   "context": "string",
    "id": "string",
    "s3_policies_ids": [
       1,
@@ -41,7 +42,8 @@ var _ = Describe(" NonLocalUser", func() {
       6
    ],
    "tenant_id": 100,
-   "uid": 100
+   "uid": 100,
+   "username": "string"
 }
                          `
 	var server *ghttp.Server

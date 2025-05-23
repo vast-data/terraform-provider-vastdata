@@ -14,88 +14,100 @@ import (
 	"net/url"
 )
 
-func DataSourceSnapshot() *schema.Resource {
+func DataSourceNonLocalUser() *schema.Resource {
 	return &schema.Resource{
-		ReadContext: dataSourceSnapshotRead,
+		ReadContext: dataSourceNonLocalUserRead,
 		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier`,
+			},
+
+			"uid": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the snapshot`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
 			},
 
-			"guid": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the snapshot`,
-			},
-
-			"expiration_time": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire`,
-			},
-
-			"name": &schema.Schema{
+			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Username of the Non-Local User`,
 			},
 
-			"path": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from`,
-			},
-
-			"tenant_id": &schema.Schema{
-				Type:        schema.TypeInt,
-				Computed:    true,
-				Required:    false,
-				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use`,
-			},
-
-			"indestructible": &schema.Schema{
+			"allow_create_bucket": &schema.Schema{
 				Type:        schema.TypeBool,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Allow create bucket`,
+			},
+
+			"allow_delete_bucket": &schema.Schema{
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Allow delete bucket`,
+			},
+
+			"tenant_id": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
+			},
+
+			"s3_policies_ids": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) List S3 policies IDs`,
+
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
+			},
+
+			"context": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
 			},
 		},
 	}
 }
 
-func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func dataSourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
 	values := url.Values{}
-	datasource_config := codegen_configs.GetDataSourceByName("Snapshot")
+	datasource_config := codegen_configs.GetDataSourceByName("NonLocalUser")
 
-	name := d.Get("name")
-	values.Add("name", fmt.Sprintf("%v", name))
+	context := d.Get("context")
+	values.Add("context", fmt.Sprintf("%v", context))
 
-	if d.HasChanges("tenant_id") {
-		tenant_id := d.Get("tenant_id")
-		tflog.Debug(ctx, "Using optional attribute \"tenant_id\"")
-		values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
-	}
+	tenant_id := d.Get("tenant_id")
+	values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
 
-	response, err := client.Get(ctx, utils.GenPath("snapshots"), values.Encode(), map[string]string{})
+	username := d.Get("username")
+	values.Add("username", fmt.Sprintf("%v", username))
+
+	response, err := client.Get(ctx, utils.GenPath("users/query"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -106,7 +118,7 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 
 	}
-	resource_l := []api_latest.Snapshot{}
+	resource_l := []api_latest.NonLocalUser{}
 	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -161,50 +173,50 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Uid", resource.Uid))
 
-	err = d.Set("guid", resource.Guid)
+	err = d.Set("uid", resource.Uid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ExpirationTime", resource.ExpirationTime))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Username", resource.Username))
 
-	err = d.Set("expiration_time", resource.ExpirationTime)
+	err = d.Set("username", resource.Username)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"expiration_time\"",
+			Summary:  "Error occurred setting value to \"username\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowCreateBucket", resource.AllowCreateBucket))
 
-	err = d.Set("name", resource.Name)
+	err = d.Set("allow_create_bucket", resource.AllowCreateBucket)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"allow_create_bucket\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Path", resource.Path))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "AllowDeleteBucket", resource.AllowDeleteBucket))
 
-	err = d.Set("path", resource.Path)
+	err = d.Set("allow_delete_bucket", resource.AllowDeleteBucket)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"path\"",
+			Summary:  "Error occurred setting value to \"allow_delete_bucket\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -221,14 +233,26 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Indestructible", resource.Indestructible))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "S3PoliciesIds", resource.S3PoliciesIds))
 
-	err = d.Set("indestructible", resource.Indestructible)
+	err = d.Set("s3_policies_ids", utils.FlattenListOfPrimitives(&resource.S3PoliciesIds))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"indestructible\"",
+			Summary:  "Error occurred setting value to \"s3_policies_ids\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Context", resource.Context))
+
+	err = d.Set("context", resource.Context)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"context\"",
 			Detail:   err.Error(),
 		})
 	}

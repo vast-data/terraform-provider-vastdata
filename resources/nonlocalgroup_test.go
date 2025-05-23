@@ -31,6 +31,7 @@ var _ = Describe(" NonLocalGroup", func() {
 	var NonLocalGroupResourceData *schema.ResourceData
 	var model_json = `
                          {
+   "context": "string",
    "gid": 100,
    "groupname": "string",
    "id": "string",

@@ -12,7 +12,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
-	"strconv"
 )
 
 func DataSourceGlobalSnapshot() *schema.Resource {
@@ -135,7 +134,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -147,7 +146,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -157,7 +156,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -191,7 +190,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -203,7 +202,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -215,7 +214,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -227,7 +226,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"loanee_tenant_id\"",
+			Summary:  "Error occurred setting value to \"loanee_tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -239,7 +238,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"loanee_root_path\"",
+			Summary:  "Error occurred setting value to \"loanee_root_path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -251,7 +250,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"remote_target_id\"",
+			Summary:  "Error occurred setting value to \"remote_target_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -263,7 +262,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"remote_target_guid\"",
+			Summary:  "Error occurred setting value to \"remote_target_guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -275,7 +274,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"remote_target_path\"",
+			Summary:  "Error occurred setting value to \"remote_target_path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -287,7 +286,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -300,7 +299,7 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"owner_root_snapshot\"",
+			Summary:  "Error occurred setting value to \"owner_root_snapshot\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -313,12 +312,19 @@ func dataSourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"owner_tenant\"",
+			Summary:  "Error occurred setting value to \"owner_tenant\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }

@@ -12,7 +12,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
-	"strconv"
 )
 
 func DataSourceActiveDirectory2() *schema.Resource {
@@ -307,7 +306,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -319,7 +318,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -329,7 +328,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -363,7 +362,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -375,7 +374,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"machine_account_name\"",
+			Summary:  "Error occurred setting value to \"machine_account_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -387,7 +386,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"organizational_unit\"",
+			Summary:  "Error occurred setting value to \"organizational_unit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -399,7 +398,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"smb_allowed\"",
+			Summary:  "Error occurred setting value to \"smb_allowed\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -411,7 +410,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ntlm_enabled\"",
+			Summary:  "Error occurred setting value to \"ntlm_enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -423,7 +422,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_auto_discovery\"",
+			Summary:  "Error occurred setting value to \"use_auto_discovery\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -435,7 +434,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_ldaps\"",
+			Summary:  "Error occurred setting value to \"use_ldaps\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -447,7 +446,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"port\"",
+			Summary:  "Error occurred setting value to \"port\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -459,7 +458,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"binddn\"",
+			Summary:  "Error occurred setting value to \"binddn\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -471,7 +470,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"searchbase\"",
+			Summary:  "Error occurred setting value to \"searchbase\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -483,7 +482,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"domain_name\"",
+			Summary:  "Error occurred setting value to \"domain_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -495,7 +494,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"method\"",
+			Summary:  "Error occurred setting value to \"method\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -507,7 +506,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"query_groups_mode\"",
+			Summary:  "Error occurred setting value to \"query_groups_mode\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -519,7 +518,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_attributes_source\"",
+			Summary:  "Error occurred setting value to \"posix_attributes_source\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -531,7 +530,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_tls\"",
+			Summary:  "Error occurred setting value to \"use_tls\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -543,7 +542,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tls_certificate\"",
+			Summary:  "Error occurred setting value to \"tls_certificate\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -555,7 +554,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"reverse_lookup\"",
+			Summary:  "Error occurred setting value to \"reverse_lookup\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -567,7 +566,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gid_number\"",
+			Summary:  "Error occurred setting value to \"gid_number\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -579,7 +578,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_multi_forest\"",
+			Summary:  "Error occurred setting value to \"use_multi_forest\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -591,7 +590,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -603,7 +602,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_number\"",
+			Summary:  "Error occurred setting value to \"uid_number\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -615,7 +614,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"match_user\"",
+			Summary:  "Error occurred setting value to \"match_user\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -627,7 +626,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member_value_property_name\"",
+			Summary:  "Error occurred setting value to \"uid_member_value_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -639,7 +638,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member\"",
+			Summary:  "Error occurred setting value to \"uid_member\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -651,7 +650,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_account\"",
+			Summary:  "Error occurred setting value to \"posix_account\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -663,7 +662,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_group\"",
+			Summary:  "Error occurred setting value to \"posix_group\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -675,7 +674,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"username_property_name\"",
+			Summary:  "Error occurred setting value to \"username_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -687,7 +686,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"user_login_name\"",
+			Summary:  "Error occurred setting value to \"user_login_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -699,7 +698,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"group_login_name\"",
+			Summary:  "Error occurred setting value to \"group_login_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -711,7 +710,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"mail_property_name\"",
+			Summary:  "Error occurred setting value to \"mail_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -723,7 +722,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_vms_auth_provider\"",
+			Summary:  "Error occurred setting value to \"is_vms_auth_provider\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -735,7 +734,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bindpw\"",
+			Summary:  "Error occurred setting value to \"bindpw\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -747,12 +746,19 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"urls\"",
+			Summary:  "Error occurred setting value to \"urls\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }

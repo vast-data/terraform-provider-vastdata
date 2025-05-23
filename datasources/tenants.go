@@ -12,7 +12,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
-	"strconv"
 )
 
 func DataSourceTenant() *schema.Resource {
@@ -248,7 +247,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -260,7 +259,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -270,7 +269,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -304,7 +303,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -316,7 +315,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -328,7 +327,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -340,7 +339,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_smb_privileged_user\"",
+			Summary:  "Error occurred setting value to \"use_smb_privileged_user\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -352,7 +351,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"smb_privileged_user_name\"",
+			Summary:  "Error occurred setting value to \"smb_privileged_user_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -364,7 +363,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_smb_privileged_group\"",
+			Summary:  "Error occurred setting value to \"use_smb_privileged_group\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -376,7 +375,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"smb_privileged_group_sid\"",
+			Summary:  "Error occurred setting value to \"smb_privileged_group_sid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -388,7 +387,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"smb_privileged_group_full_access\"",
+			Summary:  "Error occurred setting value to \"smb_privileged_group_full_access\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -400,7 +399,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"smb_administrators_group_name\"",
+			Summary:  "Error occurred setting value to \"smb_administrators_group_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -412,7 +411,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_others_share_level_perm\"",
+			Summary:  "Error occurred setting value to \"default_others_share_level_perm\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -424,7 +423,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"trash_gid\"",
+			Summary:  "Error occurred setting value to \"trash_gid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -436,7 +435,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"client_ip_ranges\"",
+			Summary:  "Error occurred setting value to \"client_ip_ranges\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -448,7 +447,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_primary_provider\"",
+			Summary:  "Error occurred setting value to \"posix_primary_provider\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -460,7 +459,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ad_provider_id\"",
+			Summary:  "Error occurred setting value to \"ad_provider_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -472,7 +471,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ldap_provider_id\"",
+			Summary:  "Error occurred setting value to \"ldap_provider_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -484,7 +483,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"nis_provider_id\"",
+			Summary:  "Error occurred setting value to \"nis_provider_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -496,7 +495,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"encryption_crn\"",
+			Summary:  "Error occurred setting value to \"encryption_crn\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -508,7 +507,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_nfsv42_supported\"",
+			Summary:  "Error occurred setting value to \"is_nfsv42_supported\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -520,7 +519,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_locked_users\"",
+			Summary:  "Error occurred setting value to \"allow_locked_users\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -532,7 +531,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_disabled_users\"",
+			Summary:  "Error occurred setting value to \"allow_disabled_users\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -544,7 +543,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_smb_native\"",
+			Summary:  "Error occurred setting value to \"use_smb_native\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -556,7 +555,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vippool_names\"",
+			Summary:  "Error occurred setting value to \"vippool_names\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -568,12 +567,19 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vippool_ids\"",
+			Summary:  "Error occurred setting value to \"vippool_ids\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }

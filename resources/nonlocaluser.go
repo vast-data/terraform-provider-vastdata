@@ -7,6 +7,9 @@ import (
 	"io"
 	"reflect"
 
+	//        "net/url"
+	"errors"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -24,6 +27,10 @@ func ResourceNonLocalUser() *schema.Resource {
 		DeleteContext: resourceNonLocalUserDelete,
 		CreateContext: resourceNonLocalUserCreate,
 		UpdateContext: resourceNonLocalUserUpdate,
+
+		Importer: &schema.ResourceImporter{
+			StateContext: resourceNonLocalUserImporter,
+		},
 
 		Description: ``,
 		Schema:      getResourceNonLocalUserSchema(),
@@ -49,6 +56,16 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 
 			Required:    true,
 			Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
+		},
+
+		"username": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("username"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Username of the Non-Local User`,
 		},
 
 		"allow_create_bucket": &schema.Schema{
@@ -94,6 +111,14 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 				Type: schema.TypeInt,
 			},
 		},
+
+		"context": &schema.Schema{
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("context"),
+
+			Required:    true,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
+		},
 	}
 }
 
@@ -123,6 +148,18 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"uid\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Username", resource.Username))
+
+	err = d.Set("username", resource.Username)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"username\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -171,6 +208,18 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occured setting value to \"s3_policies_ids\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Context", resource.Context))
+
+	err = d.Set("context", resource.Context)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occured setting value to \"context\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -277,7 +326,7 @@ func resourceNonLocalUserCreate(ctx context.Context, d *schema.ResourceData, m i
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags
@@ -324,8 +373,8 @@ func resourceNonLocalUserCreate(ctx context.Context, d *schema.ResourceData, m i
 		return diags
 	}
 
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
+	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Failed to set Id",
@@ -358,7 +407,7 @@ func resourceNonLocalUserUpdate(ctx context.Context, d *schema.ResourceData, m i
 				if version_validation_mode_exists && version_validation_mode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
-						Summary:  "Cluster Version & Build Version Are Too Differant",
+						Summary:  "Cluster Version & Build Version Are Too Different",
 						Detail:   versions_error.Error(),
 					})
 					return diags
@@ -406,5 +455,52 @@ func resourceNonLocalUserUpdate(ctx context.Context, d *schema.ResourceData, m i
 	resourceNonLocalUserRead(ctx, d, m)
 
 	return diags
+
+}
+
+func resourceNonLocalUserImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+
+	result := []*schema.ResourceData{}
+	client := m.(*vast_client.VMSSession)
+	resource_config := codegen_configs.GetResourceByName("NonLocalUser")
+	attrs := map[string]interface{}{"path": utils.GenPath("users/query")}
+	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+
+	if err != nil {
+		return result, err
+	}
+
+	resource_l := []api_latest.NonLocalUser{}
+	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+
+	if err != nil {
+		return result, err
+	}
+	err = json.Unmarshal(body, &resource_l)
+	if err != nil {
+		return result, err
+	}
+
+	if len(resource_l) == 0 {
+		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	}
+
+	resource := resource_l[0]
+	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
+	if id_err != nil {
+		return result, id_err
+	}
+
+	diags := ResourceNonLocalUserReadStructIntoSchema(ctx, resource, d)
+	if diags.HasError() {
+		all_errors := "Errors occured while importing:\n"
+		for _, dig := range diags {
+			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+		}
+		return result, errors.New(all_errors)
+	}
+	result = append(result, d)
+
+	return result, err
 
 }

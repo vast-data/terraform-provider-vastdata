@@ -21,4 +21,6 @@ type NonLocalGroup struct {
 	TenantId int32 `json:"tenant_id,omitempty"`
 	// List S3 policies IDs
 	S3PoliciesIds []int32 `json:"s3_policies_ids,omitempty"`
+	// Context from which the user originates. Available: 'ad', 'nis' and 'ldap'
+	Context string `json:"context,omitempty"`
 }

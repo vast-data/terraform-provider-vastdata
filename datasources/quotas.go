@@ -12,7 +12,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
-	"strconv"
 )
 
 func DataSourceQuota() *schema.Resource {
@@ -723,7 +722,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -735,7 +734,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -746,7 +745,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading urls from response",
+			Summary:  "Error occurred reading urls from response",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -755,7 +754,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -789,7 +788,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -801,7 +800,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -813,7 +812,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -825,7 +824,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"state\"",
+			Summary:  "Error occurred setting value to \"state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -837,7 +836,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"pretty_state\"",
+			Summary:  "Error occurred setting value to \"pretty_state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -849,7 +848,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"path\"",
+			Summary:  "Error occurred setting value to \"path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -861,7 +860,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"pretty_grace_period\"",
+			Summary:  "Error occurred setting value to \"pretty_grace_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -873,7 +872,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"grace_period\"",
+			Summary:  "Error occurred setting value to \"grace_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -885,7 +884,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"time_to_block\"",
+			Summary:  "Error occurred setting value to \"time_to_block\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -897,7 +896,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"soft_limit\"",
+			Summary:  "Error occurred setting value to \"soft_limit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -909,7 +908,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"hard_limit\"",
+			Summary:  "Error occurred setting value to \"hard_limit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -921,7 +920,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"hard_limit_inodes\"",
+			Summary:  "Error occurred setting value to \"hard_limit_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -933,7 +932,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"soft_limit_inodes\"",
+			Summary:  "Error occurred setting value to \"soft_limit_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -945,7 +944,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_inodes\"",
+			Summary:  "Error occurred setting value to \"used_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -957,7 +956,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_capacity\"",
+			Summary:  "Error occurred setting value to \"used_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -969,7 +968,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_capacity_tb\"",
+			Summary:  "Error occurred setting value to \"used_capacity_tb\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -981,7 +980,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_effective_capacity\"",
+			Summary:  "Error occurred setting value to \"used_effective_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -993,7 +992,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_effective_capacity_tb\"",
+			Summary:  "Error occurred setting value to \"used_effective_capacity_tb\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1005,7 +1004,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1017,7 +1016,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_name\"",
+			Summary:  "Error occurred setting value to \"tenant_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1029,7 +1028,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster\"",
+			Summary:  "Error occurred setting value to \"cluster\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1041,7 +1040,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster_id\"",
+			Summary:  "Error occurred setting value to \"cluster_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1053,7 +1052,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"system_id\"",
+			Summary:  "Error occurred setting value to \"system_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1065,7 +1064,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_user_quota\"",
+			Summary:  "Error occurred setting value to \"is_user_quota\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1077,7 +1076,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enable_email_providers\"",
+			Summary:  "Error occurred setting value to \"enable_email_providers\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1089,7 +1088,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"num_exceeded_users\"",
+			Summary:  "Error occurred setting value to \"num_exceeded_users\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1101,7 +1100,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"num_blocked_users\"",
+			Summary:  "Error occurred setting value to \"num_blocked_users\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1113,7 +1112,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enable_alarms\"",
+			Summary:  "Error occurred setting value to \"enable_alarms\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1125,7 +1124,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_email\"",
+			Summary:  "Error occurred setting value to \"default_email\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1137,7 +1136,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"percent_inodes\"",
+			Summary:  "Error occurred setting value to \"percent_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1149,7 +1148,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"percent_capacity\"",
+			Summary:  "Error occurred setting value to \"percent_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1162,7 +1161,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_user_quota\"",
+			Summary:  "Error occurred setting value to \"default_user_quota\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1175,7 +1174,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_group_quota\"",
+			Summary:  "Error occurred setting value to \"default_group_quota\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1187,7 +1186,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"user_quotas\"",
+			Summary:  "Error occurred setting value to \"user_quotas\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1199,12 +1198,19 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"group_quotas\"",
+			Summary:  "Error occurred setting value to \"group_quotas\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }

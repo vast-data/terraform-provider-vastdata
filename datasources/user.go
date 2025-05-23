@@ -12,7 +12,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
-	"strconv"
 )
 
 func DataSourceUser() *schema.Resource {
@@ -199,7 +198,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -211,7 +210,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -221,7 +220,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -255,7 +254,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -267,7 +266,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -279,7 +278,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -291,7 +290,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -303,7 +302,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"leading_gid\"",
+			Summary:  "Error occurred setting value to \"leading_gid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -315,7 +314,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gids\"",
+			Summary:  "Error occurred setting value to \"gids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -327,7 +326,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"groups\"",
+			Summary:  "Error occurred setting value to \"groups\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -339,7 +338,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"group_count\"",
+			Summary:  "Error occurred setting value to \"group_count\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -351,7 +350,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"leading_group_name\"",
+			Summary:  "Error occurred setting value to \"leading_group_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -363,7 +362,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"leading_group_gid\"",
+			Summary:  "Error occurred setting value to \"leading_group_gid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -375,7 +374,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sid\"",
+			Summary:  "Error occurred setting value to \"sid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -387,7 +386,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"primary_group_sid\"",
+			Summary:  "Error occurred setting value to \"primary_group_sid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -399,7 +398,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sids\"",
+			Summary:  "Error occurred setting value to \"sids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -411,7 +410,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"local\"",
+			Summary:  "Error occurred setting value to \"local\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -423,7 +422,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_create_bucket\"",
+			Summary:  "Error occurred setting value to \"allow_create_bucket\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -435,7 +434,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_delete_bucket\"",
+			Summary:  "Error occurred setting value to \"allow_delete_bucket\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -447,7 +446,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_superuser\"",
+			Summary:  "Error occurred setting value to \"s3_superuser\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -459,12 +458,19 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_policies_ids\"",
+			Summary:  "Error occurred setting value to \"s3_policies_ids\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }

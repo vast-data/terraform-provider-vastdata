@@ -14,88 +14,92 @@ import (
 	"net/url"
 )
 
-func DataSourceSnapshot() *schema.Resource {
+func DataSourceNonLocalGroup() *schema.Resource {
 	return &schema.Resource{
-		ReadContext: dataSourceSnapshotRead,
+		ReadContext: dataSourceNonLocalGroupRead,
 		Description: ``,
 		Schema: map[string]*schema.Schema{
 
 			"id": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalGroup identifier`,
+			},
+
+			"gid": &schema.Schema{
 				Type:        schema.TypeInt,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the snapshot`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Group GID`,
 			},
 
-			"guid": &schema.Schema{
+			"sid": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the snapshot`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Group SID`,
 			},
 
-			"expiration_time": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire`,
-			},
-
-			"name": &schema.Schema{
+			"groupname": &schema.Schema{
 				Type:        schema.TypeString,
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
-			},
-
-			"path": &schema.Schema{
-				Type:        schema.TypeString,
-				Computed:    true,
-				Required:    false,
-				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Groupname`,
 			},
 
 			"tenant_id": &schema.Schema{
 				Type:        schema.TypeInt,
-				Computed:    true,
-				Required:    false,
-				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use`,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
 			},
 
-			"indestructible": &schema.Schema{
-				Type:        schema.TypeBool,
+			"s3_policies_ids": &schema.Schema{
+				Type:        schema.TypeList,
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) List S3 policies IDs`,
+
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
+			},
+
+			"context": &schema.Schema{
+				Type:        schema.TypeString,
+				Computed:    false,
+				Required:    true,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
 			},
 		},
 	}
 }
 
-func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func dataSourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
 	values := url.Values{}
-	datasource_config := codegen_configs.GetDataSourceByName("Snapshot")
+	datasource_config := codegen_configs.GetDataSourceByName("NonLocalGroup")
 
-	name := d.Get("name")
-	values.Add("name", fmt.Sprintf("%v", name))
+	groupname := d.Get("groupname")
+	values.Add("groupname", fmt.Sprintf("%v", groupname))
 
-	if d.HasChanges("tenant_id") {
-		tenant_id := d.Get("tenant_id")
-		tflog.Debug(ctx, "Using optional attribute \"tenant_id\"")
-		values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
-	}
+	context := d.Get("context")
+	values.Add("context", fmt.Sprintf("%v", context))
 
-	response, err := client.Get(ctx, utils.GenPath("snapshots"), values.Encode(), map[string]string{})
+	tenant_id := d.Get("tenant_id")
+	values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
+
+	response, err := client.Get(ctx, utils.GenPath("groups/query"), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -106,7 +110,7 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		return diags
 
 	}
-	resource_l := []api_latest.Snapshot{}
+	resource_l := []api_latest.NonLocalGroup{}
 	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
@@ -161,50 +165,38 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Guid", resource.Guid))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Gid", resource.Gid))
 
-	err = d.Set("guid", resource.Guid)
+	err = d.Set("gid", resource.Gid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"gid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ExpirationTime", resource.ExpirationTime))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sid", resource.Sid))
 
-	err = d.Set("expiration_time", resource.ExpirationTime)
+	err = d.Set("sid", resource.Sid)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"expiration_time\"",
+			Summary:  "Error occurred setting value to \"sid\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Name", resource.Name))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Groupname", resource.Groupname))
 
-	err = d.Set("name", resource.Name)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"name\"",
-			Detail:   err.Error(),
-		})
-	}
-
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Path", resource.Path))
-
-	err = d.Set("path", resource.Path)
+	err = d.Set("groupname", resource.Groupname)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"path\"",
+			Summary:  "Error occurred setting value to \"groupname\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -221,14 +213,26 @@ func dataSourceSnapshotRead(ctx context.Context, d *schema.ResourceData, m inter
 		})
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Indestructible", resource.Indestructible))
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "S3PoliciesIds", resource.S3PoliciesIds))
 
-	err = d.Set("indestructible", resource.Indestructible)
+	err = d.Set("s3_policies_ids", utils.FlattenListOfPrimitives(&resource.S3PoliciesIds))
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred setting value to \"indestructible\"",
+			Summary:  "Error occurred setting value to \"s3_policies_ids\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Context", resource.Context))
+
+	err = d.Set("context", resource.Context)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"context\"",
 			Detail:   err.Error(),
 		})
 	}

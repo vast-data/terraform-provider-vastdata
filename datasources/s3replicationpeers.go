@@ -12,7 +12,6 @@ import (
 	utils "github.com/vast-data/terraform-provider-vastdata/utils"
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"net/url"
-	"strconv"
 )
 
 func DataSourceS3replicationPeers() *schema.Resource {
@@ -139,7 +138,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -151,7 +150,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -161,7 +160,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -195,7 +194,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -207,7 +206,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -219,7 +218,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -231,7 +230,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
+			Summary:  "Error occurred setting value to \"url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -243,7 +242,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_name\"",
+			Summary:  "Error occurred setting value to \"bucket_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -255,7 +254,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"http_protocol\"",
+			Summary:  "Error occurred setting value to \"http_protocol\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -267,7 +266,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"type_\"",
+			Summary:  "Error occurred setting value to \"type_\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -279,7 +278,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"proxies\"",
+			Summary:  "Error occurred setting value to \"proxies\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -291,7 +290,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"aws_region\"",
+			Summary:  "Error occurred setting value to \"aws_region\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -303,7 +302,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"access_key\"",
+			Summary:  "Error occurred setting value to \"access_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -315,7 +314,7 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"secret_key\"",
+			Summary:  "Error occurred setting value to \"secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -327,12 +326,19 @@ func dataSourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"custom_bucket_url\"",
+			Summary:  "Error occurred setting value to \"custom_bucket_url\"",
 			Detail:   err.Error(),
 		})
 	}
 
-	Id := (int64)(resource.Id)
-	d.SetId(strconv.FormatInt(Id, 10))
+	err = datasource_config.IdFunc(ctx, client, resource.Id, d)
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Failed to set Id",
+			Detail:   err.Error(),
+		})
+		return diags
+	}
 	return diags
 }
