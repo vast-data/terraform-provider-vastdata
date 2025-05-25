@@ -119,7 +119,7 @@ components:
           type: "array"
           items:
             type: "string"
-          description: "A list of bucket creator users"
+          description: "A list of bucket creator users."
         bucket_creators_groups:
             type: "array"
             items:
@@ -155,14 +155,14 @@ components:
           properties:
             enabled:
               type: "boolean"
-              description: "True if share-level ACLs are enabled on the view, otherwise false."
+              description: "If true, share-level ACLs are enabled on the view."
             acl:
               type: "array"
               items:
                 type: "object"
                 $ref: '#/components/schemas/ShareAcl'
                 description: "Share-level ACE"
-              description: "Share-level ACL"
+              description: "Share-level ACL."
         qos_policy_id:
           type: "integer"
           description: "The ID of the QoS policy associated with the view."
@@ -283,7 +283,7 @@ components:
             description: "A list of bucket creator groups."
         s3_locks:
           type: "boolean"
-          description: "Enables or disables S3 object locks"
+          description: "Enables or disables S3 object locks."
         s3_locks_retention_mode:
           type: "string"
           description: "S3 locks retention mode."
@@ -311,14 +311,14 @@ components:
           properties:
             enabled:
               type: "boolean"
-              description: "True if share-level ACLs are enabled on the view, otherwise false."
+              description: "If true, share-level ACLs are enabled on the view."
             acl:
               type: "array"
               items:
                 type: "object"
                 $ref: '#/components/schemas/ShareAcl'
                 description: "Share-level ACE"
-              description: "Share-level ACL"
+              description: "Share-level ACL."
         qos_policy_id:
           type: "integer"
           description: "The ID of the QoS policy associated with the view."
@@ -439,6 +439,9 @@ components:
           items:
             type: "integer"
           description: "A list of identity policy IDs."
+        context:
+          type: "string"
+          description: "Context from which the user originates. Valid values: 'ad', 'nis' and 'ldap'."
     UserKey:
       type: "object"
       properties:
@@ -487,7 +490,7 @@ components:
           description: "The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in `pgp_public_key`."
         tenant_id:
           type: "integer"
-          description: "Tenant ID"
+          description: "Tenant ID."
         enabled:
           type: "boolean"
           description: "Sets the key to be enabled or disabled."
@@ -541,7 +544,7 @@ components:
           description: "An optional custom name to specify a non-default privileged group. If not set, the privileged group is the Backup Operators domain group."
         default_others_share_level_perm:
           type: "string"
-          description: "Default share-level permissions for others"
+          description: "Default share-level permissions for others."
           enum: [READ, CHANGE, FULL]
         trash_gid:
           type: "integer"
@@ -565,7 +568,7 @@ components:
           description: "The ID of the OpenLDAP provider specified separately by the user."
         nis_provider_id:
           type: "integer"
-          description: "NIS provider ID."
+          description: "The NIS provider ID."
         encryption_crn:
           type: "string"
           description: "The unique ID of the tenant's encryption group."
@@ -604,7 +607,7 @@ components:
           description: "The unique ID of the view policy."
         guid:
           type: "string"
-          description: "The unique ID of the view policy."
+          description: "The unique GUID of the view policy."
         name:
           type: "string"
           description: "The unique name of the view policy."
@@ -906,14 +909,14 @@ components:
           description: ""
         role:
           type: "string"
-          description: "Role"
+          description: "Role."
         ip_ranges:
           type: "array"
           items:
             type: "array"
             items:
               type: "string"
-          description: "IP ranges"
+          description: "IP ranges."
         vms_preferred:
           type: "boolean"
           description: "If `true`, the CNodes included in this virtual IP pool are handled as preferred CNodes during VMS host election."
@@ -953,7 +956,7 @@ components:
           description: "The virtual IP for the DNS service. DNS requests from your external DNS server must be delegated to this IP."
         domain_suffix:
           type: "string"
-          description: "A suffix to append to domain names of each virtual IP pool. The suffix should append each domain name to form a valid FQDN for DNS requests to target"
+          description: "A suffix to append to domain names of each virtual IP pool. The suffix should append each domain name to form a valid FQDN for DNS requests to target."
         vip_gateway:
           type: "string"
           description: "The IPv4 address of the gateway to the external DNS server if it is on a different subnet. Must be on the same subnet as the IP and reachable from the relevant network interface."
@@ -968,7 +971,7 @@ components:
           description: "The subnet, in the CIDR format, on which the DNS resides."
         vip_vlan:
           type: "integer"
-          description: "Specifies a VLAN if needed to enable communication with the external DNS server(s)."
+          description: "The VLAN (optional) to enable communication with the external DNS server(s)."
         cnode_ids:
           type: "array"
           items:
@@ -1054,7 +1057,7 @@ components:
         used_effective_capacity:
           type: "integer"
           format: "int64"
-          description: "Used effective capacity in bytes"
+          description: "Used effective capacity in bytes."
         used_effective_capacity_tb:
           type: "number"
           format: "float"
@@ -1216,7 +1219,7 @@ components:
           default: 389
         binddn:
           type: "string"
-          description: "Distinguished name of LDAP superuser."
+          description: "Distinguished name of the LDAP superuser."
         bindpw:
           type: "string"
           description: "Password for the LDAP superuser."
@@ -1306,7 +1309,7 @@ components:
           default: "uid"
         use_auto_discovery:
           type: "boolean"
-          description: "If `true` enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If `false`, queries are restricted to the joined domain and URIs must be provided in `urls`."
+          description: "If `true`, Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If `false`, queries are restricted to the joined domain and URIs must be provided in `urls`."
         use_ldaps:
           type: "boolean"
           description: "Specifies whether to use LDAPS for auto-discovery."
@@ -1326,7 +1329,7 @@ components:
           description: ""
         name:
           type: "string"
-          description: "A unique name"
+          description: "A unique name."
         guid:
           type: "string"
           description: ""
@@ -1354,7 +1357,7 @@ components:
           description: "If `true`, removes expired object delete markers."
         noncurrent_days:
           type: "integer"
-          description: "Number of days after objects become non-current."
+          description: "Number of days after which objects become non-current."
         newer_noncurrent_versions:
           type: "integer"
           description: "The number of newer versions to retain."
@@ -1865,7 +1868,7 @@ components:
       properties:
         name:
           type: "string"
-          description: "Ten name of the remote tenant."
+          description: "The name of the remote tenant."
         guid:
           type: "string"
           description: "The remote tenant GUID."
@@ -1877,10 +1880,10 @@ components:
           description: "The unique ID of the replication peer configuration."
         guid:
           type: "string"
-          description: "The unique GUID of the  replication peer configuration."
+          description: "The unique GUID of the replication peer configuration."
         name:
           type: "string"
-          description: "The name of the replication peer configuration"
+          description: "The name of the replication peer configuration."
         url:
           type: "string"
           description: "Direct URL of the replication peer configuration."
@@ -1992,7 +1995,7 @@ components:
           type: "array"
           items:
             type: "string"
-            description: "The HTTP pproxy URL."
+            description: "The HTTP proxy URL."
           description: "A list of HTTP proxies."
         aws_region:
           type: "string"
@@ -2043,7 +2046,7 @@ components:
           description: "Which port to use."
         binddn:
           type: "string"
-          description: "Distinguished name of Active Directory superuser."
+          description: "Distinguished name of the Active Directory superuser."
         searchbase:
           type: "string"
           description: "The base DN is the starting point that the Active Directory provider uses when searching for users and groups. If a group base DN is configured, it will be used instead of the base DN (for groups only)."
@@ -2074,7 +2077,7 @@ components:
         reverse_lookup:
           type: "boolean"
           default: false
-          description: "Specifies whether to resolve Active Directory netgroups into hostnames"
+          description: "Specifies whether to resolve Active Directory netgroups into hostnames."
         gid_number:
           type: "string"
           description: "The attribute of a user entry on the Active Directory server that contains the UID number, if different from `uidNumber`. Often, when binding the VAST cluster to Active Directory, this does not need to be set."
@@ -2102,8 +2105,7 @@ components:
           description: "The object class that defines a user entry on the Active Directory server, if different from `posixAccount`. When binding the VAST cluster to Active Directory, set this parameter to `user` to ensure that authorization works properly."
         posix_group:
           type: "string"
-          description: "	
-The object class that defines a group entry on the Active Directory server, if different from `posixGroup`. When binding the VAST cluster to Active Directory, set this parameter to `group` to ensure that authorization works properly."
+          description: "The object class that defines a group entry on the Active Directory server, if different from `posixGroup`. When binding the VAST cluster to Active Directory, set this parameter to `group` to ensure that authorization works properly."
         username_property_name:
           type: "string"
           description: "The attribute to use for querying users in VMS user-initated user queries. Default is `name`. Sometimes it can be set to `cn`."
@@ -2149,7 +2151,7 @@ The object class that defines a group entry on the Active Directory server, if d
           default: false
         log_hostname:
           type: "boolean"
-          description: "Enables or disables logging of the accessing host name"
+          description: "Enables or disables logging of the accessing host name."
         modify_data_md:
           type: "boolean"
           description: "Enables or disables logging of operations that modify metadata."
@@ -2253,10 +2255,10 @@ The object class that defines a group entry on the Active Directory server, if d
       properties:
         id:
           type: "int64"
-          description: "A unique ID of the manager."
+          description: "The unique ID of the manager."
         guid:
           type: "string"
-          description: "A unique GUID of the manager."
+          description: "The unique GUID of the manager."
         username:
           type: "string"
           description: "The username of the manager."
