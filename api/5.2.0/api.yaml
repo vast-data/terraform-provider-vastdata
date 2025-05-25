@@ -63,7 +63,7 @@ components:
           description: "The unique GUID of the view."
         name:
           type: "string"
-          description: "the unique name of the view."
+          description: "The unique name of the view."
         path:
           type: "string"
           description: "File system path. Begin with '/'. Do not include a trailing slash."
