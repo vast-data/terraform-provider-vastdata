@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: VastData API
-  description: A API document representing VastData API
+  title: VAST Data API
+  description: An API document representing VAST Data API
 servers:
   - url: https://example.com/api
 #----------------------------------------------------Paths----------------------------------------------------#
-#-------------------------------------------------Componants-------------------------------------------------#
+#-------------------------------------------------Components-------------------------------------------------#
 components:
   schemas:
     Group:
@@ -14,24 +14,24 @@ components:
      properties:
        id:
          type: "integer"
-         description: "A uniqe Identifier of a group"
+         description: "The unique ID of the group."
        guid:
          type: "string"
-         description: "A uniqe GUID assigned to the group"
+         description: "The unique GUID of the group."
        name:
          type: "string"
-         description: "A uniq name given to the group"
+         description: "The unique name of the group."
        gid:
          type: "integer"
-         description: "The group linux gid"
+         description: "The Unix GID of the group."
        sid:
          type: "string"
-         description: "The group SID"
+         description: "The SID of the group."
        s3_policies_ids:
          type: "array"
          items:
            type: "integer"
-         description: "List of S3 policies IDs"
+         description: "A list of identity policy IDs."
     ShareAcl:
       type: "object"
       properties:
@@ -57,105 +57,105 @@ components:
       properties:
         id:
           type: "integer"
-          description: "A uniqe ID used to identify the View"
+          description: "The unique ID of the view."
         guid:
           type: "string"
-          description: "A uniqe GUID assigned to the View"
+          description: "The unique GUID of the view."
         name:
           type: "string"
-          description: "A uniq name given to the view"
+          description: "the unique name of the view."
         path:
           type: "string"
-          description: "File system path. Begin with '/'. Do not include a trailing slash"
+          description: "File system path. Begin with '/'. Do not include a trailing slash."
         create_dir:
           type: "boolean"
-          description: "Creates the directory specified by the path"
+          description: "If true, creates the directory specified by the path."
         alias:
           type: "string"
-          description: "Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path"
+          description: "Alias for NFS export. The alias must start with '/' and can include ASCII characters only. If configured, this setting supersedes the exposed NFS export path."
         bucket:
           type: "string"
-          description: "S3 Bucket name"
+          description: "S3 bucket name."
         policy_id:
           type: "integer"
-          description: "Associated view policy ID"
+          description: "The ID of the QoS policy associated with the view."
         cluster:
           type: "string"
-          description: "Parent Cluster"
+          description: "Parent cluster."
         cluster_id:
           type: "integer"
-          description: "Parent Cluster ID"
+          description: "Parent cluster ID."
         tenant_id:
           type: "integer"
-          description: "The tenant ID related to this view"
+          description: "The ID of the tenant associated with this view."
         directory:
           type: "boolean"
-          description: "Create the directory if it does not exist"
+          description: "If true, creates the directory if it does not exist."
         s3_versioning:
           type: "boolean"
-          description: "Trun on S3 Versioning"
+          description: "Enables or disables S3 versioning."
         s3_unverified_lookup:
           type: "boolean"
-          description: "Allow S3 Unverified Lookup"
+          description: "Allows or prohibits S3 Unverified Lookup."
         allow_anonymous_access:
           type: "boolean"
-          description: "Allow S3 anonymous access"
+          description: "Allows or prohibits S3 anonymous access."
         allow_s3_anonymous_access:
           type: "boolean"
-          description: "Allow S3 anonymous access"
+          description: "Allows or prohibits S3 anonymous access."
         protocols:
           type: "array"
           items:
             type: "string"
             enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4]
-          description: "Protocols exposed by this view"
+          description: "Protocols exposed by this view."
         share:
           type: "string"
-          description: 'Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?'
+          description: 'Name of the SMB share. The name cannot not include the following characters: " \ / [ ] : | < > + = ; , * ?'
         bucket_owner:
           type: "string"
-          description: "S3 Bucket owner"
+          description: "S3 bucket owner."
         bucket_creators:
           type: "array"
           items:
             type: "string"
-          description: "List of bucket creators users"
+          description: "A list of bucket creator users"
         bucket_creators_groups:
             type: "array"
             items:
                 type: "string"
-            description: "List of bucket creators groups"
+            description: "A list of bucket creator groups."
         s3_locks:
           type: "boolean"
-          description: "S3 Object Lock"
+          description: "Enables or disables S3 object locks."
         s3_locks_retention_mode:
           type: "string"
-          description: "S3 Locks retention mode"
+          description: "S3 locks retention mode."
         s3_locks_retention_period:
           type: "string"
-          description: "Period should be positive in format like 0d|2d|1y|2y"
+          description: "Retention period for S3 locks. The period is specified as a positive integer suffixed by a time unit of measure, for example: 0d|2d|1y|2y"
         physical_capacity:
           type: "integer"
           format: "int64"
-          description: "Physical Capacity"
+          description: "Physical capacity."
         logical_capacity:
           type: "integer"
           format: "int64"
-          description: "Logical Capacity"
+          description: "Logical capacity."
         nfs_interop_flags:
           type: "string"
           enum: [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED, ONLY_NFS3_INTEROP_ENABLED,
                  ONLY_NFS4_INTEROP_ENABLED, BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]
-          description: "Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols."
+          description: "Indicates whether the view supports simultaneous access using NFSv3/NFSv4/SMB protocols."
         is_remote:
           type: "boolean"
         share_acl:
           type: "object"
-          description: "Share-level ACL details"
+          description: "Share-level ACL details."
           properties:
             enabled:
               type: "boolean"
-              description: "True if Share ACL is enabled on the view, otherwise False"
+              description: "True if share-level ACLs are enabled on the view, otherwise false."
             acl:
               type: "array"
               items:
@@ -165,39 +165,33 @@ components:
               description: "Share-level ACL"
         qos_policy_id:
           type: "integer"
-          description: "QoS Policy ID"
+          description: "The ID of the QoS policy associated with the view."
         is_seamless:
           type: "boolean"
-          description: "Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer."
+          description: "Enables or disables support for  seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be done when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer."
         max_retention_period:
           type: "string"
-          description: "Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years)."
+          description: "Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the time unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years)."
         min_retention_period:
            type: "string"
-           description: "Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day)."
+           description: "Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the time unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day)."
         files_retention_mode:
           type: "string"
           enum: [GOVERNANCE,COMPLIANCE,NONE]
-          description: "Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object."
+          description: "Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, `files_retention_mode` must be set to `GOVERNANCE` or `COMPLIANCE`. If the view is enabled for S3 and not for NFSv3 or SMB, `files_retention_mode` can be set to `NONE`. If set to `GOVERNANCE`, locked files cannot be deleted or changed. The retention period can be shortened or extended by users with sufficient permissions. If set to `COMPLIANCE`, locked files cannot be deleted or changed. The retention period can be extended, but not shortened, by users with sufficient permissions. If set to `NONE` (S3 only), the retention mode is not set for the view; it is set individually for each object."
         default_retention_period:
           type: "string"
-          description: "Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y."
+          description: "Relevant if locking is enabled. Required if `s3_locks_retention_mode` is set to `GOVERNANCE` or `COMPLIANCE`. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y."
         auto_commit:
           type: "string"
-          description: "Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours)."
+          description: "Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default retention period, after which they are unlocked. Specify as an integer value followed by a letter for the time unit (h - hours, d - days, y - years). Example: 2h (2 hours)."
         s3_object_ownership_rule:
           type: "string"
           enum: [ None, BucketOwnerPreferred, ObjectWriter, BucketOwnerEnforced ]
-          Description: "S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket.
-A bucket can be configured with one of the following object ownership rules:
-BucketOwnerEnforced - The bucket owner has full control over any object in the bucket
-ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object.
-BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects.
-None - S3 Object Ownership is disabled for the bucket.
-"
+          Description: "S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: `BucketOwnerEnforced` - The bucket owner has full control over any object in the bucket. `ObjectWriter` - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. `BucketOwnerPreferred` - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. `None` - S3 Object Ownership is disabled for the bucket."
         locking:
           type: "boolean"
-          description: "Write Once Read Many (WORM) locking enabled"
+          description: "Enables or disables Write Once Read Many (WORM) locking."
         ignore_oos:
           type: "boolean"
           description: "Ignore oos"
@@ -208,15 +202,15 @@ None - S3 Object Ownership is disabled for the bucket.
           type: "array"
           items:
             type: "string"
-          description: "List of attribute based access control tags, this option can be used only when using SMB/NFSv4 protocols"
+          description: "A list of Attribute-Based Access Control (ABAC) tags. This option can be used only when using SMB/NFSv4 protocols."
         abe_max_depth:
           type: "integer"
-          description: "Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths."
+          description: "Restricts Access-Based Enumeration (ABE) to a specified path depth. For example, if `abe_max_depth` is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths."
         abe_protocols:
           type: "array"
           items:
             type: "string"
-          description: "The protocols for which Access-Based Enumeration (ABE) is enabled , allowed values [ NFS, SMB, NFS4, S3 ]"
+          description: "The protocols for which Access-Based Enumeration (ABE) is enabled. Valid values: [ NFS, SMB, NFS4, S3 ]"
     ViewCreate:
       type: "object"
       required:
@@ -224,100 +218,100 @@ None - S3 Object Ownership is disabled for the bucket.
       properties:
         name:
           type: "string"
-          description: "A uniq name given to the view"
+          description: "A unique name for the view."
         path:
           type: "string"
-          description: "File system path. Begin with '/'. Do not include a trailing slash"
+          description: "File system path. Begin with '/'. Do not include a trailing slash."
         create_dir:
           type: "boolean"
-          description: "Creates the directory specified by the path"
+          description: "If `true`, creates the directory specified by the path."
         alias:
           type: "string"
-          description: "Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path"
+          description: "Alias for NFS export. The alias must start with '/' and can include ASCII characters only. If configured, this setting supersedes the exposed NFS export path."
         bucket:
           type: "string"
-          description: "S3 Bucket name"
+          description: "S3 bucket name."
         policy_id:
           type: "integer"
-          description: "Associated view policy ID"
+          description: "The ID of the view policy to be associated with the view."
         cluster:
           type: "string"
-          description: "Parent Cluster"
+          description: "Parent cluster."
           x-cli-header: "Cluster"
         cluster_id:
           type: "integer"
-          description: "Parent Cluster ID"
+          description: "Parent cluster ID."
         tenant_id:
           type: "integer"
-          description: "The tenant ID related to this view"
+          description: "The ID of the tenant associated with this view."
         directory:
           type: "boolean"
-          description: "Create the directory if it does not exist"
+          description: "If `true`, creates the directory if it does not exist."
         s3_versioning:
           type: "boolean"
-          description: "Trun on S3 Versioning"
+          description: "Enables or disables S3 versioning."
         s3_unverified_lookup:
           type: "boolean"
-          description: "Allow S3 Unverified Lookup"
+          description: "Allows or prohibits S3 Unverified Lookup."
         allow_anonymous_access:
           type: "boolean"
-          description: "Allow S3 anonymous access"
+          description: "Allows or prohibits S3 anonymous access."
         allow_s3_anonymous_access:
           type: "boolean"
-          description: "Allow S3 anonymous access"
+          description: "Allows or prohibits S3 anonymous access."
         protocols:
           type: "array"
           items:
             type: "string"
             enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4]
-          description: "Protocols exposed by this view"
+          description: "Protocols exposed by this view."
         share:
           type: "string"
-          description: 'Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?'
+          description: 'Name of the SMB share. The name cannot not include the following characters: " \ / [ ] : | < > + = ; , * ?'
         bucket_owner:
           type: "string"
-          description: "S3 Bucket owner"
+          description: "S3 bucket owner."
         bucket_creators:
           type: "array"
           items:
             type: "string"
-          description: "List of bucket creators users"
+          description: "A list of bucket creator users."
         bucket_creators_groups:
             type: "array"
             items:
                 type: "string"
-            description: "List of bucket creators groups"
+            description: "A list of bucket creator groups."
         s3_locks:
           type: "boolean"
-          description: "S3 Object Lock"
+          description: "Enables or disables S3 object locks"
         s3_locks_retention_mode:
           type: "string"
-          description: "S3 Locks retention mode"
+          description: "S3 locks retention mode."
         s3_locks_retention_period:
           type: "string"
-          description: "Period should be positive in format like 0d|2d|1y|2y"
+          description: "Retention period for S3 locks. The period is specified as a positive integer suffixed by a time unit of measure, for example: `0d`|`2d`|`1y`|`2y`"
         physical_capacity:
           type: "integer"
           format: "int64"
-          description: "Physical Capacity"
+          description: "Physical capacity."
         logical_capacity:
           type: "integer"
           format: "int64"
-          description: "Logical Capacity"
+          description: "Logical capacity."
         nfs_interop_flags:
           type: "string"
           enum: [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED, ONLY_NFS3_INTEROP_ENABLED,
                  ONLY_NFS4_INTEROP_ENABLED, BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]
-          description: "Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols."
+          description: "Indicates whether the view supports simultaneous access using NFSv3/NFSv4/SMB protocols."
         is_remote:
           type: "boolean"
         share_acl:
           type: "object"
-          description: "Share-level ACL details"
+          description: "Share-level ACL details."
           properties:
             enabled:
               type: "boolean"
-              description: "True if Share ACL is enabled on the view, otherwise False"
+              description: "True if share-level ACLs are enabled on the view, otherwise false."
             acl:
               type: "array"
               items:
@@ -327,282 +321,279 @@ None - S3 Object Ownership is disabled for the bucket.
               description: "Share-level ACL"
         qos_policy_id:
           type: "integer"
-          description: "QoS Policy ID"
+          description: "The ID of the QoS policy associated with the view."
     User:
       type: "object"
       properties:
         id:
           type: "integer"
-          description: "A uniq id given to user"
+          description: "The unique ID of the user."
         guid:
           type: "string"
-          description: "A uniq guid given to the user"
+          description: "The unique GUID of the user."
         name:
           type: "string"
-          description: "A uniq name given to the user"
+          description: "The unique name of the user."
         uid:
           type: "integer"
-          description: "The user unix UID"
+          description: "The user's Unix UID."
         leading_gid:
           type: "integer"
-          description: "The user leading unix GID"
+          description: "The user's leading Unix GID."
         gids:
           type: "array"
           items:
             type: "integer"
-          description: "List of supplementary GID list"
+          description: "A list of supplementary GIDs."
         groups:
           type: "array"
           items:
             type: "string"
-          description: "List of supplementary Group list"
+          description: "A list of supplementary groups."
         group_count:
           type: "integer"
-          description: "Group Count"
+          description: "Group count."
         leading_group_name:
           type: "string"
-          description: "Leading Group Name"
+          description: "The name of the leading group."
         leading_group_gid:
           type: "int"
-          description: "Leading Group GID"
+          description: "The GID of the leading group."
         sid:
           type: "string"
-          description: "The user SID"
+          description: "The user's SID."
         primary_group_sid :
           type: "string"
-          description: "The user primary group SID"
+          description: "The user's primary group SID."
         sids:
           type: "array"
           items:
             type: "string"
-          description: "supplementary SID list"
+          description: "A list of supplementary SIDs."
         local:
           type: "boolean"
-          description: "IS this a local user"
+          description: "If `true`, the user is a local user."
         allow_create_bucket:
           type: "boolean"
-          description: "Allow create bucket"
+          description: "Allows or prohibits bucket creation by the user."
         allow_delete_bucket:
           type: "boolean"
-          description: "Allow delete bucket"
+          description: "Allows or prohibits bucket deletion by the user."
         s3_superuser:
           type: "boolean"
-          description: "Is S3 superuser"
+          description: "If `true`, the user is an S3 superuser."
         s3_policies_ids:
           type: "array"
           items:
             type: "integer"
-          description: "List S3 policies IDs"
+          description: "A list of identity policy IDs."
     NonLocalUser:
       type: "object"
       properties:
         id:
           type: "string"
-          description: "The NonLocalUser identifier"
+          description: "The ID of the non-local user."
         uid:
           type: "integer"
-          description: "The user unix UID"
+          description: "The user's Unix UID."
         username:
           type: "string"
-          description: "Username of the Non-Local User"
+          description: "The  username of the non-local user."
         allow_create_bucket:
           type: "boolean"
-          description: "Allow create bucket"
+          description: "Allows or prohibits bucket creation by the user."
         allow_delete_bucket:
           type: "boolean"
-          description: "Allow delete bucket"
+          description: "Allows or prohibits bucket deletion by the user."
         tenant_id:
           type: "integer"
-          description: "Tenant ID"
+          description: "Tenant ID."
         s3_policies_ids:
           type: "array"
           items:
             type: "integer"
-          description: "List S3 policies IDs"
+          description: "A list of identity policy IDs."
         context:
           type: "string"
-          description: "Context from which the user originates. Available: 'ad', 'nis' and 'ldap'"
+          description: "Context from which the user originates. Valid values: 'ad', 'nis' and 'ldap'."
     NonLocalGroup:
       type: "object"
       properties:
         id:
           type: "string"
-          description: "The NonLocalGroup identifier"
+          description: "The ID of the non-local group."
         gid:
           type: "integer"
-          description: "Group GID"
+          description: "Group GID."
         sid:
           type: "string"
-          description: "Group SID"
+          description: "Group SID."
         groupname:
           type: "string"
-          description: "Groupname"
+          description: "Group name."
         tenant_id:
           type: "integer"
-          description: "Tenant ID"
+          description: "Tenant ID."
         s3_policies_ids:
           type: "array"
           items:
             type: "integer"
-          description: "List S3 policies IDs"
-        context:
-          type: "string"
-          description: "Context from which the user originates. Available: 'ad', 'nis' and 'ldap'"
+          description: "A list of identity policy IDs."
     UserKey:
       type: "object"
       properties:
         id:
           type: "string"
-          description: "The Access key unique identifier"
+          description: "The unique ID of the access key."
         user_id:
           type: "integer"
-          description: "The user id to create the Key for"
+          description: "The ID of the user to create the key for."
         access_key:
           type: "string"
-          description: "The access id of the user key"
+          description: "The access key of the user."
         secret_key:
           type: "string"
-          description: "The secret id of the user key, please note that that the secret id is not encrypted and should be kept in an highly secure backend ,this field will only be returned if pgp_public_key is not provided"
+          description: "The secret key of the user. This secret key is not encrypted and should be kept in an highly secure backend. This field will only be returned if `pgp_public_key` is not provided."
         pgp_public_key:
           type: "string"
-          description: "The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect"
+          description: "The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the `encrypted_secret_key` will be returned, while `secret_key` will be empty. Changing this after apply will have no effect."
         encrypted_secret_key:
           type: "string"
-          description: "The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key"
+          description: "The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in `pgp_public_key`."
         enabled:
           type: "boolean"
-          description: "Should the key be enabled or disabled"
+          description: "Sets the key to be enabled or disabled."
           default: true
     NonLocalUserKey:
       type: "object"
       properties:
         id:
           type: "string"
-          description: "The Access key unique identifier"
+          description: "The unique ID of the access key."
         uid:
           type: "integer"
-          description: "The user unix UID"
+          description: "The user's Unix UID."
         access_key:
           type: "string"
-          description: "The access id of the user key"
+          description: "The user's access key."
         secret_key:
           type: "string"
-          description: "The secret id of the user key"
+          description: "The user's secret key."
         pgp_public_key:
           type: "string"
-          description: "The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect"
+          description: "The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the `encrypted_secret_key` will be returned, while `secret_key` will be empty. Changing this after apply will have no effect."
         encrypted_secret_key:
           type: "string"
-          description: "The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key"
+          description: "The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in `pgp_public_key`."
         tenant_id:
           type: "integer"
           description: "Tenant ID"
         enabled:
           type: "boolean"
-          description: "Should the key be enabled or disabled"
-          default: true
+          description: "Sets the key to be enabled or disabled."
+          default: true          
     Nis:
       type: "object"
       properties:
         id:
           type: "integer"
-          description: "A uniq id given to the nis server configuration"
+          description: "The unique ID of the NIS server  configuration."
         guid:
           type: "string"
-          description: "A uniq guid given to the nis server configuration"
+          description: "The unique GUID of the NIS server configuration."
         domain_name:
           type: "string"
-          description: "The nis server domain name"
+          description: "The NIS server domain name."
         hosts:
           type: "array"
           items:
             type: "string"
-          description: "List of ip addresses/hostnames of nis servers"
+          description: "A list of IP addresses or hostnames of NIS servers."
     Tenant:
       type: "object"
       properties:
         id:
           type: "integer"
-          description: "A uniq id given to the tenant"
+          description: "The unique ID of the tenant."
         guid:
           type: "string"
-          description: "A uniq guid given to the tenant"
+          description: "The unique GUID of the tenant."
         name:
           type: "string"
-          description: "A uniq name given to the tenant"
+          description: "The unique name of the tenant."
         use_smb_privileged_user:
           type: "boolean"
-          description: "Enables SMB privileged user"
+          description: "Enables or disables SMB privileged user."
         smb_privileged_user_name:
           type: "string"
-          description: "Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'"
+          description: "An optional custom username for the SMB privileged user. If not set, the SMB privileged user name is `vastadmin`."
         use_smb_privileged_group:
           type: "boolean"
-          description: "Enables SMB privileged user group"
+          description: "Enables or disables SMB privileged user group."
         smb_privileged_group_sid:
           type: "string"
-          description: "Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group."
+          description: "An optional custom SID to specify a non-default SMB privileged group. If not set, the SMB privileged group is the Backup Operators domain group."
         smb_privileged_group_full_access:
           type: "boolean"
-          description: "True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access."
+          description: "If `true`, the SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. If `false`, the privileged group has read-only access."
         smb_administrators_group_name:
           type: "string"
-          description: "Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group."
+          description: "An optional custom name to specify a non-default privileged group. If not set, the privileged group is the Backup Operators domain group."
         default_others_share_level_perm:
           type: "string"
-          description: "Default Share-level permissions for Others"
+          description: "Default share-level permissions for others"
           enum: [READ, CHANGE, FULL]
         trash_gid:
           type: "integer"
-          description: "GID with permissions to the trash folder"
+          description: "A GID with permissions to the trash folder."
         client_ip_ranges:
           type: "array"
           items:
             type: "array"
             items:
               type: "string"
-          description: "Array of source IP ranges to allow for the tenant."
+          description: "An array of source IP ranges to allow for the tenant."
         posix_primary_provider:
           type: "string"
           enum: [NONE, LDAP, NIS, AD, LOCAL]
-          description: "POSIX primary provider type"
+          description: "The POSIX primary provider type."
         ad_provider_id:
           type: "integer"
-          description: "AD provider ID"
+          description: "The ID of the Active Directory provider."
         ldap_provider_id:
           type: "integer"
-          description: "Open-LDAP provider ID specified separately by the user"
+          description: "The ID of the OpenLDAP provider specified separately by the user."
         nis_provider_id:
           type: "integer"
-          description: "NIS provider ID"
+          description: "NIS provider ID."
         encryption_crn:
           type: "string"
-          description: "Tenant's encryption group unique identifier"
+          description: "The unique ID of the tenant's encryption group."
         is_nfsv42_supported:
           type: "boolean"
-          description: "Enable NFSv4.2"
+          description: "Enables or disables NFSv4.2."
         allow_locked_users:
           type: "boolean"
-          description: "Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts."
+          description: "Allows or prohibits IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts."
           default: false
         allow_disabled_users:
           type: "boolean"
-          description: "Allow IO from users whose Active Directory accounts are explicitly disabled."
+          description: "Allows or prohibits IO from users whose Active Directory accounts are explicitly disabled."
           default: false
         use_smb_native:
           type: "boolean"
-          description: "Use native SMB authentication"
+          description: "Enables or disables use of native SMB authentication."
         vippool_names:
            type: "array"
            items:
              type: "string"
-           description: "An array of VIP Pool names attached to this tenant."
+           description: "An array of names of virtual IP pools attached to the tenant."
         vippool_ids:
            type: "array"
            items:
              type: "integer"
              format: "int64"
-           description: "An array of VIP Pool ids to attach to tenant."
+           description: "An array of IDs of virtual IP pools attached to the tenant."
     ViewPolicy:
       type: "object"
       required:
@@ -610,29 +601,29 @@ None - S3 Object Ownership is disabled for the bucket.
       properties:
         id:
           type: "integer"
-          description: "A uniqe guid given to the view policy"
+          description: "The unique ID of the view policy."
         guid:
           type: "string"
-          description: "A uniqe guid given to the view policy"
+          description: "The unique ID of the view policy."
         name:
           type: "string"
-          description: "A uniqe name given to the view policy.                         "
+          description: "The unique name of the view policy."
         gid_inheritance:
           type: "string"
-          description: "Determine the way a file inherits GID"
+          description: "Determines the way a file inherits GID."
         flavor:
           type: "string"
           description: "Security flavor, which determines how file and directory permissions are applied in multiprotocol views."
         access_flavor:
           type: "string"
-          description: "Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)"
+          description: "Controls which protocols can set file permissions when the security flavor is set to `MIXED_LAST_WINS`. Note that with `MIXED_LAST_WINS`, NFSv3 access is unaffected by this option."
         path_length:
           type: "string"
-          description: "How to determine the maximum allowed path length"
+          description: "How to determine the maximum allowed path length."
           enum: [ LCD, NPL ]
         allowed_characters:
           type: "string"
-          description: "How to determine the allowed characters in a path"
+          description: "How to determine the allowed characters in a path."
         use_32bit_fileid:
           type: "boolean"
           description: ""
@@ -641,109 +632,78 @@ None - S3 Object Ownership is disabled for the bucket.
           description: ""
         use_auth_provider:
           type: "boolean"
-          description: "Use configured Auth Provider(s) to enforce group permissions when set to true , 
-if set to ture with out specifing auth_source , the auth_source set to \"PROVIDERS\".  
-if set to false than auth_source set to RPC.
-Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value.
-therefor it is adviasable to always specify the value of auth_source"
+          description: "Enables or disables use of the configured authentication provider(s) to enforce group permissions. If set to `true` without specifing `auth_source`, the `auth_source` is set to `PROVIDERS`. If set to `false`, the `auth_source` is set to RPC. Due to the nature of Terraform, simply changing `use_auth_provider` from `false` to `true` or the other way around will not change the value of the `auth_source` parameter because Terrafrom will keep holding the previous value. Therefore it is advisable to always specify the value of `auth_source`."
           default: false
         auth_source:
           type: "string"
-          description: "The source of authentication"
+          description: "The source of authentication."
           enum: [PROVIDERS,RPC,RPC_AND_PROVIDERS]
         read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read/write permissions"
+          description: "Hosts with NFS read/write permissions."
         read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read only permissions"
+          description: "Hosts with NFS read-only permissions."
         nfs_read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read/write permissions.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with NFS read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_read_write` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         nfs_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read only permissions.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with NFS read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_read_only` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         smb_read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with SMB read/write permissions.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with SMB read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `smb_read_write` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         smb_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with SMB read only permissions.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with SMB read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `smb_read_only` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         s3_read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with S3 read/write permissions.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with S3 read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `s3_read_write` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         s3_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with S3 read only permissions.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with S3 read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `s3_read_only` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         trash_access:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with trash permissions"
+          description: "Hosts with trash folder permissions."
         nfs_posix_acl:
           type: "boolean"
-          description: "Enable POSIX ACL"
+          description: "Enables or disables POSIX ACL."
         nfs_return_open_permissions:
           type: "boolean"
-          description: "when using smb use open permissions for files"
+          description: "When using SMB, enables or disables use of open permissions for files."
         nfs_no_squash:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with no squash policy.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with the no-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_no_squash` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         nfs_root_squash:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with root squash policy.
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []."
+          description: "Hosts with the root squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_root_squash` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         nfs_all_squash:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with all squash policy. 
-when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses
-However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases.
-If there is a need to change the value an empty list it must be secifed and set to []"
+          description: "Hosts with the all-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_all_squash` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         s3_bucket_full_control:
           type: "string"
           description: "Hosts with full permissions"
@@ -779,28 +739,28 @@ If there is a need to change the value an empty list it must be secifed and set 
           description: "Hosts with full permissions"
         smb_file_mode:
           type: "integer"
-          description: "Default unix type permissions on new file"
+          description: "Default UNIX-type permissions on a new file."
         smb_directory_mode:
           type: "integer"
-          description: "Default unix type permissions on new folder"
+          description: "Default UNIX-type permissions on a new folder."
         smb_file_mode_padded:
           type: "string"
-          description: "Default unix type permissions on new file"
+          description: "Default UNIX-type permissions on a new file."
         smb_directory_mode_padded:
           type: "string"
-          description: "Default unix type permissions on new folder"
+          description: "Default UNIX-type permissions on a new folder."
         cluster:
           type: "string"
-          description: "Parent Cluster"
+          description: "Parent cluster."
         cluster_id:
           type: "integer"
-          description: "Parent Cluster ID"
+          description: "Parent cluster ID."
         tenant_id:
           type: "integer"
-          description: "Tenant ID"
+          description: "Tenant ID."
         tenant_name:
           type: string
-          description: Tenant Name
+          description: "Tenant name."
         url:
           type: "string"
           description: ""
@@ -811,81 +771,80 @@ If there is a need to change the value an empty list it must be secifed and set 
           type: "array"
           items:
             type: "integer"
-          description: "Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather.
-Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write"
+          description: "A comma-separated list of virtual IP pool IDs. This attribute conflicts with `vippool_permissions` and cannot be supplied together with it. Also, due to the lack of ability to configure virtual IP pool permissions using this attibute, the pool permissions are always defined as read/write."
         nfs_minimal_protection_level:
           type: "string"
-          description: "NFS 4.1 minimal protection level"
+          description: "NFSv4.1 minimal protection level."
           enum: [ NONE, SYSTEM, KRB_AUTH_ONLY, KRB_INTEGRITY, KRB_PRIVACY ]
         s3_visibility:
           type: "array"
           items:
             type: "string"
-          description: "A list of usernames for bucket listing permissions"
+          description: "A list of usernames for bucket listing permissions."
         s3_visibility_groups:
           type: "array"
           items:
             type: "string"
-          description: "A list of group names for bucket listing permissions"
+          description: "A list of group names for bucket listing permissions."
         apple_sid:
           type: "boolean"
-          description: "Apple sid"
+          description: "Enables or disables returning Security IDs (SIDs) in Apple compatible representation."
         protocols:
           type: "array"
           items:
             type: "string"
-          description: "Protocols to audit"
+          description: "Protocols to audit."
         data_create_delete:
           type: "boolean"
-          description: "Create/Delete Files/Directories/Objects"
+          description: "If `true`, logs operations that create or delete files, directories, or objects."
         data_modify:
           type: "boolean"
-          description: "Modify data/MD"
+          description: "If `true`, logs operations that modify data or metadata."
         data_read:
           type: "boolean"
-          description: "Read data"
+          description: "If `true`, logs operations that read data or metadata."
         log_full_path:
           type: "boolean"
-          description: "Log full path"
+          description: "Enables or disables logging of full Element Store path to the requested resource."
         log_hostname:
           type: "boolean"
-          description: "Log hostname"
+          description: "Enables or disables logging of the accessing host name."
         log_username:
           type: "boolean"
-          description: "Log username"
+          description: "Enables or disables logging of username of the requesting user. Disabled by default."
         log_deleted:
           type: "boolean"
-          description: "Log deleted files/dirs from trash dir"
+          description: "Enables or disables logging of deleted files and directories from the trash folder."
         remote_mapping:
           type: "object"
           description: ""
         count_views:
           type: "integer"
-          description: "Number of Policy related Views"
+          description: "The total number of views associated with this view policy."
         enable_snapshot_lookup:
           type: "boolean"
-          description: "Specifies whether to make the .snapshot directory accessible in subdirectories of the View."
+          description: "Specifies whether to make the .snapshot directory accessible in subdirectories of the view."
         enable_listing_of_snapshot_dir:
           type: "boolean"
-          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
+          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the view."
         s3_special_chars_support:
           type: "boolean"
-          description: "This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols."
+          description: "Allows or prohibits object names that contain “//“ or “/../“ and are incompatible with other protocols."
         smb_is_ca:
           type: "boolean"
-          description: "When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event."
+          description: "If `true`, the SMB share exposed by the view is set as continuously available, which allows SMBv3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event."
         nfs_case_insensitive:
           type: "boolean"
-          description: "Force case insensitivity for NFSv3 and NFSv4"
+          description: "If `true`, forces case insensitivity for NFSv3 and NFSv4."
         enable_access_to_snapshot_dir_in_subdirs:
           type: "boolean"
-          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
+          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the view."
         enable_visibility_of_snapshot_dir:
           type: "boolean"
-          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the View."
+          description: "Specifies whether to make the .snapshot directory visible in subdirectories of the view."
         nfs_enforce_tls:
           type: "boolean"
-          description: "Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None."
+          description: "If `true`, NFSv3 and NFSv4.1 client mounts are accepted only if they are TLS-encrypted. Use only with `nfs_minimal_protection_level` set to `System` or `None`."
         protocols_audit:
           type: "object"
           $ref: "#/components/schemas/ProtocolsAudit"
@@ -895,7 +854,7 @@ Also due to the lack of ability to configure vippool permissions using this atti
           items:
             type: "object"
             $ref: "#/components/schemas/PermissionsPerVipPool"
-          description: "List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather"
+          description: "A list of virtual IP pool permissions. This attribute conflicts with `vip_pools` and cannot be supplied together with it."
         # permission_per_vip_pool:
         #   type: "object"
         #   additionalProperties:
@@ -906,28 +865,28 @@ Also due to the lack of ability to configure vippool permissions using this atti
       properties:
         id:
           type: "integer"
-          description: "A uniq id given to the vippool"
+          description: "The unique ID of the virtual IP pool."
         guid:
           type: "string"
-          description: "A uniq guid given to the vippool"
+          description: "The unique GUID of the virtual IP pool."
         name:
           type: "string"
-          description: "A uniq name given to the vippool"
+          description: "The unique name of the virtual IP pool."
         subnet_cidr:
           type: "integer"
-          description: "IPv4 Subnet CIDR prefix (bits number)"
+          description: "IPv4 subnet CIDR prefix (number of bits)."
         subnet_cidr_ipv6:
           type: "integer"
-          description: "IPv6 Subnet CIDR prefix (bits number)"
+          description: "IPv6 subnet CIDR prefix (number of bits)."
         gw_ip:
           type: "string"
-          description: "Gateway IP Address"
+          description: "Gateway IPv4 address."
         gw_ipv6:
           type: "string"
-          description: "GW IPv6 Address"
+          description: "Gateway IPv6 address."
         vlan:
           type: "int"
-          description: "VIPPool VLAN"
+          description: "The VLAN of the virtual IP pool."
         state:
           type: "string"
           description: ""
@@ -935,10 +894,10 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "array"
           items:
             type: "integer"
-          description: "IDs of cnodes comprising cnode group"
+          description: "IDs of CNodes comprising the CNode group."
         cluster:
           type: "string"
-          description: "Parent Cluster"
+          description: "Parent cluster."
         url:
           type: "string"
           description: ""
@@ -957,89 +916,89 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: "IP ranges"
         vms_preferred:
           type: "boolean"
-          description: "If true, CNodes participating in the vip pool are preferred in VMS host election"
+          description: "If `true`, the CNodes included in this virtual IP pool are handled as preferred CNodes during VMS host election."
         enabled:
           type: "boolean"
-          description: "True for enable, False for disable"
+          description: "Enables or disables the virtual IP pool."
         port_membership:
           type: "string"
-          description: "The port on the CNode this pool will use. Right, left or all"
+          description: "The port(s) on the CNode that this pool will use: `Right`, `Left` or `All`."
         active_interfaces:
           type: "integer"
-          description: "Numver of active interfaces"
+          description: "The number of active interfaces."
         enable_l3:
           type: "boolean"
-          description: "Enables L3 CNode access"
+          description: "Enables or disables L3 CNode access."
         vast_asn:
           type: "integer"
-          description: "VAST ASN"
+          description: "VAST ASN."
         peer_asn:
           type: "integer"
-          description: "Peer ASN"
+          description: "Peer ASN."
         tenant_id:
           type: "integer"
           format: "int64"
-          description: "The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants "
+          description: "The ID of the tenant associated with the virtual IP pool. An ID of `0` (zero) means the virtual IP pool is available for all tenants."
     Dns:
       type: "object"
       properties:
         name:
           type: "string"
-          description: "Specifies a name for the VAST DNS server configuration"
+          description: "The name of the VAST DNS server configuration."
         id:
           type: "integer"
-          description: "A uniqe id given to the VAST DNS server configurations"
+          description: "The unique ID of the VAST DNS server configuration."
         vip:
           type: "string"
-          description: "Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP."
+          description: "The virtual IP for the DNS service. DNS requests from your external DNS server must be delegated to this IP."
         domain_suffix:
           type: "string"
-          description: "Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target."
+          description: "A suffix to append to domain names of each virtual IP pool. The suffix should append each domain name to form a valid FQDN for DNS requests to target"
         vip_gateway:
           type: "string"
-          description: "Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface."
+          description: "The IPv4 address of the gateway to the external DNS server if it is on a different subnet. Must be on the same subnet as the IP and reachable from the relevant network interface."
         enabled:
           type: "boolean"
-          description: "Enable the VAST DNS server configurations"
+          description: "Enables or disables the VAST DNS server configuration."
         guid:
           type: "string"
-          description: "A uniqe guid assigned to the VAST DNS server configurations"
+          description: "The unique GUID of the VAST DNS server configuration."
         vip_subnet_cidr:
           type: "integer"
-          description: "Specifies the subnet, as a CIDR index, on which the DNS resides."
+          description: "The subnet, in the CIDR format, on which the DNS resides."
         vip_vlan:
           type: "integer"
-          description: "Specifies a VLAN if needed to enable communication with external DNS server(s)."
+          description: "Specifies a VLAN if needed to enable communication with the external DNS server(s)."
         cnode_ids:
           type: "array"
           items:
             type: "integer"
         vip_ipv6:
           type: "string"
-          description: "Assigns an IPv6 to the DNS service."
+          description: "The IPv6 address of the DNS service."
         vip_ipv6_subnet_cidr:
           type: "integer"
-          description: "Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]"
+          description: "The subnet, in the CIDR format, on which the DNS resides. Valid values: [1..128]"
         vip_ipv6_gateway:
           type: "string"
-          description: "Specifies a gateway IPv6 to external DNS server if on different subnet."
+          description: "The IPv6 address of the gateway to the external DNS server if it is on a different subnet."
         net_type:
           type: "string"
-          description: "Select the interface, that listens for DNS service delegation requests"
+          description: "The interface that listens for DNS service delegation requests."
           enum: [NORTH_PORT, SOUTH_PORT, EXTERNAL_PORT]
         invalid_name_response:
           type: "string"
-          description: "The response DNS type for invalid dns name"
+          description: "The response DNS type for invalid DNS name."
           enum: [NXDOMAIN, REFUSED, SERVFAIL, NOERROR]
         invalid_type_response:
           type: "string"
-          description: "The response DNS type for invalid dns type"
+          description: "The response DNS type for invalid DNS type."
           enum: [NXDOMAIN, REFUSED, SERVFAIL, NOERROR]
         ttl:
           type: "integer"
-          description: "The reposne TTL in seconds"
+          description: "The response TTL in seconds."
     Quota:
-      description: "This is a quota"
+      description: "This is a quota."
       type: "object"
       properties:
         id:
@@ -1047,51 +1006,51 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: ""
         guid:
           type: "string"
-          description: "Quota guid"
+          description: "Quota GUID."
         name:
           type: "string"
-          description: "The name"
+          description: "Quota name."
         state:
           type: "string"
         pretty_state:
           type: "string"
         path:
           type: "string"
-          description: "Directory path"
+          description: "Directory path."
         pretty_grace_period:
           type: "string"
-          description: "Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m"
+          description: "The quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m"
         grace_period:
           type: "string"
           description: "Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m"
         time_to_block:
           type: "string"
-          description: "Grace period expiration time"
+          description: "Grace period expiration time."
         soft_limit:
           type: "integer"
           format: "int64"
-          description: "Soft quota limit"
+          description: "Soft quota limit."
         hard_limit:
           type: "integer"
           format: "int64"
-          description: "Hard quota limit"
+          description: "Hard quota limit."
         hard_limit_inodes:
           type: "integer"
-          description: "Hard inodes quota limit"
+          description: "Hard inodes quota limit."
         soft_limit_inodes:
           type: "integer"
-          description: "Soft inodes quota limit"
+          description: "Soft inodes quota limit."
         used_inodes:
           type: "integer"
-          description: "Used inodes"
+          description: "Used inodes."
         used_capacity:
           type: "integer"
           format: "int64"
-          description: "Used capacity in bytes"
+          description: "Used capacity in bytes."
         used_capacity_tb:
           type: "number"
           format: "float"
-          description: "Used capacity in TB"
+          description: "Used capacity in TB."
         used_effective_capacity:
           type: "integer"
           format: "int64"
@@ -1099,19 +1058,19 @@ Also due to the lack of ability to configure vippool permissions using this atti
         used_effective_capacity_tb:
           type: "number"
           format: "float"
-          description: "Used effective capacity in TB"
+          description: "Used effective capacity in TB."
         tenant_id:
           type: "integer"
-          description: "Tenant ID"
+          description: "Tenant ID."
         tenant_name:
           type: "string"
-          description: "Tenant Name"
+          description: "Tenant name."
         cluster:
           type: "string"
-          description: "Parent Cluster"
+          description: "Parent cluster."
         cluster_id:
           type: "integer"
-          description: "Parent Cluster ID"
+          description: "Parent cluster ID."
         system_id:
           type: "integer"
           description: ""
@@ -1125,16 +1084,16 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "integer"
         enable_alarms:
           type: "boolean"
-          description: "Enable alarms when users or groups are exceeding their limit"
+          description: "Enables or disables alarms when users or groups are exceeding their limits."
         default_email:
           type: "string"
-          description: "The default Email if there is no suffix and no address in the providers"
+          description: "The default email address used if there is no suffix specified and no address can be found in the providers."
         percent_inodes:
           type: "integer"
-          description: "Percent of used inodes out of the hard limit"
+          description: "Percentage of used inodes out of the hard limit."
         percent_capacity:
             type: "integer"
-            description: "Percent of used capacity out of the hard limit"
+            description: "Percentage of used capacity out of the hard limit."
         default_user_quota:
           type: "object"
           $ref: "#/components/schemas/DefaultQuota"
@@ -1156,59 +1115,59 @@ Also due to the lack of ability to configure vippool permissions using this atti
       properties:
         quota_system_id:
           type: "integer"
-          description: "The system ID of the quota"
+          description: "The system ID of the quota."
         soft_limit:
           type: "integer"
           format: "int64"
-          description: "The size soft limit in bytes"
+          description: "The soft limit for capacity in bytes."
         hard_limit:
           type: "integer"
           format: "int64"
-          description: "The size hard limit in bytes"
+          description: "The hard limit for capacity in bytes."
         sof_limit_inodes:
           type: "integer"
           format: "int64"
-          description: "The sof limit of inodes number"
+          description: "The soft limit for the number of inodes."
         hard_limit_inodes:
           type: "integer"
           format: "int64"
-          description: "The hard limit in inode number"
+          description: "The hard limit for the number of inodes."
         grace_period:
           type: "string"
-          description: "Quota enforcement grace period at the format of HH:MM:SS"
+          description: "Quota enforcement grace period in the format of HH:MM:SS."
     UserQuota:
       type: "object"
       properties:
         grace_period:
           type: "string"
-          description: "Quota enforcement grace period at the format of HH:MM:SS"
+          description: "Quota enforcement grace period in the format of HH:MM:SS."
         time_to_block:
           type: "string"
-          description: "Grace period expiration time"
+          description: "Grace period expiration time."
         soft_limit:
           type: "integer"
           format: "int64"
-          description: "Soft quota limit"
+          description: "Soft quota limit."
         hard_limit:
           type: "integer"
           format: "int64"
-          description: "Hard quota limit"
+          description: "Hard quota limit."
         hard_limit_inodes:
           type: "integer"
           format: "int64"
-          description: "Hard inodes quota limit"
+          description: "Hard quota limit for the number of inodes."
         soft_limit_inodes:
           type: "integer"
           format: "int64"
-          description: "Soft inodes quota limit"
+          description: "Soft quota limit for the number of inodes."
         used_inodes:
           type: "integer"
           format: "int64"
-          description: "Used inodes"
+          description: "Used inodes."
         used_capacity:
           type: "integer"
           format: "int64"
-          description: "Used capacity in bytes"
+          description: "Used capacity in bytes."
         is_accountable:
           type: "boolean"
           description: ""
@@ -1225,7 +1184,7 @@ Also due to the lack of ability to configure vippool permissions using this atti
       properties:
         name:
           type: "string"
-          description: "The name of the entity"
+          description: "The name of the entity."
         vast_id:
           type: "integer"
           description: ""
@@ -1250,62 +1209,62 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "array"
           items:
             type: "string"
-          description: "List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2"
+          description: "A list of URIs of LDAP servers (Domain Controllers in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format `<scheme>://<address>`. `<address>` can be either a DNS name or an IP address, for example: `ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`."
         port:
           type: "integer"
           description: "LDAP server port. 389 (LDAP)  636 (LDAPS)"
           default: 389
         binddn:
           type: "string"
-          description: "Distinguished name of LDAP superuser"
+          description: "Distinguished name of LDAP superuser."
         bindpw:
           type: "string"
-          description: "Password for the LDAP superuser"
+          description: "Password for the LDAP superuser."
         searchbase:
           type: "string"
-          description: "The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only"
+          description: "The base DN is the starting point that the LDAP provider uses when searching for users and groups. If a group base DN is configured, it will be used instead of the base DN, for groups only."
         group_searchbase:
           type: "string"
-          description: "Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs."
+          description: "Base DN for group queries within the joined domain only. When auto-discovery is enabled, group queries outside the joined domain use automatically discovered base DNs."
         method:
           type: "string"
-          description: "Bind Authentication Method"
+          description: "Bind authentication method."
           enum: [simple,sasl,anonymous]
         gid_number:
           type: "string"
-          description: "Attrirbute mapping for gid number"
+          description: "Attribute mapping for gid number."
           default: "gidNumber"
         uid:
           type: "string"
-          description: "Attrirbute mapping for uid"
+          description: "Attribute mapping for uid."
           default: "uid"
         uid_number:
           type: "string"
-          description: "Attrirbute mapping for uid number"
+          description: "Attribute mapping for uid number."
           default: "uidNumber"
         match_user:
           type: "string"
-          description: "Attribute mapping for user matching"
+          description: "Attribute mapping for user matching."
           default: "uid"
         uid_member:
           type: "string"
-          description: "Attrirbute mapping for uid member"
+          description: "Attribute mapping for uid member."
           default: "memberUID"
         posix_account:
           type: "string"
-          description: "Attrirbute mapping for posix account"
+          description: "Attribute mapping for posix account."
           default: "posixAccount"
         posix_group:
           type: "string"
-          description: "Attrirbute mapping for posix account"
+          description: "Attribute mapping for posix group."
           default: "posixGroup"
         use_tls:
           type: "boolean"
-          description: "configure LDAP with TLS"
+          description: "Specifies whether to configure LDAP with TLS."
           default: false
         posix_primary_provider:
           type: "boolean"
-          description: "POSIX primary provider"
+          description: "POSIX primary provider."
         posix_attributes_source:
           type: "string"
           description: ""
@@ -1322,22 +1281,22 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: ""
         query_groups_mode:
           type: "string"
-          description: "Query group mode"
+          description: "Query group mode."
           enum: [COMPATIBLE,RFC2307BIS,RFC2307,NONE]
         username_property_name:
           type: "string"
-          description: "Username property name"
+          description: "Username property name."
           default: "cn"
         domain_name:
           type: "string"
           description: "FQDN of the domain."
         user_login_name:
           type: "string"
-          description: "The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1."
+          description: "The attribute used to query the provider for the user login name in NFS ID mapping."
           default: "uid"
         group_login_name:
           type: "string"
-          description: "The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1."
+          description: "The attribute used to query the provider for the group login name in NFS ID mapping."
           default: "cn"
         mail_property_name:
           type: "string"
@@ -1347,21 +1306,18 @@ Also due to the lack of ability to configure vippool permissions using this atti
           default: "uid"
         use_auto_discovery:
           type: "boolean"
-          description: "When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field."
+          description: "If `true` enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If `false`, queries are restricted to the joined domain and URIs must be provided in `urls`."
         use_ldaps:
           type: "boolean"
-          description: "Use LDAPS for Auto-Discovery"
+          description: "Specifies whether to use LDAPS for auto-discovery."
         is_vms_auth_provider:
           type: boolean
           default: false
-          description: "Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o."
+          description: "Specifies whether the LDAP is to be used for VMS authentication. There can be only two LDAP configurations that can be used for VMS authentication: one with Active Directory and the other without Active Directory."
         query_posix_attributes_from_gc:
           type: boolean
           default: false
-          description: |
-            When set to True - users/groups from non-joined domain POSIX attributes are supported,
-            when set to False - Posix attributes of users/groups from non-joined domain are not supported.
-            As a condition Global catalog needs to be configured to support Posix attributes.
+          description: "If `true`, users/groups from non-joined domain POSIX attributes are supported. If `false`, POSIX attributes of users/groups from non-joined domain are not supported."
     S3LifeCycleRule:
       type: "object"
       properties:
@@ -1382,35 +1338,35 @@ Also due to the lack of ability to configure vippool permissions using this atti
         min_size:
           type: "integer"
           format: "int64"
-          description: "The minimum size of the object"
+          description: "The minimum size of the object."
         max_size:
           type: "integer"
           format: "int64"
-          description: "The maximum size of the object"
+          description: "The maximum size of the object."
         expiration_days:
           type: "integer"
-          description: "The number of days from creation until an object expires"
+          description: "The number of days from creation until an object expires."
         expiration_date:
           type: "string"
-          description: "The expiration date of the object"
+          description: "The expiration date of the object."
         expired_obj_delete_marker:
           type: "boolean"
-          description: "Remove expired objects delete markers"
+          description: "If `true`, removes expired object delete markers."
         noncurrent_days:
           type: "integer"
-          description: "Number of days after objects become noncurrent"
+          description: "Number of days after objects become non-current."
         newer_noncurrent_versions:
           type: "integer"
-          description: "The number of newer versions to retain"
+          description: "The number of newer versions to retain."
         abort_mpu_days_after_initiation:
           type: "integer"
-          description: "The number of days until expiration after an incomplete multipart upload"
+          description: "The number of days until expiration after an incomplete multipart upload."
         view_path:
           type: "string"
-          description: "The path of the related View"
+          description: "The path of the view to which the lifecycle rule applies."
         view_id:
           type: "integer"
-          description: "The ID of the related View"
+          description: "The ID of the view to which the lifecycle rule applies."
     ActiveDirectory:
       type: "object"
       properties:
@@ -1436,38 +1392,38 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: integer
         guid:
           type: string
-          description: QoS Policy guid
+          description: "QoS policy GUID."
         name:
           type: string
         mode:
           type: string
           enum: [STATIC, USED_CAPACITY, PROVISIONED_CAPACITY]
-          description: QoS provisioning mode
+          description: "QoS provisioning mode."
         policy_type:
           type: string
           enum: [VIEW,USER]
-          description: "The QoS type"
+          description: "The QoS policy type."
         limit_by:
           type: string
           enum: [BW_IOPS,BW,IOPS]
           default: "BW_IOPS"
-          description: "What attributes are setting the limitations."
+          description: "Specifies which attributes are setting the limitations."
         tenant_id:
           type: integer
           format: int64
-          description: "When setting is_default this is the tenant which will take affect"
+          description: "When setting `is_default`, this is the tenant for which the policy will be used as the default user QoS policy."
         attached_users_identifiers:
           type: "array"
           items:
             type: "string"
-          description: "List of local user IDs to which this QoS Policy is affective."
+          description: "A list of local user IDs to which this QoS policy applies."
         is_default:
           type: boolean
-          description: "Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute"
+          description: "Specifies whether this QoS policy is to be used as the default QoS policy per user for this tenant. Setting this attribute requires that `tenant_id` is also supplied."
         io_size_bytes:
           type: "integer"
           format: "int64"
-          description: 'Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M'
+          description: 'Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing the request size by IO size. Default: 64K. Recommended range: 4K - 1M.'
         static_limits:
           $ref: '#/components/schemas/QosStaticLimits'
           description: 'Performance limits per view. Maximum limits define maximum provisioning in the absence of resource contention. Valid values: 0-4294967296. 0 means unlimited.'
@@ -1483,163 +1439,163 @@ Also due to the lack of ability to configure vippool permissions using this atti
           items:
             type: "object"
             $ref: "#/components/schemas/QosUser"
-            description: "List of user associated with this QsS policy"
+            description: "A list of users to which the QoS policy applies."
     QosStaticLimits:
       type: object
       properties:
         min_reads_bw_mbps:
           type: integer
           format: "int64"
-          description: Minimal amount of performance to provide when there is resource contention
+          description: Minimum performance to provide when there is resource contention.
         max_reads_bw_mbps:
           type: integer
           format: "int64"
-          description: Maximal amount of performance to provide when there is no resource contention
+          description: Maximum performance to provide when there is no resource contention.
         min_writes_bw_mbps:
           type: integer
           format: "int64"
-          description: Minimal amount of performance to provide when there is resource contention
+          description: Minimum performance to provide when there is resource contention.
         max_writes_bw_mbps:
           type: integer
           format: "int64"
-          description: Maximal amount of performance to provide when there is no resource contention
+          description: Maximum performance to provide when there is no resource contention.
         min_reads_iops:
           type: integer
           format: "int64"
-          description: Minimal amount of performance to provide when there is resource contention
+          description: Minimum performance to provide when there is resource contention.
         max_reads_iops:
           type: integer
           format: "int64"
-          description: Maximal amount of performance to provide when there is no resource contention
+          description: Maximum performance to provide when there is no resource contention.
         min_writes_iops:
           type: integer
           format: "int64"
-          description: Minimal amount of performance to provide when there is resource contention
+          description: Minimum performance to provide when there is resource contention.
         max_writes_iops:
           type: integer
           format: "int64"
-          description: Maximal amount of performance to provide when there is no resource contention      
+          description: Maximum performance to provide when there is no resource contention.      
         burst_reads_bw_mb:
           type: "integer"
           format: "int64"
-          description : "Burst reads BW Mb"
+          description : "Burst read bandwidth (in MB/s)."
         burst_reads_loan_mb:
           type: "integer"
           format: "int64"
-          description : "Burst reads loan Mb"
+          description : "Burst read credits (in MB/s)."
         burst_writes_bw_mb:
           type: "integer"
           format: "int64"
-          description : "Burst writes BW Mb"
+          description : "Burst write bandwidth (in MB/s)."
         burst_writes_loan_mb:
           type: "integer"
           format: "int64"
-          description : "Burst writes loan Mb"
+          description : "Burst write credits (in MB/s)."
         burst_reads_iops:
           type: "integer"
           format: "int64"
-          description : "Burst reads IOPS"
+          description : "Burst read IOPS."
         burst_reads_loan_iops:
           type: "integer"
           format: "int64"
-          description : "Burst reads loan IOPS"
+          description : "Burst read IOPS credits."
         burst_writes_iops:
           type: "integer"
           format: "int64"
-          description : "Burst writes IOPS"
+          description : "Burst write IOPS."
         burst_writes_loan_iops:
           type: "integer"
           format: "int64"
-          description : "Burst writes loan IOPS"          
+          description : "Burst write IOPS credits."          
     QosDynamicLimits:
       type: object
       properties:
         max_reads_bw_mbps_per_gb_capacity:
           type: integer
           format: "int64"
-          description: Maximal amount of performance per GB to provide when there is no resource contention
+          description: "Maximum read bandwidth (in MB/s) per GB to provide when there is no resource contention."
         max_writes_bw_mbps_per_gb_capacity:
           type: integer
           format: "int64"
-          description: Maximal amount of performance per GB to provide when there is no resource contention
+          description: "Maximum write bandwidth (in MB/s) per GB to provide when there is no resource contention."
         max_reads_iops_per_gb_capacity:
           type: integer
           format: "int64"
-          description: Maximal amount of performance per GB to provide when there is no resource contention
+          description: "Maximum read IOPS per GB to provide when there is no resource contention."
         max_writes_iops_per_gb_capacity:
           type: integer
           format: "int64"
-          description: Maximal amount of performance per GB to provide when there is no resource contention
+          description: "Maximum write IOPS per GB to provide when there is no resource contention."
     QoSStaticTotalLimits:
       type: object
       properties:
         max_bw_mbps:
           type: "integer"
           format: "int64"
-          description: "Maximal BW Mb/s"
+          description: "Maximum bandwidth (in MB/s)."
         burst_bw_mb:
           type: "integer"
           format: "int64"
-          description: "Burst BW Mb"
+          description: "Burst bandwidth (in MB/s)"
         burst_loan_mb:
           type: "integer"
           format: "int64"
-          description: "Burst loan Mb"
+          description: "Burst credits (in MB/s)"
         max_iops:
           type: "integer"
           format: "int64"
-          description: "Maximal IOPS"
+          description: "Maximum IOPS."
         burst_iops:
           type: "integer"
           format: "int64"
-          description: "Burst IOPS"
+          description: "Burst IOPS."
         burst_loan_iops:
           type: "integer"
           format: "int64"
-          description: "Burst loan IOPS"
+          description: "Burst IOPS credits."
     QoSDynamicTotalLimits:
       type: object
       properties:
         max_bw_mbps_per_gb_capacity:
           type: "integer"
           format: "int64"
-          description: "Maximal amount of performance per GB to provide when there is no resource contention"
+          description: "Maximum bandwidth (in MB/s) per GB to provide when there is no resource contention."
         max_iops_per_gb_capacity:
           type: "integer"
           format: "int64"
-          description: "Maximal amount of performance per GB to provide when there is no resource contention"
+          description: "Maximum IOPS per GB to provide when there is no resource contention."
     QosUser:
       type: object
       properties:
         fqdn:
           type: string
-          description: "User FQDN"
+          description: "User FQDN."
         is_sid:
           type: boolean
         sid_str:
           type: string
-          description: "The user SID"
+          description: "User SID."
         uid_or_gid:
           type: integer
           format: int64
         label:
           type: string
-          description: "How to display the user"
+          description: "How to display the user."
         value:
           type: string
-          description: "The user name"
+          description: "User name."
         login_name:
           type: string
-          description: "The user login name"
+          description: "User login name."
         name:
           type: string
-          description: "The user name"
+          description: "User name."
         identifier_type:
           type: string
-          description: "The user type of idetify"
+          description: "The type of identifier used to identify the user."
         identifier_value:
           type: string
-          description: "The value to use fo the identifier_type"
+          description: "The identifier of type specified in `identifier_type`."
     S3Policy:
       required:
       - "enabled"
@@ -1661,12 +1617,12 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "array"
           items:
             type: "string"
-          description: "List of group names associated with this policy"
+          description: "A list of user names associated with this policy."
         groups:
           type: "array"
           items:
             type: "string"
-          description: "List of group names associated with this policy"
+          description: "A list of group names associated with this policy."
         is_replicated:
           type: "boolean"
         enabled:
@@ -1693,22 +1649,22 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: ""
         ip:
           type: "string"
-          description: "Currently used IP Address, bond of ip1 and ip2"
+          description: "The IP address being used, bond of `ip1` and `ip2`."
         ip1:
           type: "string"
-          description: "1st internal IP Address"
+          description: "First internal IP address."
         ip2:
           type: "string"
-          description: "2nd internal IP Address"
+          description: "Second internal IP address."
         ipv6:
           type: "string"
-          description: "External IPv6 Address"
+          description: "External IPv6 address."
         host_label:
           type: "string"
-          description: "Host label, used to label container, e.g. 11.0.0.1-4000"
+          description: "Host label, used to label the  container, e.g. 11.0.0.1-4000."
         sn:
           type: "string"
-          description: "The host serial number"
+          description: "Host serial number."
         state:
           type: "string"
           description: ""
@@ -1732,41 +1688,41 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: ""
         enabled:
           type: "boolean"
-          description: "cnode enabled"
+          description: "Sets the CNode to be enabled or disabled."
         is_mgmt:
           type: "boolean"
-          description: "The cnode is running management"
+          description: "Specifies whether the CNode is running VMS."
         cbox:
           type: "string"
-          description: "Parent CBox"
+          description: "Parent CBox."
         cbox_uid:
           type: "string"
-          description: "Unique Parent CBox identifier"
+          description: "UID of the parent CBox."
         cbox_id:
           type: "integer"
-          description: "Parent CBox id"
+          description: "ID of the parent CBox."
         cluster:
           type: "string"
-          description: "Parent Cluster"
+          description: "Parent cluster."
           x-cli-header: "Cluster"
         os_version:
           type: "string"
-          description: "Node OS version"
+          description: "Node OS version."
         bmc_fw_version:
           type: "string"
-          description: "BMC FW version"
+          description: "BMC FW version."
         vms_preferred:
           type: "boolean"
-          description: "VMS preferred CNode"
+          description: "VMS preferred CNode."
         url:
           type: "string"
           description: ""
         mgmt_ip:
           type: "string"
-          description: "Management IP"
+          description: "Management IP."
         hostname:
           type: "string"
-          description: "Host Name"
+          description: "Host name."
     ProtectedPath:
       type: "object"
       properties:
@@ -1778,80 +1734,80 @@ Also due to the lack of ability to configure vippool permissions using this atti
           description: ""
         guid:
           type: "string"
-          description: "guid"
+          description: "GUID"
         protection_policy_id:
           type: "integer"
-          description: "protection policy id"
+          description: "Protection policy ID."
         source_dir:
           type: "string"
-          description: "path to replicate"
+          description: "Path to replicate."
         target_exported_dir:
           type: "string"
-          description: "where to replicate on the remote"
+          description: "The destination path to replicate to on the remote cluster."
         tenant_id:
           type: "integer"
-          description: "Local Tenant ID"
+          description: "Local tenant ID."
         remote_tenant_guid:
           type: "string"
-          description: "The Remote tenant guid"
+          description: "Remote tenant GUID."
         target_id:
           type: "integer"
-          description: "The remote target object id"
+          description: "Remote target object ID."
         capabilities:
           type: "string"
-          description: "Replication capabilities which define , avaliable only for cluster from version 5.1"
+          description: "Available replication capabilities. Supported only for clusters v5.1 and later."
           enum: [ASYNC_REPLICATION]
         enabled:
           type: "boolean"
-          description: "Is the protected path enabled"
+          description: "Specifies whether the protected path is enabled."
     Snapshot:
       type: "object"
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the snapshot"
+          description: "The unique ID of the snapshot."
         guid:
           type: "string"
-          description: "A unique guid given to the snapshot"
+          description: "The unique GUID of the snapshot."
         expiration_time:
           type: "string"
-          description: "When will this sanpshot expire"
+          description: "The snapshot's expiration time."
         name:
           type: "string"
-          description: "The name of the snapshot"
+          description: "The name of the snapshot."
         path:
           type: "string"
-          description: "The path to make snapshot from"
+          description: "The path to make snapshot from."
         tenant_id:
           type: "int"
-          description: "The tenant id to use"
+          description: "The tenant ID to use."
         indestructible:
           type: "boolean"
-          description: "Is it indestructable"
+          description: "If `true`, the snapshot is indestructable."
     GlobalLocalSnapshot:
       type: "object"
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the global snapshot"
+          description: "The unique ID of the global snapshot."
         guid:
           type: "string"
-          description: "A unique guid given to the global snapshot"
+          description: "The unique GUID of the global snapshot."
         name:
           type: "string"
-          description: "The name of the snapshot"
+          description: "The name of the snapshot."
         loanee_tenant_id:
           type: "int"
-          description: "The tenant ID of the target"
+          description: "The tenant ID on the destination peer."
         loanee_root_path:
           type: "string"
-          description: "The path where to store the snapshot on a Target"
+          description: "The path where to store the snapshot on the destination peer."
         loanee_snapshot_id:
           type: "int"
-          description: "The id of the local snapshot"
+          description: "The ID of the local snapshot."
         enabled:
           type: "boolean"
-          description: "Is the snapshot enabled"
+          description: "Sets the snapshot to be enabled or disabled."
           default: true
         owner_tenant:
           type: "object"
@@ -1861,31 +1817,31 @@ Also due to the lack of ability to configure vippool permissions using this atti
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the global snapshot"
+          description: "The unique ID of the global snapshot."
         guid:
           type: "string"
-          description: "A unique guid given to the global snapshot"
+          description: "The unique GUID of the global snapshot."
         name:
           type: "string"
-          description: "The name of the snapshot"
+          description: "The name of the snapshot."
         loanee_tenant_id:
           type: "int"
-          description: "The tenant ID of the target"
+          description: "The tenant ID on the destination peer."
         loanee_root_path:
           type: "string"
-          description: "The path where to store the snapshot on a Target"
+          description: "The path where to store the snapshot on the destination peer."
         remote_target_id:
           type: "int"
-          description: "The remote replication peering id"
+          description: "The remote replication peering ID."
         remote_target_guid:
           type: "string"
-          description: "The remote replication peering guid"
+          description: "The remote replication peering GUID."
         remote_target_path:
           type: "string"
-          description: "The path on the remote cluster"
+          description: "The path on the remote cluster."
         enabled:
           type: "boolean"
-          description: "Is the snapshot enabled"
+          description: "Sets the snapshot to be enabled or disabled."
         owner_root_snapshot:
           type: "object"
           $ref: "#/components/schemas/GlobalSnapshotOwnerRootSnapshot"
@@ -1897,114 +1853,114 @@ Also due to the lack of ability to configure vippool permissions using this atti
       properties:
         clone_id:
           type: "int64"
-          description: "The ID of the clone"
+          description: "The ID of the clone."
         name:
           type: "string"
-          description: "Remote Clone Name"
+          description: "Remote clone name."
         parent_handle_ehandle:
           type: "string"
-          description: "The remote handle (inode)"
+          description: "The remote handle (inode)."
     GlobalSnapshotOwnerTenant:
       type: "object"
       properties:
         name:
           type: "string"
-          description: "Ten name of the remote Tenant"
+          description: "Ten name of the remote tenant."
         guid:
           type: "string"
-          description: "The remote tenant guid"
+          description: "The remote tenant GUID."
     ReplicationPeers:
       type: "object"
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the replication peer configuration"
+          description: "The unique ID of the replication peer configuration."
         guid:
           type: "string"
-          description: "A unique guid given to the  replication peer configuration"
+          description: "The unique GUID of the  replication peer configuration."
         name:
           type: "string"
           description: "The name of the replication peer configuration"
         url:
           type: "string"
-          description: "Direct url of the replication peer configurations"
+          description: "Direct URL of the replication peer configuration."
         leading_vip:
           type: "string"
-          description: "The vip provided for the replication peer configuration"  
+          description: "The virtual IP pool provided for the replication peer configuration."
         remote_vip_range:
           type: "string"
-          description: "The vip range which were reported by the peer"
+          description: "The range of virtual IPs that were reported by the peer."
         version:
           type: "string"
-          description: "The version of the source"
+          description: "The version of the source."
         remote_version:
           type: "string"
-          description: "The version of the remote peer"
+          description: "The version of the remote peer."
         is_local:
           type: "boolean"
-          description: "Is the source of the replication local (this host is the source)"
+          description: "Specifies whether the source of the replication is local (this host is the source)."
         peer_name:
           type: "string"
-          description: "The name of the peer cluster"
+          description: "The name of the peer cluster."
         secure_mode:
           type: "string"
-          description: "Is the connection secure"
+          description: "If true, the connection is secure."
         pool_id:
           type: "int"
-          description: "The replication Vippool id"
+          description: "The ID of the replication virtual IP pool."
     ProtectionPolicy:
       type: "object"
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the replication peer configuration"
+          description: "The unique ID of the protection policy."
         guid:
           type: "string"
-          description: "A unique guid given to the  replication peer configuration"
+          description: "The unique GUID of the protection policy."
         name:
           type: "string"
-          description: "The name of the replication peer configuration"  
+          description: "The name of the protection policy."  
         url:
           type: "string"
-          description: "Direct link to the replication policy"
+          description: "Direct URL of the protection policy."
         target_name:
           type: "string"
-          description: "The target peer name"
+          description: "The name of the destination peer."
         target_object_id:
           type: "int"
-          description: "The id of the target peer"
+          description: "The ID of the destination peer."
         prefix:
           type: "string"
-          description: "The prefix to be given to the replicated data"
+          description: "The prefix to be given to the replicated data."
         clone_type:
           type: "string"
-          description: "The type the replication"
+          description: "The type of replication."
           enum: [NATIVE_REPLICATION,LOCAL]
         frames:
           type: "array"
           items:
             type: "object"
             $ref: "#/components/schemas/ProtectionPolicySchedule"
-            description: "A schedule for creating a snapshot"
-          description: "List of snapshots schedules"
+            description: "Snapshot creation schedule"
+          description: "A list of snapshot schedules."
         indestructible:
           type: "boolean"
-          description: "Is the snapshot indestructable"
+          description: "If true, the snapshot is  indestructable."
     ProtectionPolicySchedule:
       type: "object"
       properties:      
         every:
           type: "string"
-          description: "How often to make a snapshot, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day"
+          description: "How often to create a snapshot. The format is <integer><time period>. The time period can be D - Days, W - Weeks, s - Seconds, m - Minutes, H - Hours, M - Months, Y - Years. For example: 1D = 1 Day"
         start-at:
           type: "string"
-          description: "The start data of the replication"
+          description: "Replication start date and time."
         keep-local:
           type: "string"
-          description: "For how long to keep a local copy of the replication, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day"
+          description: "For how long to keep the local copy. The format is <integer><time period>. The time period can be D - Days, W - Weeks, s - Seconds, m - Minutes, H - Hours, M - Months, Y - Years. For example: 1D = 1 Day"
         keep-remote:
           type: "string"
-          description: "For how long to keep the copy on the remote side, format is <integer><time period> , while time period can be D - Days ,W - Weeks ,s - Seconds ,m - Minutes, H - Hours, M - Months, Y - Years , Ex 1D = 1 Day"
+          description: "For how long to keep the copy on the remote peer. The format is <integer><time period>. The time period can be D - Days, W - Weeks, s - Seconds, m - Minutes, H - Hours, M - Months, Y - Years. For example: 1D = 1 Day"
     S3replicationPeers:
       required:
       - "type"
@@ -2012,85 +1968,85 @@ Also due to the lack of ability to configure vippool permissions using this atti
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the s3 replication peer configuration"
+          description: "The unique ID of the S3 replication peer configuration."
         guid:
           type: "string"
-          description: "A unique guid given to the s3 replication peer configuration"
+          description: "The unique GUID of the S3 replication peer configuration."
         name:
           type: "string"
-          description: "The name of the s3 replication peer configuration"  
+          description: "The name of the S3 replication peer configuration."  
         url:
           type: "string"
-          description: "Direct link to the s3 replication peer configurations"
+          description: "Direct URL of the S3 replication peer configuration."
         bucket_name:
           type: "string"
-          description: "The name of the peer bucket to replicate to"
+          description: "The name of the peer bucket to replicate to."
         http_protocol:
           type: "string"
-          description: "The http protocol user http/https"
+          description: "The HTTP protocol used (HTTP or HTTPS)."
         type:
           type: "string"
-          description: "The type of the peer bucket CUSTOM_S3/AWS_S3"
+          description: "The type of the peer bucket: CUSTOM_S3/AWS_S3"
           enum: [CUSTOM_S3,AWS_S3]
         proxies:
           type: "array"
           items:
             type: "string"
-            description: "A url of an http proxy"
-          description: "List of http procies"
+            description: "The HTTP pproxy URL."
+          description: "A list of HTTP proxies."
         aws_region:
           type: "string"
-          description: "The Bucket AWS region, Valid only when type is AWS_S3"
+          description: "The AWS region of the bucket. Valid only when type is AWS_S3."
         access_key:
           type: "string"
-          description: "The S3 access key"
+          description: "The S3 access key."
         secret_key:
           type: "string"
-          description: "The S3 secret key"
+          description: "The S3 secret key."
         custom_bucket_url:
           type: "string"
-          description: "The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3"      
+          description: "The S3 URL of the bucket (DNS name/IP), used only when using CUSTOM_S3."  
     ActiveDirectory2:
       type: "object"
       properties:
         id:
           type: "integer"
-          description: "A uniqe ID given to this resource"
+          description: "The unique ID of the resource."
         guid:
           type: "string"
-          description: "A uniqe ID given to this resource"          
+          description: "The unique GUID of the resource."          
         machine_account_name:
           type: "string"
-          description: "Name of the computer object/machine account to add. Recommended to be the name of the cluster"
+          description: "The name of the computer object/machine account to add. Recommended to use the name of the cluster."
         organizational_unit:
           type: "string"
-          description: "Organizational Unit within AD where the Cluster Machine account will be created. If left empty, it will go into default Computers OU"
+          description: "Organizational unit within Active Directory where the cluster's machine account will be created. If left empty, defaults to Computers OU."
         smb_allowed:
           type: "boolean"
           default: true
-          description: "Indicates if AD is allowed for SMB."
+          description: "Indicates if Active Directory is allowed for SMB."
         ntlm_enabled:
           type: "boolean"
           default: true
-          description: "Manages support of NTLM authentication method for SMB protocol."
+          description: "Enables or disables support of NTLM authentication for SMB."
         use_auto_discovery:
           type: "boolean"
           default: false
-          description: "When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field."
+          description: "If `true`, Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If `false`, queries are restricted to the joined domain and DCs must be provided in the URLs field."
         use_ldaps:
           type: "boolean"
           default: false
-          description: "Use LDAPS for auto-Discovery. To activate, set use_auto_discovery to true also."
+          description: "Specifies whether to use LDAPS for auto-discovery. To enable use of LDAPS, also set `use_auto_discovery` to `true`."
         port:
           type: "int"
           default: 389
-          description: "Which port to use"
+          description: "Which port to use."
         binddn:
           type: "string"
-          description: "Distinguished name of AD superuser"
+          description: "Distinguished name of Active Directory superuser."
         searchbase:
           type: "string"
-          description: "The Base DN is the starting point the AD provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only"
+          description: "The base DN is the starting point that the Active Directory provider uses when searching for users and groups. If a group base DN is configured, it will be used instead of the base DN (for groups only)."
         domain_name:
           type: "string"
           description: "FQDN of the domain."
@@ -2098,12 +2054,12 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "string"
           enum: [simple,anonymous,sasl]
           default: "simple"
-          description: "Bind Authentication Method"
+          description: "Bind authentication method."
         query_groups_mode:
           type: "string"
           enum: [COMPATIBLE,NONE,RFC2307BIS,RFC2307]
           default: "COMPATIBLE"
-          description: "Query group mode"
+          description: "Query group mode."
         posix_attributes_source:
           type: "string"
           default: "JOINED_DOMAIN"
@@ -2111,96 +2067,96 @@ Also due to the lack of ability to configure vippool permissions using this atti
         use_tls:
           type: "boolean"
           default: false
-          description: "Set to true to enable use of TLS to secure communication between VAST Cluster and the AD server."
+          description: "Set to `true` to enable use of TLS to secure communication between the VAST cluster and the Active Directory server."
         tls_certificate:
           type: "string"
-          description: "TLS certificate to use for verifying the remote AD server’s TLS certificate."
+          description: "TLS certificate to use for verifying the remote Active Directory server’s TLS certificate."
         reverse_lookup:
           type: "boolean"
           default: false
-          description: "Resolve AD netgroups into hostnames"
+          description: "Specifies whether to resolve Active Directory netgroups into hostnames"
         gid_number:
           type: "string"
-          description: "The attribute of a user entry on the AD server that contains the UID number, if different from ‘uidNumber’. Often when binding VAST Cluster to AD this does not need to be set."
+          description: "The attribute of a user entry on the Active Directory server that contains the UID number, if different from `uidNumber`. Often, when binding the VAST cluster to Active Directory, this does not need to be set."
         use_multi_forest:
           type: "boolean"
           default: false
-          description: "Allow access for users from trusted domains on other forests."
+          description: "Allows or prohibits access for users from trusted domains on other forests."
         uid:
           type: "string"
-          description: "The attribute of a user entry on the AD server that contains the user name, if different from ‘uid’ When binding VAST Cluster to AD, you may need to set this to ‘sAMAccountname’."
+          description: "The attribute of a user entry on the Active Directory server that contains the user name, if different from `uid`. When binding the VAST cluster to Active Directory, you may need to set this to `sAMAccountname`."
         uid_number:
           type: "string"
-          description: "The attribute of a user entry on the AD server that contains the UID number, if different from ‘uidNumber’. Often when binding VAST Cluster to AD this does not need to be set."
+          description: "The attribute of a user entry on the Active Directory server that contains the UID number, if different from `uidNumber`. Often when binding the VAST cluster to Active Directory, this does not need to be set."
         match_user:
           type: "string"
-          description: "The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved."
+          description: "The attribute to use when querying a provider for a user that matches a user that has already been retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved."
         uid_member_value_property_name:
           type: "string"
-          description: "Specifies the attribute which represents the value of the AD group’s member property."
+          description: "Specifies the attribute which represents the value of the Active Directory group’s member property."
         uid_member:
           type: "string"
-          description: "The attribute of a group entry on the AD server that contains names of group members, if different from ‘memberUid’. When binding VAST Cluster to AD, you may need to set this to ‘memberUID’."
+          description: "The attribute of a group entry on the Active Directory server that contains names of group members, if different from `memberUid`. When binding the VAST cluster to Active Directory, you may need to set this to `memberUID`."
         posix_account:
           type: "string"
-          description: "The object class that defines a user entry on the AD server, if different from ‘posixAccount’. When binding VAST Cluster to AD, set this parameter to ‘user’ in order for authorization to work properly."
+          description: "The object class that defines a user entry on the Active Directory server, if different from `posixAccount`. When binding the VAST cluster to Active Directory, set this parameter to `user` to ensure that authorization works properly."
         posix_group:
           type: "string"
           description: "	
-The object class that defines a group entry on the AD server, if different from ‘posixGroup’. When binding VAST Cluster to AD, set this parameter to ‘group’ in order for authorization to work properly."
+The object class that defines a group entry on the Active Directory server, if different from `posixGroup`. When binding the VAST cluster to Active Directory, set this parameter to `group` to ensure that authorization works properly."
         username_property_name:
           type: "string"
-          description: "The attribute to use for querying users in VMS user-initated user queries. Default is ‘name’. Sometimes set to ‘cn’"
+          description: "The attribute to use for querying users in VMS user-initated user queries. Default is `name`. Sometimes it can be set to `cn`."
         user_login_name:
           type: "string"
-          description: "Specifies the attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1."
+          description: "Specifies the attribute used to query Active Directory for the user login name in NFS ID mapping."
         group_login_name:
           type: "string"
-          description: "Specifies the attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1."
+          description: "Specifies the attribute used to query Active Directory for the group login name in NFS ID mapping."
         mail_property_name:
           type: "string"
           description: "Specifies the attribute to use for the user’s email address."
         is_vms_auth_provider:
           type: "boolean"
           default: false
-          description: "Enables use of the AD for VMS authentication. Two AD configurations per cluster can be used for VMS authentication: one with AD and one without."
+          description: "Enables or disables use of the Active Directory for VMS authentication. Two Active Directory configurations per cluster can be used for VMS authentication: one with Active Directory and the other without Active Directory."
         bindpw:
           type: "string"
-          description: "The password used with the Bind DN to authenticate to the AD server."
+          description: "The password used with the Bind DN to authenticate to the Active Directory server."
         urls:
           type: "array"
           items:
             type: "string"
-          description: "Comma separated list of URIs of AD servers in the format SCHEME://ADDRESS. The order of listing defines the priority order. The URI with highest priority that has a good health status is used."
+          description: "A comma-separated list of URIs of Active Directory servers in the format `SCHEME://ADDRESS`. The order of listing defines the priority order. The URI with the highest priority that has a good health status is used."
     ProtocolsAudit:
       type: "object"
       properties:
         create_delete_files_dirs_objects:
           type: "boolean"
-          description: "Audit operations that create or delete files, directories, or objects."
+          description: "Enables or disables logging of operations that create or delete files, directories, or objects."
           default: false
         log_deleted_files_dirs:
           type: "boolean"
-          description: "Log deleted files and directories."
+          description: "Enables or disables logging of deleted files and directories."
           default: false
         log_full_path:
           type: "boolean"
-          description: "Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded."
+          description: "If `true` (default), enables logging of full Element Store path to the requested resource. May affect performance. If `false`, the view path is recorded."
           default: true
         log_username:
           type: "boolean"
-          description: "Log username of requesting user. Disabled by default"
+          description: "Enables or disables (default) logging of username of the requesting user."
           default: false
         log_hostname:
           type: "boolean"
-          description: "Log the accessing Hostname"
+          description: "Enables or disables logging of the accessing host name"
         modify_data_md:
           type: "boolean"
-          description: "Audit operations that modify data (including operations that change the file size) and metadata"
+          description: "Enables or disables logging of operations that modify metadata."
           default: false
         read_data:
           type: "boolean"
-          description: "Audit operations that read data and metadata"
+          description: "Enables or disables logging of operations that read data."
           default: false
         modify_data:
           type: "boolean"
@@ -2213,10 +2169,10 @@ The object class that defines a group entry on the AD server, if different from 
       properties:
         vippool_id:
           type: "string"
-          description: "The Vippool ID"
+          description: "The ID of the virtual IP pool."
         vippool_permissions:
           type: "string"
-          description: "VIP pool permissions "
+          description: "Permissions for the virtual IP pool."
           default: "RW"
           enum: [RW,RO]
     BucketLogging:
@@ -2225,17 +2181,13 @@ The object class that defines a group entry on the AD server, if different from 
         destination_id:
           type: "integer"
           format: "int64"
-          description: "The Logging bucket ID"
+          description: "The ID of the logging bucket."
         prefix:
           type: "string"
           description: "Log line prefix to add"
         key_format:
           type: "string"
-          description: "The format for log object keys. 
-SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString], 
-PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the logged events occurred, 
-PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the log object has been delivered to the destination bucket. 
-Default: SIMPLE_PREFIX"
+          description: "The format for log object keys: `SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]`, `PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]` where the partitioning is done based on the time when the logged events occurred, `PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]` where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: `SIMPLE_PREFIX`."
           enum: [ SIMPLE_PREFIX, PARTITIONED_PREFIX_EVENT_TIME, PARTITIONED_PREFIX_DELIVERY_TIME ]
           default: "SIMPLE_PREFIX"
     Realm:
@@ -2243,100 +2195,100 @@ Default: SIMPLE_PREFIX"
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the realm"
+          description: "The unique ID of the realm."
         guid:
           type: "string"
-          description: "A uniqe GUID assigned to the realm"
+          description: "The unique GUID of the realm."
         name:
           type: "string"
-          description: "A uniqe name of the realm"
+          description: "The unique name of the realm."
         object_types: 
           type: "array"
           items:
             type: "string"
-          description: "List of allowed permissions"
+          description: "A list of permissions granted."
           enum: [cnodegroup, managedapplication, managedapplicationset, alarm, event, eventdefinition, eventdefinitionconfig, cbox, cnode, carrier, cluster, dbox, dnode, dtray, ebox, fan, host, nic, nvram, psu, port, rack, ssd, subnetmanager, switch, dns, globalsnapstream, kafkabroker, nativereplicationremotetarget, protectedpath, protectionpolicy, qospolicy, quota, quotaentityinfo, replicationrestorepoint, replicationstream, replicationtarget, s3lifecyclerule, snapshot, userquota, vip, vippool, view, viewpolicy, monitor, activedirectory, encryptedpath, encryptiongroup, group, indestructibility, ldap, manager, nis, permission, realm, role, s3policy, tenant, user, vms, callhomeconfig, challengetoken, env, license, module, supportbundle, systemsettingsdiff]
     Role:
       type: "object"
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the role"
+          description: "The unique ID of the role."
         guid:
           type: "string"
-          description: "A uniqe GUID assigned to the role"
+          description: "The unique GUID  of the role."
         name:
           type: "string"
-          description: "A uniqe name of the role"
+          description: "The unique name of the role."
         permissions_list:
           type: "array"
           items:
             type: "string"
-          description: "List of allowed permissions"
+          description: "A list of permissions granted."
           enum: [ create_support, create_settings, create_security, create_monitoring, create_logical, create_hardware, create_events, create_database, create_applications, view_support, view_settings, view_security, view_monitoring, view_logical, view_hardware, view_events, view_applications, view_database, edit_support, edit_settings, edit_security, edit_monitoring, edit_logical, edit_hardware, edit_events, edit_database, edit_applications, delete_support, delete_settings, delete_security, delete_monitoring, delete_logical, delete_hardware, delete_events, delete_applications, delete_database ]
         permissions:
             type: "array"
             items:
               type: "string"
-            description: "List of allowed permissions returned from the VMS"
+            description: "A list of granted permissions returned from the VMS."
         tenants:
           type: "array"
           items:
             type: "integer"
             format: "int64"
-          description: "List of tenants to which this role is associated with"
+          description: "A list of tenants the role is associated with."
         is_admin:
           type: "boolean"
-          description: "Is the role is an admin role"
+          description: "If true, the role is an admin role."
         is_default:
           type: "boolean"
-          description: "Is the role is a default role"
+          description: "If true, the role is a default role."
         ldap_groups:
           type: "array"
           items:
             type: "string"
-          description: "LDAP group(s) associated with the role. Members of the specified groups on a connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles."
+          description: "LDAP group(s) associated with the role. Members of the specified groups on the connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles."
     Manager:
       type: "object"
       properties:
         id:
           type: "int64"
-          description: "A unique id given to the manager"
+          description: "A unique ID of the manager."
         guid:
           type: "string"
-          description: "A uniqe GUID assigned to the manager"
+          description: "A unique GUID of the manager."
         username:
           type: "string"
-          description: "The username of the manager"
+          description: "The username of the manager."
         password:
           type: "string"
-          description: "The username of the manager"
+          description: "The password of the manager."
         first_name:
           type: "string"
-          description: "The user firstname"
+          description: "The manager's first name."
         last_name:
           type: "string"
-          description: "The user last name"
+          description: "The manager's last name."
         permissions_list:
           type: "array"
           items:
             type: "string"
-          description: "List of allowed permissions"
+          description: "A list of permissions granted."
           enum: [ create_support, create_settings, create_security, create_monitoring, create_logical, create_hardware, create_events, create_database, create_applications, view_support, view_settings, view_security, view_monitoring, view_logical, view_hardware, view_events, view_applications, view_database, edit_support, edit_settings, edit_security, edit_monitoring, edit_logical, edit_hardware, edit_events, edit_database, edit_applications, delete_support, delete_settings, delete_security, delete_monitoring, delete_logical, delete_hardware, delete_events, delete_applications, delete_database ]
         roles:
           type: "array"
           items:
             type: "int"
             format: "int64"
-          description: "List of roles ids"
+          description: "A list of role IDs."
         password_expiration_disabled:
           type: "boolean"
-          description: "Disable password expiration"
+          description: "If true, the password does not expire."
         is_temporary_password:
           type: "boolean"
-          description: "If this set to true next time that a user will login he will be promped to replace his password"
+          description: "If true, a prompt to replace the password will be displayed next time the user logs in."
         permissions:
             type: "array"
             items:
               type: "string"
-            description: "List of allowed permissions returned from the VMS"
+            description: "A list of granted permissions returned from the VMS."
