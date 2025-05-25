@@ -1,9 +1,9 @@
-#When there is only one snapshot with that name at the entire cluster
+#When there is only one snapshot with that name on the entire cluster
 data "vastdata_snapshot" "snapshot1" {
   name = "snapshot01"
 }
 
-#When there is more than one snapshot with that name at the cluster with differant tenant id
+#When there is more than one snapshot with that name on the cluster, with different tenant ID
 
 resource "vastdata_tenant" "tenant1" {
   name = "tenant01"

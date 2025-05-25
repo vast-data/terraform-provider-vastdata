@@ -1,4 +1,4 @@
-#Create a view with S3 protocol + user , and attach an s3 lifecycle rul
+#Create a user, create a view with S3 protocol, and attach an S3 lifecycle rule:
 resource "vastdata_user" "s3user" {
   name = "s3user"
   uid  = 2000

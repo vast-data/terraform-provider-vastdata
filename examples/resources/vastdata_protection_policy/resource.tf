@@ -1,6 +1,6 @@
-#We defined 2 porivders , each one represents a cluster , clusterA & clusterB.
-#We define vip pools for replication for each cluster & make them replication peers.
-#Than we define a protection policy
+#Suppose that two providers are defined, each of which represents a cluster: cluster A and cluster B.
+#Start with defining replication virtual IP pools for each cluster and setting the clusters to be replication peers.
+#Then define a protection policy.
 resource "vastdata_vip_pool" "pool1-clusterB" {
   name        = "pool1"
   role        = "REPLICATION"

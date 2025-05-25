@@ -25,21 +25,21 @@ func Provider() *schema.Provider {
 				Type:        schema.TypeString,
 				Required:    true,
 				Optional:    false,
-				Description: `The VastData Cluster hostname/address , if environment variable VASTDATA_HOST exists it will be used`,
+				Description: `The VAST cluster hostname/address. If the VASTDATA_HOST environment variable exists, it will be used.`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_HOST", nil),
 			},
 			"port": {
 				Type:        schema.TypeInt,
 				Required:    false,
 				Optional:    true,
-				Description: `The server API port (Default is 443) ,if environment variable VASTDATA_PORT exists it will be used`,
+				Description: `The server API port (default is 443). If the VASTDATA_PORT environment variable exists, it will be used.`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_PORT", 443),
 			},
 			"skip_ssl_verify": {
 				Type:        schema.TypeBool,
 				Required:    false,
 				Optional:    true,
-				Description: `A boolean representing should SSL certificate be verified (Default is False) , if environmnet variable VASTDATA_VERIFY_SSL exists it will be used`,
+				Description: `A flag to determine whether the SSL certificate is to be verified (default is False). If the VASTDATA_VERIFY_SSL environment variable exists, it will be used.`,
 				DefaultFunc: schema.EnvDefaultFunc("VASTDATA_VERIFY_SSL", false),
 			},
 
@@ -48,7 +48,7 @@ func Provider() *schema.Provider {
 				Required:      false,
 				Optional:      true,
 				Sensitive:     true,
-				Description:   `The VastData Cluster username, if environment variable VASTDATA_CLUSTER_USERNAME exists it will be used`,
+				Description:   `The VAST cluster user name. If the VASTDATA_CLUSTER_USERNAME environment variable exists, it will be used.`,
 				DefaultFunc:   schema.EnvDefaultFunc("VASTDATA_CLUSTER_USERNAME", nil),
 				ConflictsWith: []string{"api_token"},
 				RequiredWith:  []string{"password"},
@@ -59,7 +59,7 @@ func Provider() *schema.Provider {
 				Required:      false,
 				Optional:      true,
 				Sensitive:     true,
-				Description:   `The VastData Cluster password, if environment variable VASTDATA_CLUSTER_PASSWORD exists it will be used`,
+				Description:   `The VAST cluster password. If the VASTDATA_CLUSTER_PASSWORD environment variable exists, it will be used.`,
 				DefaultFunc:   schema.EnvDefaultFunc("VASTDATA_CLUSTER_PASSWORD", nil),
 				ConflictsWith: []string{"api_token"},
 				RequiredWith:  []string{"username"},
@@ -69,7 +69,7 @@ func Provider() *schema.Provider {
 				Required:      false,
 				Optional:      true,
 				Sensitive:     true,
-				Description:   `The VastData Cluster API token. If environment variable VASTDATA_API_TOKEN exists it will be used`,
+				Description:   `The VAST cluster API token. If the VASTDATA_API_TOKEN environment variable exists, it will be used.`,
 				DefaultFunc:   schema.EnvDefaultFunc("VASTDATA_API_TOKEN", nil),
 				ConflictsWith: []string{"username", "password"},
 				AtLeastOneOf:  []string{"api_token", "username"},
@@ -79,11 +79,7 @@ func Provider() *schema.Provider {
 				Required:  false,
 				Optional:  true,
 				Sensitive: false,
-				Description: `The version validation mode to use , version validation checks if a resource request will work with the current cluster version
-			Depending on the value the operation will abort from happening if according to the version the operation might not work.
-			2 options are valid for this attribute
-			1. strict - abort the operation before it starts
-			2. warn - Just issue a warning `,
+				Description: `The version validation mode to use. Version validation checks if a resource request will work with the current cluster version. Depending on the value, the operation will be aborted if it won't work with the current version. Valid values: strict - to abort the operation before it starts, warn - to issue a warning without aborting the operation.`,
 				DefaultFunc:  schema.EnvDefaultFunc("VERSION_VALIDATION_MODE", "warn"),
 				ValidateFunc: validation.StringInSlice([]string{"warn", "strict"}, true),
 			},
@@ -117,7 +113,7 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Unable to start a session to the vastdata cluster",
+			Summary:  "Unable to start a session to the VAST cluster",
 			Detail:   err.Error(),
 		})
 		return client, diags

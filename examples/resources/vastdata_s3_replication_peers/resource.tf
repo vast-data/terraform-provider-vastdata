@@ -1,4 +1,4 @@
-#Create s3 replication peer for a custome bucket
+#Create an S3 replication peer for a custom bucket
 resource "vastdata_s3_replication_peers" "s3peers" {
   name              = "s3peer"
   bucket_name       = "s3bucket"
@@ -10,7 +10,7 @@ resource "vastdata_s3_replication_peers" "s3peers" {
 
 }
 
-#Create s3 replication peer for an aws bucket
+#Create an S3 replication peer for an AWS bucket
 resource "vastdata_s3_replication_peers" "s3peer-aws" {
   name          = "s3peer-aws"
   bucket_name   = "my-aws-s3-bucket"

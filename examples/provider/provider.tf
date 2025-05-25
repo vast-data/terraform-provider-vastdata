@@ -1,4 +1,4 @@
-#A Simple provider with warn version validation level
+#A Simple provider with the version validation level of `warn`
 provider vastdata {
   username = "<username>"
   port = 443
@@ -8,7 +8,7 @@ provider vastdata {
   version_validation_mode = "warn"
 }
 
-#Define 2 providers for 2 different cluster with alias one with port 443 and one with port 9443
+#Define two providers for two different clusters named clusterA and clusterB, one with port 443 and the other with port 9443
 
 provider vastdata {
   api_token = "<api_token>"

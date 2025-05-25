@@ -1,4 +1,4 @@
-#Basic defenition of VIP pool 
+#Basic definition of virtual IP pool 
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"
@@ -14,10 +14,10 @@ resource "vastdata_vip_pool" "pool1" {
   }
 }
 
-#Setting up VIP pool related tenant can be done in 2 ways.
-#It is advisable to select only one method per tenant,vippool combination.
+#A virtual IP pool can be associated with a tenant in two ways: by defining the `vastdata_tenant` resource, or by setting the `tenant_id` attribute on the virtual IP pool.
+#It is recommended to use only one of these methods per tenant and pool combination.
 
-#Define VIP pool setting up the tenant_id of it using vastdata_tenant resource 
+#Define a virtual IP pool and associate it with a tenant using the `vastdata_tenant` resource
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"
@@ -43,7 +43,7 @@ resource "vastdata_tenant" "tenant1" {
 }
 
 
-#Define VIP pool setting up the tenant_id using the tenent_id attribute.
+#Define a virtual IP pool and associate it with a tenant using the `tenant_id` attribute of the pool
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"
@@ -68,7 +68,7 @@ resource "vastdata_tenant" "tenant1" {
   }
 }
 
-#Define a VIP pool for all tenants by setting tenant_id = 0
+#Define a virtual IP pool for all tenants by setting `tenant_id = 0`
 resource "vastdata_vip_pool" "pool1" {
   name        = "pool1"
   role        = "PROTOCOLS"

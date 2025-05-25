@@ -1,4 +1,4 @@
-#Realms are avaliable from version 5.2.0
+#Realms are avaliable in version 5.2.0 and later
 
 resource "vastdata_administators_realms" "realm01" {
   name         = "realm01"

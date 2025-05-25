@@ -1,4 +1,4 @@
-#Creating a local global snapshot from a snapshot on the same tenant
+#Create a local global snapshot from a snapshot on the same tenant
 resource "vastdata_tenant" "tenant" {
   name = "tenant1"
   client_ip_ranges {
