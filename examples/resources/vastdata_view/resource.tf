@@ -1,4 +1,4 @@
-# Create a view with NFS & NFSv4 protocols
+# Create a view with NFSv3 and NFSv4 protocols
 resource "vastdata_view_policy" "example" {
   name   = "example"
   flavor = "NFS"
