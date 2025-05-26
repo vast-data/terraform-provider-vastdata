@@ -50,6 +50,6 @@ func GetFuncName(i interface{}) string {
 	if p != nil {
 		return p.Name()
 	}
-	return "Unkown"
+	return "Unknown"
 
 }
