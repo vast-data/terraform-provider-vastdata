@@ -40,7 +40,7 @@ func ResourceQosPolicy() *schema.Resource {
 func getResourceQosPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS Policy guid`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"mode": &schema.Schema{
+		"mode": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("mode"),
 
@@ -70,7 +70,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 		},
 
-		"policy_type": &schema.Schema{
+		"policy_type": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("policy_type"),
 
@@ -82,7 +82,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.2.0) The QoS type Allowed Values are [VIEW USER]`,
 		},
 
-		"limit_by": &schema.Schema{
+		"limit_by": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("limit_by"),
 
@@ -96,7 +96,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Default: "BW_IOPS",
 		},
 
-		"tenant_id": &schema.Schema{
+		"tenant_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("tenant_id"),
 
@@ -106,7 +106,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.2.0) When setting is_default this is the tenant which will take affect`,
 		},
 
-		"attached_users_identifiers": &schema.Schema{
+		"attached_users_identifiers": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("attached_users_identifiers"),
 
@@ -120,7 +120,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"is_default": &schema.Schema{
+		"is_default": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("is_default"),
 
@@ -130,7 +130,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.2.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute`,
 		},
 
-		"io_size_bytes": &schema.Schema{
+		"io_size_bytes": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("io_size_bytes"),
 
@@ -140,7 +140,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M`,
 		},
 
-		"static_limits": &schema.Schema{
+		"static_limits": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("static_limits"),
 
@@ -152,7 +152,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"min_reads_bw_mbps": &schema.Schema{
+					"min_reads_bw_mbps": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_reads_bw_mbps"),
 
@@ -162,7 +162,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
-					"max_reads_bw_mbps": &schema.Schema{
+					"max_reads_bw_mbps": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_reads_bw_mbps"),
 
@@ -172,7 +172,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
-					"min_writes_bw_mbps": &schema.Schema{
+					"min_writes_bw_mbps": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_writes_bw_mbps"),
 
@@ -182,7 +182,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
-					"max_writes_bw_mbps": &schema.Schema{
+					"max_writes_bw_mbps": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_writes_bw_mbps"),
 
@@ -192,7 +192,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
-					"min_reads_iops": &schema.Schema{
+					"min_reads_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_reads_iops"),
 
@@ -202,7 +202,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
-					"max_reads_iops": &schema.Schema{
+					"max_reads_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_reads_iops"),
 
@@ -212,7 +212,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
-					"min_writes_iops": &schema.Schema{
+					"min_writes_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("min_writes_iops"),
 
@@ -222,7 +222,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
 					},
 
-					"max_writes_iops": &schema.Schema{
+					"max_writes_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("max_writes_iops"),
 
@@ -232,7 +232,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
 					},
 
-					"burst_reads_bw_mb": &schema.Schema{
+					"burst_reads_bw_mb": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_bw_mb"),
 
@@ -242,7 +242,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst reads BW Mb`,
 					},
 
-					"burst_reads_loan_mb": &schema.Schema{
+					"burst_reads_loan_mb": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_loan_mb"),
 
@@ -252,7 +252,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst reads loan Mb`,
 					},
 
-					"burst_writes_bw_mb": &schema.Schema{
+					"burst_writes_bw_mb": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_bw_mb"),
 
@@ -262,7 +262,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst writes BW Mb`,
 					},
 
-					"burst_writes_loan_mb": &schema.Schema{
+					"burst_writes_loan_mb": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_loan_mb"),
 
@@ -272,7 +272,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst writes loan Mb`,
 					},
 
-					"burst_reads_iops": &schema.Schema{
+					"burst_reads_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_iops"),
 
@@ -282,7 +282,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst reads IOPS`,
 					},
 
-					"burst_reads_loan_iops": &schema.Schema{
+					"burst_reads_loan_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_reads_loan_iops"),
 
@@ -292,7 +292,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst reads loan IOPS`,
 					},
 
-					"burst_writes_iops": &schema.Schema{
+					"burst_writes_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_iops"),
 
@@ -302,7 +302,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst writes IOPS`,
 					},
 
-					"burst_writes_loan_iops": &schema.Schema{
+					"burst_writes_loan_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosStaticLimits").GetConflictingFields("burst_writes_loan_iops"),
 
@@ -315,7 +315,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"capacity_limits": &schema.Schema{
+		"capacity_limits": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("capacity_limits"),
 
@@ -327,7 +327,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"max_reads_bw_mbps_per_gb_capacity": &schema.Schema{
+					"max_reads_bw_mbps_per_gb_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_reads_bw_mbps_per_gb_capacity"),
 
@@ -337,7 +337,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
-					"max_writes_bw_mbps_per_gb_capacity": &schema.Schema{
+					"max_writes_bw_mbps_per_gb_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_writes_bw_mbps_per_gb_capacity"),
 
@@ -347,7 +347,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
-					"max_reads_iops_per_gb_capacity": &schema.Schema{
+					"max_reads_iops_per_gb_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_reads_iops_per_gb_capacity"),
 
@@ -357,7 +357,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
-					"max_writes_iops_per_gb_capacity": &schema.Schema{
+					"max_writes_iops_per_gb_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosDynamicLimits").GetConflictingFields("max_writes_iops_per_gb_capacity"),
 
@@ -370,7 +370,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"static_total_limits": &schema.Schema{
+		"static_total_limits": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("static_total_limits"),
 
@@ -382,7 +382,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"max_bw_mbps": &schema.Schema{
+					"max_bw_mbps": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("max_bw_mbps"),
 
@@ -392,7 +392,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Maximal BW Mb/s`,
 					},
 
-					"burst_bw_mb": &schema.Schema{
+					"burst_bw_mb": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_bw_mb"),
 
@@ -402,7 +402,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst BW Mb`,
 					},
 
-					"burst_loan_mb": &schema.Schema{
+					"burst_loan_mb": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_loan_mb"),
 
@@ -412,7 +412,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst loan Mb`,
 					},
 
-					"max_iops": &schema.Schema{
+					"max_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("max_iops"),
 
@@ -422,7 +422,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Maximal IOPS`,
 					},
 
-					"burst_iops": &schema.Schema{
+					"burst_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_iops"),
 
@@ -432,7 +432,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Burst IOPS`,
 					},
 
-					"burst_loan_iops": &schema.Schema{
+					"burst_loan_iops": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSStaticTotalLimits").GetConflictingFields("burst_loan_iops"),
 
@@ -445,7 +445,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"capacity_total_limits": &schema.Schema{
+		"capacity_total_limits": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("capacity_total_limits"),
 
@@ -457,7 +457,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"max_bw_mbps_per_gb_capacity": &schema.Schema{
+					"max_bw_mbps_per_gb_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSDynamicTotalLimits").GetConflictingFields("max_bw_mbps_per_gb_capacity"),
 
@@ -467,7 +467,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
 					},
 
-					"max_iops_per_gb_capacity": &schema.Schema{
+					"max_iops_per_gb_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QoSDynamicTotalLimits").GetConflictingFields("max_iops_per_gb_capacity"),
 
@@ -480,7 +480,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"attached_users": &schema.Schema{
+		"attached_users": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("QosPolicy").GetConflictingFields("attached_users"),
 
@@ -492,7 +492,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"fqdn": &schema.Schema{
+					"fqdn": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("fqdn"),
 
@@ -502,7 +502,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) User FQDN`,
 					},
 
-					"is_sid": &schema.Schema{
+					"is_sid": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("is_sid"),
 
@@ -512,7 +512,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) `,
 					},
 
-					"sid_str": &schema.Schema{
+					"sid_str": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("sid_str"),
 
@@ -522,7 +522,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) The user SID`,
 					},
 
-					"uid_or_gid": &schema.Schema{
+					"uid_or_gid": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("uid_or_gid"),
 
@@ -532,7 +532,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) `,
 					},
 
-					"label": &schema.Schema{
+					"label": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("label"),
 
@@ -542,7 +542,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) How to display the user`,
 					},
 
-					"value": &schema.Schema{
+					"value": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("value"),
 
@@ -552,7 +552,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) The user name`,
 					},
 
-					"login_name": &schema.Schema{
+					"login_name": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("login_name"),
 
@@ -562,7 +562,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) The user login name`,
 					},
 
-					"name": &schema.Schema{
+					"name": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("name"),
 
@@ -572,7 +572,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) The user name`,
 					},
 
-					"identifier_type": &schema.Schema{
+					"identifier_type": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("identifier_type"),
 
@@ -582,7 +582,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) The user type of idetify`,
 					},
 
-					"identifier_value": &schema.Schema{
+					"identifier_value": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("QosUser").GetConflictingFields("identifier_value"),
 
@@ -597,7 +597,7 @@ func getResourceQosPolicySchema() map[string]*schema.Schema {
 	}
 }
 
-var QosPolicy_names_mapping map[string][]string = map[string][]string{}
+var QosPolicyNamesMapping = map[string][]string{}
 
 func ResourceQosPolicyReadStructIntoSchema(ctx context.Context, resource api_latest.QosPolicy, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -782,16 +782,16 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("QosPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("QosPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceQosPolicyRead] Calling Get Function : %v for resource QosPolicy", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceQosPolicyRead] Calling Get Function : %v for resource QosPolicy", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -799,12 +799,12 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.QosPolicy{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -814,7 +814,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -823,7 +823,7 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 	diags = ResourceQosPolicyReadStructIntoSchema(ctx, resource, d)
 
 	var after_read_error error
-	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
+	after_read_error = resourceConfig.AfterReadFunc(client, ctx, d)
 	if after_read_error != nil {
 		return diag.FromErr(after_read_error)
 	}
@@ -834,10 +834,10 @@ func resourceQosPolicyRead(ctx context.Context, d *schema.ResourceData, m interf
 func resourceQosPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("QosPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("QosPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -848,7 +848,7 @@ func resourceQosPolicyDelete(ctx context.Context, d *schema.ResourceData, m inte
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -859,44 +859,44 @@ func resourceQosPolicyDelete(ctx context.Context, d *schema.ResourceData, m inte
 }
 
 func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, QosPolicy_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, QosPolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("QosPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("QosPolicy")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource QosPolicy"))
-	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_QosPolicy.Elem(), d, &data, "", false)
+	reflectQosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
+	utils.PopulateResourceMap(newCtx, reflectQosPolicy.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	data, before_post_error = resourceConfig.BeforePostFunc(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "QosPolicy")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "QosPolicy")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "QosPolicy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "QosPolicy", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -911,22 +911,22 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
 	resource := api_latest.QosPolicy{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -936,7 +936,7 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -945,51 +945,51 @@ func resourceQosPolicyCreate(ctx context.Context, d *schema.ResourceData, m inte
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceQosPolicyRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceQosPolicyRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, QosPolicy_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, QosPolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("QosPolicy")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "QosPolicy")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("QosPolicy")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "QosPolicy")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "QosPolicy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "QosPolicy", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource QosPolicy"))
-	reflect_QosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_QosPolicy.Elem(), d, &data, "", false)
+	reflectQosPolicy := reflect.TypeOf((*api_latest.QosPolicy)(nil))
+	utils.PopulateResourceMap(newCtx, reflectQosPolicy.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -1004,14 +1004,14 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  QosPolicy %v", patchErr))
+	if patchErr != nil {
+		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -1023,44 +1023,44 @@ func resourceQosPolicyUpdate(ctx context.Context, d *schema.ResourceData, m inte
 
 func resourceQosPolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("QosPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("QosPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("qospolicies")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.QosPolicy{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.QosPolicy
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceQosPolicyReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occurred while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

@@ -40,7 +40,7 @@ func ResourceGlobalSnapshot() *schema.Resource {
 func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
 		},
 
-		"loanee_tenant_id": &schema.Schema{
+		"loanee_tenant_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("loanee_tenant_id"),
 
@@ -69,7 +69,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target`,
 		},
 
-		"loanee_root_path": &schema.Schema{
+		"loanee_root_path": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("loanee_root_path"),
 
@@ -77,7 +77,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target`,
 		},
 
-		"remote_target_id": &schema.Schema{
+		"remote_target_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_id"),
 
@@ -85,7 +85,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering id`,
 		},
 
-		"remote_target_guid": &schema.Schema{
+		"remote_target_guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_guid"),
 
@@ -93,7 +93,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering guid`,
 		},
 
-		"remote_target_path": &schema.Schema{
+		"remote_target_path": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_path"),
 
@@ -101,7 +101,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster`,
 		},
 
-		"enabled": &schema.Schema{
+		"enabled": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("enabled"),
 
@@ -111,7 +111,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled`,
 		},
 
-		"owner_root_snapshot": &schema.Schema{
+		"owner_root_snapshot": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("owner_root_snapshot"),
 
@@ -121,7 +121,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"clone_id": &schema.Schema{
+					"clone_id": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerRootSnapshot").GetConflictingFields("clone_id"),
 
@@ -131,7 +131,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the clone`,
 					},
 
-					"name": &schema.Schema{
+					"name": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerRootSnapshot").GetConflictingFields("name"),
 
@@ -139,7 +139,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remote Clone Name`,
 					},
 
-					"parent_handle_ehandle": &schema.Schema{
+					"parent_handle_ehandle": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerRootSnapshot").GetConflictingFields("parent_handle_ehandle"),
 
@@ -152,7 +152,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"owner_tenant": &schema.Schema{
+		"owner_tenant": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("owner_tenant"),
 
@@ -162,7 +162,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"name": &schema.Schema{
+					"name": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("name"),
 
@@ -170,7 +170,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant`,
 					},
 
-					"guid": &schema.Schema{
+					"guid": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("guid"),
 
@@ -183,7 +183,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 	}
 }
 
-var GlobalSnapshot_names_mapping map[string][]string = map[string][]string{}
+var GlobalSnapshotNamesMapping = map[string][]string{}
 
 func ResourceGlobalSnapshotReadStructIntoSchema(ctx context.Context, resource api_latest.GlobalSnapshot, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -318,16 +318,16 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("GlobalSnapshot")
+	resourceConfig := codegen_configs.GetResourceByName("GlobalSnapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceGlobalSnapshotRead] Calling Get Function : %v for resource GlobalSnapshot", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceGlobalSnapshotRead] Calling Get Function : %v for resource GlobalSnapshot", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -335,12 +335,12 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 	}
 	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.GlobalSnapshot{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -350,7 +350,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -364,10 +364,10 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 func resourceGlobalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("GlobalSnapshot")
+	resourceConfig := codegen_configs.GetResourceByName("GlobalSnapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -378,7 +378,7 @@ func resourceGlobalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -389,44 +389,44 @@ func resourceGlobalSnapshotDelete(ctx context.Context, d *schema.ResourceData, m
 }
 
 func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, GlobalSnapshot_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, GlobalSnapshotNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("GlobalSnapshot")
+	resourceConfig := codegen_configs.GetResourceByName("GlobalSnapshot")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource GlobalSnapshot"))
-	reflect_GlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
+	reflectGlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
+	utils.PopulateResourceMap(newCtx, reflectGlobalSnapshot.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	data, before_post_error = resourceConfig.BeforePostFunc(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "GlobalSnapshot")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "GlobalSnapshot")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "GlobalSnapshot", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "GlobalSnapshot", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -441,22 +441,22 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
 	resource := api_latest.GlobalSnapshot{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -466,7 +466,7 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -475,51 +475,51 @@ func resourceGlobalSnapshotCreate(ctx context.Context, d *schema.ResourceData, m
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceGlobalSnapshotRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceGlobalSnapshotRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, GlobalSnapshot_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, GlobalSnapshotNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("GlobalSnapshot")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "GlobalSnapshot")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("GlobalSnapshot")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "GlobalSnapshot")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "GlobalSnapshot", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "GlobalSnapshot", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource GlobalSnapshot"))
-	reflect_GlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_GlobalSnapshot.Elem(), d, &data, "", false)
+	reflectGlobalSnapshot := reflect.TypeOf((*api_latest.GlobalSnapshot)(nil))
+	utils.PopulateResourceMap(newCtx, reflectGlobalSnapshot.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -534,14 +534,14 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalSnapshot %v", patchErr))
+	if patchErr != nil {
+		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -553,44 +553,44 @@ func resourceGlobalSnapshotUpdate(ctx context.Context, d *schema.ResourceData, m
 
 func resourceGlobalSnapshotImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("GlobalSnapshot")
+	resourceConfig := codegen_configs.GetResourceByName("GlobalSnapshot")
 	attrs := map[string]interface{}{"path": utils.GenPath("globalsnapstreams")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.GlobalSnapshot{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.GlobalSnapshot
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceGlobalSnapshotReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occurred while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

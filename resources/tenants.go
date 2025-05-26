@@ -40,7 +40,7 @@ func ResourceTenant() *schema.Resource {
 func getResourceTenantSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the tenant`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the tenant`,
 		},
 
-		"use_smb_privileged_user": &schema.Schema{
+		"use_smb_privileged_user": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("use_smb_privileged_user"),
 
@@ -68,7 +68,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Enables SMB privileged user`,
 		},
 
-		"smb_privileged_user_name": &schema.Schema{
+		"smb_privileged_user_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_privileged_user_name"),
 
@@ -78,7 +78,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'`,
 		},
 
-		"use_smb_privileged_group": &schema.Schema{
+		"use_smb_privileged_group": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("use_smb_privileged_group"),
 
@@ -88,7 +88,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Enables SMB privileged user group`,
 		},
 
-		"smb_privileged_group_sid": &schema.Schema{
+		"smb_privileged_group_sid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_privileged_group_sid"),
 
@@ -98,7 +98,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.`,
 		},
 
-		"smb_privileged_group_full_access": &schema.Schema{
+		"smb_privileged_group_full_access": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_privileged_group_full_access"),
 
@@ -108,7 +108,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.`,
 		},
 
-		"smb_administrators_group_name": &schema.Schema{
+		"smb_administrators_group_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("smb_administrators_group_name"),
 
@@ -118,7 +118,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
 		},
 
-		"default_others_share_level_perm": &schema.Schema{
+		"default_others_share_level_perm": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("default_others_share_level_perm"),
 
@@ -130,7 +130,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]`,
 		},
 
-		"trash_gid": &schema.Schema{
+		"trash_gid": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("trash_gid"),
 
@@ -140,7 +140,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GID with permissions to the trash folder`,
 		},
 
-		"client_ip_ranges": &schema.Schema{
+		"client_ip_ranges": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("client_ip_ranges"),
 
@@ -169,7 +169,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"posix_primary_provider": &schema.Schema{
+		"posix_primary_provider": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("posix_primary_provider"),
 
@@ -181,7 +181,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]`,
 		},
 
-		"ad_provider_id": &schema.Schema{
+		"ad_provider_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("ad_provider_id"),
 
@@ -191,7 +191,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) AD provider ID`,
 		},
 
-		"ldap_provider_id": &schema.Schema{
+		"ldap_provider_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("ldap_provider_id"),
 
@@ -201,7 +201,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Open-LDAP provider ID specified separately by the user`,
 		},
 
-		"nis_provider_id": &schema.Schema{
+		"nis_provider_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("nis_provider_id"),
 
@@ -211,7 +211,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) NIS provider ID`,
 		},
 
-		"encryption_crn": &schema.Schema{
+		"encryption_crn": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("encryption_crn"),
 
@@ -221,7 +221,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant's encryption group unique identifier`,
 		},
 
-		"is_nfsv42_supported": &schema.Schema{
+		"is_nfsv42_supported": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("is_nfsv42_supported"),
 
@@ -231,7 +231,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Enable NFSv4.2`,
 		},
 
-		"allow_locked_users": &schema.Schema{
+		"allow_locked_users": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("allow_locked_users"),
 
@@ -243,7 +243,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"allow_disabled_users": &schema.Schema{
+		"allow_disabled_users": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("allow_disabled_users"),
 
@@ -255,7 +255,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"use_smb_native": &schema.Schema{
+		"use_smb_native": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("use_smb_native"),
 
@@ -265,7 +265,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Use native SMB authentication`,
 		},
 
-		"vippool_names": &schema.Schema{
+		"vippool_names": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("vippool_names"),
 
@@ -279,7 +279,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"vippool_ids": &schema.Schema{
+		"vippool_ids": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Tenant").GetConflictingFields("vippool_ids"),
 
@@ -297,7 +297,7 @@ func getResourceTenantSchema() map[string]*schema.Schema {
 	}
 }
 
-var Tenant_names_mapping map[string][]string = map[string][]string{
+var TenantNamesMapping = map[string][]string{
 	"client_ip_ranges": []string{"start_ip", "end_ip"},
 }
 
@@ -576,16 +576,16 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Tenant")
+	resourceConfig := codegen_configs.GetResourceByName("Tenant")
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceTenantRead] Calling Get Function : %v for resource Tenant", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceTenantRead] Calling Get Function : %v for resource Tenant", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -593,12 +593,12 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.Tenant{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -608,7 +608,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -617,7 +617,7 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 	diags = ResourceTenantReadStructIntoSchema(ctx, resource, d)
 
 	var after_read_error error
-	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
+	after_read_error = resourceConfig.AfterReadFunc(client, ctx, d)
 	if after_read_error != nil {
 		return diag.FromErr(after_read_error)
 	}
@@ -628,10 +628,10 @@ func resourceTenantRead(ctx context.Context, d *schema.ResourceData, m interface
 func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Tenant")
+	resourceConfig := codegen_configs.GetResourceByName("Tenant")
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -642,7 +642,7 @@ func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interfa
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -653,44 +653,44 @@ func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interfa
 }
 
 func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Tenant_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, TenantNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Tenant")
+	resourceConfig := codegen_configs.GetResourceByName("Tenant")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Tenant"))
-	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Tenant.Elem(), d, &data, "", false)
+	reflectTenant := reflect.TypeOf((*api_latest.Tenant)(nil))
+	utils.PopulateResourceMap(newCtx, reflectTenant.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	data, before_post_error = resourceConfig.BeforePostFunc(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Tenant")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Tenant")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Tenant", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Tenant", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -705,22 +705,22 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Tenant %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Tenant %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
 	resource := api_latest.Tenant{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -730,7 +730,7 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -739,51 +739,51 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceTenantRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceTenantRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Tenant_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, TenantNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("Tenant")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Tenant")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("Tenant")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Tenant")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Tenant", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Tenant", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Tenant"))
-	reflect_Tenant := reflect.TypeOf((*api_latest.Tenant)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Tenant.Elem(), d, &data, "", false)
+	reflectTenant := reflect.TypeOf((*api_latest.Tenant)(nil))
+	utils.PopulateResourceMap(newCtx, reflectTenant.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -798,14 +798,14 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Tenant %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Tenant %v", patchErr))
+	if patchErr != nil {
+		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -817,44 +817,44 @@ func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interfa
 
 func resourceTenantImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Tenant")
+	resourceConfig := codegen_configs.GetResourceByName("Tenant")
 	attrs := map[string]interface{}{"path": utils.GenPath("tenants")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.Tenant{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.Tenant
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceTenantReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occurred while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

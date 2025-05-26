@@ -40,7 +40,7 @@ func ResourceViewPolicy() *schema.Resource {
 func getResourceViewPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe guid given to the view policy`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name given to the view policy.                         `,
 		},
 
-		"gid_inheritance": &schema.Schema{
+		"gid_inheritance": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("gid_inheritance"),
 
@@ -68,7 +68,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Determine the way a file inherits GID`,
 		},
 
-		"flavor": &schema.Schema{
+		"flavor": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("flavor"),
 
@@ -78,7 +78,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Security flavor, which determines how file and directory permissions are applied in multiprotocol views.`,
 		},
 
-		"access_flavor": &schema.Schema{
+		"access_flavor": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("access_flavor"),
 
@@ -88,7 +88,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)`,
 		},
 
-		"path_length": &schema.Schema{
+		"path_length": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("path_length"),
 
@@ -100,7 +100,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
 		},
 
-		"allowed_characters": &schema.Schema{
+		"allowed_characters": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("allowed_characters"),
 
@@ -110,7 +110,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) How to determine the allowed characters in a path`,
 		},
 
-		"use32bit_fileid": &schema.Schema{
+		"use32bit_fileid": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("use32bit_fileid"),
 
@@ -120,7 +120,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: ``,
 		},
 
-		"expose_id_in_fsid": &schema.Schema{
+		"expose_id_in_fsid": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("expose_id_in_fsid"),
 
@@ -130,7 +130,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"use_auth_provider": &schema.Schema{
+		"use_auth_provider": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("use_auth_provider"),
 
@@ -142,7 +142,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"auth_source": &schema.Schema{
+		"auth_source": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("auth_source"),
 
@@ -154,7 +154,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) The source of authentication Allowed Values are [PROVIDERS RPC RPC_AND_PROVIDERS]`,
 		},
 
-		"read_write": &schema.Schema{
+		"read_write": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("read_write"),
 
@@ -168,7 +168,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"read_only": &schema.Schema{
+		"read_only": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("read_only"),
 
@@ -182,7 +182,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"nfs_read_write": &schema.Schema{
+		"nfs_read_write": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_read_write"),
 
@@ -198,7 +198,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"nfs_read_only": &schema.Schema{
+		"nfs_read_only": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_read_only"),
 
@@ -212,7 +212,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"smb_read_write": &schema.Schema{
+		"smb_read_write": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_read_write"),
 
@@ -226,7 +226,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"smb_read_only": &schema.Schema{
+		"smb_read_only": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_read_only"),
 
@@ -240,7 +240,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"s3_read_write": &schema.Schema{
+		"s3_read_write": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_read_write"),
 
@@ -254,7 +254,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"s3_read_only": &schema.Schema{
+		"s3_read_only": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_read_only"),
 
@@ -268,7 +268,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"trash_access": &schema.Schema{
+		"trash_access": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("trash_access"),
 
@@ -282,7 +282,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"nfs_posix_acl": &schema.Schema{
+		"nfs_posix_acl": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_posix_acl"),
 
@@ -292,7 +292,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enable POSIX ACL`,
 		},
 
-		"nfs_return_open_permissions": &schema.Schema{
+		"nfs_return_open_permissions": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_return_open_permissions"),
 
@@ -302,7 +302,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) when using smb use open permissions for files`,
 		},
 
-		"nfs_no_squash": &schema.Schema{
+		"nfs_no_squash": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_no_squash"),
 
@@ -318,7 +318,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"nfs_root_squash": &schema.Schema{
+		"nfs_root_squash": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_root_squash"),
 
@@ -332,7 +332,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"nfs_all_squash": &schema.Schema{
+		"nfs_all_squash": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_all_squash"),
 
@@ -346,7 +346,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"s3_bucket_full_control": &schema.Schema{
+		"s3_bucket_full_control": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_full_control"),
 
@@ -356,7 +356,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_bucket_listing": &schema.Schema{
+		"s3_bucket_listing": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_listing"),
 
@@ -366,7 +366,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_bucket_read": &schema.Schema{
+		"s3_bucket_read": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_read"),
 
@@ -376,7 +376,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_bucket_read_acp": &schema.Schema{
+		"s3_bucket_read_acp": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_read_acp"),
 
@@ -386,7 +386,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_bucket_write": &schema.Schema{
+		"s3_bucket_write": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_write"),
 
@@ -396,7 +396,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_bucket_write_acp": &schema.Schema{
+		"s3_bucket_write_acp": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_bucket_write_acp"),
 
@@ -406,7 +406,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_object_full_control": &schema.Schema{
+		"s3_object_full_control": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_full_control"),
 
@@ -416,7 +416,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_object_read": &schema.Schema{
+		"s3_object_read": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_read"),
 
@@ -426,7 +426,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_object_read_acp": &schema.Schema{
+		"s3_object_read_acp": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_read_acp"),
 
@@ -436,7 +436,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_object_write": &schema.Schema{
+		"s3_object_write": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_write"),
 
@@ -446,7 +446,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"s3_object_write_acp": &schema.Schema{
+		"s3_object_write_acp": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_object_write_acp"),
 
@@ -456,7 +456,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with full permissions`,
 		},
 
-		"smb_file_mode": &schema.Schema{
+		"smb_file_mode": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_file_mode"),
 
@@ -466,7 +466,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new file`,
 		},
 
-		"smb_directory_mode": &schema.Schema{
+		"smb_directory_mode": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_directory_mode"),
 
@@ -476,7 +476,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new folder`,
 		},
 
-		"smb_file_mode_padded": &schema.Schema{
+		"smb_file_mode_padded": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_file_mode_padded"),
 
@@ -486,7 +486,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new file`,
 		},
 
-		"smb_directory_mode_padded": &schema.Schema{
+		"smb_directory_mode_padded": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_directory_mode_padded"),
 
@@ -496,7 +496,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new folder`,
 		},
 
-		"cluster": &schema.Schema{
+		"cluster": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("cluster"),
 
@@ -506,7 +506,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
 		},
 
-		"cluster_id": &schema.Schema{
+		"cluster_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("cluster_id"),
 
@@ -516,7 +516,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID`,
 		},
 
-		"tenant_id": &schema.Schema{
+		"tenant_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("tenant_id"),
 
@@ -526,7 +526,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID`,
 		},
 
-		"tenant_name": &schema.Schema{
+		"tenant_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("tenant_name"),
 
@@ -536,7 +536,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant Name`,
 		},
 
-		"url": &schema.Schema{
+		"url": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("url"),
 
@@ -546,7 +546,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"atime_frequency": &schema.Schema{
+		"atime_frequency": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("atime_frequency"),
 
@@ -556,7 +556,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds.`,
 		},
 
-		"vip_pools": &schema.Schema{
+		"vip_pools": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("vip_pools"),
 
@@ -572,7 +572,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"nfs_minimal_protection_level": &schema.Schema{
+		"nfs_minimal_protection_level": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_minimal_protection_level"),
 
@@ -584,7 +584,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) NFS 4.1 minimal protection level Allowed Values are [NONE SYSTEM KRB_AUTH_ONLY KRB_INTEGRITY KRB_PRIVACY]`,
 		},
 
-		"s3_visibility": &schema.Schema{
+		"s3_visibility": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_visibility"),
 
@@ -598,7 +598,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"s3_visibility_groups": &schema.Schema{
+		"s3_visibility_groups": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_visibility_groups"),
 
@@ -612,7 +612,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"apple_sid": &schema.Schema{
+		"apple_sid": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("apple_sid"),
 
@@ -622,7 +622,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Apple sid`,
 		},
 
-		"protocols": &schema.Schema{
+		"protocols": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("protocols"),
 
@@ -636,7 +636,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"data_create_delete": &schema.Schema{
+		"data_create_delete": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("data_create_delete"),
 
@@ -646,7 +646,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Create/Delete Files/Directories/Objects`,
 		},
 
-		"data_modify": &schema.Schema{
+		"data_modify": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("data_modify"),
 
@@ -656,7 +656,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Modify data/MD`,
 		},
 
-		"data_read": &schema.Schema{
+		"data_read": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("data_read"),
 
@@ -666,7 +666,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Read data`,
 		},
 
-		"log_full_path": &schema.Schema{
+		"log_full_path": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_full_path"),
 
@@ -676,7 +676,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log full path`,
 		},
 
-		"log_hostname": &schema.Schema{
+		"log_hostname": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_hostname"),
 
@@ -686,7 +686,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log hostname`,
 		},
 
-		"log_username": &schema.Schema{
+		"log_username": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_username"),
 
@@ -696,7 +696,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log username`,
 		},
 
-		"log_deleted": &schema.Schema{
+		"log_deleted": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("log_deleted"),
 
@@ -706,7 +706,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log deleted files/dirs from trash dir`,
 		},
 
-		"count_views": &schema.Schema{
+		"count_views": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("count_views"),
 
@@ -716,7 +716,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Number of Policy related Views`,
 		},
 
-		"enable_snapshot_lookup": &schema.Schema{
+		"enable_snapshot_lookup": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_snapshot_lookup"),
 
@@ -726,7 +726,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to make the .snapshot directory accessible in subdirectories of the View.`,
 		},
 
-		"enable_listing_of_snapshot_dir": &schema.Schema{
+		"enable_listing_of_snapshot_dir": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_listing_of_snapshot_dir"),
 
@@ -736,7 +736,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
 		},
 
-		"s3_special_chars_support": &schema.Schema{
+		"s3_special_chars_support": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("s3_special_chars_support"),
 
@@ -746,7 +746,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols.`,
 		},
 
-		"smb_is_ca": &schema.Schema{
+		"smb_is_ca": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("smb_is_ca"),
 
@@ -756,7 +756,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.`,
 		},
 
-		"nfs_case_insensitive": &schema.Schema{
+		"nfs_case_insensitive": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_case_insensitive"),
 
@@ -766,7 +766,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Force case insensitivity for NFSv3 and NFSv4`,
 		},
 
-		"enable_access_to_snapshot_dir_in_subdirs": &schema.Schema{
+		"enable_access_to_snapshot_dir_in_subdirs": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_access_to_snapshot_dir_in_subdirs"),
 
@@ -776,7 +776,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
 		},
 
-		"enable_visibility_of_snapshot_dir": &schema.Schema{
+		"enable_visibility_of_snapshot_dir": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("enable_visibility_of_snapshot_dir"),
 
@@ -786,7 +786,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
 		},
 
-		"nfs_enforce_tls": &schema.Schema{
+		"nfs_enforce_tls": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("nfs_enforce_tls"),
 
@@ -796,7 +796,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.`,
 		},
 
-		"protocols_audit": &schema.Schema{
+		"protocols_audit": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("protocols_audit"),
 
@@ -808,7 +808,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"create_delete_files_dirs_objects": &schema.Schema{
+					"create_delete_files_dirs_objects": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("create_delete_files_dirs_objects"),
 
@@ -820,7 +820,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Default: false,
 					},
 
-					"log_deleted_files_dirs": &schema.Schema{
+					"log_deleted_files_dirs": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_deleted_files_dirs"),
 
@@ -832,7 +832,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Default: false,
 					},
 
-					"log_full_path": &schema.Schema{
+					"log_full_path": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_full_path"),
 
@@ -844,7 +844,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Default: true,
 					},
 
-					"log_username": &schema.Schema{
+					"log_username": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_username"),
 
@@ -856,7 +856,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Default: false,
 					},
 
-					"log_hostname": &schema.Schema{
+					"log_hostname": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("log_hostname"),
 
@@ -866,7 +866,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.1.0,5.2.0) Log the accessing Hostname`,
 					},
 
-					"modify_data_md": &schema.Schema{
+					"modify_data_md": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("modify_data_md"),
 
@@ -878,7 +878,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Default: false,
 					},
 
-					"read_data": &schema.Schema{
+					"read_data": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("read_data"),
 
@@ -890,7 +890,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Default: false,
 					},
 
-					"modify_data": &schema.Schema{
+					"modify_data": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("modify_data"),
 
@@ -902,7 +902,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Default: false,
 					},
 
-					"read_data_md": &schema.Schema{
+					"read_data_md": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtocolsAudit").GetConflictingFields("read_data_md"),
 
@@ -917,7 +917,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"vippool_permissions": &schema.Schema{
+		"vippool_permissions": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("vippool_permissions"),
 
@@ -931,7 +931,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"vippool_id": &schema.Schema{
+					"vippool_id": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("PermissionsPerVipPool").GetConflictingFields("vippool_id"),
 
@@ -941,7 +941,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.1.0,5.2.0) The Vippool ID`,
 					},
 
-					"vippool_permissions": &schema.Schema{
+					"vippool_permissions": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("PermissionsPerVipPool").GetConflictingFields("vippool_permissions"),
 
@@ -960,7 +960,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 	}
 }
 
-var ViewPolicy_names_mapping map[string][]string = map[string][]string{}
+var ViewPolicyNamesMapping = map[string][]string{}
 
 func ResourceViewPolicyReadStructIntoSchema(ctx context.Context, resource api_latest.ViewPolicy, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -1814,16 +1814,16 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ViewPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceViewPolicyRead] Calling Get Function : %v for resource ViewPolicy", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceViewPolicyRead] Calling Get Function : %v for resource ViewPolicy", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -1831,12 +1831,12 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	}
 	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.ViewPolicy{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -1846,7 +1846,7 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -1860,10 +1860,10 @@ func resourceViewPolicyRead(ctx context.Context, d *schema.ResourceData, m inter
 func resourceViewPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ViewPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -1874,7 +1874,7 @@ func resourceViewPolicyDelete(ctx context.Context, d *schema.ResourceData, m int
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -1885,44 +1885,44 @@ func resourceViewPolicyDelete(ctx context.Context, d *schema.ResourceData, m int
 }
 
 func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, ViewPolicy_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, ViewPolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ViewPolicy")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ViewPolicy"))
-	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_ViewPolicy.Elem(), d, &data, "", false)
+	reflectViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
+	utils.PopulateResourceMap(newCtx, reflectViewPolicy.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	data, before_post_error = resourceConfig.BeforePostFunc(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ViewPolicy")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "ViewPolicy")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ViewPolicy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ViewPolicy", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -1937,22 +1937,22 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  ViewPolicy %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  ViewPolicy %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
 	resource := api_latest.ViewPolicy{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1962,7 +1962,7 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1971,51 +1971,51 @@ func resourceViewPolicyCreate(ctx context.Context, d *schema.ResourceData, m int
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceViewPolicyRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceViewPolicyRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, ViewPolicy_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, ViewPolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ViewPolicy")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("ViewPolicy")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "ViewPolicy")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ViewPolicy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ViewPolicy", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ViewPolicy"))
-	reflect_ViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_ViewPolicy.Elem(), d, &data, "", false)
+	reflectViewPolicy := reflect.TypeOf((*api_latest.ViewPolicy)(nil))
+	utils.PopulateResourceMap(newCtx, reflectViewPolicy.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -2030,14 +2030,14 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  ViewPolicy %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  ViewPolicy %v", patchErr))
+	if patchErr != nil {
+		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -2049,44 +2049,44 @@ func resourceViewPolicyUpdate(ctx context.Context, d *schema.ResourceData, m int
 
 func resourceViewPolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ViewPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ViewPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("viewpolicies")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.ViewPolicy{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.ViewPolicy
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceViewPolicyReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occurred while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

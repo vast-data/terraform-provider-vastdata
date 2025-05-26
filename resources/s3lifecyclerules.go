@@ -40,7 +40,7 @@ func ResourceS3LifeCycleRule() *schema.Resource {
 func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("name"),
 
@@ -48,7 +48,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name`,
 		},
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("guid"),
 
@@ -58,7 +58,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"enabled": &schema.Schema{
+		"enabled": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("enabled"),
 
@@ -66,7 +66,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"prefix": &schema.Schema{
+		"prefix": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("prefix"),
 
@@ -74,7 +74,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Defines a scope of elements (objects, files or directories) by prefix. All objects with keys that begin with the specified prefix are included in the scope. In file and directory nomenclature, a prefix is a file and/or directory path within the view that can include part of the file or directory name. For example, sales/jan would include the file sales/january and the directory sales/jan/week1/. No characters are handled as wildcards.`,
 		},
 
-		"min_size": &schema.Schema{
+		"min_size": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("min_size"),
 
@@ -84,7 +84,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The minimum size of the object`,
 		},
 
-		"max_size": &schema.Schema{
+		"max_size": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("max_size"),
 
@@ -94,7 +94,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The maximum size of the object`,
 		},
 
-		"expiration_days": &schema.Schema{
+		"expiration_days": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("expiration_days"),
 
@@ -104,7 +104,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days from creation until an object expires`,
 		},
 
-		"expiration_date": &schema.Schema{
+		"expiration_date": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("expiration_date"),
 
@@ -114,7 +114,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The expiration date of the object`,
 		},
 
-		"expired_obj_delete_marker": &schema.Schema{
+		"expired_obj_delete_marker": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("expired_obj_delete_marker"),
 
@@ -124,7 +124,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remove expired objects delete markers`,
 		},
 
-		"noncurrent_days": &schema.Schema{
+		"noncurrent_days": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("noncurrent_days"),
 
@@ -134,7 +134,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Number of days after objects become noncurrent`,
 		},
 
-		"newer_noncurrent_versions": &schema.Schema{
+		"newer_noncurrent_versions": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("newer_noncurrent_versions"),
 
@@ -144,7 +144,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of newer versions to retain`,
 		},
 
-		"abort_mpu_days_after_initiation": &schema.Schema{
+		"abort_mpu_days_after_initiation": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("abort_mpu_days_after_initiation"),
 
@@ -154,7 +154,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days until expiration after an incomplete multipart upload`,
 		},
 
-		"view_path": &schema.Schema{
+		"view_path": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("view_path"),
 
@@ -164,7 +164,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path of the related View`,
 		},
 
-		"view_id": &schema.Schema{
+		"view_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("view_id"),
 
@@ -176,7 +176,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 	}
 }
 
-var S3LifeCycleRule_names_mapping map[string][]string = map[string][]string{}
+var S3LifeCycleRuleNamesMapping = map[string][]string{}
 
 func ResourceS3LifeCycleRuleReadStructIntoSchema(ctx context.Context, resource api_latest.S3LifeCycleRule, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -357,16 +357,16 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
+	resourceConfig := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceS3LifeCycleRuleRead] Calling Get Function : %v for resource S3LifeCycleRule", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceS3LifeCycleRuleRead] Calling Get Function : %v for resource S3LifeCycleRule", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -374,12 +374,12 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 	}
 	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.S3LifeCycleRule{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -389,7 +389,7 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -403,10 +403,10 @@ func resourceS3LifeCycleRuleRead(ctx context.Context, d *schema.ResourceData, m 
 func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
+	resourceConfig := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -417,7 +417,7 @@ func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -428,44 +428,44 @@ func resourceS3LifeCycleRuleDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, S3LifeCycleRule_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, S3LifeCycleRuleNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
+	resourceConfig := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource S3LifeCycleRule"))
-	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
+	reflectS3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
+	utils.PopulateResourceMap(newCtx, reflectS3LifeCycleRule.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	data, before_post_error = resourceConfig.BeforePostFunc(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3LifeCycleRule")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "S3LifeCycleRule")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3LifeCycleRule", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3LifeCycleRule", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -480,22 +480,22 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
 	resource := api_latest.S3LifeCycleRule{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -505,7 +505,7 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -514,51 +514,51 @@ func resourceS3LifeCycleRuleCreate(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceS3LifeCycleRuleRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceS3LifeCycleRuleRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, S3LifeCycleRule_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, S3LifeCycleRuleNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3LifeCycleRule")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("S3LifeCycleRule")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "S3LifeCycleRule")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3LifeCycleRule", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3LifeCycleRule", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3LifeCycleRule"))
-	reflect_S3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_S3LifeCycleRule.Elem(), d, &data, "", false)
+	reflectS3LifeCycleRule := reflect.TypeOf((*api_latest.S3LifeCycleRule)(nil))
+	utils.PopulateResourceMap(newCtx, reflectS3LifeCycleRule.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -573,14 +573,14 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3LifeCycleRule %v", patchErr))
+	if patchErr != nil {
+		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -592,44 +592,44 @@ func resourceS3LifeCycleRuleUpdate(ctx context.Context, d *schema.ResourceData, 
 
 func resourceS3LifeCycleRuleImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3LifeCycleRule")
+	resourceConfig := codegen_configs.GetResourceByName("S3LifeCycleRule")
 	attrs := map[string]interface{}{"path": utils.GenPath("s3lifecyclerules")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.S3LifeCycleRule{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.S3LifeCycleRule
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceS3LifeCycleRuleReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occurred while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

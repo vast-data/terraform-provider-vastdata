@@ -40,7 +40,7 @@ func ResourceDns() *schema.Resource {
 func getResourceDnsSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("name"),
 
@@ -48,7 +48,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a name for the VAST DNS server configuration`,
 		},
 
-		"vip": &schema.Schema{
+		"vip": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("vip"),
 
@@ -58,7 +58,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.`,
 		},
 
-		"domain_suffix": &schema.Schema{
+		"domain_suffix": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("domain_suffix"),
 
@@ -68,7 +68,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.`,
 		},
 
-		"vip_gateway": &schema.Schema{
+		"vip_gateway": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("vip_gateway"),
 
@@ -78,7 +78,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
 		},
 
-		"enabled": &schema.Schema{
+		"enabled": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("enabled"),
 
@@ -88,7 +88,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enable the VAST DNS server configurations`,
 		},
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("guid"),
 
@@ -98,7 +98,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe guid assigned to the VAST DNS server configurations`,
 		},
 
-		"vip_subnet_cidr": &schema.Schema{
+		"vip_subnet_cidr": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("vip_subnet_cidr"),
 
@@ -108,7 +108,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies the subnet, as a CIDR index, on which the DNS resides.`,
 		},
 
-		"vip_vlan": &schema.Schema{
+		"vip_vlan": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("vip_vlan"),
 
@@ -118,7 +118,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a VLAN if needed to enable communication with external DNS server(s).`,
 		},
 
-		"cnode_ids": &schema.Schema{
+		"cnode_ids": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("cnode_ids"),
 
@@ -132,7 +132,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"vip_ipv6": &schema.Schema{
+		"vip_ipv6": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("vip_ipv6"),
 
@@ -142,7 +142,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns an IPv6 to the DNS service.`,
 		},
 
-		"vip_ipv6_subnet_cidr": &schema.Schema{
+		"vip_ipv6_subnet_cidr": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("vip_ipv6_subnet_cidr"),
 
@@ -152,7 +152,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
 		},
 
-		"vip_ipv6_gateway": &schema.Schema{
+		"vip_ipv6_gateway": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("vip_ipv6_gateway"),
 
@@ -162,7 +162,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IPv6 to external DNS server if on different subnet.`,
 		},
 
-		"net_type": &schema.Schema{
+		"net_type": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("net_type"),
 
@@ -174,7 +174,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.1.0,5.2.0) Select the interface, that listens for DNS service delegation requests Allowed Values are [NORTH_PORT SOUTH_PORT EXTERNAL_PORT]`,
 		},
 
-		"invalid_name_response": &schema.Schema{
+		"invalid_name_response": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("invalid_name_response"),
 
@@ -186,7 +186,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns name Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
 		},
 
-		"invalid_type_response": &schema.Schema{
+		"invalid_type_response": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("invalid_type_response"),
 
@@ -198,7 +198,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns type Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
 		},
 
-		"ttl": &schema.Schema{
+		"ttl": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Dns").GetConflictingFields("ttl"),
 
@@ -210,7 +210,7 @@ func getResourceDnsSchema() map[string]*schema.Schema {
 	}
 }
 
-var Dns_names_mapping map[string][]string = map[string][]string{}
+var DnsNamesMapping = map[string][]string{}
 
 func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dns, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -415,16 +415,16 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Dns")
+	resourceConfig := codegen_configs.GetResourceByName("Dns")
 	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceDnsRead] Calling Get Function : %v for resource Dns", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceDnsRead] Calling Get Function : %v for resource Dns", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -432,12 +432,12 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	}
 	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.Dns{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -447,7 +447,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -461,10 +461,10 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Dns")
+	resourceConfig := codegen_configs.GetResourceByName("Dns")
 	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -475,7 +475,7 @@ func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -486,38 +486,38 @@ func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{
 }
 
 func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Dns_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, DnsNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Dns")
+	resourceConfig := codegen_configs.GetResourceByName("Dns")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Dns"))
-	reflect_Dns := reflect.TypeOf((*api_latest.Dns)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Dns.Elem(), d, &data, "", false)
+	reflectDns := reflect.TypeOf((*api_latest.Dns)(nil))
+	utils.PopulateResourceMap(newCtx, reflectDns.Elem(), d, &data, "", false)
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Dns")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Dns")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Dns", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Dns", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -532,22 +532,22 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("dns")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
 	resource := api_latest.Dns{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -557,7 +557,7 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -566,46 +566,46 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceDnsRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceDnsRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Dns_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, DnsNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("Dns")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Dns")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("Dns")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Dns")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Dns", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Dns", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Dns"))
-	reflect_Dns := reflect.TypeOf((*api_latest.Dns)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Dns.Elem(), d, &data, "", false)
+	reflectDns := reflect.TypeOf((*api_latest.Dns)(nil))
+	utils.PopulateResourceMap(newCtx, reflectDns.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -619,14 +619,14 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("dns"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Dns %v", patchErr))
+	if patchErr != nil {
+		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -638,44 +638,44 @@ func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{
 
 func resourceDnsImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Dns")
+	resourceConfig := codegen_configs.GetResourceByName("Dns")
 	attrs := map[string]interface{}{"path": utils.GenPath("dns")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.Dns{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.Dns
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceDnsReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occurred while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

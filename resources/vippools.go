@@ -40,7 +40,7 @@ func ResourceVipPool() *schema.Resource {
 func getResourceVipPoolSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the vippool`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the vippool`,
 		},
 
-		"subnet_cidr": &schema.Schema{
+		"subnet_cidr": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("subnet_cidr"),
 
@@ -68,7 +68,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)`,
 		},
 
-		"subnet_cidr_ipv6": &schema.Schema{
+		"subnet_cidr_ipv6": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("subnet_cidr_ipv6"),
 
@@ -78,7 +78,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)`,
 		},
 
-		"gw_ip": &schema.Schema{
+		"gw_ip": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("gw_ip"),
 
@@ -88,7 +88,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IP Address`,
 		},
 
-		"gw_ipv6": &schema.Schema{
+		"gw_ipv6": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("gw_ipv6"),
 
@@ -98,7 +98,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GW IPv6 Address`,
 		},
 
-		"vlan": &schema.Schema{
+		"vlan": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("vlan"),
 
@@ -108,7 +108,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN`,
 		},
 
-		"state": &schema.Schema{
+		"state": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("state"),
 
@@ -118,7 +118,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"cnode_ids": &schema.Schema{
+		"cnode_ids": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("cnode_ids"),
 
@@ -134,7 +134,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"cluster": &schema.Schema{
+		"cluster": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("cluster"),
 
@@ -144,7 +144,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
 		},
 
-		"url": &schema.Schema{
+		"url": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("url"),
 
@@ -154,7 +154,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"domain_name": &schema.Schema{
+		"domain_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("domain_name"),
 
@@ -164,7 +164,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"role": &schema.Schema{
+		"role": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("role"),
 
@@ -172,7 +172,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Role`,
 		},
 
-		"ip_ranges": &schema.Schema{
+		"ip_ranges": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("ip_ranges"),
 
@@ -199,7 +199,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"vms_preferred": &schema.Schema{
+		"vms_preferred": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("vms_preferred"),
 
@@ -209,7 +209,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, CNodes participating in the vip pool are preferred in VMS host election`,
 		},
 
-		"enabled": &schema.Schema{
+		"enabled": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("enabled"),
 
@@ -219,7 +219,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) True for enable, False for disable`,
 		},
 
-		"port_membership": &schema.Schema{
+		"port_membership": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("port_membership"),
 
@@ -229,7 +229,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The port on the CNode this pool will use. Right, left or all`,
 		},
 
-		"active_interfaces": &schema.Schema{
+		"active_interfaces": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("active_interfaces"),
 
@@ -239,7 +239,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Numver of active interfaces`,
 		},
 
-		"enable_l3": &schema.Schema{
+		"enable_l3": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("enable_l3"),
 
@@ -249,7 +249,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables L3 CNode access`,
 		},
 
-		"vast_asn": &schema.Schema{
+		"vast_asn": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("vast_asn"),
 
@@ -259,7 +259,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN`,
 		},
 
-		"peer_asn": &schema.Schema{
+		"peer_asn": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("peer_asn"),
 
@@ -269,7 +269,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN`,
 		},
 
-		"tenant_id": &schema.Schema{
+		"tenant_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("tenant_id"),
 
@@ -281,7 +281,7 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 	}
 }
 
-var VipPool_names_mapping map[string][]string = map[string][]string{
+var VipPoolNamesMapping = map[string][]string{
 	"ip_ranges": []string{"start_ip", "end_ip"},
 }
 
@@ -560,16 +560,16 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("VipPool")
+	resourceConfig := codegen_configs.GetResourceByName("VipPool")
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceVipPoolRead] Calling Get Function : %v for resource VipPool", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceVipPoolRead] Calling Get Function : %v for resource VipPool", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -577,12 +577,12 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	tflog.Info(ctx, response.Request.URL.String())
 	resource := api_latest.VipPool{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -592,7 +592,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -606,10 +606,10 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceVipPoolDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("VipPool")
+	resourceConfig := codegen_configs.GetResourceByName("VipPool")
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -620,7 +620,7 @@ func resourceVipPoolDelete(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -631,44 +631,44 @@ func resourceVipPoolDelete(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, VipPool_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, VipPoolNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("VipPool")
+	resourceConfig := codegen_configs.GetResourceByName("VipPool")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource VipPool"))
-	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_VipPool.Elem(), d, &data, "", false)
+	reflectVipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
+	utils.PopulateResourceMap(newCtx, reflectVipPool.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	data, before_post_error = resourceConfig.BeforePostFunc(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "VipPool")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "VipPool")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VipPool", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VipPool", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -683,22 +683,22 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
 	resource := api_latest.VipPool{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -708,7 +708,7 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -717,51 +717,51 @@ func resourceVipPoolCreate(ctx context.Context, d *schema.ResourceData, m interf
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceVipPoolRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceVipPoolRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, VipPool_names_mapping)
+	namesMapping := utils.ContextKey("namesMapping")
+	newCtx := context.WithValue(ctx, namesMapping, VipPoolNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("VipPool")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "VipPool")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("VipPool")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "VipPool")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VipPool", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "VipPool", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource VipPool"))
-	reflect_VipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_VipPool.Elem(), d, &data, "", false)
+	reflectVipPool := reflect.TypeOf((*api_latest.VipPool)(nil))
+	utils.PopulateResourceMap(newCtx, reflectVipPool.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -776,14 +776,14 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  VipPool %v", patchErr))
+	if patchErr != nil {
+		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -795,44 +795,44 @@ func resourceVipPoolUpdate(ctx context.Context, d *schema.ResourceData, m interf
 
 func resourceVipPoolImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("VipPool")
+	resourceConfig := codegen_configs.GetResourceByName("VipPool")
 	attrs := map[string]interface{}{"path": utils.GenPath("vippools")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.VipPool{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.VipPool
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceVipPoolReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occurred while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 
