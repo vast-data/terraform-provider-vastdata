@@ -110,7 +110,7 @@ func ResourceUserKeyReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"user_id\"",
+			Summary:  "Error occurred setting value to \"user_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -122,7 +122,7 @@ func ResourceUserKeyReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"access_key\"",
+			Summary:  "Error occurred setting value to \"access_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -134,7 +134,7 @@ func ResourceUserKeyReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"secret_key\"",
+			Summary:  "Error occurred setting value to \"secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -146,7 +146,7 @@ func ResourceUserKeyReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"pgp_public_key\"",
+			Summary:  "Error occurred setting value to \"pgp_public_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -158,7 +158,7 @@ func ResourceUserKeyReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"encrypted_secret_key\"",
+			Summary:  "Error occurred setting value to \"encrypted_secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -170,7 +170,7 @@ func ResourceUserKeyReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -191,7 +191,7 @@ func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -204,7 +204,7 @@ func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -214,7 +214,7 @@ func resourceUserKeyRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -248,7 +248,7 @@ func resourceUserKeyDelete(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 

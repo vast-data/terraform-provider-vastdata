@@ -160,7 +160,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -172,7 +172,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -184,7 +184,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"protection_policy_id\"",
+			Summary:  "Error occurred setting value to \"protection_policy_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -196,7 +196,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"source_dir\"",
+			Summary:  "Error occurred setting value to \"source_dir\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -208,7 +208,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_exported_dir\"",
+			Summary:  "Error occurred setting value to \"target_exported_dir\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -220,7 +220,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -232,7 +232,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"remote_tenant_guid\"",
+			Summary:  "Error occurred setting value to \"remote_tenant_guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -244,7 +244,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_id\"",
+			Summary:  "Error occurred setting value to \"target_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -256,7 +256,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"capabilities\"",
+			Summary:  "Error occurred setting value to \"capabilities\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -268,7 +268,7 @@ func ResourceProtectedPathReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -289,7 +289,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -302,7 +302,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -312,7 +312,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -340,7 +340,7 @@ func resourceProtectedPathDelete(ctx context.Context, d *schema.ResourceData, m 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 
@@ -554,7 +554,7 @@ func resourceProtectedPathImporter(ctx context.Context, d *schema.ResourceData, 
 
 	diags := ResourceProtectedPathReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		all_errors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
 			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}

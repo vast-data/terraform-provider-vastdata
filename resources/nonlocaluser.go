@@ -135,7 +135,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -147,7 +147,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -159,7 +159,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"username\"",
+			Summary:  "Error occurred setting value to \"username\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -171,7 +171,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_create_bucket\"",
+			Summary:  "Error occurred setting value to \"allow_create_bucket\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -183,7 +183,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_delete_bucket\"",
+			Summary:  "Error occurred setting value to \"allow_delete_bucket\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -195,7 +195,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -207,7 +207,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_policies_ids\"",
+			Summary:  "Error occurred setting value to \"s3_policies_ids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -219,7 +219,7 @@ func ResourceNonLocalUserReadStructIntoSchema(ctx context.Context, resource api_
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"context\"",
+			Summary:  "Error occurred setting value to \"context\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -240,7 +240,7 @@ func resourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m int
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -253,7 +253,7 @@ func resourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m int
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -263,7 +263,7 @@ func resourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m int
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -291,7 +291,7 @@ func resourceNonLocalUserDelete(ctx context.Context, d *schema.ResourceData, m i
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 
@@ -493,7 +493,7 @@ func resourceNonLocalUserImporter(ctx context.Context, d *schema.ResourceData, m
 
 	diags := ResourceNonLocalUserReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		all_errors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
 			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}

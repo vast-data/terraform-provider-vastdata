@@ -423,7 +423,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -435,7 +435,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"urls\"",
+			Summary:  "Error occurred setting value to \"urls\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -447,7 +447,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"port\"",
+			Summary:  "Error occurred setting value to \"port\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -459,7 +459,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"binddn\"",
+			Summary:  "Error occurred setting value to \"binddn\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -471,7 +471,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bindpw\"",
+			Summary:  "Error occurred setting value to \"bindpw\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -483,7 +483,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"searchbase\"",
+			Summary:  "Error occurred setting value to \"searchbase\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -495,7 +495,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"group_searchbase\"",
+			Summary:  "Error occurred setting value to \"group_searchbase\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -507,7 +507,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"method\"",
+			Summary:  "Error occurred setting value to \"method\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -519,7 +519,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gid_number\"",
+			Summary:  "Error occurred setting value to \"gid_number\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -531,7 +531,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -543,7 +543,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_number\"",
+			Summary:  "Error occurred setting value to \"uid_number\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -555,7 +555,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"match_user\"",
+			Summary:  "Error occurred setting value to \"match_user\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -567,7 +567,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member\"",
+			Summary:  "Error occurred setting value to \"uid_member\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -579,7 +579,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_account\"",
+			Summary:  "Error occurred setting value to \"posix_account\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -591,7 +591,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_group\"",
+			Summary:  "Error occurred setting value to \"posix_group\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -603,7 +603,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_tls\"",
+			Summary:  "Error occurred setting value to \"use_tls\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -615,7 +615,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_primary_provider\"",
+			Summary:  "Error occurred setting value to \"posix_primary_provider\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -627,7 +627,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_attributes_source\"",
+			Summary:  "Error occurred setting value to \"posix_attributes_source\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -639,7 +639,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"reverse_lookup\"",
+			Summary:  "Error occurred setting value to \"reverse_lookup\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -651,7 +651,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tls_certificate\"",
+			Summary:  "Error occurred setting value to \"tls_certificate\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -663,7 +663,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"active_directory\"",
+			Summary:  "Error occurred setting value to \"active_directory\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -675,7 +675,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"query_groups_mode\"",
+			Summary:  "Error occurred setting value to \"query_groups_mode\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -687,7 +687,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"username_property_name\"",
+			Summary:  "Error occurred setting value to \"username_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -699,7 +699,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"domain_name\"",
+			Summary:  "Error occurred setting value to \"domain_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -711,7 +711,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"user_login_name\"",
+			Summary:  "Error occurred setting value to \"user_login_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -723,7 +723,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"group_login_name\"",
+			Summary:  "Error occurred setting value to \"group_login_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -735,7 +735,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"mail_property_name\"",
+			Summary:  "Error occurred setting value to \"mail_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -747,7 +747,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member_value_property_name\"",
+			Summary:  "Error occurred setting value to \"uid_member_value_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -759,7 +759,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_auto_discovery\"",
+			Summary:  "Error occurred setting value to \"use_auto_discovery\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -771,7 +771,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_ldaps\"",
+			Summary:  "Error occurred setting value to \"use_ldaps\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -783,7 +783,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_vms_auth_provider\"",
+			Summary:  "Error occurred setting value to \"is_vms_auth_provider\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -795,7 +795,7 @@ func ResourceLdapReadStructIntoSchema(ctx context.Context, resource api_latest.L
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"query_posix_attributes_from_gc\"",
+			Summary:  "Error occurred setting value to \"query_posix_attributes_from_gc\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -816,7 +816,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -829,7 +829,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -839,7 +839,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -867,7 +867,7 @@ func resourceLdapDelete(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 
@@ -1063,7 +1063,7 @@ func resourceLdapImporter(ctx context.Context, d *schema.ResourceData, m interfa
 
 	diags := ResourceLdapReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		all_errors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
 			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}

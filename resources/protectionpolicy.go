@@ -196,7 +196,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -208,7 +208,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -220,7 +220,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
+			Summary:  "Error occurred setting value to \"url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -232,7 +232,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_name\"",
+			Summary:  "Error occurred setting value to \"target_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -244,7 +244,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_object_id\"",
+			Summary:  "Error occurred setting value to \"target_object_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -256,7 +256,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"prefix\"",
+			Summary:  "Error occurred setting value to \"prefix\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -268,7 +268,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"clone_type\"",
+			Summary:  "Error occurred setting value to \"clone_type\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -280,7 +280,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"frames\"",
+			Summary:  "Error occurred setting value to \"frames\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -292,7 +292,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"indestructible\"",
+			Summary:  "Error occurred setting value to \"indestructible\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -313,7 +313,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -326,7 +326,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -336,7 +336,7 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -364,7 +364,7 @@ func resourceProtectionPolicyDelete(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 
@@ -566,7 +566,7 @@ func resourceProtectionPolicyImporter(ctx context.Context, d *schema.ResourceDat
 
 	diags := ResourceProtectionPolicyReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		all_errors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
 			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}

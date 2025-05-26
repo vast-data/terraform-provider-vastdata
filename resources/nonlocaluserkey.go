@@ -127,7 +127,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -139,7 +139,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -151,7 +151,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"access_key\"",
+			Summary:  "Error occurred setting value to \"access_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -163,7 +163,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"secret_key\"",
+			Summary:  "Error occurred setting value to \"secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -175,7 +175,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"pgp_public_key\"",
+			Summary:  "Error occurred setting value to \"pgp_public_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -187,7 +187,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"encrypted_secret_key\"",
+			Summary:  "Error occurred setting value to \"encrypted_secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -199,7 +199,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -211,7 +211,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -232,7 +232,7 @@ func resourceNonLocalUserKeyRead(ctx context.Context, d *schema.ResourceData, m 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -245,7 +245,7 @@ func resourceNonLocalUserKeyRead(ctx context.Context, d *schema.ResourceData, m 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -255,7 +255,7 @@ func resourceNonLocalUserKeyRead(ctx context.Context, d *schema.ResourceData, m 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -283,7 +283,7 @@ func resourceNonLocalUserKeyDelete(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 

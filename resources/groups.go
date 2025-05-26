@@ -105,7 +105,7 @@ func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -117,7 +117,7 @@ func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -129,7 +129,7 @@ func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gid\"",
+			Summary:  "Error occurred setting value to \"gid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -141,7 +141,7 @@ func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sid\"",
+			Summary:  "Error occurred setting value to \"sid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -153,7 +153,7 @@ func ResourceGroupReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_policies_ids\"",
+			Summary:  "Error occurred setting value to \"s3_policies_ids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -174,7 +174,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -187,7 +187,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -197,7 +197,7 @@ func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -225,7 +225,7 @@ func resourceGroupDelete(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 
@@ -421,7 +421,7 @@ func resourceGroupImporter(ctx context.Context, d *schema.ResourceData, m interf
 
 	diags := ResourceGroupReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		all_errors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
 			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}

@@ -223,7 +223,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -235,7 +235,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip\"",
+			Summary:  "Error occurred setting value to \"vip\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -247,7 +247,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"domain_suffix\"",
+			Summary:  "Error occurred setting value to \"domain_suffix\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -259,7 +259,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_gateway\"",
+			Summary:  "Error occurred setting value to \"vip_gateway\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -271,7 +271,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -283,7 +283,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -295,7 +295,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_subnet_cidr\"",
+			Summary:  "Error occurred setting value to \"vip_subnet_cidr\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -307,7 +307,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_vlan\"",
+			Summary:  "Error occurred setting value to \"vip_vlan\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -319,7 +319,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cnode_ids\"",
+			Summary:  "Error occurred setting value to \"cnode_ids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -331,7 +331,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_ipv6\"",
+			Summary:  "Error occurred setting value to \"vip_ipv6\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -343,7 +343,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_ipv6_subnet_cidr\"",
+			Summary:  "Error occurred setting value to \"vip_ipv6_subnet_cidr\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -355,7 +355,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"vip_ipv6_gateway\"",
+			Summary:  "Error occurred setting value to \"vip_ipv6_gateway\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -367,7 +367,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"net_type\"",
+			Summary:  "Error occurred setting value to \"net_type\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -379,7 +379,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"invalid_name_response\"",
+			Summary:  "Error occurred setting value to \"invalid_name_response\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -391,7 +391,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"invalid_type_response\"",
+			Summary:  "Error occurred setting value to \"invalid_type_response\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -403,7 +403,7 @@ func ResourceDnsReadStructIntoSchema(ctx context.Context, resource api_latest.Dn
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ttl\"",
+			Summary:  "Error occurred setting value to \"ttl\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -424,7 +424,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -437,7 +437,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -447,7 +447,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -475,7 +475,7 @@ func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 
@@ -671,7 +671,7 @@ func resourceDnsImporter(ctx context.Context, d *schema.ResourceData, m interfac
 
 	diags := ResourceDnsReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		all_errors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
 			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}

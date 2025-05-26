@@ -123,7 +123,7 @@ func ResourceNonLocalGroupReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -135,7 +135,7 @@ func ResourceNonLocalGroupReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gid\"",
+			Summary:  "Error occurred setting value to \"gid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -147,7 +147,7 @@ func ResourceNonLocalGroupReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"sid\"",
+			Summary:  "Error occurred setting value to \"sid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -159,7 +159,7 @@ func ResourceNonLocalGroupReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"groupname\"",
+			Summary:  "Error occurred setting value to \"groupname\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -171,7 +171,7 @@ func ResourceNonLocalGroupReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -183,7 +183,7 @@ func ResourceNonLocalGroupReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_policies_ids\"",
+			Summary:  "Error occurred setting value to \"s3_policies_ids\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -195,7 +195,7 @@ func ResourceNonLocalGroupReadStructIntoSchema(ctx context.Context, resource api
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"context\"",
+			Summary:  "Error occurred setting value to \"context\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -216,7 +216,7 @@ func resourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -229,7 +229,7 @@ func resourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
+			Summary:  "Error occurred reading data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -239,7 +239,7 @@ func resourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data recived from VastData cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -267,7 +267,7 @@ func resourceNonLocalGroupDelete(ctx context.Context, d *schema.ResourceData, m 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 			Detail:   err.Error(),
 		})
 
@@ -463,7 +463,7 @@ func resourceNonLocalGroupImporter(ctx context.Context, d *schema.ResourceData, 
 
 	diags := ResourceNonLocalGroupReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		all_errors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
 			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}

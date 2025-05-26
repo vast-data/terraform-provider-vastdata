@@ -145,7 +145,7 @@ func Resource{{ .ResourceName }}ReadStructIntoSchema(ctx context.Context, resour
      if err!=nil {
           diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured setting value to \"{{.Attributes.name}}\"",
+		Summary:  "Error occurred setting value to \"{{.Attributes.name}}\"",
 		Detail:   err.Error(),
 		})
           }
@@ -169,7 +169,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      if err!=nil {
         diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured while obtaining data from the vastdata cluster",
+		Summary:  "Error occurred while obtaining data from the vastdata cluster",
 		Detail:   err.Error(),
 		})
        return diags
@@ -182,7 +182,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      if err!=nil {
          diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured reading data recived from VastData cluster",
+		Summary:  "Error occurred reading data recived from VastData cluster",
 		Detail:   err.Error(),
 		})
        return diags
@@ -192,7 +192,7 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      if err!=nil {
                 diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured while parsing data recived from VastData cluster",
+		Summary:  "Error occurred while parsing data recived from VastData cluster",
 		Detail:   err.Error(),
 		})
        return diags
@@ -235,7 +235,7 @@ func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceDa
      if err!=nil {
         diags = append(diags, diag.Diagnostic {
 		Severity: diag.Error,
-		Summary:  "Error occured while deleting a resource from the vastdata cluster",
+		Summary:  "Error occurred while deleting a resource from the vastdata cluster",
 		Detail:   err.Error(),
 		})
 
@@ -467,7 +467,7 @@ func resource{{ .ResourceName }}Importer(ctx context.Context, d *schema.Resource
 
      diags := Resource{{.ResourceName}}ReadStructIntoSchema(ctx, resource, d)
      if diags.HasError() {
-         all_errors:="Errors occured while importing:\n"
+         all_errors:="Errors occurred while importing:\n"
          for _,dig := range diags {
            all_errors+=fmt.Sprintf("Summary:%s\nDetails:%s\n",dig.Summary,dig.Detail)
          }
