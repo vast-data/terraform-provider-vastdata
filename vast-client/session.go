@@ -89,71 +89,69 @@ func validateResponse(response *http.Response, err error, allowed ...int) (*http
 
 /*Define basic HTTP methods to be used with the session*/
 func (s *VMSSession) Get(ctx context.Context, path string, query string, headers map[string]string) (response *http.Response, err error) {
-
-	_url := buildUrl(s, path, query)
-	url := _url.String()
-	req, err := http.NewRequest("GET", url, nil)
-	e := setupHeaders(ctx, s, req, headers)
-	if e != nil {
-		return nil, e
+	fullURL := buildUrl(s, path, query)
+	_url := fullURL.String()
+	req, err := http.NewRequest("GET", _url, nil)
+	err = setupHeaders(ctx, s, req, headers)
+	if err != nil {
+		return nil, err
 	}
-	tflog.Debug(ctx, fmt.Sprintf("Calling Get with URL %s", url))
-	response, response_error := s.client.Do(req)
-	return validateResponse(response, response_error, 200, 201, 204)
+	tflog.Debug(ctx, fmt.Sprintf("Calling Get with URL %s", _url))
+	response, responseError := s.client.Do(req)
+	return validateResponse(response, responseError, 200, 201, 204)
 }
 
 func (s *VMSSession) Post(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
+	fullURL := buildUrl(s, path, "")
+	_url := fullURL.String()
+	req, err := http.NewRequest("POST", _url, body)
 
-	_url := buildUrl(s, path, "")
-	url := _url.String()
-	req, err := http.NewRequest("POST", url, body)
-
-	e := setupHeaders(ctx, s, req, headers)
-	if e != nil {
-		return nil, e
+	err = setupHeaders(ctx, s, req, headers)
+	if err != nil {
+		return nil, err
 	}
-	tflog.Debug(ctx, fmt.Sprintf("Calling Post with URL %s", url))
-	response, response_error := s.client.Do(req)
-	return validateResponse(response, response_error, 200, 201, 204)
+	tflog.Debug(ctx, fmt.Sprintf("Requesting [POST] URL %s", _url))
+	response, responseError := s.client.Do(req)
+	return validateResponse(response, responseError, 200, 201, 204)
 }
 
 func (s *VMSSession) Put(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
-	_url := buildUrl(s, path, "")
-	url := _url.String()
-	req, err := http.NewRequest("PUT", url, body)
-	e := setupHeaders(ctx, s, req, headers)
-	if e != nil {
-		return nil, e
+	fullURL := buildUrl(s, path, "")
+	_url := fullURL.String()
+	req, err := http.NewRequest("PUT", _url, body)
+	err = setupHeaders(ctx, s, req, headers)
+	if err != nil {
+		return nil, err
 	}
-	response, response_error := s.client.Do(req)
-	tflog.Debug(ctx, fmt.Sprintf("Calling Put with URL %s", url))
-	return validateResponse(response, response_error, 200, 201, 204)
+	response, responseError := s.client.Do(req)
+	tflog.Debug(ctx, fmt.Sprintf("Requesting [PUT] URL %s", _url))
+	return validateResponse(response, responseError, 200, 201, 204)
 }
 
 func (s *VMSSession) Patch(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
-	_url := buildUrl(s, path, "")
-	url := fmt.Sprintf("%s/", _url.String())
-	req, err := http.NewRequest("PATCH", url, body)
-	e := setupHeaders(ctx, s, req, headers)
-	if e != nil {
-		return nil, e
+	fullURL := buildUrl(s, path, "")
+	_url := fmt.Sprintf("%s/", fullURL.String())
+	req, err := http.NewRequest("PATCH", _url, body)
+	err = setupHeaders(ctx, s, req, headers)
+	if err != nil {
+		return nil, err
 	}
-	tflog.Debug(ctx, fmt.Sprintf("Calling Patch with URL %s", url))
-	response, response_error := s.client.Do(req)
-	return validateResponse(response, response_error, 200, 201, 204)
+	tflog.Debug(ctx, fmt.Sprintf("Requesting [PATCH] URL %s", _url))
+	response, responseError := s.client.Do(req)
+	return validateResponse(response, responseError, 200, 201, 204)
 }
 
 func (s *VMSSession) Delete(ctx context.Context, path, query string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
-	_url := buildUrl(s, path, query)
-	url := fmt.Sprintf("%s/", _url.String())
-	req, err := http.NewRequest("DELETE", url, body)
-	e := setupHeaders(ctx, s, req, headers)
-	if e != nil {
-		return nil, e
+	fullURL := buildUrl(s, path, query)
+	_url := fmt.Sprintf("%s/", fullURL.String())
+	req, err := http.NewRequest("DELETE", _url, body)
+	err = setupHeaders(ctx, s, req, headers)
+	if err != nil {
+		return nil, err
 	}
-	tflog.Debug(ctx, fmt.Sprintf("Calling Delete with URL %s", url))
-	response, response_error := s.client.Do(req)
-	return validateResponse(response, response_error, 200, 201, 204)
+	tflog.Debug(ctx, fmt.Sprintf("Requesting [DELETE] URL %s", _url))
+	response, responseError := s.client.Do(req)
+	return validateResponse(response, responseError, 200, 201, 204)
 }
 
 func (s *VMSSession) ClusterVersion(ctx context.Context) (version string, response *http.Response, err error) {
