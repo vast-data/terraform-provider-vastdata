@@ -69,22 +69,22 @@ func buildUrl(s *VMSSession, path, query string) url.URL {
 }
 
 /*
-This function validate that the response is OK by validating that the error is nill and that the
-Exist code of the response is part of the allwed list
+This function validate that the response is OK by validating that the error is nil and that the
+Exist code of the response is part of the allowed list
 */
 func validateResponse(response *http.Response, err error, allowed ...int) (*http.Response, error) {
 	if err != nil {
 		return response, err
 	}
 	if response == nil {
-		return response, errors.New("Nil response was provided")
+		return response, errors.New("nil response was provided")
 	}
 	for _, i := range allowed {
 		if response.StatusCode == i {
 			return response, err
 		}
 	}
-	return response, errors.New(fmt.Sprintf("Response Status code is %d , which is not allowed", response.StatusCode))
+	return response, fmt.Errorf("response status code is %d, which is not allowed", response.StatusCode)
 }
 
 /*Define basic HTTP methods to be used with the session*/
@@ -166,27 +166,27 @@ func (s *VMSSession) ClusterVersion(ctx context.Context) (version string, respon
 		return *s.clusterVersion, nil, nil
 	}
 	var b []byte
-	response, response_error := s.Get(ctx, "/api/clusters/", "", map[string]string{})
-	response, response_error = validateResponse(response, response_error, 200, 201, 204)
-	if response_error != nil {
-		return "", response, response_error
+	response, responseError := s.Get(ctx, "/api/clusters/", "", map[string]string{})
+	response, responseError = validateResponse(response, responseError, 200, 201, 204)
+	if responseError != nil {
+		return "", response, responseError
 	}
-	clustersVersions := []ClusterVersion{}
-	b, response_error = io.ReadAll(response.Body)
-	if response_error != nil {
-		return "", response, errors.New("Failed to read http response body")
+	var clustersVersions []ClusterVersion
+	b, responseError = io.ReadAll(response.Body)
+	if responseError != nil {
+		return "", response, errors.New("failed to read http response body")
 	}
-	response_error = json.Unmarshal(b, &clustersVersions)
-	if response_error != nil {
-		return "", response, errors.New("Falied to extract list of clusters version from server response")
+	responseError = json.Unmarshal(b, &clustersVersions)
+	if responseError != nil {
+		return "", response, errors.New("failed to extract list of clusters version from server response")
 	}
 	if len(clustersVersions) <= 0 {
-		return "", response, errors.New("Could not found clusters to obtain version from")
+		return "", response, errors.New("could not find clusters to obtain version from")
 	}
 	//For now we as assume that there is only one cluster so we always grab the first cluster in the list.
 	clusterVersion := clustersVersions[0]
 	if clusterVersion.ClusterVersion == "" {
-		return "", response, errors.New("Empty Cluster version returned")
+		return "", response, errors.New("empty Cluster version returned")
 	}
 	s.clusterVersion = &clusterVersion.ClusterVersion
 	return clusterVersion.ClusterVersion, response, nil
