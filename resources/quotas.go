@@ -1402,7 +1402,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Quota", clusterVersion))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "Quota", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -1421,7 +1421,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", createErr))
 
 	if createErr != nil {
-		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
@@ -1430,7 +1430,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 	responseBody, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.Quota{}
 	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
@@ -1483,7 +1483,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Quota", clusterVersion))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "Quota", clusterVersion))
 		}
 	}
 
@@ -1513,7 +1513,7 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", patchErr))
 	if patchErr != nil {
-		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",

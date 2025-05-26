@@ -325,7 +325,7 @@ func resourceGlobalLocalSnapshotCreate(ctx context.Context, d *schema.ResourceDa
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "GlobalLocalSnapshot", clusterVersion))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "GlobalLocalSnapshot", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -344,7 +344,7 @@ func resourceGlobalLocalSnapshotCreate(ctx context.Context, d *schema.ResourceDa
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalLocalSnapshot %v", createErr))
 
 	if createErr != nil {
-		errorMessage := createErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
@@ -353,7 +353,7 @@ func resourceGlobalLocalSnapshotCreate(ctx context.Context, d *schema.ResourceDa
 		return diags
 	}
 	responseBody, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(responseBody)))
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.GlobalLocalSnapshot{}
 	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
@@ -406,7 +406,7 @@ func resourceGlobalLocalSnapshotUpdate(ctx context.Context, d *schema.ResourceDa
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "GlobalLocalSnapshot", clusterVersion))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "GlobalLocalSnapshot", clusterVersion))
 		}
 	}
 
@@ -430,7 +430,7 @@ func resourceGlobalLocalSnapshotUpdate(ctx context.Context, d *schema.ResourceDa
 	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
 	tflog.Info(ctx, fmt.Sprintf("Server Error for  GlobalLocalSnapshot %v", patchErr))
 	if patchErr != nil {
-		errorMessage := patchErr.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
