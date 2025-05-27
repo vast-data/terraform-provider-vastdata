@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -137,6 +138,19 @@ func DefaultGetFunc(ctx context.Context, _client interface{}, attr map[string]in
 
 	tflog.Debug(ctx, fmt.Sprintf("Calling GET to path \"%v\" , with Query %v", path, query))
 	return client.Get(ctx, path, query, headers)
+}
+
+type GetFallbackFuncType func(context.Context, interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
+
+func DefaultGetByGUIDFunc(ctx context.Context, _client *vast_client.VMSSession, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
+	attributes, err := getAttributesAsString([]string{"path"}, attr)
+	if err != nil {
+		return nil, err
+	}
+	path := (*attributes)["path"]
+	query := url.Values{}
+	query.Add("guid", d.Get("guid").(string))
+	return _client.Get(ctx, path, query.Encode(), headers)
 }
 
 type IdFuncType func(context.Context, interface{}, interface{}, *schema.ResourceData) error

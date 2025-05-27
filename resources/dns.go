@@ -421,26 +421,37 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
+	var body []byte
+	var resource api_latest.Dns
 	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
-			Detail:   err.Error(),
-		})
-		return diags
+		if response != nil && response.StatusCode == 404 {
+			result, _ := utils.DefaultGetByGUIDFunc(ctx, client, attrs, d, map[string]string{})
+			x, _ := io.ReadAll(result.Body)
+			var y []map[string]interface{}
+			_ = json.Unmarshal(x, &y)
+			id := fmt.Sprintf("%v", y[0]["id"])
+			d.SetId(id)
+			body, _ = json.Marshal(y[0])
+		} else {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
 
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.Dns{}
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occurred reading data received from VAST Data cluster",
-			Detail:   err.Error(),
-		})
-		return diags
+		}
 
 	}
 	err = json.Unmarshal(body, &resource)
