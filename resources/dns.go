@@ -442,7 +442,6 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 			Detail:   err.Error(),
 		})
 		return diags
-
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
 		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
@@ -453,9 +452,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 				Detail:   err.Error(),
 			})
 			return diags
-
 		}
-
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {

@@ -165,29 +165,40 @@ func resource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceData
      tflog.Debug(ctx,fmt.Sprintf("[resource{{ .ResourceName }}Read] Calling Get Function : %v for resource {{ .ResourceName }}",utils.GetFuncName(resourceConfig.GetFunc)))  
      response,err:=resourceConfig.GetFunc(ctx,client,attrs,d,map[string]string{})
      utils.VastVersionsWarn(ctx)
-
-     if err!=nil {
-        diags = append(diags, diag.Diagnostic {
-		Severity: diag.Error,
-		Summary:  "Error occurred while obtaining data from the VAST Data cluster",
-		Detail:   err.Error(),
+	
+	var body []byte
+	var resource api_latest.{{.ResourceName}}
+	if err != nil && response != nil && response.StatusCode == 404 {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+			Detail:   err.Error(),
 		})
-       return diags
-
-     }
-     tflog.Info(ctx,response.Request.URL.String())
-     resource:=api_latest.{{.ResourceName}}{}
-     body,err:=resourceConfig.ResponseProcessingFunc(ctx,response)
-     
-     if err!=nil {
-         diags = append(diags, diag.Diagnostic {
-		Severity: diag.Error,
-		Summary:  "Error occurred reading data received from VAST Data cluster",
-		Detail:   err.Error(),
-		})
-       return diags
-
-     }
+		return diags
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
+	}
      err=json.Unmarshal(body,&resource)
      if err!=nil {
                 diags = append(diags, diag.Diagnostic {
