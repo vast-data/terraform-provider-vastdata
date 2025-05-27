@@ -425,13 +425,28 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	var resource api_latest.Dns
 	if err != nil {
 		if response != nil && response.StatusCode == 404 {
-			result, _ := utils.DefaultGetByGUIDFunc(ctx, client, attrs, d, map[string]string{})
-			x, _ := io.ReadAll(result.Body)
-			var y []map[string]interface{}
-			_ = json.Unmarshal(x, &y)
-			id := fmt.Sprintf("%v", y[0]["id"])
-			d.SetId(id)
-			body, _ = json.Marshal(y[0])
+			response, err := utils.DefaultGetByGUIDFunc(ctx, client, attrs, d, map[string]string{})
+			if err != nil {
+				errorMessage := fmt.Sprintf("Initial request returned 404, but it failed:\n%v\nWe tried fallback request, but it also failed:\n%v", err.Error(), err.Error())
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+					Detail:   errorMessage,
+				})
+				return diags
+			}
+			var id string
+			body, id, err = utils.GetBodyBytesAndId(response)
+			if err != nil {
+				errorMessage := fmt.Sprintf("Initial request returned 404, but it failed:\n%v\nFallback request succeeded, but there was another error:\n%v", err.Error(), err.Error())
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Error,
+					Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+					Detail:   errorMessage,
+				})
+				return diags
+			}
+			resourceConfig.IdFunc(ctx, nil, id, d)
 		} else {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
