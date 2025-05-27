@@ -424,7 +424,8 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 	var body []byte
 	var resource api_latest.Dns
 	if err != nil && response != nil && response.StatusCode == 404 {
-		response, fallbackErr := utils.DefaultGetByGUIDFunc(ctx, client, attrs, d, map[string]string{})
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
 		if fallbackErr != nil {
 			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
 			diags = append(diags, diag.Diagnostic{
@@ -434,29 +435,7 @@ func resourceDnsRead(ctx context.Context, d *schema.ResourceData, m interface{})
 			})
 			return diags
 		}
-		var id string
-		body, id, fallbackErr = utils.GetBodyBytesAndId(response)
-		if fallbackErr != nil {
-			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request succeeded, but there was another error:\n%v", err.Error(), fallbackErr.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
-				Detail:   errorMessage,
-			})
-			return diags
-		}
-		fallbackErr = resourceConfig.IdFunc(ctx, nil, id, d)
-		if fallbackErr != nil {
-			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request succeeded, but there was another error:\n%v", err.Error(), fallbackErr.Error())
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
-				Detail:   errorMessage,
-			})
-			return diags
-		}
-	}
-	if err != nil {
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
