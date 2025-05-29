@@ -289,27 +289,19 @@ func PopulateResourceMap(ctx context.Context, t reflect.Type, d *schema.Resource
 			full_tag = prefix + "." + tf_name
 		}
 		tflog.Debug(ctx, fmt.Sprintf("Full Tag Name %s", full_tag))
-		value, value_exists := d.GetOk(full_tag)
-		if !value_exists {
-			if fld.Type.Kind() == reflect.Slice {
-				switch fld.Type.String() {
-				case "[]string", "[]int", "[]int32", "[]int64", "[]float", "[]float32", "[]float64":
-					(*m)[*tag] = value
-				}
-			}
+		value, valueExists := d.GetOkExists(full_tag)
+		if !valueExists {
 			continue
 		}
 		tflog.Debug(ctx, fmt.Sprintf("Tag %s Exists , %v", full_tag, value))
-		//Do not parse values values which have not been changed
+		// Do not parse values which have not been changed
 		if !ignore_changes {
 			changed := d.HasChange(full_tag)
 			if !changed {
 				continue
 			}
 		}
-		if value_exists {
-			tflog.Debug(ctx, fmt.Sprintf("Value of field %s", full_tag))
-		}
+		tflog.Debug(ctx, fmt.Sprintf("Value of field %s", full_tag))
 		switch fld.Type.Kind() {
 		case reflect.Struct, reflect.Pointer:
 			tflog.Debug(ctx, fmt.Sprintf("Handling Struct/Pointer %v", fld))
@@ -367,7 +359,7 @@ func PopulateResourceMap(ctx context.Context, t reflect.Type, d *schema.Resource
 				}
 
 			}
-
+		default:
 		}
 	}
 }
