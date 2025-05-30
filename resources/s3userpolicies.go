@@ -242,7 +242,7 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 	var body []byte
 	var resource api_latest.S3Policy
-	if err != nil && response != nil && response.StatusCode == 404 {
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
 		var fallbackErr error
 		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
 		if fallbackErr != nil {

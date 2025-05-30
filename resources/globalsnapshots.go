@@ -326,7 +326,7 @@ func resourceGlobalSnapshotRead(ctx context.Context, d *schema.ResourceData, m i
 
 	var body []byte
 	var resource api_latest.GlobalSnapshot
-	if err != nil && response != nil && response.StatusCode == 404 {
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
 		var fallbackErr error
 		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
 		if fallbackErr != nil {

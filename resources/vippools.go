@@ -568,7 +568,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	var body []byte
 	var resource api_latest.VipPool
-	if err != nil && response != nil && response.StatusCode == 404 {
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
 		var fallbackErr error
 		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
 		if fallbackErr != nil {
