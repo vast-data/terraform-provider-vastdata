@@ -60,6 +60,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
 			"s3_policies_ids": utils.ListsDiffSuppress,
 		},
+		DisableFallbackRequest: true,
 	},
 	ResourceTemplateV2{
 		ResourceName:             "NonLocalGroup",
@@ -82,8 +83,9 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			{DisplayName: "Context", FieldName: "context"},
 			{DisplayName: "Tenant ID", FieldName: "tenant_id"},
 		}),
-		ImportFunc:     utils.NonLocalGroupImportFunc,
-		DataSourceName: "vastdata_non_local_group",
+		ImportFunc:             utils.NonLocalGroupImportFunc,
+		DataSourceName:         "vastdata_non_local_group",
+		DisableFallbackRequest: true,
 	},
 	ResourceTemplateV2{
 		ResourceName:             "Group",
@@ -675,6 +677,7 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		GetFunc:                  utils.GetNonLocalUserKeyFunc,
 		SensitiveFields:          NewStringSet("secret_key"),
 		DisableImport:            true,
+		DisableFallbackRequest:   true,
 	},
 	ResourceTemplateV2{
 		ResourceName:             "ActiveDirectory2",

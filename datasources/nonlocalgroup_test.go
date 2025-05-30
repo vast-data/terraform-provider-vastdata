@@ -87,14 +87,14 @@ var _ = Describe(" NonLocalGroup", func() {
 				Expect(err).To(BeNil())
 				values := url.Values{}
 
-				values.Add("groupname", fmt.Sprintf("%v", resource.Groupname))
-				NonLocalGroupDataSourceData.Set("groupname", resource.Groupname)
-
 				values.Add("context", fmt.Sprintf("%v", resource.Context))
 				NonLocalGroupDataSourceData.Set("context", resource.Context)
 
 				values.Add("tenant_id", fmt.Sprintf("%v", resource.TenantId))
 				NonLocalGroupDataSourceData.Set("tenant_id", resource.TenantId)
+
+				values.Add("groupname", fmt.Sprintf("%v", resource.Groupname))
+				NonLocalGroupDataSourceData.Set("groupname", resource.Groupname)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
 					ghttp.VerifyRequest("GET", "groups/query", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
