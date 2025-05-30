@@ -6,7 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -139,6 +141,19 @@ func DefaultGetFunc(ctx context.Context, _client interface{}, attr map[string]in
 	return client.Get(ctx, path, query, headers)
 }
 
+type GetFallbackFuncType func(context.Context, interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
+
+func DefaultGetByGUIDFunc(ctx context.Context, _client *vast_client.VMSSession, attr map[string]interface{}, d *schema.ResourceData, headers map[string]string) (*http.Response, error) {
+	attributes, err := getAttributesAsString([]string{"path"}, attr)
+	if err != nil {
+		return nil, err
+	}
+	path := (*attributes)["path"]
+	query := url.Values{}
+	query.Add("guid", d.Get("guid").(string))
+	return _client.Get(ctx, path, query.Encode(), headers)
+}
+
 type IdFuncType func(context.Context, interface{}, interface{}, *schema.ResourceData) error
 
 func DefaultIdFunc(ctx context.Context, _client interface{}, _id interface{}, d *schema.ResourceData) error {
@@ -151,4 +166,22 @@ type ImportFunc func(context.Context, interface{}, map[string]interface{}, *sche
 func DefaultImportFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, g GetFuncType) (*http.Response, error) {
 	tflog.Debug(ctx, fmt.Sprintf("Calling Import Func %v", g))
 	return g(ctx, _client, attr, d, map[string]string{})
+}
+
+func GetBodyBytesAndId(response *http.Response) ([]byte, string, error) {
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, "", err
+	}
+	var unmarshalledBody []map[string]interface{}
+	err = json.Unmarshal(body, &unmarshalledBody)
+	if err != nil {
+		return nil, "", err
+	}
+	marshalledBody, err := json.Marshal(unmarshalledBody[0])
+	if err != nil {
+		return nil, "", err
+	}
+	id := fmt.Sprintf("%v", unmarshalledBody[0]["id"])
+	return marshalledBody, id, nil
 }
