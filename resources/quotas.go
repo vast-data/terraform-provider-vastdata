@@ -1376,7 +1376,7 @@ func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interfac
 }
 
 func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, QuotaNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -1469,7 +1469,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 }
 
 func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, QuotaNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

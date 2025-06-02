@@ -362,7 +362,7 @@ func resourceProtectedPathDelete(ctx context.Context, d *schema.ResourceData, m 
 }
 
 func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, ProtectedPathNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -461,7 +461,7 @@ func resourceProtectedPathCreate(ctx context.Context, d *schema.ResourceData, m 
 }
 
 func resourceProtectedPathUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, ProtectedPathNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

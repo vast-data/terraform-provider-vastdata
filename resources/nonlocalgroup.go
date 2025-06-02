@@ -289,7 +289,7 @@ func resourceNonLocalGroupDelete(ctx context.Context, d *schema.ResourceData, m 
 }
 
 func resourceNonLocalGroupCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, NonLocalGroupNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -376,7 +376,7 @@ func resourceNonLocalGroupCreate(ctx context.Context, d *schema.ResourceData, m 
 }
 
 func resourceNonLocalGroupUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, NonLocalGroupNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

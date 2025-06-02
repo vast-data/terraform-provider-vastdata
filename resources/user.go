@@ -531,7 +531,7 @@ func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface
 }
 
 func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, UserNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -618,7 +618,7 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 }
 
 func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, UserNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

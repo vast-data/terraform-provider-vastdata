@@ -497,7 +497,7 @@ func resourceDnsDelete(ctx context.Context, d *schema.ResourceData, m interface{
 }
 
 func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, DnsNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -584,7 +584,7 @@ func resourceDnsCreate(ctx context.Context, d *schema.ResourceData, m interface{
 }
 
 func resourceDnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, DnsNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

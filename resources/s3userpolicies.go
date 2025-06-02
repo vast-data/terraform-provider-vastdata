@@ -316,7 +316,7 @@ func resourceS3PolicyDelete(ctx context.Context, d *schema.ResourceData, m inter
 }
 
 func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, S3PolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -415,7 +415,7 @@ func resourceS3PolicyCreate(ctx context.Context, d *schema.ResourceData, m inter
 }
 
 func resourceS3PolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, S3PolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

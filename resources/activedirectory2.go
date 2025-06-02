@@ -898,7 +898,7 @@ func resourceActiveDirectory2Delete(ctx context.Context, d *schema.ResourceData,
 }
 
 func resourceActiveDirectory2Create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, ActiveDirectory2NamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -985,7 +985,7 @@ func resourceActiveDirectory2Create(ctx context.Context, d *schema.ResourceData,
 }
 
 func resourceActiveDirectory2Update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, ActiveDirectory2NamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

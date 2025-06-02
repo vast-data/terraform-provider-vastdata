@@ -265,7 +265,7 @@ func resource{{ .ResourceName }}Delete(ctx context.Context, d *schema.ResourceDa
 }
 
 func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-    namesMapping := utils.ContextKey("namesMapping")
+    namesMapping := utils.ContextKey("names_mapping")
     newCtx := context.WithValue(ctx, namesMapping, {{ .ResourceName }}NamesMapping)
     var diags diag.Diagnostics
     data := make(map[string]interface{})
@@ -365,7 +365,7 @@ func resource{{ .ResourceName }}Create(ctx context.Context, d *schema.ResourceDa
 }
 
 func resource{{ .ResourceName }}Update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-    namesMapping := utils.ContextKey("namesMapping")
+    namesMapping := utils.ContextKey("names_mapping")
     newCtx := context.WithValue(ctx, namesMapping, {{ .ResourceName }}NamesMapping)
     var diags diag.Diagnostics
     data := make(map[string]interface{})

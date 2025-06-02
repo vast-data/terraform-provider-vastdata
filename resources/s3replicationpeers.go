@@ -387,7 +387,7 @@ func resourceS3replicationPeersDelete(ctx context.Context, d *schema.ResourceDat
 }
 
 func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, S3replicationPeersNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -474,7 +474,7 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 }
 
 func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, S3replicationPeersNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

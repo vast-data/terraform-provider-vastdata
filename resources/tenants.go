@@ -664,7 +664,7 @@ func resourceTenantDelete(ctx context.Context, d *schema.ResourceData, m interfa
 }
 
 func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, TenantNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -757,7 +757,7 @@ func resourceTenantCreate(ctx context.Context, d *schema.ResourceData, m interfa
 }
 
 func resourceTenantUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, TenantNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})

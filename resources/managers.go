@@ -378,7 +378,7 @@ func resourceManagerDelete(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, ManagerNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
@@ -465,7 +465,7 @@ func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func resourceManagerUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	namesMapping := utils.ContextKey("namesMapping")
+	namesMapping := utils.ContextKey("names_mapping")
 	newCtx := context.WithValue(ctx, namesMapping, ManagerNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
