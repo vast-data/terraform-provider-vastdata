@@ -343,10 +343,11 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		GetFunc:           utils.ViewPolicyGetFunc,
 		ConflictingFields: map[string][]string{"vippool_permissions": []string{"vip_pools"}},
 		AttributesDiffFuncs: map[string]schema.SchemaDiffSuppressFunc{
-			"vippool_permissions": utils.VippoolPermissionsIdsDiffSupress,
-			"vip_pools":           utils.ListsDiffSuppress,
-			"nfs_no_squash":       utils.ListsDiffSuppress,
-			"nfs_read_write":      utils.ListsDiffSuppress,
+			"vippool_permissions":      utils.VippoolPermissionsIdsDiffSupress,
+			"vip_pools":                utils.ListsDiffSuppress,
+			"nfs_no_squash":            utils.ListsDiffSuppress,
+			"nfs_read_write":           utils.ListsDiffSuppress,
+			"nfs_client_ips_read_only": utils.ListsDiffSuppress,
 		},
 	},
 	ResourceTemplateV2{
@@ -515,7 +516,6 @@ var ResourcesTemplates = []ResourceTemplateV2{
 			[]utils.HttpFieldTuple{
 				utils.HttpFieldTuple{DisplayName: "Name", FieldName: "name"},
 			}),
-		CreateFunc:       utils.ProtectedPathCreateFunc,
 		DeleteFunc:       utils.ProtectedPathDeleteFunc,
 		BeforePostFunc:   utils.ProtectedPathBeforePostFunc,
 		BeforePatchFunc:  utils.ProtectedPathBeforePatchFunc,
