@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -50,6 +51,23 @@ func GetFuncName(i interface{}) string {
 	if p != nil {
 		return p.Name()
 	}
-	return "Unkown"
+	return "Unknown"
 
+}
+
+func HandleFallback(ctx context.Context, client *vast_client.VMSSession, attrs map[string]interface{}, d *schema.ResourceData, idFunc IdFuncType) ([]byte, error) {
+	response, fallbackErr := DefaultGetByGUIDFunc(ctx, client, attrs, d, map[string]string{})
+	if fallbackErr != nil {
+		return nil, fallbackErr
+	}
+	var id string
+	body, id, fallbackErr := GetBodyBytesAndId(response)
+	if fallbackErr != nil {
+		return nil, fallbackErr
+	}
+	fallbackErr = idFunc(ctx, nil, id, d)
+	if fallbackErr != nil {
+		return nil, fallbackErr
+	}
+	return body, nil
 }

@@ -168,6 +168,7 @@ type ResourceTemplateV2 struct {
 	AttributesDiffFuncs      map[string]schema.SchemaDiffSuppressFunc
 	Timeouts                 *schema.ResourceTimeout
 	DisableAutoValidator     *StringSet
+	DisableFallbackRequest   bool
 }
 
 func (r *ResourceTemplateV2) AutomaticValidationIsDisabled(s string) bool {

@@ -40,7 +40,7 @@ func ResourceProtectionPolicy() *schema.Resource {
 func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration`,
 		},
 
-		"url": &schema.Schema{
+		"url": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("url"),
 
@@ -68,7 +68,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the replication policy`,
 		},
 
-		"target_name": &schema.Schema{
+		"target_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("target_name"),
 
@@ -78,7 +78,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The target peer name`,
 		},
 
-		"target_object_id": &schema.Schema{
+		"target_object_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("target_object_id"),
 
@@ -88,7 +88,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the target peer`,
 		},
 
-		"prefix": &schema.Schema{
+		"prefix": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("prefix"),
 
@@ -96,7 +96,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data`,
 		},
 
-		"clone_type": &schema.Schema{
+		"clone_type": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("clone_type"),
 
@@ -106,7 +106,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]`,
 		},
 
-		"frames": &schema.Schema{
+		"frames": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("frames"),
 
@@ -118,7 +118,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"every": &schema.Schema{
+					"every": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("every"),
 
@@ -131,7 +131,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 					},
 
-					"start_at": &schema.Schema{
+					"start_at": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("start_at"),
 
@@ -142,7 +142,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						ValidateDiagFunc: utils.ProtectionPolicyStartAt,
 					},
 
-					"keep_local": &schema.Schema{
+					"keep_local": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("keep_local"),
 
@@ -155,7 +155,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 						ValidateDiagFunc: utils.ProtectionPolicyTimeIntervalValidation,
 					},
 
-					"keep_remote": &schema.Schema{
+					"keep_remote": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicySchedule").GetConflictingFields("keep_remote"),
 
@@ -171,7 +171,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			},
 		},
 
-		"indestructible": &schema.Schema{
+		"indestructible": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("indestructible"),
 
@@ -183,7 +183,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 	}
 }
 
-var ProtectionPolicy_names_mapping map[string][]string = map[string][]string{}
+var ProtectionPolicyNamesMapping = map[string][]string{}
 
 func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource api_latest.ProtectionPolicy, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -196,7 +196,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -208,7 +208,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -220,7 +220,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
+			Summary:  "Error occurred setting value to \"url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -232,7 +232,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_name\"",
+			Summary:  "Error occurred setting value to \"target_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -244,7 +244,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"target_object_id\"",
+			Summary:  "Error occurred setting value to \"target_object_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -256,7 +256,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"prefix\"",
+			Summary:  "Error occurred setting value to \"prefix\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -268,7 +268,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"clone_type\"",
+			Summary:  "Error occurred setting value to \"clone_type\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -280,7 +280,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"frames\"",
+			Summary:  "Error occurred setting value to \"frames\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -292,7 +292,7 @@ func ResourceProtectionPolicyReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"indestructible\"",
+			Summary:  "Error occurred setting value to \"indestructible\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -304,39 +304,50 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ProtectionPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceProtectionPolicyRead] Calling Get Function : %v for resource ProtectionPolicy", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceProtectionPolicyRead] Calling Get Function : %v for resource ProtectionPolicy", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	if err != nil {
+	var body []byte
+	var resource api_latest.ProtectionPolicy
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
-
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.ProtectionPolicy{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -350,10 +361,10 @@ func resourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData, m
 func resourceProtectionPolicyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ProtectionPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -364,7 +375,7 @@ func resourceProtectionPolicyDelete(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -375,38 +386,38 @@ func resourceProtectionPolicyDelete(ctx context.Context, d *schema.ResourceData,
 }
 
 func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, ProtectionPolicy_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ProtectionPolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ProtectionPolicy")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ProtectionPolicy"))
-	reflect_ProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_ProtectionPolicy.Elem(), d, &data, "", false)
+	reflectProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
+	utils.PopulateResourceMap(newCtx, reflectProtectionPolicy.Elem(), d, &data, "", false)
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ProtectionPolicy")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "ProtectionPolicy")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ProtectionPolicy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "ProtectionPolicy", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -421,22 +432,22 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectionPolicy %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectionPolicy %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.ProtectionPolicy{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -446,7 +457,7 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -455,51 +466,51 @@ func resourceProtectionPolicyCreate(ctx context.Context, d *schema.ResourceData,
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceProtectionPolicyRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceProtectionPolicyRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, ProtectionPolicy_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ProtectionPolicyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ProtectionPolicy")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("ProtectionPolicy")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "ProtectionPolicy")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ProtectionPolicy", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "ProtectionPolicy", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ProtectionPolicy"))
-	reflect_ProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_ProtectionPolicy.Elem(), d, &data, "", false)
+	reflectProtectionPolicy := reflect.TypeOf((*api_latest.ProtectionPolicy)(nil))
+	utils.PopulateResourceMap(newCtx, reflectProtectionPolicy.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -514,14 +525,14 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectionPolicy %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  ProtectionPolicy %v", patchErr))
+	if patchErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -533,44 +544,44 @@ func resourceProtectionPolicyUpdate(ctx context.Context, d *schema.ResourceData,
 
 func resourceProtectionPolicyImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ProtectionPolicy")
+	resourceConfig := codegen_configs.GetResourceByName("ProtectionPolicy")
 	attrs := map[string]interface{}{"path": utils.GenPath("protectionpolicies")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.ProtectionPolicy{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.ProtectionPolicy
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceProtectionPolicyReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

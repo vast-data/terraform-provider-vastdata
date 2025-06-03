@@ -40,7 +40,7 @@ func ResourceManager() *schema.Resource {
 func getResourceManagerSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the manager`,
 		},
 
-		"username": &schema.Schema{
+		"username": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("username"),
 
@@ -58,7 +58,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager`,
 		},
 
-		"password": &schema.Schema{
+		"password": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password"),
 
@@ -71,7 +71,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: utils.ValidateManagerPassword,
 		},
 
-		"first_name": &schema.Schema{
+		"first_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("first_name"),
 
@@ -81,7 +81,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user firstname`,
 		},
 
-		"last_name": &schema.Schema{
+		"last_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("last_name"),
 
@@ -91,7 +91,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user last name`,
 		},
 
-		"permissions_list": &schema.Schema{
+		"permissions_list": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("permissions_list"),
 
@@ -107,7 +107,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"roles": &schema.Schema{
+		"roles": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("roles"),
 
@@ -121,7 +121,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"password_expiration_disabled": &schema.Schema{
+		"password_expiration_disabled": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("password_expiration_disabled"),
 
@@ -131,7 +131,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Disable password expiration`,
 		},
 
-		"is_temporary_password": &schema.Schema{
+		"is_temporary_password": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("is_temporary_password"),
 
@@ -141,7 +141,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If this set to true next time that a user will login he will be promped to replace his password`,
 		},
 
-		"permissions": &schema.Schema{
+		"permissions": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("permissions"),
 
@@ -157,7 +157,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 	}
 }
 
-var Manager_names_mapping map[string][]string = map[string][]string{}
+var ManagerNamesMapping = map[string][]string{}
 
 func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_latest.Manager, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -170,7 +170,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -182,7 +182,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"username\"",
+			Summary:  "Error occurred setting value to \"username\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -194,7 +194,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"password\"",
+			Summary:  "Error occurred setting value to \"password\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -206,7 +206,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"first_name\"",
+			Summary:  "Error occurred setting value to \"first_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -218,7 +218,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"last_name\"",
+			Summary:  "Error occurred setting value to \"last_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -230,7 +230,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"permissions_list\"",
+			Summary:  "Error occurred setting value to \"permissions_list\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -242,7 +242,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"roles\"",
+			Summary:  "Error occurred setting value to \"roles\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -254,7 +254,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"password_expiration_disabled\"",
+			Summary:  "Error occurred setting value to \"password_expiration_disabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -266,7 +266,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_temporary_password\"",
+			Summary:  "Error occurred setting value to \"is_temporary_password\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -278,7 +278,7 @@ func ResourceManagerReadStructIntoSchema(ctx context.Context, resource api_lates
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"permissions\"",
+			Summary:  "Error occurred setting value to \"permissions\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -290,39 +290,50 @@ func resourceManagerRead(ctx context.Context, d *schema.ResourceData, m interfac
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Manager")
+	resourceConfig := codegen_configs.GetResourceByName("Manager")
 	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceManagerRead] Calling Get Function : %v for resource Manager", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceManagerRead] Calling Get Function : %v for resource Manager", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	if err != nil {
+	var body []byte
+	var resource api_latest.Manager
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
-
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.Manager{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -331,7 +342,7 @@ func resourceManagerRead(ctx context.Context, d *schema.ResourceData, m interfac
 	diags = ResourceManagerReadStructIntoSchema(ctx, resource, d)
 
 	var after_read_error error
-	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
+	after_read_error = resourceConfig.AfterReadFunc(client, ctx, d)
 	if after_read_error != nil {
 		return diag.FromErr(after_read_error)
 	}
@@ -342,10 +353,10 @@ func resourceManagerRead(ctx context.Context, d *schema.ResourceData, m interfac
 func resourceManagerDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Manager")
+	resourceConfig := codegen_configs.GetResourceByName("Manager")
 	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -356,7 +367,7 @@ func resourceManagerDelete(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -367,38 +378,38 @@ func resourceManagerDelete(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Manager_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ManagerNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Manager")
+	resourceConfig := codegen_configs.GetResourceByName("Manager")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Manager"))
-	reflect_Manager := reflect.TypeOf((*api_latest.Manager)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Manager.Elem(), d, &data, "", false)
+	reflectManager := reflect.TypeOf((*api_latest.Manager)(nil))
+	utils.PopulateResourceMap(newCtx, reflectManager.Elem(), d, &data, "", false)
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Manager")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Manager")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Manager", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "Manager", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -413,22 +424,22 @@ func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("managers")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Manager %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Manager %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.Manager{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -438,7 +449,7 @@ func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interf
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -447,46 +458,46 @@ func resourceManagerCreate(ctx context.Context, d *schema.ResourceData, m interf
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceManagerRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceManagerRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceManagerUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Manager_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ManagerNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("Manager")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Manager")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("Manager")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Manager")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Manager", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "Manager", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Manager"))
-	reflect_Manager := reflect.TypeOf((*api_latest.Manager)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Manager.Elem(), d, &data, "", false)
+	reflectManager := reflect.TypeOf((*api_latest.Manager)(nil))
+	utils.PopulateResourceMap(newCtx, reflectManager.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -500,14 +511,14 @@ func resourceManagerUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("managers"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Manager %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Manager %v", patchErr))
+	if patchErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -519,44 +530,44 @@ func resourceManagerUpdate(ctx context.Context, d *schema.ResourceData, m interf
 
 func resourceManagerImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Manager")
+	resourceConfig := codegen_configs.GetResourceByName("Manager")
 	attrs := map[string]interface{}{"path": utils.GenPath("managers")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.Manager{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.Manager
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceManagerReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 
