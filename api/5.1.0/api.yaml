@@ -1398,7 +1398,7 @@ components:
         io_size_bytes:
           type: "integer"
           format: "int64"
-          description: 'Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing the request size by IO size. Default: 64K. Recommended range: 4K - 1M'
+          description: "Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing the request size by IO size. Default: 64K. Recommended range: 4K - 1M"
         static_limits:
           $ref: '#/components/schemas/QosStaticLimits'
           description: 'Performance limits per view. Maximum limits define maximum provisioning in the absence of resource contention. Valid values: 0-4294967296. 0 means unlimited.'
