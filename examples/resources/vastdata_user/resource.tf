@@ -1,10 +1,10 @@
-#Create a user named example with uid of 9000
+#Create a user named example with UID of 9000
 resource "vastdata_user" "example-user" {
   name = "example"
   uid  = 9000
 }
 
-#Create a user named user1 with leading group & supplementary groups
+#Create a user named user1 with leading group and supplementary groups
 resource "vastdata_group" "group2" {
   name = "group2"
   gid  = 2000

@@ -1,8 +1,8 @@
-#We defined 2 poviders 1 for each Vastdata cluster
-#1. a provider with the alias clusterA
-#2. a provider with the alia clusterB
+#Suppose that two providers are defined, one for each VAST cluster:
+#1. A provider with the alias `clusterA`
+#2. A provider with the alias `clusterB`
 
-#Define replication Vippool for cluster A
+#Define replication virtual IP for cluster A:
 resource "vastdata_vip_pool" "pool1-clusterA" {
   name        = "pool1"
   role        = "REPLICATION"
@@ -15,7 +15,7 @@ resource "vastdata_vip_pool" "pool1-clusterA" {
 
 }
 
-#Define replication Vippool for cluster B
+#Define replication virtual IP pool for cluster B:
 resource "vastdata_vip_pool" "pool1-clusterB" {
   name        = "pool1"
   role        = "REPLICATION"
@@ -27,7 +27,7 @@ resource "vastdata_vip_pool" "pool1-clusterB" {
   }
 
 }
-#Define a replication peering on clusterA using Vippool configurations from clusterB
+#Define a replication peer on cluster A using virtual IP pool settings from cluster B:
 resource "vastdata_replication_peers" "clusterA-clusterB-peer" {
   name        = "peer-loop-b"
   leading_vip = vastdata_vip_pool.pool1-clusterB.ip_ranges[0].start_ip

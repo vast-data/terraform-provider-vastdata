@@ -1,4 +1,4 @@
-#Create a quota with user & group quota
+#Create a quota with user and group quota limits
 resource "vastdata_view_policy" "example" {
   name   = "example"
   flavor = "NFS"

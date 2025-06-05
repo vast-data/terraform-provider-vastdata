@@ -1,6 +1,6 @@
-#We have defined 2 clusters called clusterA, clusterB.
-#We define all needed componants in order to define the proteced path
-# this will create a replication of view with path /view1 from clusterA to remote clusterB path /view1
+#Suppose that two clusters are defined, cluster A and cluster B. Start with defining all components that will be required to define a protected path.
+#This will set up replication from the view with path `/view1` on cluster A to the remote path `/view1` on cluster B.
+
 resource "vastdata_vip_pool" "pool" {
   provider    = vastdata.clusterA
   name        = "protocols-pool"
