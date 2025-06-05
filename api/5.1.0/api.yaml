@@ -984,7 +984,7 @@ components:
           default: "EXTERNAL_PORT"
         invalid_name_response:
           type: "string"
-          description: "TThe response DNS type for invalid DNS name."
+          description: "The response DNS type for invalid DNS name."
           enum: [NXDOMAIN, REFUSED, SERVFAIL, NOERROR]
         invalid_type_response:
           type: "string"
