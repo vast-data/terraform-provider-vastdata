@@ -1567,7 +1567,7 @@ components:
         cluster:
           type: "string"
           description: "Parent cluster."
-          x-cli-header: "Cluster."
+          x-cli-header: "Cluster"
         os_version:
           type: "string"
           description: "Node OS version."
