@@ -1439,7 +1439,7 @@ components:
         max_writes_iops:
           type: integer
           format: "int64"
-          description: :Maximum performance to provide when there is no resource contention."
+          description: "Maximum performance to provide when there is no resource contention."
     QosDynamicLimits:
       type: object
       properties:
