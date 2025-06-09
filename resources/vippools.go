@@ -276,7 +276,105 @@ func getResourceVipPoolSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants `,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants`,
+		},
+
+		"active_cnode_ids": {
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("active_cnode_ids"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) IDs of active CNodes`,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeInt,
+			},
+		},
+
+		"cluster_id": {
+			Type:          schema.TypeInt,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("cluster_id"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Cluster ID`,
+		},
+
+		"cnodes": {
+			Type:          schema.TypeList,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("cnodes"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) `,
+
+			Elem: &schema.Schema{
+				Type: schema.TypeString,
+			},
+		},
+
+		"enable_weighted_balancing": {
+			Type:          schema.TypeBool,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("enable_weighted_balancing"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Weighted Balancing Enabled`,
+		},
+
+		"ranges_summary": {
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("ranges_summary"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) IP ranges`,
+		},
+
+		"sync_time": {
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("sync_time"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Synchronization time with leader`,
+		},
+
+		"sync": {
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("sync"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Synchronization state with leader`,
+		},
+
+		"tenant_name": {
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("tenant_name"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant Name`,
+		},
+
+		"title": {
+			Type:          schema.TypeString,
+			ConflictsWith: codegen_configs.GetResourceByName("VipPool").GetConflictingFields("title"),
+
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   false,
+			Description: `(Valid for versions: 5.1.0,5.2.0) IP range of the VIP pool`,
 		},
 	}
 }
@@ -549,6 +647,114 @@ func ResourceVipPoolReadStructIntoSchema(ctx context.Context, resource api_lates
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occurred setting value to \"tenant_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ActiveCnodeIds", resource.ActiveCnodeIds))
+
+	err = d.Set("active_cnode_ids", utils.FlattenListOfPrimitives(&resource.ActiveCnodeIds))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"active_cnode_ids\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "ClusterId", resource.ClusterId))
+
+	err = d.Set("cluster_id", resource.ClusterId)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"cluster_id\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Cnodes", resource.Cnodes))
+
+	err = d.Set("cnodes", utils.FlattenListOfPrimitives(&resource.Cnodes))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"cnodes\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "EnableWeightedBalancing", resource.EnableWeightedBalancing))
+
+	err = d.Set("enable_weighted_balancing", resource.EnableWeightedBalancing)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"enable_weighted_balancing\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "RangesSummary", resource.RangesSummary))
+
+	err = d.Set("ranges_summary", resource.RangesSummary)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"ranges_summary\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "SyncTime", resource.SyncTime))
+
+	err = d.Set("sync_time", resource.SyncTime)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"sync_time\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Sync", resource.Sync))
+
+	err = d.Set("sync", resource.Sync)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"sync\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "TenantName", resource.TenantName))
+
+	err = d.Set("tenant_name", resource.TenantName)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"tenant_name\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "Title", resource.Title))
+
+	err = d.Set("title", resource.Title)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"title\"",
 			Detail:   err.Error(),
 		})
 	}

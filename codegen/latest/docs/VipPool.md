@@ -25,7 +25,16 @@ Name | Type | Description | Notes
 **EnableL3** | **bool** | Enables L3 CNode access | [optional] [default to null]
 **VastAsn** | **int32** | VAST ASN | [optional] [default to null]
 **PeerAsn** | **int32** | Peer ASN | [optional] [default to null]
-**TenantId** | **int64** | The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants  | [optional] [default to null]
+**TenantId** | **int64** | The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants | [optional] [default to null]
+**ActiveCnodeIds** | **[]int32** | IDs of active CNodes | [optional] [default to null]
+**ClusterId** | **int32** | Cluster ID | [optional] [default to null]
+**Cnodes** | **[]string** |  | [optional] [default to null]
+**EnableWeightedBalancing** | **bool** | Weighted Balancing Enabled | [optional] [default to null]
+**RangesSummary** | **string** | IP ranges | [optional] [default to null]
+**SyncTime** | **string** | Synchronization time with leader | [optional] [default to null]
+**Sync** | **string** | Synchronization state with leader | [optional] [default to null]
+**TenantName** | **string** | Tenant Name | [optional] [default to null]
+**Title** | **string** | IP range of the VIP pool | [optional] [default to null]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
