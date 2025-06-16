@@ -100,8 +100,7 @@ func StructMapDiff(struct_map map[string]interface{}, data_map map[string]interf
 
 			*diffs = append(*diffs, prefix+"."+key)
 		} else {
-
-			if IsPrimitive(reflect.TypeOf(value)) {
+			if value == nil || IsPrimitive(reflect.TypeOf(value)) {
 				continue
 			}
 			switch reflect.TypeOf(value) {
