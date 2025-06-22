@@ -9,6 +9,10 @@
 package swagger
 
 type Saml struct {
+	// Internal (Terraform) ID of SAML
+	Id string `json:"id,omitempty"`
+	// VMS ID
+	VmsId int32 `json:"vms_id,omitempty"`
 	// SAML IDP name
 	IdpName string `json:"idp_name,omitempty"`
 	// Set to true if the IdP encrypts the assertion. If true, an encryption certificate and key must be uploaded. Use encryption_saml_crt and encryption_saml_key to provide the required certificate and key. Default: false. Set to false to disable encryption.

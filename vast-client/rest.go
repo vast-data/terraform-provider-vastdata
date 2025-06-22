@@ -14,10 +14,10 @@ import (
 
 type RestClient interface {
 	GetConfig() *RestClientConfig
-	Post(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error)
+	Post(ctx context.Context, path string, query string, body io.Reader, headers map[string]string) (response *http.Response, err error)
 	Get(ctx context.Context, path, query string, headers map[string]string) (response *http.Response, err error)
 	Put(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error)
-	Patch(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error)
+	Patch(ctx context.Context, path string, query string, body io.Reader, headers map[string]string) (response *http.Response, err error)
 	Delete(ctx context.Context, path, query string, body io.Reader, headers map[string]string) (response *http.Response, err error)
 }
 

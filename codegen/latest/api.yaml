@@ -2374,6 +2374,12 @@ Default: SIMPLE_PREFIX"
     Saml:
       type: "object"
       properties:
+        id:
+          type: string
+          description: "Internal (Terraform) ID of SAML"
+        vms_id:
+          type: integer
+          description: "VMS ID"
         idp_name:
           type: string
           description: "SAML IDP name"

@@ -132,65 +132,78 @@ func FlattenModelToList(ctx context.Context, element interface{}) []interface{} 
 	return make([]interface{}, 0)
 }
 
-func ModelToMap(ctx context.Context, model interface{}) map[string]interface{} {
+func handleValue(ctx context.Context, value reflect.Value) any {
+	switch value.Type().String() {
+	case "int", "int32", "int64", "int8", "int16":
+		return value.Int()
+	case "string":
+		return value.String()
+	case "bool":
+		return value.Bool()
+	case "uint", "uint32", "uint64", "uint8", "uint16":
+		return value.Uint()
+	case "float32", "float64":
+		return value.Float()
+	default:
+		//If we got here it means that this is not a primitive but a complex type
+		kind := value.Type().Kind()
+		tflog.Debug(ctx, fmt.Sprintf("Model Kind %v", kind))
+		if kind == reflect.Pointer && value.IsNil() {
+			tflog.Debug(ctx, fmt.Sprintf("Nil Pointer processing return empty mapping"))
+			return make([]interface{}, 0)
+		}
+		if kind == reflect.Slice || kind == reflect.Array {
+			//Handling Slices / Arrays
+			tflog.Debug(ctx, fmt.Sprintf("Processing list of models"))
+			var l []any
+			for i := 0; i < value.Len(); i++ {
+				itemValue := value.Index(i)
+				itemKind := itemValue.Type().Kind()
+				var item any
+				if itemKind == reflect.Pointer {
+					item = ModelToMap(ctx, itemValue.Interface())
+				} else {
+					item = handleValue(ctx, itemValue)
+				}
+				l = append(l, item)
+			}
+			return l
+		}
+		if kind == reflect.Pointer && !value.IsNil() {
+			//Handling of pointers
+			i := reflect.Indirect(value)
+			tflog.Debug(ctx, fmt.Sprintf("Processing a pointer to %v", i))
+			o := make([]interface{}, 1, 1)
+			o[0] = ModelToMap(ctx, i.Interface())
+			return o
+		}
+		if kind == reflect.Struct {
+			tflog.Debug(ctx, fmt.Sprintf("Processing struct %v", value.Interface()))
+			// Handling Structs (we assume those are models)
+			o := make([]any, 1)
+			o[0] = ModelToMap(ctx, value.Interface())
+			return o
+		}
+		panic(fmt.Sprintf("Can not handle values from the type of %s", kind))
+
+	}
+}
+
+func ModelToMap(ctx context.Context, model interface{}) map[string]any {
 	/*
 	   Get A model and return it as a map of map[string]interface{}
 	   where the string is the fieled name and the Value is the actual Value
 	*/
 	tflog.Debug(ctx, fmt.Sprintf("Processing %v", model))
 	m := make(map[string]interface{})
-	model_value := reflect.ValueOf(model)
-	if model_value.Type().Kind() == reflect.Pointer && model_value.IsNil() {
+	modelValue := reflect.ValueOf(model)
+	if modelValue.Type().Kind() == reflect.Pointer && modelValue.IsNil() {
 		return m
 	}
-	name_mapping := BuildModelNameMapping(ctx, model)
-	for k, v := range name_mapping {
-		value := model_value.FieldByName(k)
-		switch value.Type().String() {
-		case "int", "int32", "int64", "int8", "int16":
-			m[v] = value.Int()
-		case "string":
-			m[v] = value.String()
-		case "bool":
-			m[v] = value.Bool()
-		case "uint", "uint32", "uint64", "uint8", "uint16":
-			m[v] = value.Uint()
-		case "float32", "float64":
-			m[v] = value.Float()
-		default:
-			//If we got here it means that this is not a primitive but a complex type
-			kind := value.Type().Kind()
-			tflog.Debug(ctx, fmt.Sprintf("Model Kind %v", kind))
-			if kind == reflect.Pointer && value.IsNil() {
-				tflog.Debug(ctx, fmt.Sprintf("Nil Pointer processing return empty mapping"))
-				m[v] = make([]interface{}, 0)
-			} else if kind == reflect.Slice || kind == reflect.Array {
-				//Handling Slices / Arrays
-				tflog.Debug(ctx, fmt.Sprintf("Processing list of models"))
-				l := []interface{}{}
-				for i := 0; i < value.Len(); i++ {
-					l = append(l, ModelToMap(ctx, value.Index(i).Interface()))
-				}
-				m[v] = l
-			} else if kind == reflect.Pointer && !value.IsNil() {
-				//Handling of pointers
-				i := reflect.Indirect(value)
-				tflog.Debug(ctx, fmt.Sprintf("Processing a pointer to %v", i))
-				o := make([]interface{}, 1, 1)
-				o[0] = ModelToMap(ctx, i.Interface())
-				m[v] = o
-			} else if kind == reflect.Struct {
-				tflog.Debug(ctx, fmt.Sprintf("Processing struct %v", model))
-				//Handlig Structs (we assume those are models)
-				o := make([]interface{}, 1, 1)
-				o[0] = ModelToMap(ctx, value.Interface())
-				m[v] = o
-			} else {
-				panic(fmt.Sprintf("Can not Hanlde values from the type of %s", kind))
-			}
-
-		}
-
+	nameMapping := BuildModelNameMapping(ctx, model)
+	for k, v := range nameMapping {
+		value := modelValue.FieldByName(k)
+		m[v] = handleValue(ctx, value)
 	}
 	return m
 }

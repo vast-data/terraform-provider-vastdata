@@ -3,6 +3,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Id** | **string** | Internal (Terraform) ID of SAML | [optional] [default to null]
+**VmsId** | **int32** | VMS ID | [optional] [default to null]
 **IdpName** | **string** | SAML IDP name | [optional] [default to null]
 **EncryptAssertion** | **bool** | Set to true if the IdP encrypts the assertion. If true, an encryption certificate and key must be uploaded. Use encryption_saml_crt and encryption_saml_key to provide the required certificate and key. Default: false. Set to false to disable encryption. | [optional] [default to null]
 **EncryptionSamlCrt** | **string** | Specifies the encryption certificate file content to upload. Required if encrypt_assertion is true. | [optional] [default to null]

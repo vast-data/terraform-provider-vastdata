@@ -39,7 +39,7 @@ func CreateNonLocalUserKeyFunc(ctx context.Context, _client any, attr map[string
 		return nil, marshallingError
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling POST to path \"%v\"", attr))
-	response, err := client.Post(ctx, path, bytes.NewReader(buffer), map[string]string{})
+	response, err := client.Post(ctx, path, "", bytes.NewReader(buffer), map[string]string{})
 	if err != nil {
 		return response, err
 	}
@@ -63,7 +63,7 @@ func CreateNonLocalUserKeyFunc(ctx context.Context, _client any, attr map[string
 			return nil, pMarshallingError
 		}
 		tflog.Debug(ctx, fmt.Sprintf("Disabling NonLocalUserKey %v", accessKey))
-		presponse, perr := client.Patch(ctx, path, bytes.NewReader(pBuffer), map[string]string{})
+		presponse, perr := client.Patch(ctx, path, "", bytes.NewReader(pBuffer), map[string]string{})
 		if perr != nil {
 			return presponse, perr
 		}
@@ -104,7 +104,7 @@ func UpdateNonLocalUserKeyFunc(ctx context.Context, _client any, attr map[string
 		return nil, marshallingError
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Updating NonLocalUserKey %v with data %v", accessKey, payload))
-	response, err := client.Patch(ctx, path, bytes.NewReader(buffer), map[string]string{})
+	response, err := client.Patch(ctx, path, "", bytes.NewReader(buffer), map[string]string{})
 	if err != nil {
 		return response, err
 	}
