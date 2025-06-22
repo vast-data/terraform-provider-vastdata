@@ -112,20 +112,29 @@ resource "vastdata_vip_pool" "pool1" {
 
 ### Optional
 
+- `active_cnode_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) IDs of active CNodes
 - `active_interfaces` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Numver of active interfaces
 - `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
+- `cluster_id` (Number) (Valid for versions: 5.1.0,5.2.0) Cluster ID
 - `cnode_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of cnodes comprising cnode group
+- `cnodes` (List of String) (Valid for versions: 5.1.0,5.2.0)
 - `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `enable_l3` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables L3 CNode access
+- `enable_weighted_balancing` (Boolean) (Valid for versions: 5.1.0,5.2.0) Weighted Balancing Enabled
 - `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) True for enable, False for disable
 - `gw_ip` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IP Address
 - `gw_ipv6` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) GW IPv6 Address
 - `peer_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN
 - `port_membership` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The port on the CNode this pool will use. Right, left or all
+- `ranges_summary` (String) (Valid for versions: 5.1.0,5.2.0) IP ranges
 - `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `subnet_cidr` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)
 - `subnet_cidr_ipv6` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)
+- `sync` (String) (Valid for versions: 5.1.0,5.2.0) Synchronization state with leader
+- `sync_time` (String) (Valid for versions: 5.1.0,5.2.0) Synchronization time with leader
 - `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants
+- `tenant_name` (String) (Valid for versions: 5.1.0,5.2.0) Tenant Name
+- `title` (String) (Valid for versions: 5.1.0,5.2.0) IP range of the VIP pool
 - `url` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `vast_asn` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN
 - `vlan` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN

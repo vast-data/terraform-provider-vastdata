@@ -24,13 +24,13 @@ type VipPool struct {
 	// GW IPv6 Address
 	GwIpv6 string `json:"gw_ipv6,omitempty"`
 	// VIPPool VLAN
-	Vlan int `json:"vlan,omitempty"`
+	Vlan  int    `json:"vlan,omitempty"`
 	State string `json:"state,omitempty"`
 	// IDs of cnodes comprising cnode group
 	CnodeIds []int32 `json:"cnode_ids,omitempty"`
 	// Parent Cluster
-	Cluster string `json:"cluster,omitempty"`
-	Url string `json:"url,omitempty"`
+	Cluster    string `json:"cluster,omitempty"`
+	Url        string `json:"url,omitempty"`
 	DomainName string `json:"domain_name,omitempty"`
 	// Role
 	Role string `json:"role,omitempty"`
@@ -50,6 +50,23 @@ type VipPool struct {
 	VastAsn int32 `json:"vast_asn,omitempty"`
 	// Peer ASN
 	PeerAsn int32 `json:"peer_asn,omitempty"`
-	// The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants 
+	// The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants
 	TenantId int64 `json:"tenant_id,omitempty"`
+	// IDs of active CNodes
+	ActiveCnodeIds []int32 `json:"active_cnode_ids,omitempty"`
+	// Cluster ID
+	ClusterId int32    `json:"cluster_id,omitempty"`
+	Cnodes    []string `json:"cnodes,omitempty"`
+	// Weighted Balancing Enabled
+	EnableWeightedBalancing bool `json:"enable_weighted_balancing,omitempty"`
+	// IP ranges
+	RangesSummary string `json:"ranges_summary,omitempty"`
+	// Synchronization time with leader
+	SyncTime string `json:"sync_time,omitempty"`
+	// Synchronization state with leader
+	Sync string `json:"sync,omitempty"`
+	// Tenant Name
+	TenantName string `json:"tenant_name,omitempty"`
+	// IP range of the VIP pool
+	Title string `json:"title,omitempty"`
 }

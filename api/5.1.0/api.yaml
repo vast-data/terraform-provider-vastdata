@@ -970,6 +970,37 @@ Also due to the lack of ability to configure vippool permissions using this atti
           type: "integer"
           format: "int64"
           description: "The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants"
+        active_cnode_ids:
+          type: "array"
+          items:
+            type: "integer"
+          description: "IDs of active CNodes"
+        cluster_id:
+          type: "integer"
+          description: "Cluster ID"
+        cnodes:
+          type: "array"
+          items:
+            type: "string"
+            description: "Names of CNodes comprising CNode group"
+        enable_weighted_balancing:
+          type: "boolean"
+          description: "Weighted Balancing Enabled"
+        ranges_summary:
+          type: "string"
+          description: "IP ranges"
+        sync_time:
+          type: "string"
+          description: "Synchronization time with leader"
+        sync:
+          type: "string"
+          description: "Synchronization state with leader"
+        tenant_name:
+          type: "string"
+          description: "Tenant Name"
+        title:
+          type: "string"
+          description: "IP range of the VIP pool"
     Dns:
       type: "object"
       properties:
