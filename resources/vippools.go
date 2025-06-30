@@ -795,7 +795,7 @@ func resourceVipPoolRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -1023,7 +1023,7 @@ func resourceVipPoolImporter(ctx context.Context, d *schema.ResourceData, m inte
 	}
 
 	var resourceList []api_latest.VipPool
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err

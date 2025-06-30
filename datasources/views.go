@@ -506,7 +506,10 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 		values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
 	}
 
-	response, err := client.Get(ctx, utils.GenPath("views"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"views",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -518,7 +521,7 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	}
 	resource_l := []api_latest.View{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

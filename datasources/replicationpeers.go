@@ -129,7 +129,10 @@ func dataSourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData,
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, utils.GenPath("nativereplicationremotetargets"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"nativereplicationremotetargets",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -141,7 +144,7 @@ func dataSourceReplicationPeersRead(ctx context.Context, d *schema.ResourceData,
 
 	}
 	resource_l := []api_latest.ReplicationPeers{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

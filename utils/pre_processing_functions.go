@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,10 +18,10 @@ type WithURL struct {
 	Url string `json:"url,omitempty"`
 }
 
-type ResponseProcessingFunc func(context.Context, *http.Response) ([]byte, error)
+type ResponseProcessingFunc func(context.Context, *http.Response, *schema.ResourceData) ([]byte, error)
 
 // The default processing func for http responses for read
-func DefaultProcessingFunc(ctx context.Context, response *http.Response) ([]byte, error) {
+func DefaultProcessingFunc(ctx context.Context, response *http.Response, d *schema.ResourceData) ([]byte, error) {
 	body, err := io.ReadAll(response.Body)
 	tflog.Debug(ctx, fmt.Sprintf("HTTP Response body %s", string(body)))
 	return body, err
@@ -58,7 +59,7 @@ Ex: of response
 	    ]
 	}
 */
-func ProcessingResultsListResponse(ctx context.Context, response *http.Response) ([]byte, error) {
+func ProcessingResultsListResponse(ctx context.Context, response *http.Response, d *schema.ResourceData) ([]byte, error) {
 	m := new(map[string]interface{})
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {

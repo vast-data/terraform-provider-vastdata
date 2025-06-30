@@ -263,7 +263,7 @@ func resourceS3PolicyRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -497,7 +497,7 @@ func resourceS3PolicyImporter(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	var resourceList []api_latest.S3Policy
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err

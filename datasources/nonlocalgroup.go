@@ -90,16 +90,19 @@ func dataSourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m 
 	values := url.Values{}
 	datasource_config := codegen_configs.GetDataSourceByName("NonLocalGroup")
 
+	groupname := d.Get("groupname")
+	values.Add("groupname", fmt.Sprintf("%v", groupname))
+
 	context := d.Get("context")
 	values.Add("context", fmt.Sprintf("%v", context))
 
 	tenant_id := d.Get("tenant_id")
 	values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
 
-	groupname := d.Get("groupname")
-	values.Add("groupname", fmt.Sprintf("%v", groupname))
-
-	response, err := client.Get(ctx, utils.GenPath("groups/query"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"groups/query",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -111,7 +114,7 @@ func dataSourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m 
 
 	}
 	resource_l := []api_latest.NonLocalGroup{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

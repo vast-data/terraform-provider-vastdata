@@ -849,6 +849,32 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		},
 		Importer: &utils.ManagerImporter{},
 	},
+	{
+		ResourceName:             "Saml",
+		Path:                     ToStringPointer("vms/%v/saml_config"),
+		Model:                    api_latest.Saml{},
+		DestFile:                 ToStringPointer("samls.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("idp_name", "idp_entityid", "vms_id"),
+		OptionalIdentifierFields: NewStringSet(),
+		ComputedFields:           NewStringSet(),
+		SensitiveFields:          NewStringSet("encryption_saml_crt", "encryption_saml_key", "signing_cert", "signing_key"),
+		Generate:                 true,
+		ResponseGetByURL:         false,
+		DataSourceName:           "vastdata_saml",
+		CreateFunc:               utils.SamlCreateFunc,
+		GetFunc:                  utils.SamlGetFunc,
+		BeforeDeleteFunc:         utils.SamlBeforeDeleteFunc,
+		DeleteFunc:               utils.SamlDeleteFunc,
+		UpdateFunc:               utils.SamlUpdateFunc,
+		Importer: utils.NewImportByHttpFields(true,
+			[]utils.HttpFieldTuple{
+				{DisplayName: "VMS ID", FieldName: "vms_id"},
+				{DisplayName: "IDP name", FieldName: "idp_name"},
+			}),
+		DisableFallbackRequest: true,
+		ImportFunc:             utils.SamlImportFunc,
+	},
 }
 
 func init() {

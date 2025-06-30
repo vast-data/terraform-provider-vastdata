@@ -309,7 +309,7 @@ func resourceProtectedPathRead(ctx context.Context, d *schema.ResourceData, m in
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -543,7 +543,7 @@ func resourceProtectedPathImporter(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	var resourceList []api_latest.ProtectedPath
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err

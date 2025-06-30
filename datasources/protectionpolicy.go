@@ -150,7 +150,10 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, utils.GenPath("protectionpolicies"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"protectionpolicies",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -162,7 +165,7 @@ func dataSourceProtectionPolicyRead(ctx context.Context, d *schema.ResourceData,
 
 	}
 	resource_l := []api_latest.ProtectionPolicy{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

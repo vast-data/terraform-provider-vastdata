@@ -717,7 +717,10 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 		values.Add("tenant_id", fmt.Sprintf("%v", tenant_id))
 	}
 
-	response, err := client.Get(ctx, utils.GenPath("quotas"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"quotas",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -729,7 +732,7 @@ func dataSourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	}
 	resource_l := []api_latest.Quota{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

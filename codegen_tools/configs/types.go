@@ -134,6 +134,7 @@ type ResourceTemplateV2 struct {
 	IgnoreFields             *StringSet
 	RequiredIdentifierFields *StringSet
 	OptionalIdentifierFields *StringSet
+	PathIdentifierFields     *StringSet
 	ComputedFields           *StringSet
 	ForceNewFields           *StringSet
 	ConflictingFields        map[string][]string

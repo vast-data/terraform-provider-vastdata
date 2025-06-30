@@ -236,7 +236,7 @@ func resourceNonLocalGroupRead(ctx context.Context, d *schema.ResourceData, m in
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -452,7 +452,7 @@ func resourceNonLocalGroupImporter(ctx context.Context, d *schema.ResourceData, 
 	}
 
 	var resourceList []api_latest.NonLocalGroup
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err

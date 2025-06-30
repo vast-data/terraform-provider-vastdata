@@ -85,7 +85,10 @@ func dataSourceGroupRead(ctx context.Context, d *schema.ResourceData, m interfac
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, utils.GenPath("groups"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"groups",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -97,7 +100,7 @@ func dataSourceGroupRead(ctx context.Context, d *schema.ResourceData, m interfac
 
 	}
 	resource_l := []api_latest.Group{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

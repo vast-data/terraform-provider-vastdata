@@ -73,7 +73,7 @@ func ProtectedPathBeforeCreateFunc(m map[string]interface{}, i interface{}, ctx 
 	id := fmt.Sprintf("%v", d.Id())
 	z := map[string]interface{}{"enabled": enabled}
 	b, _ := json.Marshal(z)
-	_, err := client.Patch(ctx, GenPath(fmt.Sprintf("%v/%v", "protectedpaths", id)), bytes.NewReader(b), map[string]string{})
+	_, err := client.Patch(ctx, GenPath(fmt.Sprintf("%v/%v", "protectedpaths", id)), "", bytes.NewReader(b), map[string]string{})
 	if err != nil {
 		return m, err
 	}

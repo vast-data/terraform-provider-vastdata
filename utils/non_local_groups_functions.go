@@ -49,7 +49,7 @@ func NonLocalGroupCreateFunc(ctx context.Context, _client interface{}, attr map[
 		return nil, marshallingError
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling POST to path \"%v\"", attr))
-	response, err := client.Patch(ctx, (*attributes)["path"], bytes.NewReader(buffer), map[string]string{})
+	response, err := client.Patch(ctx, (*attributes)["path"], "", bytes.NewReader(buffer), map[string]string{})
 	if err != nil {
 		return response, err
 	}
@@ -154,7 +154,7 @@ func NonLocalGroupImportFunc(ctx context.Context, _client interface{}, attr map[
 	return mimickedResponse, nil
 }
 
-func NonLocalGroupProcessingFunc(ctx context.Context, response *http.Response) ([]byte, error) {
+func NonLocalGroupProcessingFunc(ctx context.Context, response *http.Response, d *schema.ResourceData) ([]byte, error) {
 	mimickedResponse, err := mimicListResponseForSingularNonLocalGroup(ctx, response)
 	if err != nil {
 		return nil, err

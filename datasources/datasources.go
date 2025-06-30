@@ -31,4 +31,5 @@ var DataSources map[string]*schema.Resource = map[string]*schema.Resource{
 	"vastdata_active_directory2":    DataSourceActiveDirectory2(),
 	"vastdata_administators_realms": DataSourceRealm(),
 	"vastdata_administators_roles":  DataSourceRole(),
+	"vastdata_saml":                 DataSourceSaml(),
 }

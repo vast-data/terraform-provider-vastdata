@@ -242,7 +242,10 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, utils.GenPath("tenants"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"tenants",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -254,7 +257,7 @@ func dataSourceTenantRead(ctx context.Context, d *schema.ResourceData, m interfa
 
 	}
 	resource_l := []api_latest.Tenant{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
