@@ -10,6 +10,8 @@ import (
 	"github.com/vast-data/terraform-provider-vastdata/vast-client"
 	"io"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 func getSamlId(vmsId int, idpName string) string {
@@ -90,7 +92,7 @@ func SamlGetFunc(ctx context.Context, _client interface{}, attr map[string]inter
 		}
 	}
 	_idp := unmarshalledBody["idp"].(map[string]interface{})
-	_sp_settings := unmarshalledBody["sp_settings"].(map[string]interface{})
+	_spSettings := unmarshalledBody["sp_settings"].(map[string]interface{})
 	unmarshalledBody["idp_name"] = idpName
 	unmarshalledBody["idp_metadata"] = idpMetadata
 	unmarshalledBody["signing_cert"] = signingCert
@@ -99,9 +101,9 @@ func SamlGetFunc(ctx context.Context, _client interface{}, attr map[string]inter
 	unmarshalledBody["encryption_saml_key"] = encryptionSamlKey
 	unmarshalledBody["vms_id"] = vmsId
 	unmarshalledBody["idp_entityid"] = getKeyFromMap(_idp, idpEntityid)
-	unmarshalledBody["encrypt_assertion"] = _sp_settings["encrypt_assertion"]
-	unmarshalledBody["force_authn"] = _sp_settings["force_authn"]
-	unmarshalledBody["want_assertions_or_response_signed"] = _sp_settings["want_assertions_or_response_signed"]
+	unmarshalledBody["encrypt_assertion"] = _spSettings["encrypt_assertion"]
+	unmarshalledBody["force_authn"] = _spSettings["force_authn"]
+	unmarshalledBody["want_assertions_or_response_signed"] = _spSettings["want_assertions_or_response_signed"]
 
 	return FakeHttpResponse(response, unmarshalledBody)
 }
@@ -150,4 +152,56 @@ func SamlUpdateFunc(ctx context.Context, _client interface{}, attr map[string]in
 	}
 	data["id"] = getSamlId(vmsId, idpName)
 	return FakeHttpResponse(response, data)
+}
+
+func SamlImportFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, d *schema.ResourceData, g GetFuncType) (*http.Response, error) {
+	client := _client.(*vast_client.VMSSession)
+
+	path := attr["path"].(string)
+	passedId := d.Id()
+	splitId := strings.Split(passedId, "|")
+	if len(splitId) != 2 {
+		return nil, fmt.Errorf("import function must contain exactly one '|' separator")
+	}
+	vmsId, err := strconv.Atoi(splitId[0])
+	if err != nil {
+		return nil, err
+	}
+	idpName := splitId[1]
+
+	pathWithVmsId, query := getPathAndQuery(path, vmsId, idpName)
+
+	tflog.Debug(ctx, fmt.Sprintf("Calling GET to path \"%v\" , with Query %v", path, query))
+	response, err := client.Get(ctx, pathWithVmsId, query, map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	unmarshalledBody := map[string]interface{}{}
+	err = UnmarshalBodyToMap(response, &unmarshalledBody)
+	if err != nil {
+		return nil, err
+	}
+	id := getSamlId(vmsId, idpName)
+
+	unmarshalledBody["id"] = id
+	_metadata := unmarshalledBody["metadata"].(map[string]interface{})
+	if remote, ok := _metadata["remote"].([]interface{}); ok && len(remote) > 0 {
+		if first, ok := remote[0].(map[string]interface{}); ok {
+			if url, ok := first["url"].(string); ok {
+				unmarshalledBody["idp_metadata_url"] = url
+			}
+		}
+	}
+	_idp := unmarshalledBody["idp"].(map[string]interface{})
+	_spSettings := unmarshalledBody["sp_settings"].(map[string]interface{})
+	unmarshalledBody["idp_name"] = idpName
+	unmarshalledBody["vms_id"] = vmsId
+	unmarshalledBody["idp_entityid"] = getKeyFromMap(_idp, "")
+	unmarshalledBody["encrypt_assertion"] = _spSettings["encrypt_assertion"]
+	unmarshalledBody["force_authn"] = _spSettings["force_authn"]
+	unmarshalledBody["want_assertions_or_response_signed"] = _spSettings["want_assertions_or_response_signed"]
+	var list []*map[string]interface{}
+	list = append(list, &unmarshalledBody)
+	return FakeHttpResponseAny(response, list)
 }

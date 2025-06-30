@@ -869,9 +869,11 @@ var ResourcesTemplates = []ResourceTemplateV2{
 		UpdateFunc:               utils.SamlUpdateFunc,
 		Importer: utils.NewImportByHttpFields(true,
 			[]utils.HttpFieldTuple{
+				{DisplayName: "VMS ID", FieldName: "vms_id"},
 				{DisplayName: "IDP name", FieldName: "idp_name"},
 			}),
 		DisableFallbackRequest: true,
+		ImportFunc:             utils.SamlImportFunc,
 	},
 }
 

@@ -527,6 +527,21 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_administators_roles",
 		AfterReadFunc:            utils.RoleAfterReadFunc,
 	},
+	//{
+	//	ResourceName:             "Saml",
+	//	Path:                     ToStringPointer("vms/%v/saml_config"),
+	//	Model:                    api_latest.Saml{},
+	//	DestFile:                 ToStringPointer("samls.go"),
+	//	IgnoreFields:             NewStringSet("Id"),
+	//	RequiredIdentifierFields: NewStringSet("idp_name", "vms_id"),
+	//	OptionalIdentifierFields: NewStringSet(),
+	//	SensitiveFields:          NewStringSet("encryption_saml_crt", "encryption_saml_key", "signing_cert", "signing_key"),
+	//	ListsNamesMap:            map[string][]string{},
+	//	Generate:                 true,
+	//	ForceNewFields:           NewStringSet(),
+	//	DataSourceName:           "vastdata_administators_roles",
+	//	AfterReadFunc:            utils.RoleAfterReadFunc,
+	//},
 }
 
 func init() {
