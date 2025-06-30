@@ -31,6 +31,34 @@ func getKeyFromMap(dict map[string]interface{}, fallback string) string {
 	return fallback
 }
 
+func unmarshallBody(response *http.Response, vmsId int, idpName string, fallbackIdpEntityid string) (*map[string]interface{}, error) {
+	unmarshalledBody := map[string]interface{}{}
+	err := UnmarshalBodyToMap(response, &unmarshalledBody)
+	if err != nil {
+		return nil, err
+	}
+	id := getSamlId(vmsId, idpName)
+
+	unmarshalledBody["id"] = id
+	_metadata := unmarshalledBody["metadata"].(map[string]interface{})
+	if remote, ok := _metadata["remote"].([]interface{}); ok && len(remote) > 0 {
+		if first, ok := remote[0].(map[string]interface{}); ok {
+			if url, ok := first["url"].(string); ok {
+				unmarshalledBody["idp_metadata_url"] = url
+			}
+		}
+	}
+	_idp := unmarshalledBody["idp"].(map[string]interface{})
+	_spSettings := unmarshalledBody["sp_settings"].(map[string]interface{})
+	unmarshalledBody["idp_name"] = idpName
+	unmarshalledBody["vms_id"] = vmsId
+	unmarshalledBody["idp_entityid"] = getKeyFromMap(_idp, fallbackIdpEntityid)
+	unmarshalledBody["encrypt_assertion"] = _spSettings["encrypt_assertion"]
+	unmarshalledBody["force_authn"] = _spSettings["force_authn"]
+	unmarshalledBody["want_assertions_or_response_signed"] = _spSettings["want_assertions_or_response_signed"]
+	return &unmarshalledBody, nil
+}
+
 func SamlCreateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
 	client := _client.(*vast_client.VMSSession)
 	payload := map[string]interface{}{}
@@ -75,37 +103,17 @@ func SamlGetFunc(ctx context.Context, _client interface{}, attr map[string]inter
 		return nil, err
 	}
 
-	unmarshalledBody := map[string]interface{}{}
-	err = UnmarshalBodyToMap(response, &unmarshalledBody)
+	unmarshalledBody, err := unmarshallBody(response, vmsId, idpName, idpEntityid)
 	if err != nil {
 		return nil, err
 	}
-	id := getSamlId(vmsId, idpName)
+	(*unmarshalledBody)["idp_metadata"] = idpMetadata
+	(*unmarshalledBody)["signing_cert"] = signingCert
+	(*unmarshalledBody)["signing_key"] = signingKey
+	(*unmarshalledBody)["encryption_saml_crt"] = encryptionSamlCrt
+	(*unmarshalledBody)["encryption_saml_key"] = encryptionSamlKey
 
-	unmarshalledBody["id"] = id
-	_metadata := unmarshalledBody["metadata"].(map[string]interface{})
-	if remote, ok := _metadata["remote"].([]interface{}); ok && len(remote) > 0 {
-		if first, ok := remote[0].(map[string]interface{}); ok {
-			if url, ok := first["url"].(string); ok {
-				unmarshalledBody["idp_metadata_url"] = url
-			}
-		}
-	}
-	_idp := unmarshalledBody["idp"].(map[string]interface{})
-	_spSettings := unmarshalledBody["sp_settings"].(map[string]interface{})
-	unmarshalledBody["idp_name"] = idpName
-	unmarshalledBody["idp_metadata"] = idpMetadata
-	unmarshalledBody["signing_cert"] = signingCert
-	unmarshalledBody["signing_key"] = signingKey
-	unmarshalledBody["encryption_saml_crt"] = encryptionSamlCrt
-	unmarshalledBody["encryption_saml_key"] = encryptionSamlKey
-	unmarshalledBody["vms_id"] = vmsId
-	unmarshalledBody["idp_entityid"] = getKeyFromMap(_idp, idpEntityid)
-	unmarshalledBody["encrypt_assertion"] = _spSettings["encrypt_assertion"]
-	unmarshalledBody["force_authn"] = _spSettings["force_authn"]
-	unmarshalledBody["want_assertions_or_response_signed"] = _spSettings["want_assertions_or_response_signed"]
-
-	return FakeHttpResponse(response, unmarshalledBody)
+	return FakeHttpResponse(response, *unmarshalledBody)
 }
 
 func SamlBeforeDeleteFunc(ctx context.Context, d *schema.ResourceData, m interface{}) (io.Reader, error) {
@@ -177,31 +185,11 @@ func SamlImportFunc(ctx context.Context, _client interface{}, attr map[string]in
 		return nil, err
 	}
 
-	unmarshalledBody := map[string]interface{}{}
-	err = UnmarshalBodyToMap(response, &unmarshalledBody)
+	unmarshalledBody, err := unmarshallBody(response, vmsId, idpName, "")
 	if err != nil {
 		return nil, err
 	}
-	id := getSamlId(vmsId, idpName)
-
-	unmarshalledBody["id"] = id
-	_metadata := unmarshalledBody["metadata"].(map[string]interface{})
-	if remote, ok := _metadata["remote"].([]interface{}); ok && len(remote) > 0 {
-		if first, ok := remote[0].(map[string]interface{}); ok {
-			if url, ok := first["url"].(string); ok {
-				unmarshalledBody["idp_metadata_url"] = url
-			}
-		}
-	}
-	_idp := unmarshalledBody["idp"].(map[string]interface{})
-	_spSettings := unmarshalledBody["sp_settings"].(map[string]interface{})
-	unmarshalledBody["idp_name"] = idpName
-	unmarshalledBody["vms_id"] = vmsId
-	unmarshalledBody["idp_entityid"] = getKeyFromMap(_idp, "")
-	unmarshalledBody["encrypt_assertion"] = _spSettings["encrypt_assertion"]
-	unmarshalledBody["force_authn"] = _spSettings["force_authn"]
-	unmarshalledBody["want_assertions_or_response_signed"] = _spSettings["want_assertions_or_response_signed"]
 	var list []*map[string]interface{}
-	list = append(list, &unmarshalledBody)
+	list = append(list, unmarshalledBody)
 	return FakeHttpResponseAny(response, list)
 }
