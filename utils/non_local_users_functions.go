@@ -162,7 +162,7 @@ func NonLocalUserImportFunc(ctx context.Context, _client interface{}, attr map[s
 	return mimickedResponse, nil
 }
 
-func NonLocalUserProcessingFunc(ctx context.Context, response *http.Response) ([]byte, error) {
+func NonLocalUserProcessingFunc(ctx context.Context, response *http.Response, d *schema.ResourceData) ([]byte, error) {
 	mimickedResponse, err := mimicListResponseForSingularNonLocalUser(ctx, response)
 	if err != nil {
 		return nil, err

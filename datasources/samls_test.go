@@ -21,48 +21,31 @@ import (
 	vast_client "github.com/vast-data/terraform-provider-vastdata/vast-client"
 )
 
-var _ = Describe(" Manager", func() {
+var _ = Describe(" Saml", func() {
 	var ReadContext schema.ReadContextFunc
 	//An empty resource data to be populated per test
-	var ManagerDataSourceData *schema.ResourceData
+	var SamlDataSourceData *schema.ResourceData
 	var model_json = `
                          {
-   "first_name": "string",
-   "last_name": "string",
-   "password": "string",
-   "permissions": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "permissions_list": [
-      "A",
-      "B",
-      "C",
-      "D",
-      "E"
-   ],
-   "roles": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6
-   ],
-   "username": "string"
+   "encryption_saml_crt": "string",
+   "encryption_saml_key": "string",
+   "idp_entityid": "string",
+   "idp_metadata": "string",
+   "idp_metadata_url": "string",
+   "idp_name": "string",
+   "signing_cert": "string",
+   "signing_key": "string",
+   "vms_id": 100
 }
                          `
 	var server *ghttp.Server
 	var client *vast_client.VMSSession
-	ManagerDataSource := datasources.DataSourceManager()
-	ReadContext = ManagerDataSource.ReadContext
+	SamlDataSource := datasources.DataSourceSaml()
+	ReadContext = SamlDataSource.ReadContext
 
 	BeforeEach(func() {
-		ManagerDataSourceData = ManagerDataSource.TestResourceData()
-		ManagerDataSourceData.SetId("100")
+		SamlDataSourceData = SamlDataSource.TestResourceData()
+		SamlDataSourceData.SetId("100")
 		server = ghttp.NewTLSServer()
 		host_port := strings.Split(server.Addr(), ":")
 		host := host_port[0]
@@ -86,24 +69,27 @@ var _ = Describe(" Manager", func() {
 	)
 	Describe("Validating Datasource Read", func() {
 		Context("Read A datasource", func() {
-			It("Datasource:Manager ,reads", func() {
+			It("Datasource:Saml ,reads", func() {
 				var ctx context.Context = context.Background()
 				var output bytes.Buffer
 				var guid = "11111-11111-11111-11111-11111"
 
-				resource := api_latest.Manager{}
+				resource := api_latest.Saml{}
 				json.Unmarshal([]byte(model_json), &resource)
-				ManagerDataSourceData.SetId(guid)
+				SamlDataSourceData.SetId(guid)
 				resource.Guid = guid
 				b, err := json.Marshal(&resource)
 				Expect(err).To(BeNil())
 				values := url.Values{}
 
-				values.Add("username", fmt.Sprintf("%v", resource.Username))
-				ManagerDataSourceData.Set("username", resource.Username)
+				values.Add("idp_name", fmt.Sprintf("%v", resource.IdpName))
+				SamlDataSourceData.Set("idp_name", resource.IdpName)
+
+				values.Add("vms_id", fmt.Sprintf("%v", resource.VmsId))
+				SamlDataSourceData.Set("vms_id", resource.VmsId)
 
 				server.AppendHandlers(ghttp.CombineHandlers(
-					ghttp.VerifyRequest("GET", "managers", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
+					ghttp.VerifyRequest("GET", "vms/%v/saml_config", values.Encode()), //since this is a test http server and will not return id upon POST (creation) so json will use the zero value
 					ghttp.RespondWith(200, `[`+string(b)+`]`),
 				),
 				)
@@ -111,14 +97,14 @@ var _ = Describe(" Manager", func() {
 				ctx = tflogtest.RootLogger(ctx, &output)
 				e := client.Start()
 				Expect(e).To(BeNil())
-				d := ReadContext(ctx, ManagerDataSourceData, client)
+				d := ReadContext(ctx, SamlDataSourceData, client)
 				Expect(d).To(BeNil())
 
 				o := new(map[string]interface{})
 				json.Unmarshal(b, o)
 				z := make(map[string]string)
 				utils.MapToTFSchema(*o, &z, "")
-				attributes := ManagerDataSourceData.State().Attributes
+				attributes := SamlDataSourceData.State().Attributes
 				for k, v := range z {
 					Expect(attributes).To(HaveKeyWithValue(k, v))
 				}

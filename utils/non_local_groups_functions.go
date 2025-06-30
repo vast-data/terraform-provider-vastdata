@@ -154,7 +154,7 @@ func NonLocalGroupImportFunc(ctx context.Context, _client interface{}, attr map[
 	return mimickedResponse, nil
 }
 
-func NonLocalGroupProcessingFunc(ctx context.Context, response *http.Response) ([]byte, error) {
+func NonLocalGroupProcessingFunc(ctx context.Context, response *http.Response, d *schema.ResourceData) ([]byte, error) {
 	mimickedResponse, err := mimicListResponseForSingularNonLocalGroup(ctx, response)
 	if err != nil {
 		return nil, err

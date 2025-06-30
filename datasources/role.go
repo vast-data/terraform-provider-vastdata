@@ -113,7 +113,10 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 	name := d.Get("name")
 	values.Add("name", fmt.Sprintf("%v", name))
 
-	response, err := client.Get(ctx, utils.GenPath("roles"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"roles",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -125,7 +128,7 @@ func dataSourceRoleRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	}
 	resource_l := []api_latest.Role{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

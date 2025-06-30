@@ -193,3 +193,21 @@ func SamlImportFunc(ctx context.Context, _client interface{}, attr map[string]in
 	list = append(list, unmarshalledBody)
 	return FakeHttpResponseAny(response, list)
 }
+
+func SamlProcessingFunc(ctx context.Context, response *http.Response, d *schema.ResourceData) ([]byte, error) {
+	vmsId := d.Get("vms_id").(int)
+	idpName := d.Get("idp_name").(string)
+	unmarshalledBody, err := unmarshallBody(response, vmsId, idpName, "")
+	if err != nil {
+		return nil, err
+	}
+	var list []*map[string]interface{}
+	list = append(list, unmarshalledBody)
+	fakeResponse, err := FakeHttpResponseAny(response, list)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(fakeResponse.Body)
+	tflog.Debug(ctx, fmt.Sprintf("HTTP Response body %s", string(body)))
+	return body, err
+}

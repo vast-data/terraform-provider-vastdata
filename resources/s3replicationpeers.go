@@ -334,7 +334,7 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -550,7 +550,7 @@ func resourceS3replicationPeersImporter(ctx context.Context, d *schema.ResourceD
 	}
 
 	var resourceList []api_latest.S3replicationPeers
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err
