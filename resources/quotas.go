@@ -40,7 +40,7 @@ func ResourceQuota() *schema.Resource {
 func getResourceQuotaSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Quota guid`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name`,
 		},
 
-		"state": &schema.Schema{
+		"state": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("state"),
 
@@ -68,7 +68,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"pretty_state": &schema.Schema{
+		"pretty_state": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("pretty_state"),
 
@@ -78,7 +78,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"path": &schema.Schema{
+		"path": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("path"),
 
@@ -88,7 +88,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Directory path`,
 		},
 
-		"pretty_grace_period": &schema.Schema{
+		"pretty_grace_period": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("pretty_grace_period"),
 
@@ -98,7 +98,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m`,
 		},
 
-		"grace_period": &schema.Schema{
+		"grace_period": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("grace_period"),
 
@@ -109,7 +109,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: utils.GracePeriodFormatValidation,
 		},
 
-		"time_to_block": &schema.Schema{
+		"time_to_block": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("time_to_block"),
 
@@ -119,7 +119,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time`,
 		},
 
-		"soft_limit": &schema.Schema{
+		"soft_limit": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("soft_limit"),
 
@@ -129,7 +129,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit`,
 		},
 
-		"hard_limit": &schema.Schema{
+		"hard_limit": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("hard_limit"),
 
@@ -139,7 +139,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit`,
 		},
 
-		"hard_limit_inodes": &schema.Schema{
+		"hard_limit_inodes": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("hard_limit_inodes"),
 
@@ -149,7 +149,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit`,
 		},
 
-		"soft_limit_inodes": &schema.Schema{
+		"soft_limit_inodes": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("soft_limit_inodes"),
 
@@ -159,7 +159,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit`,
 		},
 
-		"used_inodes": &schema.Schema{
+		"used_inodes": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_inodes"),
 
@@ -169,7 +169,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes`,
 		},
 
-		"used_capacity": &schema.Schema{
+		"used_capacity": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_capacity"),
 
@@ -179,7 +179,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes`,
 		},
 
-		"used_capacity_tb": &schema.Schema{
+		"used_capacity_tb": {
 			Type:          schema.TypeFloat,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_capacity_tb"),
 
@@ -189,7 +189,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in TB`,
 		},
 
-		"used_effective_capacity": &schema.Schema{
+		"used_effective_capacity": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_effective_capacity"),
 
@@ -199,7 +199,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in bytes`,
 		},
 
-		"used_effective_capacity_tb": &schema.Schema{
+		"used_effective_capacity_tb": {
 			Type:          schema.TypeFloat,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("used_effective_capacity_tb"),
 
@@ -209,7 +209,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in TB`,
 		},
 
-		"tenant_id": &schema.Schema{
+		"tenant_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("tenant_id"),
 
@@ -219,7 +219,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID`,
 		},
 
-		"tenant_name": &schema.Schema{
+		"tenant_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("tenant_name"),
 
@@ -229,7 +229,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant Name`,
 		},
 
-		"cluster": &schema.Schema{
+		"cluster": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("cluster"),
 
@@ -239,7 +239,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
 		},
 
-		"cluster_id": &schema.Schema{
+		"cluster_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("cluster_id"),
 
@@ -249,7 +249,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID`,
 		},
 
-		"system_id": &schema.Schema{
+		"system_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("system_id"),
 
@@ -259,7 +259,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"is_user_quota": &schema.Schema{
+		"is_user_quota": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("is_user_quota"),
 
@@ -269,7 +269,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"enable_email_providers": &schema.Schema{
+		"enable_email_providers": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("enable_email_providers"),
 
@@ -279,7 +279,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"num_exceeded_users": &schema.Schema{
+		"num_exceeded_users": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("num_exceeded_users"),
 
@@ -289,7 +289,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"num_blocked_users": &schema.Schema{
+		"num_blocked_users": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("num_blocked_users"),
 
@@ -299,7 +299,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"enable_alarms": &schema.Schema{
+		"enable_alarms": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("enable_alarms"),
 
@@ -309,7 +309,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enable alarms when users or groups are exceeding their limit`,
 		},
 
-		"default_email": &schema.Schema{
+		"default_email": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("default_email"),
 
@@ -319,7 +319,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The default Email if there is no suffix and no address in the providers`,
 		},
 
-		"percent_inodes": &schema.Schema{
+		"percent_inodes": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("percent_inodes"),
 
@@ -329,7 +329,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used inodes out of the hard limit`,
 		},
 
-		"percent_capacity": &schema.Schema{
+		"percent_capacity": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("percent_capacity"),
 
@@ -339,7 +339,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used capacity out of the hard limit`,
 		},
 
-		"default_user_quota": &schema.Schema{
+		"default_user_quota": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("default_user_quota"),
 
@@ -351,7 +351,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"quota_system_id": &schema.Schema{
+					"quota_system_id": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("quota_system_id"),
 
@@ -361,7 +361,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The system ID of the quota`,
 					},
 
-					"soft_limit": &schema.Schema{
+					"soft_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("soft_limit"),
 
@@ -371,7 +371,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The size soft limit in bytes`,
 					},
 
-					"hard_limit": &schema.Schema{
+					"hard_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit"),
 
@@ -381,7 +381,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The size hard limit in bytes`,
 					},
 
-					"sof_limit_inodes": &schema.Schema{
+					"sof_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("sof_limit_inodes"),
 
@@ -391,7 +391,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The sof limit of inodes number`,
 					},
 
-					"hard_limit_inodes": &schema.Schema{
+					"hard_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit_inodes"),
 
@@ -401,7 +401,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit in inode number`,
 					},
 
-					"grace_period": &schema.Schema{
+					"grace_period": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("grace_period"),
 
@@ -415,7 +415,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"default_group_quota": &schema.Schema{
+		"default_group_quota": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("default_group_quota"),
 
@@ -427,7 +427,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"quota_system_id": &schema.Schema{
+					"quota_system_id": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("quota_system_id"),
 
@@ -437,7 +437,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The system ID of the quota`,
 					},
 
-					"soft_limit": &schema.Schema{
+					"soft_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("soft_limit"),
 
@@ -447,7 +447,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The size soft limit in bytes`,
 					},
 
-					"hard_limit": &schema.Schema{
+					"hard_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit"),
 
@@ -457,7 +457,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The size hard limit in bytes`,
 					},
 
-					"sof_limit_inodes": &schema.Schema{
+					"sof_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("sof_limit_inodes"),
 
@@ -467,7 +467,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The sof limit of inodes number`,
 					},
 
-					"hard_limit_inodes": &schema.Schema{
+					"hard_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("hard_limit_inodes"),
 
@@ -477,7 +477,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit in inode number`,
 					},
 
-					"grace_period": &schema.Schema{
+					"grace_period": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("DefaultQuota").GetConflictingFields("grace_period"),
 
@@ -491,7 +491,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"user_quotas": &schema.Schema{
+		"user_quotas": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("user_quotas"),
 
@@ -503,7 +503,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"grace_period": &schema.Schema{
+					"grace_period": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
 
@@ -514,7 +514,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
 					},
 
-					"time_to_block": &schema.Schema{
+					"time_to_block": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("time_to_block"),
 
@@ -524,7 +524,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time`,
 					},
 
-					"soft_limit": &schema.Schema{
+					"soft_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit"),
 
@@ -534,7 +534,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit`,
 					},
 
-					"hard_limit": &schema.Schema{
+					"hard_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit"),
 
@@ -544,7 +544,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit`,
 					},
 
-					"hard_limit_inodes": &schema.Schema{
+					"hard_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit_inodes"),
 
@@ -554,7 +554,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit`,
 					},
 
-					"soft_limit_inodes": &schema.Schema{
+					"soft_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit_inodes"),
 
@@ -564,7 +564,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit`,
 					},
 
-					"used_inodes": &schema.Schema{
+					"used_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_inodes"),
 
@@ -574,7 +574,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes`,
 					},
 
-					"used_capacity": &schema.Schema{
+					"used_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_capacity"),
 
@@ -584,7 +584,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes`,
 					},
 
-					"is_accountable": &schema.Schema{
+					"is_accountable": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("is_accountable"),
 
@@ -594,7 +594,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 					},
 
-					"quota_system_id": &schema.Schema{
+					"quota_system_id": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("quota_system_id"),
 
@@ -604,7 +604,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 					},
 
-					"entity": &schema.Schema{
+					"entity": {
 						Type:          schema.TypeList,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("entity"),
 
@@ -616,7 +616,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 
-								"name": &schema.Schema{
+								"name": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("name"),
 
@@ -626,7 +626,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the entity`,
 								},
 
-								"vast_id": &schema.Schema{
+								"vast_id": {
 									Type:          schema.TypeInt,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("vast_id"),
 
@@ -636,7 +636,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"email": &schema.Schema{
+								"email": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
 
@@ -646,7 +646,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"is_group": &schema.Schema{
+								"is_group": {
 									Type:          schema.TypeBool,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
 
@@ -656,7 +656,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"identifier": &schema.Schema{
+								"identifier": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
 
@@ -664,7 +664,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"identifier_type": &schema.Schema{
+								"identifier_type": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
 
@@ -680,7 +680,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"group_quotas": &schema.Schema{
+		"group_quotas": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("Quota").GetConflictingFields("group_quotas"),
 
@@ -692,7 +692,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"grace_period": &schema.Schema{
+					"grace_period": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("grace_period"),
 
@@ -703,7 +703,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						ValidateDiagFunc: utils.GracePeriodFormatValidation,
 					},
 
-					"time_to_block": &schema.Schema{
+					"time_to_block": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("time_to_block"),
 
@@ -713,7 +713,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time`,
 					},
 
-					"soft_limit": &schema.Schema{
+					"soft_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit"),
 
@@ -723,7 +723,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit`,
 					},
 
-					"hard_limit": &schema.Schema{
+					"hard_limit": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit"),
 
@@ -733,7 +733,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit`,
 					},
 
-					"hard_limit_inodes": &schema.Schema{
+					"hard_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("hard_limit_inodes"),
 
@@ -743,7 +743,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit`,
 					},
 
-					"soft_limit_inodes": &schema.Schema{
+					"soft_limit_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("soft_limit_inodes"),
 
@@ -753,7 +753,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit`,
 					},
 
-					"used_inodes": &schema.Schema{
+					"used_inodes": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_inodes"),
 
@@ -763,7 +763,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes`,
 					},
 
-					"used_capacity": &schema.Schema{
+					"used_capacity": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("used_capacity"),
 
@@ -773,7 +773,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes`,
 					},
 
-					"is_accountable": &schema.Schema{
+					"is_accountable": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("is_accountable"),
 
@@ -783,7 +783,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 					},
 
-					"quota_system_id": &schema.Schema{
+					"quota_system_id": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("quota_system_id"),
 
@@ -793,7 +793,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 					},
 
-					"entity": &schema.Schema{
+					"entity": {
 						Type:          schema.TypeList,
 						ConflictsWith: codegen_configs.GetResourceByName("UserQuota").GetConflictingFields("entity"),
 
@@ -805,7 +805,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 
-								"name": &schema.Schema{
+								"name": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("name"),
 
@@ -815,7 +815,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the entity`,
 								},
 
-								"vast_id": &schema.Schema{
+								"vast_id": {
 									Type:          schema.TypeInt,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("vast_id"),
 
@@ -825,7 +825,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"email": &schema.Schema{
+								"email": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("email"),
 
@@ -835,7 +835,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"is_group": &schema.Schema{
+								"is_group": {
 									Type:          schema.TypeBool,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("is_group"),
 
@@ -845,7 +845,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"identifier": &schema.Schema{
+								"identifier": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier"),
 
@@ -853,7 +853,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"identifier_type": &schema.Schema{
+								"identifier_type": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("QuotaEntityInfo").GetConflictingFields("identifier_type"),
 
@@ -871,7 +871,7 @@ func getResourceQuotaSchema() map[string]*schema.Schema {
 	}
 }
 
-var Quota_names_mapping map[string][]string = map[string][]string{}
+var QuotaNamesMapping = map[string][]string{}
 
 func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.Quota, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -884,7 +884,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -896,7 +896,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -908,7 +908,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"state\"",
+			Summary:  "Error occurred setting value to \"state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -920,7 +920,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"pretty_state\"",
+			Summary:  "Error occurred setting value to \"pretty_state\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -932,7 +932,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"path\"",
+			Summary:  "Error occurred setting value to \"path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -944,7 +944,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"pretty_grace_period\"",
+			Summary:  "Error occurred setting value to \"pretty_grace_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -956,7 +956,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"grace_period\"",
+			Summary:  "Error occurred setting value to \"grace_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -968,7 +968,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"time_to_block\"",
+			Summary:  "Error occurred setting value to \"time_to_block\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -980,7 +980,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"soft_limit\"",
+			Summary:  "Error occurred setting value to \"soft_limit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -992,7 +992,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"hard_limit\"",
+			Summary:  "Error occurred setting value to \"hard_limit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1004,7 +1004,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"hard_limit_inodes\"",
+			Summary:  "Error occurred setting value to \"hard_limit_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1016,7 +1016,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"soft_limit_inodes\"",
+			Summary:  "Error occurred setting value to \"soft_limit_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1028,7 +1028,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_inodes\"",
+			Summary:  "Error occurred setting value to \"used_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1040,7 +1040,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_capacity\"",
+			Summary:  "Error occurred setting value to \"used_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1052,7 +1052,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_capacity_tb\"",
+			Summary:  "Error occurred setting value to \"used_capacity_tb\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1064,7 +1064,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_effective_capacity\"",
+			Summary:  "Error occurred setting value to \"used_effective_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1076,7 +1076,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"used_effective_capacity_tb\"",
+			Summary:  "Error occurred setting value to \"used_effective_capacity_tb\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1088,7 +1088,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1100,7 +1100,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_name\"",
+			Summary:  "Error occurred setting value to \"tenant_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1112,7 +1112,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster\"",
+			Summary:  "Error occurred setting value to \"cluster\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1124,7 +1124,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster_id\"",
+			Summary:  "Error occurred setting value to \"cluster_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1136,7 +1136,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"system_id\"",
+			Summary:  "Error occurred setting value to \"system_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1148,7 +1148,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_user_quota\"",
+			Summary:  "Error occurred setting value to \"is_user_quota\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1160,7 +1160,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enable_email_providers\"",
+			Summary:  "Error occurred setting value to \"enable_email_providers\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1172,7 +1172,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"num_exceeded_users\"",
+			Summary:  "Error occurred setting value to \"num_exceeded_users\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1184,7 +1184,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"num_blocked_users\"",
+			Summary:  "Error occurred setting value to \"num_blocked_users\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1196,7 +1196,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enable_alarms\"",
+			Summary:  "Error occurred setting value to \"enable_alarms\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1208,7 +1208,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_email\"",
+			Summary:  "Error occurred setting value to \"default_email\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1220,7 +1220,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"percent_inodes\"",
+			Summary:  "Error occurred setting value to \"percent_inodes\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1232,7 +1232,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"percent_capacity\"",
+			Summary:  "Error occurred setting value to \"percent_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1245,7 +1245,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_user_quota\"",
+			Summary:  "Error occurred setting value to \"default_user_quota\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1258,7 +1258,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_group_quota\"",
+			Summary:  "Error occurred setting value to \"default_group_quota\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1270,7 +1270,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"user_quotas\"",
+			Summary:  "Error occurred setting value to \"user_quotas\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1282,7 +1282,7 @@ func ResourceQuotaReadStructIntoSchema(ctx context.Context, resource api_latest.
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"group_quotas\"",
+			Summary:  "Error occurred setting value to \"group_quotas\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1294,39 +1294,50 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Quota")
+	resourceConfig := codegen_configs.GetResourceByName("Quota")
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceQuotaRead] Calling Get Function : %v for resource Quota", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceQuotaRead] Calling Get Function : %v for resource Quota", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	if err != nil {
+	var body []byte
+	var resource api_latest.Quota
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
-
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.Quota{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -1340,10 +1351,10 @@ func resourceQuotaRead(ctx context.Context, d *schema.ResourceData, m interface{
 func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Quota")
+	resourceConfig := codegen_configs.GetResourceByName("Quota")
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -1354,7 +1365,7 @@ func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -1365,44 +1376,44 @@ func resourceQuotaDelete(ctx context.Context, d *schema.ResourceData, m interfac
 }
 
 func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Quota_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, QuotaNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Quota")
+	resourceConfig := codegen_configs.GetResourceByName("Quota")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource Quota"))
-	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
+	reflectQuota := reflect.TypeOf((*api_latest.Quota)(nil))
+	utils.PopulateResourceMap(newCtx, reflectQuota.Elem(), d, &data, "", false)
 
 	var before_post_error error
-	data, before_post_error = resource_config.BeforePostFunc(data, client, ctx, d)
+	data, before_post_error = resourceConfig.BeforePostFunc(data, client, ctx, d)
 	if before_post_error != nil {
 		return diag.FromErr(before_post_error)
 	}
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Quota")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Quota")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Quota", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "Quota", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -1417,22 +1428,22 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.Quota{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1442,7 +1453,7 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1451,51 +1462,51 @@ func resourceQuotaCreate(ctx context.Context, d *schema.ResourceData, m interfac
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceQuotaRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceQuotaRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, Quota_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, QuotaNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("Quota")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "Quota")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("Quota")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "Quota")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "Quota", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "Quota", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource Quota"))
-	reflect_Quota := reflect.TypeOf((*api_latest.Quota)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_Quota.Elem(), d, &data, "", false)
+	reflectQuota := reflect.TypeOf((*api_latest.Quota)(nil))
+	utils.PopulateResourceMap(newCtx, reflectQuota.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -1510,14 +1521,14 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  Quota %v", patchErr))
+	if patchErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -1529,18 +1540,18 @@ func resourceQuotaUpdate(ctx context.Context, d *schema.ResourceData, m interfac
 
 func resourceQuotaImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("Quota")
+	resourceConfig := codegen_configs.GetResourceByName("Quota")
 	attrs := map[string]interface{}{"path": utils.GenPath("quotas")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.Quota{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.Quota
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
@@ -1550,28 +1561,28 @@ func resourceQuotaImporter(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceQuotaReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

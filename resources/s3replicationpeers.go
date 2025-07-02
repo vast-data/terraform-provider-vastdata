@@ -40,7 +40,7 @@ func ResourceS3replicationPeers() *schema.Resource {
 func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the s3 replication peer configuration`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("name"),
 
@@ -58,7 +58,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the s3 replication peer configuration`,
 		},
 
-		"url": &schema.Schema{
+		"url": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("url"),
 
@@ -68,7 +68,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the s3 replication peer configurations`,
 		},
 
-		"bucket_name": &schema.Schema{
+		"bucket_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("bucket_name"),
 
@@ -78,7 +78,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer bucket to replicate to`,
 		},
 
-		"http_protocol": &schema.Schema{
+		"http_protocol": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("http_protocol"),
 
@@ -88,7 +88,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The http protocol user http/https`,
 		},
 
-		"type_": &schema.Schema{
+		"type_": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("type_"),
 
@@ -98,7 +98,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: ``,
 		},
 
-		"proxies": &schema.Schema{
+		"proxies": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("proxies"),
 
@@ -112,7 +112,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"aws_region": &schema.Schema{
+		"aws_region": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("aws_region"),
 
@@ -122,7 +122,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The Bucket AWS region, Valid only when type is AWS_S3`,
 		},
 
-		"access_key": &schema.Schema{
+		"access_key": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("access_key"),
 
@@ -135,7 +135,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 access key`,
 		},
 
-		"secret_key": &schema.Schema{
+		"secret_key": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("secret_key"),
 
@@ -148,7 +148,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 secret key`,
 		},
 
-		"custom_bucket_url": &schema.Schema{
+		"custom_bucket_url": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("S3replicationPeers").GetConflictingFields("custom_bucket_url"),
 
@@ -160,7 +160,7 @@ func getResourceS3replicationPeersSchema() map[string]*schema.Schema {
 	}
 }
 
-var S3replicationPeers_names_mapping map[string][]string = map[string][]string{}
+var S3replicationPeersNamesMapping = map[string][]string{}
 
 func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resource api_latest.S3replicationPeers, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -173,7 +173,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -185,7 +185,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -197,7 +197,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"url\"",
+			Summary:  "Error occurred setting value to \"url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -209,7 +209,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_name\"",
+			Summary:  "Error occurred setting value to \"bucket_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -221,7 +221,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"http_protocol\"",
+			Summary:  "Error occurred setting value to \"http_protocol\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -233,7 +233,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"type_\"",
+			Summary:  "Error occurred setting value to \"type_\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -245,7 +245,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"proxies\"",
+			Summary:  "Error occurred setting value to \"proxies\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -257,7 +257,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"aws_region\"",
+			Summary:  "Error occurred setting value to \"aws_region\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -269,7 +269,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"access_key\"",
+			Summary:  "Error occurred setting value to \"access_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -281,7 +281,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"secret_key\"",
+			Summary:  "Error occurred setting value to \"secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -293,7 +293,7 @@ func ResourceS3replicationPeersReadStructIntoSchema(ctx context.Context, resourc
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"custom_bucket_url\"",
+			Summary:  "Error occurred setting value to \"custom_bucket_url\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -305,39 +305,50 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
+	resourceConfig := codegen_configs.GetResourceByName("S3replicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceS3replicationPeersRead] Calling Get Function : %v for resource S3replicationPeers", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceS3replicationPeersRead] Calling Get Function : %v for resource S3replicationPeers", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	if err != nil {
+	var body []byte
+	var resource api_latest.S3replicationPeers
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
-
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.S3replicationPeers{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -351,10 +362,10 @@ func resourceS3replicationPeersRead(ctx context.Context, d *schema.ResourceData,
 func resourceS3replicationPeersDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
+	resourceConfig := codegen_configs.GetResourceByName("S3replicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -365,7 +376,7 @@ func resourceS3replicationPeersDelete(ctx context.Context, d *schema.ResourceDat
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -376,38 +387,38 @@ func resourceS3replicationPeersDelete(ctx context.Context, d *schema.ResourceDat
 }
 
 func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, S3replicationPeers_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, S3replicationPeersNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
+	resourceConfig := codegen_configs.GetResourceByName("S3replicationPeers")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource S3replicationPeers"))
-	reflect_S3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_S3replicationPeers.Elem(), d, &data, "", false)
+	reflectS3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
+	utils.PopulateResourceMap(newCtx, reflectS3replicationPeers.Elem(), d, &data, "", false)
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3replicationPeers")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "S3replicationPeers")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3replicationPeers", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "S3replicationPeers", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -422,22 +433,22 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3replicationPeers %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3replicationPeers %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.S3replicationPeers{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -447,7 +458,7 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -456,46 +467,46 @@ func resourceS3replicationPeersCreate(ctx context.Context, d *schema.ResourceDat
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceS3replicationPeersRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceS3replicationPeersRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, S3replicationPeers_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, S3replicationPeersNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "S3replicationPeers")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("S3replicationPeers")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "S3replicationPeers")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "S3replicationPeers", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "S3replicationPeers", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource S3replicationPeers"))
-	reflect_S3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_S3replicationPeers.Elem(), d, &data, "", false)
+	reflectS3replicationPeers := reflect.TypeOf((*api_latest.S3replicationPeers)(nil))
+	utils.PopulateResourceMap(newCtx, reflectS3replicationPeers.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -509,14 +520,14 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3replicationPeers %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  S3replicationPeers %v", patchErr))
+	if patchErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -528,44 +539,44 @@ func resourceS3replicationPeersUpdate(ctx context.Context, d *schema.ResourceDat
 
 func resourceS3replicationPeersImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("S3replicationPeers")
+	resourceConfig := codegen_configs.GetResourceByName("S3replicationPeers")
 	attrs := map[string]interface{}{"path": utils.GenPath("replicationtargets")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.S3replicationPeers{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.S3replicationPeers
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceS3replicationPeersReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

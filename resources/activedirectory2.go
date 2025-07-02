@@ -40,7 +40,7 @@ func ResourceActiveDirectory2() *schema.Resource {
 func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) A uniqe ID given to this resource`,
 		},
 
-		"machine_account_name": &schema.Schema{
+		"machine_account_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("machine_account_name"),
 
@@ -59,7 +59,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			ForceNew:    true,
 		},
 
-		"organizational_unit": &schema.Schema{
+		"organizational_unit": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("organizational_unit"),
 
@@ -70,7 +70,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			ForceNew:    true,
 		},
 
-		"smb_allowed": &schema.Schema{
+		"smb_allowed": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("smb_allowed"),
 
@@ -82,7 +82,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: true,
 		},
 
-		"ntlm_enabled": &schema.Schema{
+		"ntlm_enabled": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("ntlm_enabled"),
 
@@ -94,7 +94,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: true,
 		},
 
-		"use_auto_discovery": &schema.Schema{
+		"use_auto_discovery": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_auto_discovery"),
 
@@ -106,7 +106,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"use_ldaps": &schema.Schema{
+		"use_ldaps": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_ldaps"),
 
@@ -118,7 +118,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"port": &schema.Schema{
+		"port": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("port"),
 
@@ -130,7 +130,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: 389,
 		},
 
-		"binddn": &schema.Schema{
+		"binddn": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("binddn"),
 
@@ -140,7 +140,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Distinguished name of AD superuser`,
 		},
 
-		"searchbase": &schema.Schema{
+		"searchbase": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("searchbase"),
 
@@ -150,7 +150,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The Base DN is the starting point the AD provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
 		},
 
-		"domain_name": &schema.Schema{
+		"domain_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("domain_name"),
 
@@ -160,7 +160,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) FQDN of the domain.`,
 		},
 
-		"method": &schema.Schema{
+		"method": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("method"),
 
@@ -174,7 +174,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: "simple",
 		},
 
-		"query_groups_mode": &schema.Schema{
+		"query_groups_mode": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("query_groups_mode"),
 
@@ -188,7 +188,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: "COMPATIBLE",
 		},
 
-		"posix_attributes_source": &schema.Schema{
+		"posix_attributes_source": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("posix_attributes_source"),
 
@@ -200,7 +200,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: "JOINED_DOMAIN",
 		},
 
-		"use_tls": &schema.Schema{
+		"use_tls": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_tls"),
 
@@ -212,7 +212,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"tls_certificate": &schema.Schema{
+		"tls_certificate": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("tls_certificate"),
 
@@ -222,7 +222,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) TLS certificate to use for verifying the remote AD server’s TLS certificate.`,
 		},
 
-		"reverse_lookup": &schema.Schema{
+		"reverse_lookup": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("reverse_lookup"),
 
@@ -234,7 +234,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"gid_number": &schema.Schema{
+		"gid_number": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("gid_number"),
 
@@ -244,7 +244,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the AD server that contains the UID number, if different from ‘uidNumber’. Often when binding VAST Cluster to AD this does not need to be set.`,
 		},
 
-		"use_multi_forest": &schema.Schema{
+		"use_multi_forest": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("use_multi_forest"),
 
@@ -256,7 +256,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"uid": &schema.Schema{
+		"uid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid"),
 
@@ -266,7 +266,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the AD server that contains the user name, if different from ‘uid’ When binding VAST Cluster to AD, you may need to set this to ‘sAMAccountname’.`,
 		},
 
-		"uid_number": &schema.Schema{
+		"uid_number": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid_number"),
 
@@ -276,7 +276,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the AD server that contains the UID number, if different from ‘uidNumber’. Often when binding VAST Cluster to AD this does not need to be set.`,
 		},
 
-		"match_user": &schema.Schema{
+		"match_user": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("match_user"),
 
@@ -286,7 +286,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.`,
 		},
 
-		"uid_member_value_property_name": &schema.Schema{
+		"uid_member_value_property_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid_member_value_property_name"),
 
@@ -296,7 +296,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute which represents the value of the AD group’s member property.`,
 		},
 
-		"uid_member": &schema.Schema{
+		"uid_member": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("uid_member"),
 
@@ -306,7 +306,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a group entry on the AD server that contains names of group members, if different from ‘memberUid’. When binding VAST Cluster to AD, you may need to set this to ‘memberUID’.`,
 		},
 
-		"posix_account": &schema.Schema{
+		"posix_account": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("posix_account"),
 
@@ -316,7 +316,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The object class that defines a user entry on the AD server, if different from ‘posixAccount’. When binding VAST Cluster to AD, set this parameter to ‘user’ in order for authorization to work properly.`,
 		},
 
-		"posix_group": &schema.Schema{
+		"posix_group": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("posix_group"),
 
@@ -326,7 +326,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0)  The object class that defines a group entry on the AD server, if different from ‘posixGroup’. When binding VAST Cluster to AD, set this parameter to ‘group’ in order for authorization to work properly.`,
 		},
 
-		"username_property_name": &schema.Schema{
+		"username_property_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("username_property_name"),
 
@@ -336,7 +336,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The attribute to use for querying users in VMS user-initated user queries. Default is ‘name’. Sometimes set to ‘cn’`,
 		},
 
-		"user_login_name": &schema.Schema{
+		"user_login_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("user_login_name"),
 
@@ -346,7 +346,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 		},
 
-		"group_login_name": &schema.Schema{
+		"group_login_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("group_login_name"),
 
@@ -356,7 +356,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
 		},
 
-		"mail_property_name": &schema.Schema{
+		"mail_property_name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("mail_property_name"),
 
@@ -366,7 +366,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute to use for the user’s email address.`,
 		},
 
-		"is_vms_auth_provider": &schema.Schema{
+		"is_vms_auth_provider": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("is_vms_auth_provider"),
 
@@ -378,7 +378,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Default: false,
 		},
 
-		"bindpw": &schema.Schema{
+		"bindpw": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("bindpw"),
 
@@ -391,7 +391,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The password used with the Bind DN to authenticate to the AD server.`,
 		},
 
-		"urls": &schema.Schema{
+		"urls": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("ActiveDirectory2").GetConflictingFields("urls"),
 
@@ -407,7 +407,7 @@ func getResourceActiveDirectory2Schema() map[string]*schema.Schema {
 	}
 }
 
-var ActiveDirectory2_names_mapping map[string][]string = map[string][]string{}
+var ActiveDirectory2NamesMapping = map[string][]string{}
 
 func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource api_latest.ActiveDirectory2, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -420,7 +420,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -432,7 +432,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"machine_account_name\"",
+			Summary:  "Error occurred setting value to \"machine_account_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -444,7 +444,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"organizational_unit\"",
+			Summary:  "Error occurred setting value to \"organizational_unit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -456,7 +456,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"smb_allowed\"",
+			Summary:  "Error occurred setting value to \"smb_allowed\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -468,7 +468,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ntlm_enabled\"",
+			Summary:  "Error occurred setting value to \"ntlm_enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -480,7 +480,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_auto_discovery\"",
+			Summary:  "Error occurred setting value to \"use_auto_discovery\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -492,7 +492,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_ldaps\"",
+			Summary:  "Error occurred setting value to \"use_ldaps\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -504,7 +504,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"port\"",
+			Summary:  "Error occurred setting value to \"port\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -516,7 +516,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"binddn\"",
+			Summary:  "Error occurred setting value to \"binddn\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -528,7 +528,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"searchbase\"",
+			Summary:  "Error occurred setting value to \"searchbase\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -540,7 +540,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"domain_name\"",
+			Summary:  "Error occurred setting value to \"domain_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -552,7 +552,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"method\"",
+			Summary:  "Error occurred setting value to \"method\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -564,7 +564,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"query_groups_mode\"",
+			Summary:  "Error occurred setting value to \"query_groups_mode\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -576,7 +576,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_attributes_source\"",
+			Summary:  "Error occurred setting value to \"posix_attributes_source\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -588,7 +588,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_tls\"",
+			Summary:  "Error occurred setting value to \"use_tls\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -600,7 +600,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tls_certificate\"",
+			Summary:  "Error occurred setting value to \"tls_certificate\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -612,7 +612,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"reverse_lookup\"",
+			Summary:  "Error occurred setting value to \"reverse_lookup\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -624,7 +624,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"gid_number\"",
+			Summary:  "Error occurred setting value to \"gid_number\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -636,7 +636,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"use_multi_forest\"",
+			Summary:  "Error occurred setting value to \"use_multi_forest\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -648,7 +648,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -660,7 +660,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_number\"",
+			Summary:  "Error occurred setting value to \"uid_number\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -672,7 +672,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"match_user\"",
+			Summary:  "Error occurred setting value to \"match_user\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -684,7 +684,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member_value_property_name\"",
+			Summary:  "Error occurred setting value to \"uid_member_value_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -696,7 +696,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid_member\"",
+			Summary:  "Error occurred setting value to \"uid_member\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -708,7 +708,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_account\"",
+			Summary:  "Error occurred setting value to \"posix_account\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -720,7 +720,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"posix_group\"",
+			Summary:  "Error occurred setting value to \"posix_group\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -732,7 +732,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"username_property_name\"",
+			Summary:  "Error occurred setting value to \"username_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -744,7 +744,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"user_login_name\"",
+			Summary:  "Error occurred setting value to \"user_login_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -756,7 +756,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"group_login_name\"",
+			Summary:  "Error occurred setting value to \"group_login_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -768,7 +768,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"mail_property_name\"",
+			Summary:  "Error occurred setting value to \"mail_property_name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -780,7 +780,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_vms_auth_provider\"",
+			Summary:  "Error occurred setting value to \"is_vms_auth_provider\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -792,7 +792,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bindpw\"",
+			Summary:  "Error occurred setting value to \"bindpw\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -804,7 +804,7 @@ func ResourceActiveDirectory2ReadStructIntoSchema(ctx context.Context, resource 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"urls\"",
+			Summary:  "Error occurred setting value to \"urls\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -816,39 +816,50 @@ func resourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData, m
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ActiveDirectory2")
+	resourceConfig := codegen_configs.GetResourceByName("ActiveDirectory2")
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceActiveDirectory2Read] Calling Get Function : %v for resource ActiveDirectory2", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceActiveDirectory2Read] Calling Get Function : %v for resource ActiveDirectory2", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	if err != nil {
+	var body []byte
+	var resource api_latest.ActiveDirectory2
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
-
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.ActiveDirectory2{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -862,10 +873,10 @@ func resourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData, m
 func resourceActiveDirectory2Delete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ActiveDirectory2")
+	resourceConfig := codegen_configs.GetResourceByName("ActiveDirectory2")
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -876,7 +887,7 @@ func resourceActiveDirectory2Delete(ctx context.Context, d *schema.ResourceData,
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -887,38 +898,38 @@ func resourceActiveDirectory2Delete(ctx context.Context, d *schema.ResourceData,
 }
 
 func resourceActiveDirectory2Create(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, ActiveDirectory2_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ActiveDirectory2NamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ActiveDirectory2")
+	resourceConfig := codegen_configs.GetResourceByName("ActiveDirectory2")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource ActiveDirectory2"))
-	reflect_ActiveDirectory2 := reflect.TypeOf((*api_latest.ActiveDirectory2)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_ActiveDirectory2.Elem(), d, &data, "", false)
+	reflectActiveDirectory2 := reflect.TypeOf((*api_latest.ActiveDirectory2)(nil))
+	utils.PopulateResourceMap(newCtx, reflectActiveDirectory2.Elem(), d, &data, "", false)
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ActiveDirectory2")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "ActiveDirectory2")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ActiveDirectory2", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "ActiveDirectory2", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -933,22 +944,22 @@ func resourceActiveDirectory2Create(ctx context.Context, d *schema.ResourceData,
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory2 %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory2 %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.ActiveDirectory2{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -958,7 +969,7 @@ func resourceActiveDirectory2Create(ctx context.Context, d *schema.ResourceData,
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -967,46 +978,46 @@ func resourceActiveDirectory2Create(ctx context.Context, d *schema.ResourceData,
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceActiveDirectory2Read(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceActiveDirectory2Read(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceActiveDirectory2Update(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, ActiveDirectory2_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ActiveDirectory2NamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("ActiveDirectory2")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "ActiveDirectory2")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("ActiveDirectory2")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "ActiveDirectory2")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "ActiveDirectory2", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "ActiveDirectory2", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource ActiveDirectory2"))
-	reflect_ActiveDirectory2 := reflect.TypeOf((*api_latest.ActiveDirectory2)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_ActiveDirectory2.Elem(), d, &data, "", false)
+	reflectActiveDirectory2 := reflect.TypeOf((*api_latest.ActiveDirectory2)(nil))
+	utils.PopulateResourceMap(newCtx, reflectActiveDirectory2.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -1020,14 +1031,14 @@ func resourceActiveDirectory2Update(ctx context.Context, d *schema.ResourceData,
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory2 %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  ActiveDirectory2 %v", patchErr))
+	if patchErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
@@ -1039,44 +1050,44 @@ func resourceActiveDirectory2Update(ctx context.Context, d *schema.ResourceData,
 
 func resourceActiveDirectory2Importer(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("ActiveDirectory2")
+	resourceConfig := codegen_configs.GetResourceByName("ActiveDirectory2")
 	attrs := map[string]interface{}{"path": utils.GenPath("activedirectory")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.ActiveDirectory2{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.ActiveDirectory2
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceActiveDirectory2ReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -20,7 +21,7 @@ type ResponseProcessingFunc func(context.Context, *http.Response) ([]byte, error
 
 // The default processing func for http responses for read
 func DefaultProcessingFunc(ctx context.Context, response *http.Response) ([]byte, error) {
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	tflog.Debug(ctx, fmt.Sprintf("HTTP Response body %s", string(body)))
 	return body, err
 }

@@ -33,7 +33,7 @@ func ResourceNonLocalUserKey() *schema.Resource {
 func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"id": &schema.Schema{
+		"id": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("id"),
 
@@ -43,7 +43,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The Access key unique identifier`,
 		},
 
-		"uid": &schema.Schema{
+		"uid": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("uid"),
 
@@ -51,7 +51,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
 		},
 
-		"access_key": &schema.Schema{
+		"access_key": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("access_key"),
 
@@ -61,7 +61,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The access id of the user key`,
 		},
 
-		"secret_key": &schema.Schema{
+		"secret_key": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("secret_key"),
 
@@ -71,7 +71,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The secret id of the user key`,
 		},
 
-		"pgp_public_key": &schema.Schema{
+		"pgp_public_key": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("pgp_public_key"),
 
@@ -82,7 +82,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			ForceNew:    true,
 		},
 
-		"encrypted_secret_key": &schema.Schema{
+		"encrypted_secret_key": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("encrypted_secret_key"),
 
@@ -92,7 +92,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key`,
 		},
 
-		"tenant_id": &schema.Schema{
+		"tenant_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("tenant_id"),
 
@@ -100,7 +100,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
 		},
 
-		"enabled": &schema.Schema{
+		"enabled": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("enabled"),
 
@@ -114,7 +114,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 	}
 }
 
-var NonLocalUserKey_names_mapping map[string][]string = map[string][]string{}
+var NonLocalUserKeyNamesMapping = map[string][]string{}
 
 func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource api_latest.NonLocalUserKey, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -127,7 +127,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"id\"",
+			Summary:  "Error occurred setting value to \"id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -139,7 +139,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"uid\"",
+			Summary:  "Error occurred setting value to \"uid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -151,7 +151,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"access_key\"",
+			Summary:  "Error occurred setting value to \"access_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -163,7 +163,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"secret_key\"",
+			Summary:  "Error occurred setting value to \"secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -175,7 +175,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"pgp_public_key\"",
+			Summary:  "Error occurred setting value to \"pgp_public_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -187,7 +187,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"encrypted_secret_key\"",
+			Summary:  "Error occurred setting value to \"encrypted_secret_key\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -199,7 +199,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -211,7 +211,7 @@ func ResourceNonLocalUserKeyReadStructIntoSchema(ctx context.Context, resource a
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"enabled\"",
+			Summary:  "Error occurred setting value to \"enabled\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -223,39 +223,50 @@ func resourceNonLocalUserKeyRead(ctx context.Context, d *schema.ResourceData, m 
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("NonLocalUserKey")
+	resourceConfig := codegen_configs.GetResourceByName("NonLocalUserKey")
 	attrs := map[string]interface{}{"path": utils.GenPath("users/non_local_keys"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceNonLocalUserKeyRead] Calling Get Function : %v for resource NonLocalUserKey", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceNonLocalUserKeyRead] Calling Get Function : %v for resource NonLocalUserKey", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	if err != nil {
+	var body []byte
+	var resource api_latest.NonLocalUserKey
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
-
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.NonLocalUserKey{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -269,10 +280,10 @@ func resourceNonLocalUserKeyRead(ctx context.Context, d *schema.ResourceData, m 
 func resourceNonLocalUserKeyDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("NonLocalUserKey")
+	resourceConfig := codegen_configs.GetResourceByName("NonLocalUserKey")
 	attrs := map[string]interface{}{"path": utils.GenPath("users/non_local_keys"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -283,7 +294,7 @@ func resourceNonLocalUserKeyDelete(ctx context.Context, d *schema.ResourceData, 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -294,38 +305,38 @@ func resourceNonLocalUserKeyDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func resourceNonLocalUserKeyCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, NonLocalUserKey_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, NonLocalUserKeyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("NonLocalUserKey")
+	resourceConfig := codegen_configs.GetResourceByName("NonLocalUserKey")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource NonLocalUserKey"))
-	reflect_NonLocalUserKey := reflect.TypeOf((*api_latest.NonLocalUserKey)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_NonLocalUserKey.Elem(), d, &data, "", false)
+	reflectNonLocalUserKey := reflect.TypeOf((*api_latest.NonLocalUserKey)(nil))
+	utils.PopulateResourceMap(newCtx, reflectNonLocalUserKey.Elem(), d, &data, "", false)
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "NonLocalUserKey")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "NonLocalUserKey")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "NonLocalUserKey", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "NonLocalUserKey", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -340,22 +351,22 @@ func resourceNonLocalUserKeyCreate(ctx context.Context, d *schema.ResourceData, 
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("users/non_local_keys")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  NonLocalUserKey %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  NonLocalUserKey %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.NonLocalUserKey{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -365,7 +376,7 @@ func resourceNonLocalUserKeyCreate(ctx context.Context, d *schema.ResourceData, 
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -374,46 +385,46 @@ func resourceNonLocalUserKeyCreate(ctx context.Context, d *schema.ResourceData, 
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceNonLocalUserKeyRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceNonLocalUserKeyRead(ctxWithResource, d, m)
 
 	return diags
 }
 
 func resourceNonLocalUserKeyUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, NonLocalUserKey_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, NonLocalUserKeyNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("NonLocalUserKey")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "NonLocalUserKey")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("NonLocalUserKey")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "NonLocalUserKey")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "NonLocalUserKey", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "NonLocalUserKey", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource NonLocalUserKey"))
-	reflect_NonLocalUserKey := reflect.TypeOf((*api_latest.NonLocalUserKey)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_NonLocalUserKey.Elem(), d, &data, "", false)
+	reflectNonLocalUserKey := reflect.TypeOf((*api_latest.NonLocalUserKey)(nil))
+	utils.PopulateResourceMap(newCtx, reflectNonLocalUserKey.Elem(), d, &data, "", false)
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
 	b, err := json.MarshalIndent(data, "", "   ")
@@ -427,14 +438,14 @@ func resourceNonLocalUserKeyUpdate(ctx context.Context, d *schema.ResourceData, 
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("users/non_local_keys"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  NonLocalUserKey %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  NonLocalUserKey %v", patchErr))
+	if patchErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}

@@ -89,13 +89,6 @@ func Provider() *schema.Provider {
 
 }
 
-/*
-	Provide a VastData client which have been started ,
-	this will validate the following:
-        *) the cluster is up and responding
-	*) the username & password are valid
-*/
-
 func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -122,10 +115,10 @@ func providerConfigure(ctx context.Context, r *schema.ResourceData) (interface{}
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error obtaning cluster version",
-			Detail:   err.Error(),
+			Summary:  "Error obtaining VAST Data cluster version",
+			Detail:   fmt.Sprintf("This is the first hit to the API. Did you provide correct credentials?\nUnderlying error is:\n%v", err.Error()),
 		})
-
+		return client, diags
 	}
 	tflog.Info(ctx, fmt.Sprintf("Cluster version found %s", clusterVersion))
 	clusterVersion, truncated := metadata.SanitizeVersion(clusterVersion)

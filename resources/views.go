@@ -40,7 +40,7 @@ func ResourceView() *schema.Resource {
 func getResourceViewSchema() map[string]*schema.Schema {
 	return map[string]*schema.Schema{
 
-		"guid": &schema.Schema{
+		"guid": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("guid"),
 
@@ -50,7 +50,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the View`,
 		},
 
-		"name": &schema.Schema{
+		"name": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("name"),
 
@@ -60,7 +60,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the view`,
 		},
 
-		"path": &schema.Schema{
+		"path": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("path"),
 
@@ -68,7 +68,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) File system path. Begin with '/'. Do not include a trailing slash`,
 		},
 
-		"create_dir": &schema.Schema{
+		"create_dir": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("create_dir"),
 
@@ -81,7 +81,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Creates the directory specified by the path`,
 		},
 
-		"alias": &schema.Schema{
+		"alias": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("alias"),
 
@@ -91,7 +91,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path`,
 		},
 
-		"bucket": &schema.Schema{
+		"bucket": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("bucket"),
 
@@ -101,7 +101,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Bucket name`,
 		},
 
-		"policy_id": &schema.Schema{
+		"policy_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("policy_id"),
 
@@ -109,7 +109,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Associated view policy ID`,
 		},
 
-		"cluster": &schema.Schema{
+		"cluster": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("cluster"),
 
@@ -119,7 +119,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
 		},
 
-		"cluster_id": &schema.Schema{
+		"cluster_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("cluster_id"),
 
@@ -129,7 +129,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID`,
 		},
 
-		"tenant_id": &schema.Schema{
+		"tenant_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("tenant_id"),
 
@@ -139,7 +139,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID related to this view`,
 		},
 
-		"directory": &schema.Schema{
+		"directory": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("directory"),
 
@@ -149,7 +149,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Create the directory if it does not exist`,
 		},
 
-		"s3_versioning": &schema.Schema{
+		"s3_versioning": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("s3_versioning"),
 
@@ -159,7 +159,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Trun on S3 Versioning`,
 		},
 
-		"s3_unverified_lookup": &schema.Schema{
+		"s3_unverified_lookup": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("s3_unverified_lookup"),
 
@@ -169,7 +169,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 Unverified Lookup`,
 		},
 
-		"allow_anonymous_access": &schema.Schema{
+		"allow_anonymous_access": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("allow_anonymous_access"),
 
@@ -179,7 +179,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access`,
 		},
 
-		"allow_s3_anonymous_access": &schema.Schema{
+		"allow_s3_anonymous_access": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("allow_s3_anonymous_access"),
 
@@ -189,7 +189,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow S3 anonymous access`,
 		},
 
-		"protocols": &schema.Schema{
+		"protocols": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("protocols"),
 
@@ -205,7 +205,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"share": &schema.Schema{
+		"share": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("share"),
 
@@ -215,7 +215,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Name of the SMB Share. Must not include the following characters: " \ / [ ] : | < > + = ; , * ?`,
 		},
 
-		"bucket_owner": &schema.Schema{
+		"bucket_owner": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("bucket_owner"),
 
@@ -225,7 +225,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Bucket owner`,
 		},
 
-		"bucket_creators": &schema.Schema{
+		"bucket_creators": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("bucket_creators"),
 
@@ -239,7 +239,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"bucket_creators_groups": &schema.Schema{
+		"bucket_creators_groups": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("bucket_creators_groups"),
 
@@ -253,7 +253,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"s3_locks": &schema.Schema{
+		"s3_locks": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("s3_locks"),
 
@@ -263,7 +263,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Object Lock`,
 		},
 
-		"s3_locks_retention_mode": &schema.Schema{
+		"s3_locks_retention_mode": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("s3_locks_retention_mode"),
 
@@ -273,7 +273,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) S3 Locks retention mode`,
 		},
 
-		"s3_locks_retention_period": &schema.Schema{
+		"s3_locks_retention_period": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("s3_locks_retention_period"),
 
@@ -283,7 +283,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Period should be positive in format like 0d|2d|1y|2y`,
 		},
 
-		"physical_capacity": &schema.Schema{
+		"physical_capacity": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("physical_capacity"),
 
@@ -293,7 +293,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Physical Capacity`,
 		},
 
-		"logical_capacity": &schema.Schema{
+		"logical_capacity": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("logical_capacity"),
 
@@ -303,7 +303,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Logical Capacity`,
 		},
 
-		"nfs_interop_flags": &schema.Schema{
+		"nfs_interop_flags": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("nfs_interop_flags"),
 
@@ -315,7 +315,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols. Allowed Values are [BOTH_NFS3_AND_NFS4_INTEROP_DISABLED ONLY_NFS3_INTEROP_ENABLED ONLY_NFS4_INTEROP_ENABLED BOTH_NFS3_AND_NFS4_INTEROP_ENABLED]`,
 		},
 
-		"is_remote": &schema.Schema{
+		"is_remote": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("is_remote"),
 
@@ -325,7 +325,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 		},
 
-		"share_acl": &schema.Schema{
+		"share_acl": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("share_acl"),
 
@@ -337,7 +337,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"enabled": &schema.Schema{
+					"enabled": {
 						Type:          schema.TypeBool,
 						ConflictsWith: codegen_configs.GetResourceByName("ViewShareAcl").GetConflictingFields("enabled"),
 
@@ -347,7 +347,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 						Description: ``,
 					},
 
-					"acl": &schema.Schema{
+					"acl": {
 						Type:          schema.TypeList,
 						ConflictsWith: codegen_configs.GetResourceByName("ViewShareAcl").GetConflictingFields("acl"),
 
@@ -359,7 +359,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 						Elem: &schema.Resource{
 							Schema: map[string]*schema.Schema{
 
-								"grantee": &schema.Schema{
+								"grantee": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("grantee"),
 
@@ -371,7 +371,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0)  Allowed Values are [users groups]`,
 								},
 
-								"permissions": &schema.Schema{
+								"permissions": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("permissions"),
 
@@ -383,7 +383,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0)  Allowed Values are [FULL CHANGE READ]`,
 								},
 
-								"sid_str": &schema.Schema{
+								"sid_str": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("sid_str"),
 
@@ -393,7 +393,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"uid_or_gid": &schema.Schema{
+								"uid_or_gid": {
 									Type:          schema.TypeInt,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("uid_or_gid"),
 
@@ -403,7 +403,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"name": &schema.Schema{
+								"name": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("name"),
 
@@ -411,7 +411,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 									Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) `,
 								},
 
-								"fqdn": &schema.Schema{
+								"fqdn": {
 									Type:          schema.TypeString,
 									ConflictsWith: codegen_configs.GetResourceByName("ShareAcl").GetConflictingFields("fqdn"),
 
@@ -427,7 +427,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"qos_policy_id": &schema.Schema{
+		"qos_policy_id": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("qos_policy_id"),
 
@@ -437,7 +437,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS Policy ID`,
 		},
 
-		"is_seamless": &schema.Schema{
+		"is_seamless": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("is_seamless"),
 
@@ -447,7 +447,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.`,
 		},
 
-		"max_retention_period": &schema.Schema{
+		"max_retention_period": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("max_retention_period"),
 
@@ -458,7 +458,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: utils.ValidateRetention,
 		},
 
-		"min_retention_period": &schema.Schema{
+		"min_retention_period": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("min_retention_period"),
 
@@ -469,7 +469,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: utils.ValidateRetention,
 		},
 
-		"files_retention_mode": &schema.Schema{
+		"files_retention_mode": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("files_retention_mode"),
 
@@ -481,7 +481,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.1.0,5.2.0) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object. Allowed Values are [GOVERNANCE COMPLIANCE NONE]`,
 		},
 
-		"default_retention_period": &schema.Schema{
+		"default_retention_period": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("default_retention_period"),
 
@@ -492,7 +492,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: utils.ValidateRetention,
 		},
 
-		"auto_commit": &schema.Schema{
+		"auto_commit": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("auto_commit"),
 
@@ -503,7 +503,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			ValidateDiagFunc: utils.ValidateRetention,
 		},
 
-		"s3_object_ownership_rule": &schema.Schema{
+		"s3_object_ownership_rule": {
 			Type:          schema.TypeString,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("s3_object_ownership_rule"),
 
@@ -515,7 +515,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description:      `(Valid for versions: 5.1.0,5.2.0) S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: BucketOwnerEnforced - The bucket owner has full control over any object in the bucket ObjectWriter - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. BucketOwnerPreferred - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. None - S3 Object Ownership is disabled for the bucket.  Allowed Values are [None BucketOwnerPreferred ObjectWriter BucketOwnerEnforced]`,
 		},
 
-		"locking": &schema.Schema{
+		"locking": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("locking"),
 
@@ -525,7 +525,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Write Once Read Many (WORM) locking enabled`,
 		},
 
-		"ignore_oos": &schema.Schema{
+		"ignore_oos": {
 			Type:          schema.TypeBool,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("ignore_oos"),
 
@@ -535,7 +535,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.1.0,5.2.0) Ignore oos`,
 		},
 
-		"bucket_logging": &schema.Schema{
+		"bucket_logging": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("bucket_logging"),
 
@@ -547,7 +547,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
 
-					"destination_id": &schema.Schema{
+					"destination_id": {
 						Type:          schema.TypeInt,
 						ConflictsWith: codegen_configs.GetResourceByName("BucketLogging").GetConflictingFields("destination_id"),
 
@@ -557,7 +557,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) The Logging bucket ID`,
 					},
 
-					"prefix": &schema.Schema{
+					"prefix": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("BucketLogging").GetConflictingFields("prefix"),
 
@@ -567,7 +567,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 						Description: `(Valid for versions: 5.2.0) Log line prefix to add`,
 					},
 
-					"key_format": &schema.Schema{
+					"key_format": {
 						Type:          schema.TypeString,
 						ConflictsWith: codegen_configs.GetResourceByName("BucketLogging").GetConflictingFields("key_format"),
 
@@ -584,7 +584,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"abac_tags": &schema.Schema{
+		"abac_tags": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("abac_tags"),
 
@@ -598,7 +598,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			},
 		},
 
-		"abe_max_depth": &schema.Schema{
+		"abe_max_depth": {
 			Type:          schema.TypeInt,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("abe_max_depth"),
 
@@ -608,7 +608,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 			Description: `(Valid for versions: 5.2.0) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.`,
 		},
 
-		"abe_protocols": &schema.Schema{
+		"abe_protocols": {
 			Type:          schema.TypeList,
 			ConflictsWith: codegen_configs.GetResourceByName("View").GetConflictingFields("abe_protocols"),
 
@@ -624,7 +624,7 @@ func getResourceViewSchema() map[string]*schema.Schema {
 	}
 }
 
-var View_names_mapping map[string][]string = map[string][]string{}
+var ViewNamesMapping = map[string][]string{}
 
 func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.View, d *schema.ResourceData) diag.Diagnostics {
 	var diags diag.Diagnostics
@@ -637,7 +637,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"guid\"",
+			Summary:  "Error occurred setting value to \"guid\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -649,7 +649,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"name\"",
+			Summary:  "Error occurred setting value to \"name\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -661,7 +661,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"path\"",
+			Summary:  "Error occurred setting value to \"path\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -673,7 +673,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"create_dir\"",
+			Summary:  "Error occurred setting value to \"create_dir\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -685,7 +685,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"alias\"",
+			Summary:  "Error occurred setting value to \"alias\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -697,7 +697,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket\"",
+			Summary:  "Error occurred setting value to \"bucket\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -709,7 +709,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"policy_id\"",
+			Summary:  "Error occurred setting value to \"policy_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -721,7 +721,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster\"",
+			Summary:  "Error occurred setting value to \"cluster\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -733,7 +733,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"cluster_id\"",
+			Summary:  "Error occurred setting value to \"cluster_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -745,7 +745,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"tenant_id\"",
+			Summary:  "Error occurred setting value to \"tenant_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -757,7 +757,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"directory\"",
+			Summary:  "Error occurred setting value to \"directory\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -769,7 +769,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_versioning\"",
+			Summary:  "Error occurred setting value to \"s3_versioning\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -781,7 +781,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_unverified_lookup\"",
+			Summary:  "Error occurred setting value to \"s3_unverified_lookup\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -793,7 +793,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_anonymous_access\"",
+			Summary:  "Error occurred setting value to \"allow_anonymous_access\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -805,7 +805,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"allow_s3_anonymous_access\"",
+			Summary:  "Error occurred setting value to \"allow_s3_anonymous_access\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -817,7 +817,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"protocols\"",
+			Summary:  "Error occurred setting value to \"protocols\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -829,7 +829,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"share\"",
+			Summary:  "Error occurred setting value to \"share\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -841,7 +841,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_owner\"",
+			Summary:  "Error occurred setting value to \"bucket_owner\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -853,7 +853,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_creators\"",
+			Summary:  "Error occurred setting value to \"bucket_creators\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -865,7 +865,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_creators_groups\"",
+			Summary:  "Error occurred setting value to \"bucket_creators_groups\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -877,7 +877,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_locks\"",
+			Summary:  "Error occurred setting value to \"s3_locks\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -889,7 +889,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_locks_retention_mode\"",
+			Summary:  "Error occurred setting value to \"s3_locks_retention_mode\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -901,7 +901,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_locks_retention_period\"",
+			Summary:  "Error occurred setting value to \"s3_locks_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -913,7 +913,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"physical_capacity\"",
+			Summary:  "Error occurred setting value to \"physical_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -925,7 +925,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"logical_capacity\"",
+			Summary:  "Error occurred setting value to \"logical_capacity\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -937,7 +937,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"nfs_interop_flags\"",
+			Summary:  "Error occurred setting value to \"nfs_interop_flags\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -949,7 +949,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_remote\"",
+			Summary:  "Error occurred setting value to \"is_remote\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -962,7 +962,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"share_acl\"",
+			Summary:  "Error occurred setting value to \"share_acl\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -974,7 +974,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"qos_policy_id\"",
+			Summary:  "Error occurred setting value to \"qos_policy_id\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -986,7 +986,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"is_seamless\"",
+			Summary:  "Error occurred setting value to \"is_seamless\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -998,7 +998,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"max_retention_period\"",
+			Summary:  "Error occurred setting value to \"max_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1010,7 +1010,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"min_retention_period\"",
+			Summary:  "Error occurred setting value to \"min_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1022,7 +1022,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"files_retention_mode\"",
+			Summary:  "Error occurred setting value to \"files_retention_mode\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1034,7 +1034,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"default_retention_period\"",
+			Summary:  "Error occurred setting value to \"default_retention_period\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1046,7 +1046,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"auto_commit\"",
+			Summary:  "Error occurred setting value to \"auto_commit\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1058,7 +1058,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"s3_object_ownership_rule\"",
+			Summary:  "Error occurred setting value to \"s3_object_ownership_rule\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1070,7 +1070,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"locking\"",
+			Summary:  "Error occurred setting value to \"locking\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1082,7 +1082,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"ignore_oos\"",
+			Summary:  "Error occurred setting value to \"ignore_oos\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1095,7 +1095,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"bucket_logging\"",
+			Summary:  "Error occurred setting value to \"bucket_logging\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1107,7 +1107,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"abac_tags\"",
+			Summary:  "Error occurred setting value to \"abac_tags\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1119,7 +1119,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"abe_max_depth\"",
+			Summary:  "Error occurred setting value to \"abe_max_depth\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1131,7 +1131,7 @@ func ResourceViewReadStructIntoSchema(ctx context.Context, resource api_latest.V
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured setting value to \"abe_protocols\"",
+			Summary:  "Error occurred setting value to \"abe_protocols\"",
 			Detail:   err.Error(),
 		})
 	}
@@ -1143,39 +1143,50 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	var diags diag.Diagnostics
 
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("View")
+	resourceConfig := codegen_configs.GetResourceByName("View")
 	attrs := map[string]interface{}{"path": utils.GenPath("views"), "id": d.Id()}
-	tflog.Debug(ctx, fmt.Sprintf("[resourceViewRead] Calling Get Function : %v for resource View", utils.GetFuncName(resource_config.GetFunc)))
-	response, err := resource_config.GetFunc(ctx, client, attrs, d, map[string]string{})
+	tflog.Debug(ctx, fmt.Sprintf("[resourceViewRead] Calling Get Function : %v for resource View", utils.GetFuncName(resourceConfig.GetFunc)))
+	response, err := resourceConfig.GetFunc(ctx, client, attrs, d, map[string]string{})
 	utils.VastVersionsWarn(ctx)
 
-	if err != nil {
+	var body []byte
+	var resource api_latest.View
+	if err != nil && response != nil && response.StatusCode == 404 && !resourceConfig.DisableFallbackRequest {
+		var fallbackErr error
+		body, fallbackErr = utils.HandleFallback(ctx, client, attrs, d, resourceConfig.IdFunc)
+		if fallbackErr != nil {
+			errorMessage := fmt.Sprintf("Initial request failed:\n%v\nFallback request also failed:\n%v", err.Error(), fallbackErr.Error())
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred while obtaining data from the VAST Data cluster",
+				Detail:   errorMessage,
+			})
+			return diags
+		}
+	} else if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while obtaining data from the vastdata cluster",
+			Summary:  "Error occurred while obtaining data from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
-
-	}
-	tflog.Info(ctx, response.Request.URL.String())
-	resource := api_latest.View{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
-
-	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error occured reading data recived from VastData cluster",
-			Detail:   err.Error(),
-		})
-		return diags
-
+	} else {
+		tflog.Info(ctx, response.Request.URL.String())
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		if err != nil {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  "Error occurred reading data received from VAST Data cluster",
+				Detail:   err.Error(),
+			})
+			return diags
+		}
 	}
 	err = json.Unmarshal(body, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while parsing data recived from VastData cluster",
+			Summary:  "Error occurred while parsing data received from VAST Data cluster",
 			Detail:   err.Error(),
 		})
 		return diags
@@ -1184,7 +1195,7 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	diags = ResourceViewReadStructIntoSchema(ctx, resource, d)
 
 	var after_read_error error
-	after_read_error = resource_config.AfterReadFunc(client, ctx, d)
+	after_read_error = resourceConfig.AfterReadFunc(client, ctx, d)
 	if after_read_error != nil {
 		return diag.FromErr(after_read_error)
 	}
@@ -1195,10 +1206,10 @@ func resourceViewRead(ctx context.Context, d *schema.ResourceData, m interface{}
 func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("View")
+	resourceConfig := codegen_configs.GetResourceByName("View")
 	attrs := map[string]interface{}{"path": utils.GenPath("views"), "id": d.Id()}
 
-	response, err := resource_config.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
+	response, err := resourceConfig.DeleteFunc(ctx, client, attrs, nil, map[string]string{})
 
 	tflog.Info(ctx, fmt.Sprintf("Removing Resource"))
 	if response != nil {
@@ -1209,7 +1220,7 @@ func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
-			Summary:  "Error occured while deleting a resource from the vastdata cluster",
+			Summary:  "Error occurred while deleting a resource from the VAST Data cluster",
 			Detail:   err.Error(),
 		})
 
@@ -1220,38 +1231,38 @@ func resourceViewDelete(ctx context.Context, d *schema.ResourceData, m interface
 }
 
 func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, View_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ViewNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("View")
+	resourceConfig := codegen_configs.GetResourceByName("View")
 	tflog.Info(ctx, fmt.Sprintf("Creating Resource View"))
-	reflect_View := reflect.TypeOf((*api_latest.View)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_View.Elem(), d, &data, "", false)
+	reflectView := reflect.TypeOf((*api_latest.View)(nil))
+	utils.PopulateResourceMap(newCtx, reflectView.Elem(), d, &data, "", false)
 
-	version_compare := utils.VastVersionsWarn(ctx)
+	versionsEqual := utils.VastVersionsWarn(ctx)
 
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "View")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "View")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "View", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "View", clusterVersion))
 		}
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -1266,22 +1277,22 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("views")}
-	response, create_err := resource_config.CreateFunc(ctx, client, attrs, data, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", create_err))
+	response, createErr := resourceConfig.CreateFunc(ctx, client, attrs, data, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", createErr))
 
-	if create_err != nil {
-		error_message := create_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	if createErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), createErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
-	response_body, _ := io.ReadAll(response.Body)
-	tflog.Debug(ctx, fmt.Sprintf("Object created , server response %v", string(response_body)))
+	responseBody, _ := io.ReadAll(response.Body)
+	tflog.Debug(ctx, fmt.Sprintf("Object created, server response %v", string(responseBody)))
 	resource := api_latest.View{}
-	err = json.Unmarshal(response_body, &resource)
+	err = json.Unmarshal(responseBody, &resource)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1291,7 +1302,7 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 
-	err = resource_config.IdFunc(ctx, client, resource.Id, d)
+	err = resourceConfig.IdFunc(ctx, client, resource.Id, d)
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
@@ -1300,57 +1311,57 @@ func resourceViewCreate(ctx context.Context, d *schema.ResourceData, m interface
 		})
 		return diags
 	}
-	ctx_with_resource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
-	resourceViewRead(ctx_with_resource, d, m)
+	ctxWithResource := context.WithValue(ctx, utils.ContextKey("resource"), resource)
+	resourceViewRead(ctxWithResource, d, m)
 
-	var before_create_error error
-	_, before_create_error = resource_config.BeforeCreateFunc(data, client, ctx, d)
-	if before_create_error != nil {
-		return diag.FromErr(before_create_error)
+	var beforeCreateErr error
+	_, beforeCreateErr = resourceConfig.BeforeCreateFunc(data, client, ctx, d)
+	if beforeCreateErr != nil {
+		return diag.FromErr(beforeCreateErr)
 	}
 
 	return diags
 }
 
 func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	names_mapping := utils.ContextKey("names_mapping")
-	new_ctx := context.WithValue(ctx, names_mapping, View_names_mapping)
+	namesMapping := utils.ContextKey("names_mapping")
+	newCtx := context.WithValue(ctx, namesMapping, ViewNamesMapping)
 	var diags diag.Diagnostics
 	data := make(map[string]interface{})
-	version_compare := utils.VastVersionsWarn(ctx)
-	resource_config := codegen_configs.GetResourceByName("View")
-	if version_compare != metadata.CLUSTER_VERSION_EQUALS {
-		cluster_version := metadata.ClusterVersionString()
-		t, t_exists := vast_versions.GetVersionedType(cluster_version, "View")
-		if t_exists {
-			versions_error := utils.VersionMatch(t, data)
-			if versions_error != nil {
-				tflog.Warn(ctx, versions_error.Error())
-				version_validation_mode, version_validation_mode_exists := metadata.GetClusterConfig("version_validation_mode")
-				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", version_validation_mode))
-				if version_validation_mode_exists && version_validation_mode == "strict" {
+	versionsEqual := utils.VastVersionsWarn(ctx)
+	resourceConfig := codegen_configs.GetResourceByName("View")
+	if versionsEqual != metadata.CLUSTER_VERSION_EQUALS {
+		clusterVersion := metadata.ClusterVersionString()
+		t, typeExists := vast_versions.GetVersionedType(clusterVersion, "View")
+		if typeExists {
+			versionError := utils.VersionMatch(t, data)
+			if versionError != nil {
+				tflog.Warn(ctx, versionError.Error())
+				versionValidationMode, versionValidationModeExists := metadata.GetClusterConfig("version_validation_mode")
+				tflog.Warn(ctx, fmt.Sprintf("Version Validation Mode Detected %s", versionValidationMode))
+				if versionValidationModeExists && versionValidationMode == "strict" {
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Cluster Version & Build Version Are Too Different",
-						Detail:   versions_error.Error(),
+						Detail:   versionError.Error(),
 					})
 					return diags
 				}
 			}
 		} else {
-			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s , things might not work properly", "View", cluster_version))
+			tflog.Warn(ctx, fmt.Sprintf("Could have not found resource %s in version %s, things might not work properly", "View", clusterVersion))
 		}
 	}
 
 	client := m.(*vast_client.VMSSession)
 	tflog.Info(ctx, fmt.Sprintf("Updating Resource View"))
-	reflect_View := reflect.TypeOf((*api_latest.View)(nil))
-	utils.PopulateResourceMap(new_ctx, reflect_View.Elem(), d, &data, "", false)
+	reflectView := reflect.TypeOf((*api_latest.View)(nil))
+	utils.PopulateResourceMap(newCtx, reflectView.Elem(), d, &data, "", false)
 
-	var before_patch_error error
-	data, before_patch_error = resource_config.BeforePatchFunc(data, client, ctx, d)
-	if before_patch_error != nil {
-		return diag.FromErr(before_patch_error)
+	var beforePatchError error
+	data, beforePatchError = resourceConfig.BeforePatchFunc(data, client, ctx, d)
+	if beforePatchError != nil {
+		return diag.FromErr(beforePatchError)
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("Data %v", data))
@@ -1365,23 +1376,23 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Request json created %v", string(b)))
 	attrs := map[string]interface{}{"path": utils.GenPath("views"), "id": d.Id()}
-	response, patch_err := resource_config.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
-	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", patch_err))
-	if patch_err != nil {
-		error_message := patch_err.Error() + " Server Response: " + utils.GetResponseBodyAsStr(response)
+	response, patchErr := resourceConfig.UpdateFunc(ctx, client, attrs, data, d, map[string]string{})
+	tflog.Info(ctx, fmt.Sprintf("Server Error for  View %v", patchErr))
+	if patchErr != nil {
+		errorMessage := fmt.Sprintf("server response:\n%v\nUnderlying error:\n%v", utils.GetResponseBodyAsStr(response), patchErr.Error())
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Object Creation Failed",
-			Detail:   error_message,
+			Detail:   errorMessage,
 		})
 		return diags
 	}
 	resourceViewRead(ctx, d, m)
 
-	var after_patch_error error
-	data, after_patch_error = resource_config.AfterPatchFunc(data, client, ctx, d)
-	if after_patch_error != nil {
-		return diag.FromErr(after_patch_error)
+	var afterPatchError error
+	data, afterPatchError = resourceConfig.AfterPatchFunc(data, client, ctx, d)
+	if afterPatchError != nil {
+		return diag.FromErr(afterPatchError)
 	}
 
 	return diags
@@ -1390,44 +1401,44 @@ func resourceViewUpdate(ctx context.Context, d *schema.ResourceData, m interface
 
 func resourceViewImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
 
-	result := []*schema.ResourceData{}
+	var result []*schema.ResourceData
 	client := m.(*vast_client.VMSSession)
-	resource_config := codegen_configs.GetResourceByName("View")
+	resourceConfig := codegen_configs.GetResourceByName("View")
 	attrs := map[string]interface{}{"path": utils.GenPath("views")}
-	response, err := resource_config.ImportFunc(ctx, client, attrs, d, resource_config.Importer.GetFunc())
+	response, err := resourceConfig.ImportFunc(ctx, client, attrs, d, resourceConfig.Importer.GetFunc())
 
 	if err != nil {
 		return result, err
 	}
 
-	resource_l := []api_latest.View{}
-	body, err := resource_config.ResponseProcessingFunc(ctx, response)
+	var resourceList []api_latest.View
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
 
 	if err != nil {
 		return result, err
 	}
-	err = json.Unmarshal(body, &resource_l)
+	err = json.Unmarshal(body, &resourceList)
 	if err != nil {
 		return result, err
 	}
 
-	if len(resource_l) == 0 {
-		return result, errors.New("Cluster provided 0 elements matchin gthis guid")
+	if len(resourceList) == 0 {
+		return result, errors.New("cluster returned 0 elements matching provided guid")
 	}
 
-	resource := resource_l[0]
-	id_err := resource_config.IdFunc(ctx, client, resource.Id, d)
-	if id_err != nil {
-		return result, id_err
+	resource := resourceList[0]
+	idErr := resourceConfig.IdFunc(ctx, client, resource.Id, d)
+	if idErr != nil {
+		return result, idErr
 	}
 
 	diags := ResourceViewReadStructIntoSchema(ctx, resource, d)
 	if diags.HasError() {
-		all_errors := "Errors occured while importing:\n"
+		allErrors := "Errors occurred while importing:\n"
 		for _, dig := range diags {
-			all_errors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
+			allErrors += fmt.Sprintf("Summary:%s\nDetails:%s\n", dig.Summary, dig.Detail)
 		}
-		return result, errors.New(all_errors)
+		return result, errors.New(allErrors)
 	}
 	result = append(result, d)
 

@@ -27,8 +27,17 @@ var _ = Describe(" VipPool", func() {
 	var VipPoolDataSourceData *schema.ResourceData
 	var model_json = `
                          {
+   "active_cnode_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+   ],
    "active_interfaces": 100,
    "cluster": "string",
+   "cluster_id": 100,
    "cnode_ids": [
       1,
       2,
@@ -36,6 +45,13 @@ var _ = Describe(" VipPool", func() {
       4,
       5,
       6
+   ],
+   "cnodes": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
    ],
    "domain_name": "string",
    "guid": "string",
@@ -87,11 +103,16 @@ var _ = Describe(" VipPool", func() {
    "name": "string",
    "peer_asn": 100,
    "port_membership": "string",
+   "ranges_summary": "string",
    "role": "string",
    "state": "string",
    "subnet_cidr": 100,
    "subnet_cidr_ipv6": 100,
+   "sync": "string",
+   "sync_time": "string",
    "tenant_id": 100,
+   "tenant_name": "string",
+   "title": "string",
    "url": "string",
    "vast_asn": 100,
    "vlan": 100

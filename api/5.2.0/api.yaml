@@ -494,7 +494,7 @@ components:
         enabled:
           type: "boolean"
           description: "Sets the key to be enabled or disabled."
-          default: true          
+          default: true
     Nis:
       type: "object"
       properties:
@@ -942,6 +942,37 @@ components:
           type: "integer"
           format: "int64"
           description: "The ID of the tenant associated with the virtual IP pool. An ID of `0` (zero) means the virtual IP pool is available for all tenants."
+        active_cnode_ids:
+          type: "array"
+          items:
+            type: "integer"
+          description: "IDs of active CNodes"
+        cluster_id:
+          type: "integer"
+          description: "Cluster ID"
+        cnodes:
+          type: "array"
+          items:
+            type: "string"
+            description: "Names of cnodes comprising cnode group"
+        enable_weighted_balancing:
+          type: "boolean"
+          description: "Weighted Balancing Enabled"
+        ranges_summary:
+          type: "string"
+          description: "IP ranges"
+        sync_time:
+          type: "string"
+          description: "Synchronization time with leader"
+        sync:
+          type: "string"
+          description: "Synchronization state with leader"
+        tenant_name:
+          type: "string"
+          description: "Tenant Name"
+        title:
+          type: "string"
+          description: "IP range of the VIP pool"
     Dns:
       type: "object"
       properties:
@@ -1477,7 +1508,7 @@ components:
         max_writes_iops:
           type: integer
           format: "int64"
-          description: Maximum performance to provide when there is no resource contention.      
+          description: Maximum performance to provide when there is no resource contention.
         burst_reads_bw_mb:
           type: "integer"
           format: "int64"
@@ -1509,7 +1540,7 @@ components:
         burst_writes_loan_iops:
           type: "integer"
           format: "int64"
-          description : "Burst write IOPS credits."          
+          description : "Burst write IOPS credits."
     QosDynamicLimits:
       type: object
       properties:
@@ -1922,7 +1953,7 @@ components:
           description: "The unique GUID of the protection policy."
         name:
           type: "string"
-          description: "The name of the protection policy."  
+          description: "The name of the protection policy."
         url:
           type: "string"
           description: "Direct URL of the protection policy."
@@ -1977,7 +2008,7 @@ components:
           description: "The unique GUID of the S3 replication peer configuration."
         name:
           type: "string"
-          description: "The name of the S3 replication peer configuration."  
+          description: "The name of the S3 replication peer configuration."
         url:
           type: "string"
           description: "Direct URL of the S3 replication peer configuration."
@@ -2008,7 +2039,7 @@ components:
           description: "The S3 secret key."
         custom_bucket_url:
           type: "string"
-          description: "The S3 URL of the bucket (DNS name/IP), used only when using CUSTOM_S3."  
+          description: "The S3 URL of the bucket (DNS name/IP), used only when using CUSTOM_S3."
     ActiveDirectory2:
       type: "object"
       properties:
@@ -2017,7 +2048,7 @@ components:
           description: "The unique ID of the resource."
         guid:
           type: "string"
-          description: "The unique GUID of the resource."          
+          description: "The unique GUID of the resource."
         machine_account_name:
           type: "string"
           description: "The name of the computer object/machine account to add. Recommended to use the name of the cluster."
