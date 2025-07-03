@@ -47,7 +47,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the replication peer configuration.`,
 		},
 
 		"name": {
@@ -55,7 +55,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("ReplicationPeers").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration.`,
 		},
 
 		"url": {
@@ -65,7 +65,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct url of the replication peer configurations`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct URL of the replication peer configuration.`,
 		},
 
 		"leading_vip": {
@@ -75,7 +75,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The vip provided for the replication peer configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP pool provided for the replication peer configuration.`,
 		},
 
 		"remote_vip_range": {
@@ -85,7 +85,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The vip range which were reported by the peer`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The range of virtual IPs that were reported by the peer.`,
 		},
 
 		"version": {
@@ -95,7 +95,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source.`,
 		},
 
 		"remote_version": {
@@ -105,7 +105,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer.`,
 		},
 
 		"is_local": {
@@ -115,7 +115,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the source of the replication local (this host is the source)`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the source of the replication is local (this host is the source).`,
 		},
 
 		"peer_name": {
@@ -125,7 +125,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer cluster`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer cluster.`,
 		},
 
 		"secure_mode": {
@@ -135,7 +135,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the connection secure`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the connection is secure.`,
 		},
 
 		"pool_id": {
@@ -145,7 +145,7 @@ func getResourceReplicationPeersSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The replication Vippool id`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the replication virtual IP pool.`,
 		},
 	}
 }

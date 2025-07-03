@@ -27,13 +27,13 @@ data "vastdata_protected_path" "protected_path1" {
 
 ### Read-Only
 
-- `capabilities` (String) (Valid for versions: 5.1.0,5.2.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]
-- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the protected path enabled
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) guid
+- `capabilities` (String) (Valid for versions: 5.1.0,5.2.0) Available replication capabilities. Supported only for clusters v5.1 and later. Allowed Values are [ASYNC_REPLICATION]
+- `enabled` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the protected path is enabled.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) GUID
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) protection policy id
-- `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The Remote tenant guid
-- `source_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) path to replicate
-- `target_exported_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) where to replicate on the remote
-- `target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The remote target object id
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Local Tenant ID
+- `protection_policy_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Protection policy ID.
+- `remote_tenant_guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Remote tenant GUID.
+- `source_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Path to replicate.
+- `target_exported_dir` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The destination path to replicate to on the remote cluster.
+- `target_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Remote target object ID.
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Local tenant ID.

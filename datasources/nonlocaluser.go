@@ -25,7 +25,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The ID of the non-local user.`,
 			},
 
 			"uid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The user's Unix UID.`,
 			},
 
 			"username": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Username of the Non-Local User`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The  username of the non-local user.`,
 			},
 
 			"allow_create_bucket": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Allow create bucket`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits bucket creation by the user.`,
 			},
 
 			"allow_delete_bucket": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Allow delete bucket`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits bucket deletion by the user.`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID.`,
 			},
 
 			"s3_policies_ids": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) List S3 policies IDs`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) A list of identity policy IDs.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -85,7 +85,7 @@ func DataSourceNonLocalUser() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Valid values: 'ad', 'nis' and 'ldap'.`,
 			},
 		},
 	}

@@ -25,7 +25,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a name for the VAST DNS server configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the VAST DNS server configuration.`,
 			},
 
 			"id": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe id given to the VAST DNS server configurations`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the VAST DNS server configuration.`,
 			},
 
 			"vip": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns a IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP for the DNS service. DNS requests from your external DNS server must be delegated to this IP.`,
 			},
 
 			"domain_suffix": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A suffix to append to domain names of each virtual IP pool. The suffix should append each domain name to form a valid FQDN for DNS requests to target.`,
 			},
 
 			"vip_gateway": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The IPv4 address of the gateway to the external DNS server if it is on a different subnet. Must be on the same subnet as the IP and reachable from the relevant network interface.`,
 			},
 
 			"enabled": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enable the VAST DNS server configurations`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables the VAST DNS server configuration.`,
 			},
 
 			"guid": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe guid assigned to the VAST DNS server configurations`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the VAST DNS server configuration.`,
 			},
 
 			"vip_subnet_cidr": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies the subnet, as a CIDR index, on which the DNS resides.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The subnet, in the CIDR format, on which the DNS resides.`,
 			},
 
 			"vip_vlan": &schema.Schema{
@@ -89,7 +89,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a VLAN if needed to enable communication with external DNS server(s).`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The VLAN (optional) to enable communication with the external DNS server(s).`,
 			},
 
 			"cnode_ids": &schema.Schema{
@@ -109,7 +109,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Assigns an IPv6 to the DNS service.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The IPv6 address of the DNS service.`,
 			},
 
 			"vip_ipv6_subnet_cidr": &schema.Schema{
@@ -117,7 +117,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies the subnet, as a CIDR index, on which the DNS resides. [1..128]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The subnet, in the CIDR format, on which the DNS resides. Valid values: [1..128]`,
 			},
 
 			"vip_ipv6_gateway": &schema.Schema{
@@ -125,7 +125,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies a gateway IPv6 to external DNS server if on different subnet.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The IPv6 address of the gateway to the external DNS server if it is on a different subnet.`,
 			},
 
 			"net_type": &schema.Schema{
@@ -133,7 +133,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Select the interface, that listens for DNS service delegation requests Allowed Values are [NORTH_PORT SOUTH_PORT EXTERNAL_PORT]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The interface that listens for DNS service delegation requests. Allowed Values are [NORTH_PORT SOUTH_PORT EXTERNAL_PORT]`,
 			},
 
 			"invalid_name_response": &schema.Schema{
@@ -141,7 +141,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns name Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid DNS name. Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
 			},
 
 			"invalid_type_response": &schema.Schema{
@@ -149,7 +149,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid dns type Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The response DNS type for invalid DNS type. Allowed Values are [NXDOMAIN REFUSED SERVFAIL NOERROR]`,
 			},
 
 			"ttl": &schema.Schema{
@@ -157,7 +157,7 @@ func DataSourceDns() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The reposne TTL in seconds`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The response TTL in seconds.`,
 			},
 		},
 	}

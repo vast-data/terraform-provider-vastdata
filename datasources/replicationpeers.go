@@ -25,7 +25,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the replication peer configuration.`,
 			},
 
 			"guid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the replication peer configuration.`,
 			},
 
 			"name": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration.`,
 			},
 
 			"url": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct url of the replication peer configurations`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct URL of the replication peer configuration.`,
 			},
 
 			"leading_vip": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The vip provided for the replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The virtual IP pool provided for the replication peer configuration.`,
 			},
 
 			"remote_vip_range": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The vip range which were reported by the peer`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The range of virtual IPs that were reported by the peer.`,
 			},
 
 			"version": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the source.`,
 			},
 
 			"remote_version": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The version of the remote peer.`,
 			},
 
 			"is_local": &schema.Schema{
@@ -89,7 +89,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the source of the replication local (this host is the source)`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the source of the replication is local (this host is the source).`,
 			},
 
 			"peer_name": &schema.Schema{
@@ -97,7 +97,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer cluster`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer cluster.`,
 			},
 
 			"secure_mode": &schema.Schema{
@@ -105,7 +105,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the connection secure`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the connection is secure.`,
 			},
 
 			"pool_id": &schema.Schema{
@@ -113,7 +113,7 @@ func DataSourceReplicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The replication Vippool id`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the replication virtual IP pool.`,
 			},
 		},
 	}

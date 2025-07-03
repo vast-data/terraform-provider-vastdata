@@ -1,11 +1,11 @@
-#we have 2 providers defined for each cluster with the aliases clusterA & clusterB
-#we create the following resources in order to create a global snapshot
-#1. Replication vippool for ceach cluster
-#2. Define them as replication  peers
+#Suppose there are two providers defined for each cluster with the aliases `clusterA` and `clusterB`.
+#Create the following resources in order to create a global snapshot:
+#1. Replication virtual IP pool for each cluster
+#2. Define the clusters as replication  peers.
 #3. A tenant 
-#4. A view with the prefix /view1 whcih belongs to the previous tenant just created
-#5  A snapshot to the view called snapshot1 on clusterB
-#6  A Global Snapshot of snapshot1 from clusterB to clusterA
+#4. A view with the prefix `/view1` that belongs to the newly created tenant
+#5. A snapshot to the view named `snapshot1` on cluster B
+#6. A global snapshot of `snapshot1` from cluster B to cluster A
 
 
 resource "vastdata_vip_pool" "pool1-clusterA" {

@@ -28,12 +28,11 @@ resource "vastdata_view_policy" "vpolicy1" {
   nfs_no_squash = ["10.0.0.1", "10.0.0.2"]
 }
 
-#Definning vippools#
-#the attribute vip_pools will work on vast version 5.0.0 and greater.
-#however when working with version greater than 5.1.0 is is advisable wither to migrate using vippool_permissions if previously vip_pools was used on cluster from version 5.0.0.
-#Important things to notice is that when using vip_pools on vast versions starting from version 5.1.0 the vippool permissions will always be set to RW.
+#Note that the `vip_pools` attribute is supported with VAST Cluster version 5.0.0 and later.
+#When using a VAST Cluster version later than 5.1.0, is is advisable to migrate using `vippool_permissions` in case you used the `vip_pools` attribute when the cluster was running version 5.0.0.
+#When using `vip_pools` with version 5.1.0 and later, the virtual IP pool permissions will always be set to W.
 
-#Example one using vip_pools versions 5.0.0 and above#
+#Example of using `vip_pools` with version 5.0.0 and later:
 
 resource "vastdata_vip_pool" "pool4" {
   name        = "pool4"
@@ -78,7 +77,7 @@ resource "vastdata_view_policy" "vpolicy1" {
   vip_pools =  [vastdata_vip_pool.pool4.id,vastdata_vip_pool.pool5.id]
 }
 
-#Example one using vippool_permissions for vast versions 5.1.0 and above, while setting view policy vippool permissions setting one vippool with read/write permissions and the other one with read only#
+#Example of using `vippool_permissions` for version 5.1.0 and later, where one virtual IP pool is set to read/write and the other is set to read-only:
 
 resource "vastdata_vip_pool" "pool4" {
   name        = "pool4"

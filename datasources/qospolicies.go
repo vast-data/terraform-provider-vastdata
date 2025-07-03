@@ -33,7 +33,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS Policy guid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS policy GUID.`,
 			},
 
 			"name": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS provisioning mode Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) QoS provisioning mode. Allowed Values are [STATIC USED_CAPACITY PROVISIONED_CAPACITY]`,
 			},
 
 			"policy_type": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) The QoS type Allowed Values are [VIEW USER]`,
+				Description: `(Valid for versions: 5.2.0) The QoS policy type. Allowed Values are [VIEW USER]`,
 			},
 
 			"limit_by": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.2.0) What attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]`,
+				Description: `(Valid for versions: 5.2.0) Specifies which attributes are setting the limitations. Allowed Values are [BW_IOPS BW IOPS]`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) When setting is_default this is the tenant which will take affect`,
+				Description: `(Valid for versions: 5.2.0) When setting 'is_default', this is the tenant for which the policy will be used as the default user QoS policy.`,
 			},
 
 			"attached_users_identifiers": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) List of local user IDs to which this QoS Policy is affective.`,
+				Description: `(Valid for versions: 5.2.0) A list of local user IDs to which this QoS policy applies.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -93,7 +93,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) Should this QoS Policy be the default QoS per user for this tenant ?, tnenat_id should be also provided when settingthis attribute`,
+				Description: `(Valid for versions: 5.2.0) Specifies whether this QoS policy is to be used as the default QoS policy per user for this tenant. Setting this attribute requires that 'tenant_id' is also supplied.`,
 			},
 
 			"io_size_bytes": &schema.Schema{
@@ -101,7 +101,7 @@ func DataSourceQosPolicy() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing the request size by IO size. Default: 64K. Recommended range: 4K - 1M.`,
 			},
 
 			"static_limits": &schema.Schema{
@@ -119,7 +119,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimum performance to provide when there is resource contention.`,
 						},
 
 						"max_reads_bw_mbps": &schema.Schema{
@@ -127,7 +127,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum performance to provide when there is no resource contention.`,
 						},
 
 						"min_writes_bw_mbps": &schema.Schema{
@@ -135,7 +135,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimum performance to provide when there is resource contention.`,
 						},
 
 						"max_writes_bw_mbps": &schema.Schema{
@@ -143,7 +143,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum performance to provide when there is no resource contention.`,
 						},
 
 						"min_reads_iops": &schema.Schema{
@@ -151,7 +151,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimum performance to provide when there is resource contention.`,
 						},
 
 						"max_reads_iops": &schema.Schema{
@@ -159,7 +159,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum performance to provide when there is no resource contention.`,
 						},
 
 						"min_writes_iops": &schema.Schema{
@@ -167,7 +167,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimal amount of performance to provide when there is resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Minimum performance to provide when there is resource contention.`,
 						},
 
 						"max_writes_iops": &schema.Schema{
@@ -175,7 +175,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum performance to provide when there is no resource contention.`,
 						},
 
 						"burst_reads_bw_mb": &schema.Schema{
@@ -183,7 +183,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst reads BW Mb`,
+							Description: `(Valid for versions: 5.2.0) Burst read bandwidth (in MB/s).`,
 						},
 
 						"burst_reads_loan_mb": &schema.Schema{
@@ -191,7 +191,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst reads loan Mb`,
+							Description: `(Valid for versions: 5.2.0) Burst read credits (in MB/s).`,
 						},
 
 						"burst_writes_bw_mb": &schema.Schema{
@@ -199,7 +199,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst writes BW Mb`,
+							Description: `(Valid for versions: 5.2.0) Burst write bandwidth (in MB/s).`,
 						},
 
 						"burst_writes_loan_mb": &schema.Schema{
@@ -207,7 +207,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst writes loan Mb`,
+							Description: `(Valid for versions: 5.2.0) Burst write credits (in MB/s).`,
 						},
 
 						"burst_reads_iops": &schema.Schema{
@@ -215,7 +215,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst reads IOPS`,
+							Description: `(Valid for versions: 5.2.0) Burst read IOPS.`,
 						},
 
 						"burst_reads_loan_iops": &schema.Schema{
@@ -223,7 +223,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst reads loan IOPS`,
+							Description: `(Valid for versions: 5.2.0) Burst read IOPS credits.`,
 						},
 
 						"burst_writes_iops": &schema.Schema{
@@ -231,7 +231,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst writes IOPS`,
+							Description: `(Valid for versions: 5.2.0) Burst write IOPS.`,
 						},
 
 						"burst_writes_loan_iops": &schema.Schema{
@@ -239,7 +239,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst writes loan IOPS`,
+							Description: `(Valid for versions: 5.2.0) Burst write IOPS credits.`,
 						},
 					},
 				},
@@ -260,7 +260,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum read bandwidth (in MB/s) per GB to provide when there is no resource contention.`,
 						},
 
 						"max_writes_bw_mbps_per_gb_capacity": &schema.Schema{
@@ -268,7 +268,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum write bandwidth (in MB/s) per GB to provide when there is no resource contention.`,
 						},
 
 						"max_reads_iops_per_gb_capacity": &schema.Schema{
@@ -276,7 +276,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum read IOPS per GB to provide when there is no resource contention.`,
 						},
 
 						"max_writes_iops_per_gb_capacity": &schema.Schema{
@@ -284,7 +284,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Maximum write IOPS per GB to provide when there is no resource contention.`,
 						},
 					},
 				},
@@ -305,7 +305,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Maximal BW Mb/s`,
+							Description: `(Valid for versions: 5.2.0) Maximum bandwidth (in MB/s).`,
 						},
 
 						"burst_bw_mb": &schema.Schema{
@@ -313,7 +313,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst BW Mb`,
+							Description: `(Valid for versions: 5.2.0) Burst bandwidth (in MB/s)`,
 						},
 
 						"burst_loan_mb": &schema.Schema{
@@ -321,7 +321,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst loan Mb`,
+							Description: `(Valid for versions: 5.2.0) Burst credits (in MB/s)`,
 						},
 
 						"max_iops": &schema.Schema{
@@ -329,7 +329,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Maximal IOPS`,
+							Description: `(Valid for versions: 5.2.0) Maximum IOPS.`,
 						},
 
 						"burst_iops": &schema.Schema{
@@ -337,7 +337,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst IOPS`,
+							Description: `(Valid for versions: 5.2.0) Burst IOPS.`,
 						},
 
 						"burst_loan_iops": &schema.Schema{
@@ -345,7 +345,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Burst loan IOPS`,
+							Description: `(Valid for versions: 5.2.0) Burst IOPS credits.`,
 						},
 					},
 				},
@@ -366,7 +366,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.2.0) Maximum bandwidth (in MB/s) per GB to provide when there is no resource contention.`,
 						},
 
 						"max_iops_per_gb_capacity": &schema.Schema{
@@ -374,7 +374,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) Maximal amount of performance per GB to provide when there is no resource contention`,
+							Description: `(Valid for versions: 5.2.0) Maximum IOPS per GB to provide when there is no resource contention.`,
 						},
 					},
 				},
@@ -395,7 +395,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) User FQDN`,
+							Description: `(Valid for versions: 5.2.0) User FQDN.`,
 						},
 
 						"is_sid": &schema.Schema{
@@ -411,7 +411,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The user SID`,
+							Description: `(Valid for versions: 5.2.0) User SID.`,
 						},
 
 						"uid_or_gid": &schema.Schema{
@@ -427,7 +427,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) How to display the user`,
+							Description: `(Valid for versions: 5.2.0) How to display the user.`,
 						},
 
 						"value": &schema.Schema{
@@ -435,7 +435,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The user name`,
+							Description: `(Valid for versions: 5.2.0) User name.`,
 						},
 
 						"login_name": &schema.Schema{
@@ -443,7 +443,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The user login name`,
+							Description: `(Valid for versions: 5.2.0) User login name.`,
 						},
 
 						"name": &schema.Schema{
@@ -451,7 +451,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The user name`,
+							Description: `(Valid for versions: 5.2.0) User name.`,
 						},
 
 						"identifier_type": &schema.Schema{
@@ -459,7 +459,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The user type of idetify`,
+							Description: `(Valid for versions: 5.2.0) The type of identifier used to identify the user.`,
 						},
 
 						"identifier_value": &schema.Schema{
@@ -467,7 +467,7 @@ func DataSourceQosPolicy() *schema.Resource {
 							Computed:    true,
 							Required:    false,
 							Optional:    false,
-							Description: `(Valid for versions: 5.2.0) The value to use fo the identifier_type`,
+							Description: `(Valid for versions: 5.2.0) The identifier of type specified in 'identifier_type'.`,
 						},
 					},
 				},

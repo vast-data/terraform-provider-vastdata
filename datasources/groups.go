@@ -25,7 +25,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe Identifier of a group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the group.`,
 			},
 
 			"guid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe GUID assigned to the group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the group.`,
 			},
 
 			"name": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the group.`,
 			},
 
 			"gid": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The group linux gid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The Unix GID of the group.`,
 			},
 
 			"sid": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The group SID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The SID of the group.`,
 			},
 
 			"s3_policies_ids": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of S3 policies IDs`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of identity policy IDs.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,

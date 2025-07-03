@@ -25,7 +25,7 @@ func DataSourceNonLocalGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalGroup identifier`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The ID of the non-local group.`,
 			},
 
 			"gid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceNonLocalGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Group GID`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Group GID.`,
 			},
 
 			"sid": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceNonLocalGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Group SID`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Group SID.`,
 			},
 
 			"groupname": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceNonLocalGroup() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Groupname`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Group name.`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceNonLocalGroup() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID.`,
 			},
 
 			"s3_policies_ids": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceNonLocalGroup() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) List S3 policies IDs`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) A list of identity policy IDs.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -77,7 +77,7 @@ func DataSourceNonLocalGroup() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Valid values: 'ad', 'nis' and 'ldap'.`,
 			},
 		},
 	}

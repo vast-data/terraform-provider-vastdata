@@ -41,7 +41,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) guid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GUID`,
 			},
 
 			"protection_policy_id": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) protection policy id`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Protection policy ID.`,
 			},
 
 			"source_dir": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) path to replicate`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Path to replicate.`,
 			},
 
 			"target_exported_dir": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) where to replicate on the remote`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The destination path to replicate to on the remote cluster.`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Local Tenant ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Local tenant ID.`,
 			},
 
 			"remote_tenant_guid": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The Remote tenant guid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remote tenant GUID.`,
 			},
 
 			"target_id": &schema.Schema{
@@ -89,7 +89,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote target object id`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remote target object ID.`,
 			},
 
 			"capabilities": &schema.Schema{
@@ -97,7 +97,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Replication capabilities which define , avaliable only for cluster from version 5.1 Allowed Values are [ASYNC_REPLICATION]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Available replication capabilities. Supported only for clusters v5.1 and later. Allowed Values are [ASYNC_REPLICATION]`,
 			},
 
 			"enabled": &schema.Schema{
@@ -105,7 +105,7 @@ func DataSourceProtectedPath() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the protected path enabled`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the protected path is enabled.`,
 			},
 		},
 	}

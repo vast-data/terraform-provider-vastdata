@@ -3,22 +3,22 @@
 page_title: "vastdata_quota Data Source - terraform-provider-vastdata"
 subcategory: ""
 description: |-
-  This is a quota
+  This is a quota.
 ---
 
 # vastdata_quota (Data Source)
 
-This is a quota
+This is a quota.
 
 ## Example Usage
 
 ```terraform
-#When there is only one quota with that name at the entire cluster
+#When there is only one quota with that name on the entire cluster
 data "vastdata_quota" "quota1" {
   name = "quota1"
 }
 
-#When there is more than one quota with that name at the cluster with differant tenant id
+#When there is more than one quota with that name on the cluster, with different tenant ID
 
 resource "vastdata_tenant" "tenant1" {
   name = "tenant01"
@@ -41,46 +41,46 @@ data "vastdata_quota" "quota3" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota name.
 
 ### Optional
 
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID.
 
 ### Read-Only
 
-- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
-- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID
-- `default_email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The default Email if there is no suffix and no address in the providers
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.
+- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster ID.
+- `default_email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The default email address used if there is no suffix specified and no address can be found in the providers.
 - `default_group_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--default_group_quota))
 - `default_user_quota` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--default_user_quota))
-- `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enable alarms when users or groups are exceeding their limit
+- `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables alarms when users or groups are exceeding their limits.
 - `enable_email_providers` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `grace_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
 - `group_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--group_quotas))
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota guid
-- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit
-- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota GUID.
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit.
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit.
 - `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `is_user_quota` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `num_blocked_users` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `num_exceeded_users` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Directory path
-- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used capacity out of the hard limit
-- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used inodes out of the hard limit
-- `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
+- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Directory path.
+- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percentage of used capacity out of the hard limit.
+- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percentage of used inodes out of the hard limit.
+- `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
 - `pretty_state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit
-- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit.
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit.
 - `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant Name
-- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time
-- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes
-- `used_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in TB
-- `used_effective_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in bytes
-- `used_effective_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in TB
-- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes
+- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant name.
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time.
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes.
+- `used_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in TB.
+- `used_effective_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in bytes.
+- `used_effective_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in TB.
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes.
 - `user_quotas` (List of Object) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedatt--user_quotas))
 
 <a id="nestedatt--default_group_quota"></a>

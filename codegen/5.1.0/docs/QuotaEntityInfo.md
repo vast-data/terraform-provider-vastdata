@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** | The name of the entity | [optional] [default to null]
+**Name** | **string** | The name of the entity. | [optional] [default to null]
 **VastId** | **int32** |  | [optional] [default to null]
 **Email** | **string** |  | [optional] [default to null]
 **IsGroup** | **bool** |  | [default to null]

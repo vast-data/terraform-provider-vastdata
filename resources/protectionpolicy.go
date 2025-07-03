@@ -47,7 +47,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the  replication peer configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the protection policy.`,
 		},
 
 		"name": {
@@ -55,7 +55,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the replication peer configuration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the protection policy.`,
 		},
 
 		"url": {
@@ -65,7 +65,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the replication policy`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct URL of the protection policy.`,
 		},
 
 		"target_name": {
@@ -75,7 +75,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The target peer name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the destination peer.`,
 		},
 
 		"target_object_id": {
@@ -85,7 +85,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the target peer`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the destination peer.`,
 		},
 
 		"prefix": {
@@ -93,7 +93,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("ProtectionPolicy").GetConflictingFields("prefix"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The prefix to be given to the replicated data.`,
 		},
 
 		"clone_type": {
@@ -103,7 +103,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Required: true,
 
 			ValidateDiagFunc: utils.OneOf([]string{"NATIVE_REPLICATION", "LOCAL"}),
-			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) The type the replication Allowed Values are [NATIVE_REPLICATION LOCAL]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) The type of replication. Allowed Values are [NATIVE_REPLICATION LOCAL]`,
 		},
 
 		"frames": {
@@ -113,7 +113,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of snapshots schedules`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of snapshot schedules.`,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -178,7 +178,7 @@ func getResourceProtectionPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot indestructable`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the snapshot is  indestructable.`,
 		},
 	}
 }

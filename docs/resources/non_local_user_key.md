@@ -46,17 +46,17 @@ resource "vastdata_non_local_user_key" "EncryptedExternalUserKey" {
 
 ### Required
 
-- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID
-- `uid` (Number) (Valid for versions: 5.1.0,5.2.0) The user unix UID
+- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID.
+- `uid` (Number) (Valid for versions: 5.1.0,5.2.0) The user's Unix UID.
 
 ### Optional
 
-- `enabled` (Boolean) (Valid for versions: 5.1.0,5.2.0) Should the key be enabled or disabled
-- `id` (String) (Valid for versions: 5.1.0,5.2.0) The Access key unique identifier
-- `pgp_public_key` (String) (Valid for versions: 5.1.0,5.2.0) The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect
+- `enabled` (Boolean) (Valid for versions: 5.1.0,5.2.0) Sets the key to be enabled or disabled.
+- `id` (String) (Valid for versions: 5.1.0,5.2.0) The unique ID of the access key.
+- `pgp_public_key` (String) (Valid for versions: 5.1.0,5.2.0) The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the 'encrypted_secret_key' will be returned, while 'secret_key' will be empty. Changing this after apply will have no effect.
 
 ### Read-Only
 
-- `access_key` (String) (Valid for versions: 5.1.0,5.2.0) The access id of the user key
-- `encrypted_secret_key` (String) (Valid for versions: 5.1.0,5.2.0) The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key
-- `secret_key` (String, Sensitive) (Valid for versions: 5.1.0,5.2.0) The secret id of the user key
+- `access_key` (String) (Valid for versions: 5.1.0,5.2.0) The user's access key.
+- `encrypted_secret_key` (String) (Valid for versions: 5.1.0,5.2.0) The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in 'pgp_public_key'.
+- `secret_key` (String, Sensitive) (Valid for versions: 5.1.0,5.2.0) The user's secret key.

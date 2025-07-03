@@ -47,7 +47,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the global snapshot.`,
 		},
 
 		"name": {
@@ -55,7 +55,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.`,
 		},
 
 		"loanee_tenant_id": {
@@ -66,7 +66,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			DiffSuppressFunc:      utils.DoNothingOnUpdate(),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID on the destination peer.`,
 		},
 
 		"loanee_root_path": {
@@ -74,7 +74,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("loanee_root_path"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on the destination peer.`,
 		},
 
 		"remote_target_id": {
@@ -82,7 +82,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_id"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering id`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering ID.`,
 		},
 
 		"remote_target_guid": {
@@ -90,7 +90,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_guid"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering guid`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering GUID.`,
 		},
 
 		"remote_target_path": {
@@ -98,7 +98,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshot").GetConflictingFields("remote_target_path"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster.`,
 		},
 
 		"enabled": {
@@ -108,7 +108,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the snapshot to be enabled or disabled.`,
 		},
 
 		"owner_root_snapshot": {
@@ -128,7 +128,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the clone`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the clone.`,
 					},
 
 					"name": {
@@ -136,7 +136,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerRootSnapshot").GetConflictingFields("name"),
 
 						Required:    true,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remote Clone Name`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remote clone name.`,
 					},
 
 					"parent_handle_ehandle": {
@@ -146,7 +146,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    false,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote handle (inode)`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote handle (inode).`,
 					},
 				},
 			},
@@ -167,7 +167,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("name"),
 
 						Required:    true,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the remote tenant.`,
 					},
 
 					"guid": {
@@ -175,7 +175,7 @@ func getResourceGlobalSnapshotSchema() map[string]*schema.Schema {
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("guid"),
 
 						Required:    true,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant guid`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant GUID.`,
 					},
 				},
 			},
