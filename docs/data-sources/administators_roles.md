@@ -23,15 +23,15 @@ data "vastdata_administators_roles" "roleB" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name of the role
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the role.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.2.0) A uniqe GUID assigned to the role
+- `guid` (String) (Valid for versions: 5.2.0) The unique GUID  of the role.
 - `id` (String) The ID of this resource.
-- `is_admin` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is an admin role
-- `is_default` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is a default role
-- `ldap_groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP group(s) associated with the role. Members of the specified groups on a connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.
-- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS
-- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
-- `tenants` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of tenants to which this role is associated with
+- `is_admin` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the role is an admin role.
+- `is_default` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the role is a default role.
+- `ldap_groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP group(s) associated with the role. Members of the specified groups on the connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.
+- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of granted permissions returned from the VMS.
+- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of permissions granted. Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
+- `tenants` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of tenants the role is associated with.

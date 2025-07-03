@@ -25,7 +25,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the s3 replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the S3 replication peer configuration.`,
 			},
 
 			"guid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the s3 replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the S3 replication peer configuration.`,
 			},
 
 			"name": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the s3 replication peer configuration`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the S3 replication peer configuration.`,
 			},
 
 			"url": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct link to the s3 replication peer configurations`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Direct URL of the S3 replication peer configuration.`,
 			},
 
 			"bucket_name": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer bucket to replicate to`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the peer bucket to replicate to.`,
 			},
 
 			"http_protocol": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The http protocol user http/https`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The HTTP protocol used (HTTP or HTTPS).`,
 			},
 
 			"type_": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of http procies`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of HTTP proxies.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -93,7 +93,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The Bucket AWS region, Valid only when type is AWS_S3`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The AWS region of the bucket. Valid only when type is AWS_S3.`,
 			},
 
 			"access_key": &schema.Schema{
@@ -101,7 +101,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 access key`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 access key.`,
 			},
 
 			"secret_key": &schema.Schema{
@@ -109,7 +109,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 secret key`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 secret key.`,
 			},
 
 			"custom_bucket_url": &schema.Schema{
@@ -117,7 +117,7 @@ func DataSourceS3replicationPeers() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 url of the bucket (dns name/ip) used only when using CUSTOM_S3`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The S3 URL of the bucket (DNS name/IP), used only when using CUSTOM_S3.`,
 			},
 		},
 	}

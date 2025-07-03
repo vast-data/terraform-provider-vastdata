@@ -25,7 +25,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) A uniqe ID given to this resource`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The unique GUID of the resource.`,
 			},
 
 			"machine_account_name": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Name of the computer object/machine account to add. Recommended to be the name of the cluster`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The name of the computer object/machine account to add. Recommended to use the name of the cluster.`,
 			},
 
 			"organizational_unit": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Organizational Unit within AD where the Cluster Machine account will be created. If left empty, it will go into default Computers OU`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Organizational unit within Active Directory where the cluster's machine account will be created. If left empty, defaults to Computers OU.`,
 			},
 
 			"smb_allowed": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Indicates if AD is allowed for SMB.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Indicates if Active Directory is allowed for SMB.`,
 			},
 
 			"ntlm_enabled": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Manages support of NTLM authentication method for SMB protocol.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables support of NTLM authentication for SMB.`,
 			},
 
 			"use_auto_discovery": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) If 'true', Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If 'false', queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
 			},
 
 			"use_ldaps": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Use LDAPS for auto-Discovery. To activate, set use_auto_discovery to true also.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to use LDAPS for auto-discovery. To enable use of LDAPS, also set 'use_auto_discovery' to 'true'.`,
 			},
 
 			"port": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Which port to use`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Which port to use.`,
 			},
 
 			"binddn": &schema.Schema{
@@ -89,7 +89,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Distinguished name of AD superuser`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Distinguished name of the Active Directory superuser.`,
 			},
 
 			"searchbase": &schema.Schema{
@@ -97,7 +97,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The Base DN is the starting point the AD provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The base DN is the starting point that the Active Directory provider uses when searching for users and groups. If a group base DN is configured, it will be used instead of the base DN (for groups only).`,
 			},
 
 			"domain_name": &schema.Schema{
@@ -113,7 +113,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Bind Authentication Method Allowed Values are [simple anonymous sasl]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Bind authentication method. Allowed Values are [simple anonymous sasl]`,
 			},
 
 			"query_groups_mode": &schema.Schema{
@@ -121,7 +121,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Query group mode Allowed Values are [COMPATIBLE NONE RFC2307BIS RFC2307]`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Query group mode. Allowed Values are [COMPATIBLE NONE RFC2307BIS RFC2307]`,
 			},
 
 			"posix_attributes_source": &schema.Schema{
@@ -137,7 +137,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Set to true to enable use of TLS to secure communication between VAST Cluster and the AD server.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Set to 'true' to enable use of TLS to secure communication between the VAST cluster and the Active Directory server.`,
 			},
 
 			"tls_certificate": &schema.Schema{
@@ -145,7 +145,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) TLS certificate to use for verifying the remote AD server’s TLS certificate.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) TLS certificate to use for verifying the remote Active Directory server’s TLS certificate.`,
 			},
 
 			"reverse_lookup": &schema.Schema{
@@ -153,7 +153,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Resolve AD netgroups into hostnames`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to resolve Active Directory netgroups into hostnames.`,
 			},
 
 			"gid_number": &schema.Schema{
@@ -161,7 +161,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the AD server that contains the UID number, if different from ‘uidNumber’. Often when binding VAST Cluster to AD this does not need to be set.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the Active Directory server that contains the UID number, if different from 'uidNumber'. Often, when binding the VAST cluster to Active Directory, this does not need to be set.`,
 			},
 
 			"use_multi_forest": &schema.Schema{
@@ -169,7 +169,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Allow access for users from trusted domains on other forests.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits access for users from trusted domains on other forests.`,
 			},
 
 			"uid": &schema.Schema{
@@ -177,7 +177,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the AD server that contains the user name, if different from ‘uid’ When binding VAST Cluster to AD, you may need to set this to ‘sAMAccountname’.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the Active Directory server that contains the user name, if different from 'uid'. When binding the VAST cluster to Active Directory, you may need to set this to 'sAMAccountname'.`,
 			},
 
 			"uid_number": &schema.Schema{
@@ -185,7 +185,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the AD server that contains the UID number, if different from ‘uidNumber’. Often when binding VAST Cluster to AD this does not need to be set.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a user entry on the Active Directory server that contains the UID number, if different from 'uidNumber'. Often when binding the VAST cluster to Active Directory, this does not need to be set.`,
 			},
 
 			"match_user": &schema.Schema{
@@ -193,7 +193,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute to use when querying a provider for a user that matches a user that has already been retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.`,
 			},
 
 			"uid_member_value_property_name": &schema.Schema{
@@ -201,7 +201,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute which represents the value of the AD group’s member property.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute which represents the value of the Active Directory group’s member property.`,
 			},
 
 			"uid_member": &schema.Schema{
@@ -209,7 +209,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a group entry on the AD server that contains names of group members, if different from ‘memberUid’. When binding VAST Cluster to AD, you may need to set this to ‘memberUID’.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute of a group entry on the Active Directory server that contains names of group members, if different from 'memberUid'. When binding the VAST cluster to Active Directory, you may need to set this to 'memberUID'.`,
 			},
 
 			"posix_account": &schema.Schema{
@@ -217,7 +217,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The object class that defines a user entry on the AD server, if different from ‘posixAccount’. When binding VAST Cluster to AD, set this parameter to ‘user’ in order for authorization to work properly.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The object class that defines a user entry on the Active Directory server, if different from 'posixAccount'. When binding the VAST cluster to Active Directory, set this parameter to 'user' to ensure that authorization works properly.`,
 			},
 
 			"posix_group": &schema.Schema{
@@ -225,7 +225,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0)  The object class that defines a group entry on the AD server, if different from ‘posixGroup’. When binding VAST Cluster to AD, set this parameter to ‘group’ in order for authorization to work properly.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The object class that defines a group entry on the Active Directory server, if different from 'posixGroup'. When binding the VAST cluster to Active Directory, set this parameter to 'group' to ensure that authorization works properly.`,
 			},
 
 			"username_property_name": &schema.Schema{
@@ -233,7 +233,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute to use for querying users in VMS user-initated user queries. Default is ‘name’. Sometimes set to ‘cn’`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The attribute to use for querying users in VMS user-initated user queries. Default is 'name'. Sometimes it can be set to 'cn'.`,
 			},
 
 			"user_login_name": &schema.Schema{
@@ -241,7 +241,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute used to query Active Directory for the user login name in NFS ID mapping.`,
 			},
 
 			"group_login_name": &schema.Schema{
@@ -249,7 +249,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Specifies the attribute used to query Active Directory for the group login name in NFS ID mapping.`,
 			},
 
 			"mail_property_name": &schema.Schema{
@@ -265,7 +265,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Enables use of the AD for VMS authentication. Two AD configurations per cluster can be used for VMS authentication: one with AD and one without.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables use of the Active Directory for VMS authentication. Two Active Directory configurations per cluster can be used for VMS authentication: one with Active Directory and the other without Active Directory.`,
 			},
 
 			"bindpw": &schema.Schema{
@@ -273,7 +273,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The password used with the Bind DN to authenticate to the AD server.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The password used with the Bind DN to authenticate to the Active Directory server.`,
 			},
 
 			"urls": &schema.Schema{
@@ -281,7 +281,7 @@ func DataSourceActiveDirectory2() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Comma separated list of URIs of AD servers in the format SCHEME://ADDRESS. The order of listing defines the priority order. The URI with highest priority that has a good health status is used.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) A comma-separated list of URIs of Active Directory servers in the format 'SCHEME://ADDRESS'. The order of listing defines the priority order. The URI with the highest priority that has a good health status is used.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

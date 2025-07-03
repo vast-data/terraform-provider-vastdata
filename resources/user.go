@@ -47,7 +47,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the user`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the user.`,
 		},
 
 		"name": {
@@ -55,7 +55,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("User").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the user`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the user.`,
 		},
 
 		"uid": {
@@ -65,7 +65,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user unix UID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user's Unix UID.`,
 		},
 
 		"leading_gid": {
@@ -75,7 +75,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user leading unix GID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user's leading Unix GID.`,
 		},
 
 		"gids": {
@@ -87,7 +87,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary GID list`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary GIDs.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -103,7 +103,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary Group list`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary groups.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -117,7 +117,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Group Count`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Group count.`,
 		},
 
 		"leading_group_name": {
@@ -127,7 +127,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group Name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the leading group.`,
 		},
 
 		"leading_group_gid": {
@@ -137,7 +137,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group GID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The GID of the leading group.`,
 		},
 
 		"sid": {
@@ -147,7 +147,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user SID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user's SID.`,
 		},
 
 		"primary_group_sid": {
@@ -157,7 +157,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user primary group SID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user's primary group SID.`,
 		},
 
 		"sids": {
@@ -167,7 +167,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) supplementary SID list`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary SIDs.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -181,7 +181,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IS this a local user`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', the user is a local user.`,
 		},
 
 		"allow_create_bucket": {
@@ -191,7 +191,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow create bucket`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits bucket creation by the user.`,
 		},
 
 		"allow_delete_bucket": {
@@ -201,7 +201,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allow delete bucket`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits bucket deletion by the user.`,
 		},
 
 		"s3_superuser": {
@@ -211,7 +211,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is S3 superuser`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', the user is an S3 superuser.`,
 		},
 
 		"s3_policies_ids": {
@@ -223,7 +223,7 @@ func getResourceUserSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) List S3 policies IDs`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of identity policy IDs.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,

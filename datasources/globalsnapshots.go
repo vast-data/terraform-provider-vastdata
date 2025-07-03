@@ -25,7 +25,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the global snapshot`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the global snapshot.`,
 			},
 
 			"guid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the global snapshot.`,
 			},
 
 			"name": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.`,
 			},
 
 			"loanee_tenant_id": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID on the destination peer.`,
 			},
 
 			"loanee_root_path": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on the destination peer.`,
 			},
 
 			"remote_target_id": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering id`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering ID.`,
 			},
 
 			"remote_target_guid": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering guid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote replication peering GUID.`,
 			},
 
 			"remote_target_path": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path on the remote cluster.`,
 			},
 
 			"enabled": &schema.Schema{
@@ -89,7 +89,7 @@ func DataSourceGlobalSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the snapshot to be enabled or disabled.`,
 			},
 
 			"owner_root_snapshot": &schema.Schema{

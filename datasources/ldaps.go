@@ -41,7 +41,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of URIs of LDAP servers (Domain Controllers in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format '<scheme>://<address>'. '<address>' can be either a DNS name or an IP address, for example: 'ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2'.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -61,7 +61,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Distinguished name of LDAP superuser`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Distinguished name of the LDAP superuser.`,
 			},
 
 			"bindpw": &schema.Schema{
@@ -69,7 +69,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Password for the LDAP superuser`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Password for the LDAP superuser.`,
 			},
 
 			"searchbase": &schema.Schema{
@@ -77,7 +77,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The base DN is the starting point that the LDAP provider uses when searching for users and groups. If a group base DN is configured, it will be used instead of the base DN, for groups only.`,
 			},
 
 			"group_searchbase": &schema.Schema{
@@ -85,7 +85,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Base DN for group queries within the joined domain only. When auto-discovery is enabled, group queries outside the joined domain use automatically discovered base DNs.`,
 			},
 
 			"method": &schema.Schema{
@@ -93,7 +93,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Bind Authentication Method Allowed Values are [simple sasl anonymous]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Bind authentication method. Allowed Values are [simple sasl anonymous]`,
 			},
 
 			"gid_number": &schema.Schema{
@@ -101,7 +101,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for gid number`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for gid number.`,
 			},
 
 			"uid": &schema.Schema{
@@ -109,7 +109,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for uid`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for uid.`,
 			},
 
 			"uid_number": &schema.Schema{
@@ -117,7 +117,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for uid number`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for uid number.`,
 			},
 
 			"match_user": &schema.Schema{
@@ -125,7 +125,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for user matching`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for user matching.`,
 			},
 
 			"uid_member": &schema.Schema{
@@ -133,7 +133,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for uid member`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for uid member.`,
 			},
 
 			"posix_account": &schema.Schema{
@@ -141,7 +141,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for posix account`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for posix account.`,
 			},
 
 			"posix_group": &schema.Schema{
@@ -149,7 +149,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attrirbute mapping for posix account`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Attribute mapping for posix group.`,
 			},
 
 			"use_tls": &schema.Schema{
@@ -157,7 +157,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) configure LDAP with TLS`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to configure LDAP with TLS.`,
 			},
 
 			"posix_primary_provider": &schema.Schema{
@@ -165,7 +165,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) POSIX primary provider`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) POSIX primary provider.`,
 			},
 
 			"posix_attributes_source": &schema.Schema{
@@ -205,7 +205,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Query group mode Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Query group mode. Allowed Values are [COMPATIBLE RFC2307BIS RFC2307 NONE]`,
 			},
 
 			"username_property_name": &schema.Schema{
@@ -213,7 +213,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Username property name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Username property name.`,
 			},
 
 			"domain_name": &schema.Schema{
@@ -229,7 +229,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The attribute used to query AD for the user login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The attribute used to query the provider for the user login name in NFS ID mapping.`,
 			},
 
 			"group_login_name": &schema.Schema{
@@ -237,7 +237,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The attribute used to query AD for the group login name in NFS ID mapping. Applicable only with AD and NFSv4.1.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The attribute used to query the provider for the group login name in NFS ID mapping.`,
 			},
 
 			"mail_property_name": &schema.Schema{
@@ -261,7 +261,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If 'false', queries are restricted to the joined domain and URIs must be provided in 'urls'.`,
 			},
 
 			"use_ldaps": &schema.Schema{
@@ -269,7 +269,7 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Use LDAPS for Auto-Discovery`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to use LDAPS for auto-discovery.`,
 			},
 
 			"is_vms_auth_provider": &schema.Schema{
@@ -277,18 +277,15 @@ func DataSourceLdap() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Whether the LDAP should be used for VMS auth. There is only two LDAPs allowed for VMS auth: one with AD and one w/o.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the LDAP is to be used for VMS authentication. There can be only two LDAP configurations that can be used for VMS authentication: one with Active Directory and the other without Active Directory.`,
 			},
 
 			"query_posix_attributes_from_gc": &schema.Schema{
-				Type:     schema.TypeBool,
-				Computed: false,
-				Required: false,
-				Optional: true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) When set to True - users/groups from non-joined domain POSIX attributes are supported,
-when set to False - Posix attributes of users/groups from non-joined domain are not supported.
-As a condition Global catalog needs to be configured to support Posix attributes.
-`,
+				Type:        schema.TypeBool,
+				Computed:    false,
+				Required:    false,
+				Optional:    true,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', users/groups from non-joined domain POSIX attributes are supported. If 'false', POSIX attributes of users/groups from non-joined domain are not supported.`,
 			},
 		},
 	}

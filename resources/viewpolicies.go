@@ -47,7 +47,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe guid given to the view policy`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the view policy.`,
 		},
 
 		"name": {
@@ -55,7 +55,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("ViewPolicy").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name given to the view policy.                         `,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the view policy.`,
 		},
 
 		"gid_inheritance": {
@@ -65,7 +65,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Determine the way a file inherits GID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Determines the way a file inherits GID.`,
 		},
 
 		"flavor": {
@@ -85,7 +85,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Controls which protocols can set file permissions when the security flavor is set to 'MIXED_LAST_WINS'. Note that with 'MIXED_LAST_WINS', NFSv3 access is unaffected by this option.`,
 		},
 
 		"path_length": {
@@ -97,7 +97,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"LCD", "NPL"}),
-			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) How to determine the maximum allowed path length Allowed Values are [LCD NPL]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) How to determine the maximum allowed path length. Allowed Values are [LCD NPL]`,
 		},
 
 		"allowed_characters": {
@@ -107,7 +107,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) How to determine the allowed characters in a path`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) How to determine the allowed characters in a path.`,
 		},
 
 		"use32bit_fileid": {
@@ -137,7 +137,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Use configured Auth Provider(s) to enforce group permissions when set to true , if set to ture with out specifing auth_source , the auth_source set to "PROVIDERS". if set to false than auth_source set to RPC. Due to the nature or terrafrom simply changing use_auth_provider from false to true or the other way around will not change the value auth_source as terrafrom will keep hold on the previous value. therefor it is adviasable to always specify the value of auth_source`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables use of the configured authentication provider(s) to enforce group permissions. If set to 'true' without specifing 'auth_source', the 'auth_source' is set to 'PROVIDERS'. If set to 'false', the 'auth_source' is set to RPC. Due to the nature of Terraform, simply changing 'use_auth_provider' from 'false' to 'true' or the other way around will not change the value of the 'auth_source' parameter because Terrafrom will keep holding the previous value. Therefore it is advisable to always specify the value of 'auth_source'.`,
 
 			Default: false,
 		},
@@ -151,7 +151,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"PROVIDERS", "RPC", "RPC_AND_PROVIDERS"}),
-			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) The source of authentication Allowed Values are [PROVIDERS RPC RPC_AND_PROVIDERS]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) The source of authentication. Allowed Values are [PROVIDERS RPC RPC_AND_PROVIDERS]`,
 		},
 
 		"read_write": {
@@ -161,7 +161,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read/write permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read/write permissions.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -175,7 +175,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read only permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read-only permissions.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -191,7 +191,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_read_write' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -205,7 +205,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with NFS read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_read_only' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -219,7 +219,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with SMB read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with SMB read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'smb_read_write' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -233,7 +233,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with SMB read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with SMB read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'smb_read_only' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -247,7 +247,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with S3 read/write permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with S3 read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 's3_read_write' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -261,7 +261,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with S3 read only permissions. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with S3 read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 's3_read_only' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -275,7 +275,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with trash permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with trash folder permissions.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -289,7 +289,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enable POSIX ACL`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables POSIX ACL.`,
 		},
 
 		"nfs_return_open_permissions": {
@@ -299,7 +299,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) when using smb use open permissions for files`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) When using SMB, enables or disables use of open permissions for files.`,
 		},
 
 		"nfs_no_squash": {
@@ -311,7 +311,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with no squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with the no-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_no_squash' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -325,7 +325,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with root squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to [].`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with the root squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_root_squash' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -339,7 +339,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with all squash policy. when creating a new View Policy if the value is not set than an empty list is sent to the VastData cluster resulting in empty list of addresses However during update if nfs_all_squash is removed from the resource nothing is changed to preserve terraform default behaviour in such cases. If there is a need to change the value an empty list it must be secifed and set to []`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Hosts with the all-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_all_squash' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to [].`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -463,7 +463,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new file`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default UNIX-type permissions on a new file.`,
 		},
 
 		"smb_directory_mode": {
@@ -473,7 +473,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new folder`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default UNIX-type permissions on a new folder.`,
 		},
 
 		"smb_file_mode_padded": {
@@ -483,7 +483,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new file`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default UNIX-type permissions on a new file.`,
 		},
 
 		"smb_directory_mode_padded": {
@@ -493,7 +493,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default unix type permissions on new folder`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default UNIX-type permissions on a new folder.`,
 		},
 
 		"cluster": {
@@ -503,7 +503,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.`,
 		},
 
 		"cluster_id": {
@@ -513,7 +513,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster ID.`,
 		},
 
 		"tenant_id": {
@@ -523,7 +523,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID.`,
 		},
 
 		"tenant_name": {
@@ -533,7 +533,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant Name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant name.`,
 		},
 
 		"url": {
@@ -565,7 +565,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) Comma separated vip pool ids, this attribute conflicts with vippool_permissions and can not be provided togather. Also due to the lack of ability to configure vippool permissions using this attibute , vippool permissions are always defined as read/write`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) A comma-separated list of virtual IP pool IDs. This attribute conflicts with 'vippool_permissions' and cannot be supplied together with it. Also, due to the lack of ability to configure virtual IP pool permissions using this attibute, the pool permissions are always defined as read/write.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -581,7 +581,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Sensitive: false,
 
 			ValidateDiagFunc: utils.OneOf([]string{"NONE", "SYSTEM", "KRB_AUTH_ONLY", "KRB_INTEGRITY", "KRB_PRIVACY"}),
-			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) NFS 4.1 minimal protection level Allowed Values are [NONE SYSTEM KRB_AUTH_ONLY KRB_INTEGRITY KRB_PRIVACY]`,
+			Description:      `(Valid for versions: 5.0.0,5.1.0,5.2.0) NFSv4.1 minimal protection level. Allowed Values are [NONE SYSTEM KRB_AUTH_ONLY KRB_INTEGRITY KRB_PRIVACY]`,
 		},
 
 		"s3_visibility": {
@@ -591,7 +591,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of usernames for bucket listing permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of usernames for bucket listing permissions.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -605,7 +605,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of group names for bucket listing permissions`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of group names for bucket listing permissions.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -619,7 +619,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Apple sid`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables returning Security IDs (SIDs) in Apple compatible representation.`,
 		},
 
 		"protocols": {
@@ -629,7 +629,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Protocols to audit`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Protocols to audit.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -643,7 +643,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Create/Delete Files/Directories/Objects`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', logs operations that create or delete files, directories, or objects.`,
 		},
 
 		"data_modify": {
@@ -653,7 +653,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Modify data/MD`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', logs operations that modify data or metadata.`,
 		},
 
 		"data_read": {
@@ -663,7 +663,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Read data`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', logs operations that read data or metadata.`,
 		},
 
 		"log_full_path": {
@@ -673,7 +673,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log full path`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables logging of full Element Store path to the requested resource.`,
 		},
 
 		"log_hostname": {
@@ -683,7 +683,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log hostname`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables logging of the accessing host name.`,
 		},
 
 		"log_username": {
@@ -693,7 +693,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log username`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables logging of username of the requesting user. Disabled by default.`,
 		},
 
 		"log_deleted": {
@@ -703,7 +703,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Log deleted files/dirs from trash dir`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables logging of deleted files and directories from the trash folder.`,
 		},
 
 		"count_views": {
@@ -713,7 +713,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Number of Policy related Views`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The total number of views associated with this view policy.`,
 		},
 
 		"enable_snapshot_lookup": {
@@ -723,7 +723,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to make the .snapshot directory accessible in subdirectories of the View.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to make the .snapshot directory accessible in subdirectories of the view.`,
 		},
 
 		"enable_listing_of_snapshot_dir": {
@@ -733,7 +733,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the view.`,
 		},
 
 		"s3_special_chars_support": {
@@ -743,7 +743,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols.`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits object names that contain “//“ or “/../“ and are incompatible with other protocols.`,
 		},
 
 		"smb_is_ca": {
@@ -753,7 +753,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) If 'true', the SMB share exposed by the view is set as continuously available, which allows SMBv3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.`,
 		},
 
 		"nfs_case_insensitive": {
@@ -763,7 +763,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Force case insensitivity for NFSv3 and NFSv4`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) If 'true', forces case insensitivity for NFSv3 and NFSv4.`,
 		},
 
 		"enable_access_to_snapshot_dir_in_subdirs": {
@@ -773,7 +773,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the view.`,
 		},
 
 		"enable_visibility_of_snapshot_dir": {
@@ -783,7 +783,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the View.`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Specifies whether to make the .snapshot directory visible in subdirectories of the view.`,
 		},
 
 		"nfs_enforce_tls": {
@@ -793,7 +793,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) If 'true', NFSv3 and NFSv4.1 client mounts are accepted only if they are TLS-encrypted. Use only with 'nfs_minimal_protection_level' set to 'System' or 'None'.`,
 		},
 
 		"protocols_audit": {
@@ -815,7 +815,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    false,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) Audit operations that create or delete files, directories, or objects.`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables logging of operations that create or delete files, directories, or objects.`,
 
 						Default: false,
 					},
@@ -827,7 +827,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    false,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) Log deleted files and directories.`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables logging of deleted files and directories.`,
 
 						Default: false,
 					},
@@ -839,7 +839,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    false,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) If 'true' (default), enables logging of full Element Store path to the requested resource. May affect performance. If 'false', the view path is recorded.`,
 
 						Default: true,
 					},
@@ -851,7 +851,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    false,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) Log username of requesting user. Disabled by default`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables (default) logging of username of the requesting user.`,
 
 						Default: false,
 					},
@@ -863,7 +863,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) Log the accessing Hostname`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables logging of the accessing host name.`,
 					},
 
 					"modify_data_md": {
@@ -873,7 +873,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    false,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) Audit operations that modify data (including operations that change the file size) and metadata`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables logging of operations that modify metadata.`,
 
 						Default: false,
 					},
@@ -885,7 +885,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    false,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) Audit operations that read data and metadata`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables logging of operations that read data.`,
 
 						Default: false,
 					},
@@ -926,7 +926,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.1.0,5.2.0) List of VIP pool permissions this attribute conflicts with vip_pools and can not be provided togather`,
+			Description:           `(Valid for versions: 5.1.0,5.2.0) A list of virtual IP pool permissions. This attribute conflicts with 'vip_pools' and cannot be supplied together with it.`,
 
 			Elem: &schema.Resource{
 				Schema: map[string]*schema.Schema{
@@ -938,7 +938,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Computed:    true,
 						Optional:    true,
 						Sensitive:   false,
-						Description: `(Valid for versions: 5.1.0,5.2.0) The Vippool ID`,
+						Description: `(Valid for versions: 5.1.0,5.2.0) The ID of the virtual IP pool.`,
 					},
 
 					"vippool_permissions": {
@@ -950,7 +950,7 @@ func getResourceViewPolicySchema() map[string]*schema.Schema {
 						Sensitive: false,
 
 						ValidateDiagFunc: utils.OneOf([]string{"RW", "RO"}),
-						Description:      `(Valid for versions: 5.1.0,5.2.0) VIP pool permissions  Allowed Values are [RW RO]`,
+						Description:      `(Valid for versions: 5.1.0,5.2.0) Permissions for the virtual IP pool. Allowed Values are [RW RO]`,
 
 						Default: "RW",
 					},

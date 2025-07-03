@@ -73,7 +73,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of group names associated with this policy`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of user names associated with this policy.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -87,7 +87,7 @@ func getResourceS3PolicySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of group names associated with this policy`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of group names associated with this policy.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,

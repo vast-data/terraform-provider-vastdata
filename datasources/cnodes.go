@@ -57,7 +57,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Currently used IP Address, bond of ip1 and ip2`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The IP address being used, bond of 'ip1' and 'ip2'.`,
 			},
 
 			"ip1": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) 1st internal IP Address`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) First internal IP address.`,
 			},
 
 			"ip2": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) 2nd internal IP Address`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Second internal IP address.`,
 			},
 
 			"ipv6": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) External IPv6 Address`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) External IPv6 address.`,
 			},
 
 			"host_label": &schema.Schema{
@@ -89,7 +89,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Host label, used to label container, e.g. 11.0.0.1-4000`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Host label, used to label the  container, e.g. 11.0.0.1-4000.`,
 			},
 
 			"sn": &schema.Schema{
@@ -97,7 +97,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The host serial number`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Host serial number.`,
 			},
 
 			"state": &schema.Schema{
@@ -161,7 +161,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) cnode enabled`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the CNode to be enabled or disabled.`,
 			},
 
 			"is_mgmt": &schema.Schema{
@@ -169,7 +169,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The cnode is running management`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Specifies whether the CNode is running VMS.`,
 			},
 
 			"cbox": &schema.Schema{
@@ -177,7 +177,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent CBox`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent CBox.`,
 			},
 
 			"cbox_uid": &schema.Schema{
@@ -185,7 +185,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Unique Parent CBox identifier`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) UID of the parent CBox.`,
 			},
 
 			"cbox_id": &schema.Schema{
@@ -193,7 +193,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent CBox id`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) ID of the parent CBox.`,
 			},
 
 			"cluster": &schema.Schema{
@@ -201,7 +201,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.`,
 			},
 
 			"os_version": &schema.Schema{
@@ -209,7 +209,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Node OS version`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Node OS version.`,
 			},
 
 			"bmc_fw_version": &schema.Schema{
@@ -217,7 +217,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) BMC FW version`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) BMC FW version.`,
 			},
 
 			"vms_preferred": &schema.Schema{
@@ -225,7 +225,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VMS preferred CNode`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VMS preferred CNode.`,
 			},
 
 			"url": &schema.Schema{
@@ -241,7 +241,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Management IP`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Management IP.`,
 			},
 
 			"hostname": &schema.Schema{
@@ -249,7 +249,7 @@ func DataSourceCnode() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Host Name`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Host name.`,
 			},
 		},
 	}

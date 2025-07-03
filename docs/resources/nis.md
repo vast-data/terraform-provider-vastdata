@@ -13,7 +13,7 @@ description: |-
 ## Example Usage
 
 ```terraform
-#Define a nis with domain my.nis.domain.example.com , with nis servers 1.1.1.1 , 2.2.2.2
+#Define a NIS with domain my.nis.domain.example.com, with NIS servers 1.1.1.1, 2.2.2.2
 resource "vastdata_nis" "nis1" {
   domain_name = "my.nis.domain.example.com"
   hosts       = ["1.1.1.1", "2.2.2.2"]
@@ -25,15 +25,15 @@ resource "vastdata_nis" "nis1" {
 
 ### Required
 
-- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The nis server domain name
+- `domain_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The NIS server domain name.
 
 ### Optional
 
-- `hosts` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of ip addresses/hostnames of nis servers
+- `hosts` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of IP addresses or hostnames of NIS servers.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the nis server configuration
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the NIS server configuration.
 - `id` (String) The ID of this resource.
 
 ## Import

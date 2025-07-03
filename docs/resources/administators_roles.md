@@ -13,16 +13,14 @@ description: |-
 ## Example Usage
 
 ```terraform
-#Basic Role creation without referring to realms (realms are avaliable from version 5.2.0).
+#Basic Role creation without referring to realms (realms are avaliable with version 5.2.0 and later)
 resource "vastdata_administators_roles" "role01" {
   name             = "role01"
   permissions_list = ["create_support", "create_settings", "create_security", "create_monitoring", "create_logical", "create_hardware"]
 }
 
-#Since version 5.2.0 reamls are supported and can be referanced by a role
-#you can specify 4 types of actions refering to realms create,delete,view,edit
-#in order to cofigure the action specify <action>_<realm name>.
-#Ex: if the realm name is realm01 in order to configure edit for this realm add the following to the permissions_list attribute edit_realm01
+#Starting with version 5.2.0, a role can reference one or more realms. You can specify 4 types of actions referring to realms: create, delete, view, edit. To configure the action, specify <action>_<realm name>.
+#For example, to configure edit for a realm named `realm01`, add the following to the `permissions_list` attribute: `edit_realm01`
 
 resource "vastdata_administators_realms" "realmc" {
   name         = "realmc"
@@ -45,21 +43,21 @@ resource "vastdata_administators_roles" "rolec" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name of the role
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the role.
 
 ### Optional
 
-- `ldap_groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP group(s) associated with the role. Members of the specified groups on a connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.
-- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
+- `ldap_groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP group(s) associated with the role. Members of the specified groups on the connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.
+- `permissions_list` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of permissions granted. Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.2.0) A uniqe GUID assigned to the role
+- `guid` (String) (Valid for versions: 5.2.0) The unique GUID  of the role.
 - `id` (String) The ID of this resource.
-- `is_admin` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is an admin role
-- `is_default` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is a default role
-- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS
-- `tenants` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of tenants to which this role is associated with
+- `is_admin` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the role is an admin role.
+- `is_default` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the role is a default role.
+- `permissions` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of granted permissions returned from the VMS.
+- `tenants` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of tenants the role is associated with.
 
 ## Import
 
