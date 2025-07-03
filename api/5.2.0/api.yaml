@@ -178,17 +178,17 @@ components:
         files_retention_mode:
           type: "string"
           enum: [GOVERNANCE,COMPLIANCE,NONE]
-          description: "Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, `files_retention_mode` must be set to `GOVERNANCE` or `COMPLIANCE`. If the view is enabled for S3 and not for NFSv3 or SMB, `files_retention_mode` can be set to `NONE`. If set to `GOVERNANCE`, locked files cannot be deleted or changed. The retention period can be shortened or extended by users with sufficient permissions. If set to `COMPLIANCE`, locked files cannot be deleted or changed. The retention period can be extended, but not shortened, by users with sufficient permissions. If set to `NONE` (S3 only), the retention mode is not set for the view; it is set individually for each object."
+          description: "Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, 'files_retention_mode' must be set to 'GOVERNANCE' or 'COMPLIANCE'. If the view is enabled for S3 and not for NFSv3 or SMB, 'files_retention_mode' can be set to 'NONE'. If set to 'GOVERNANCE', locked files cannot be deleted or changed. The retention period can be shortened or extended by users with sufficient permissions. If set to 'COMPLIANCE', locked files cannot be deleted or changed. The retention period can be extended, but not shortened, by users with sufficient permissions. If set to 'NONE' (S3 only), the retention mode is not set for the view; it is set individually for each object."
         default_retention_period:
           type: "string"
-          description: "Relevant if locking is enabled. Required if `s3_locks_retention_mode` is set to `GOVERNANCE` or `COMPLIANCE`. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y."
+          description: "Relevant if locking is enabled. Required if 's3_locks_retention_mode' is set to 'GOVERNANCE' or 'COMPLIANCE'. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y."
         auto_commit:
           type: "string"
           description: "Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default retention period, after which they are unlocked. Specify as an integer value followed by a letter for the time unit (h - hours, d - days, y - years). Example: 2h (2 hours)."
         s3_object_ownership_rule:
           type: "string"
           enum: [ None, BucketOwnerPreferred, ObjectWriter, BucketOwnerEnforced ]
-          Description: "S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: `BucketOwnerEnforced` - The bucket owner has full control over any object in the bucket. `ObjectWriter` - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. `BucketOwnerPreferred` - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. `None` - S3 Object Ownership is disabled for the bucket."
+          Description: "S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: 'BucketOwnerEnforced' - The bucket owner has full control over any object in the bucket. 'ObjectWriter' - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. 'BucketOwnerPreferred' - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. 'None' - S3 Object Ownership is disabled for the bucket."
         locking:
           type: "boolean"
           description: "Enables or disables Write Once Read Many (WORM) locking."
@@ -205,7 +205,7 @@ components:
           description: "A list of Attribute-Based Access Control (ABAC) tags. This option can be used only when using SMB/NFSv4 protocols."
         abe_max_depth:
           type: "integer"
-          description: "Restricts Access-Based Enumeration (ABE) to a specified path depth. For example, if `abe_max_depth` is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths."
+          description: "Restricts Access-Based Enumeration (ABE) to a specified path depth. For example, if 'abe_max_depth' is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths."
         abe_protocols:
           type: "array"
           items:
@@ -224,7 +224,7 @@ components:
           description: "File system path. Begin with '/'. Do not include a trailing slash."
         create_dir:
           type: "boolean"
-          description: "If `true`, creates the directory specified by the path."
+          description: "If 'true', creates the directory specified by the path."
         alias:
           type: "string"
           description: "Alias for NFS export. The alias must start with '/' and can include ASCII characters only. If configured, this setting supersedes the exposed NFS export path."
@@ -246,7 +246,7 @@ components:
           description: "The ID of the tenant associated with this view."
         directory:
           type: "boolean"
-          description: "If `true`, creates the directory if it does not exist."
+          description: "If 'true', creates the directory if it does not exist."
         s3_versioning:
           type: "boolean"
           description: "Enables or disables S3 versioning."
@@ -289,7 +289,7 @@ components:
           description: "S3 locks retention mode."
         s3_locks_retention_period:
           type: "string"
-          description: "Retention period for S3 locks. The period is specified as a positive integer suffixed by a time unit of measure, for example: `0d`|`2d`|`1y`|`2y`"
+          description: "Retention period for S3 locks. The period is specified as a positive integer suffixed by a time unit of measure, for example: '0d'|'2d'|'1y'|'2y'"
         physical_capacity:
           type: "integer"
           format: "int64"
@@ -372,7 +372,7 @@ components:
           description: "A list of supplementary SIDs."
         local:
           type: "boolean"
-          description: "If `true`, the user is a local user."
+          description: "If 'true', the user is a local user."
         allow_create_bucket:
           type: "boolean"
           description: "Allows or prohibits bucket creation by the user."
@@ -381,7 +381,7 @@ components:
           description: "Allows or prohibits bucket deletion by the user."
         s3_superuser:
           type: "boolean"
-          description: "If `true`, the user is an S3 superuser."
+          description: "If 'true', the user is an S3 superuser."
         s3_policies_ids:
           type: "array"
           items:
@@ -456,13 +456,13 @@ components:
           description: "The access key of the user."
         secret_key:
           type: "string"
-          description: "The secret key of the user. This secret key is not encrypted and should be kept in an highly secure backend. This field will only be returned if `pgp_public_key` is not provided."
+          description: "The secret key of the user. This secret key is not encrypted and should be kept in an highly secure backend. This field will only be returned if 'pgp_public_key' is not provided."
         pgp_public_key:
           type: "string"
-          description: "The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the `encrypted_secret_key` will be returned, while `secret_key` will be empty. Changing this after apply will have no effect."
+          description: "The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the 'encrypted_secret_key' will be returned, while 'secret_key' will be empty. Changing this after apply will have no effect."
         encrypted_secret_key:
           type: "string"
-          description: "The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in `pgp_public_key`."
+          description: "The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in 'pgp_public_key'."
         enabled:
           type: "boolean"
           description: "Sets the key to be enabled or disabled."
@@ -484,10 +484,10 @@ components:
           description: "The user's secret key."
         pgp_public_key:
           type: "string"
-          description: "The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the `encrypted_secret_key` will be returned, while `secret_key` will be empty. Changing this after apply will have no effect."
+          description: "The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the 'encrypted_secret_key' will be returned, while 'secret_key' will be empty. Changing this after apply will have no effect."
         encrypted_secret_key:
           type: "string"
-          description: "The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in `pgp_public_key`."
+          description: "The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in 'pgp_public_key'."
         tenant_id:
           type: "integer"
           description: "Tenant ID."
@@ -529,7 +529,7 @@ components:
           description: "Enables or disables SMB privileged user."
         smb_privileged_user_name:
           type: "string"
-          description: "An optional custom username for the SMB privileged user. If not set, the SMB privileged user name is `vastadmin`."
+          description: "An optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'."
         use_smb_privileged_group:
           type: "boolean"
           description: "Enables or disables SMB privileged user group."
@@ -538,7 +538,7 @@ components:
           description: "An optional custom SID to specify a non-default SMB privileged group. If not set, the SMB privileged group is the Backup Operators domain group."
         smb_privileged_group_full_access:
           type: "boolean"
-          description: "If `true`, the SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. If `false`, the privileged group has read-only access."
+          description: "If 'true', the SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. If 'false', the privileged group has read-only access."
         smb_administrators_group_name:
           type: "string"
           description: "An optional custom name to specify a non-default privileged group. If not set, the privileged group is the Backup Operators domain group."
@@ -619,7 +619,7 @@ components:
           description: "Security flavor, which determines how file and directory permissions are applied in multiprotocol views."
         access_flavor:
           type: "string"
-          description: "Controls which protocols can set file permissions when the security flavor is set to `MIXED_LAST_WINS`. Note that with `MIXED_LAST_WINS`, NFSv3 access is unaffected by this option."
+          description: "Controls which protocols can set file permissions when the security flavor is set to 'MIXED_LAST_WINS'. Note that with 'MIXED_LAST_WINS', NFSv3 access is unaffected by this option."
         path_length:
           type: "string"
           description: "How to determine the maximum allowed path length."
@@ -635,7 +635,7 @@ components:
           description: ""
         use_auth_provider:
           type: "boolean"
-          description: "Enables or disables use of the configured authentication provider(s) to enforce group permissions. If set to `true` without specifing `auth_source`, the `auth_source` is set to `PROVIDERS`. If set to `false`, the `auth_source` is set to RPC. Due to the nature of Terraform, simply changing `use_auth_provider` from `false` to `true` or the other way around will not change the value of the `auth_source` parameter because Terrafrom will keep holding the previous value. Therefore it is advisable to always specify the value of `auth_source`."
+          description: "Enables or disables use of the configured authentication provider(s) to enforce group permissions. If set to 'true' without specifing 'auth_source', the 'auth_source' is set to 'PROVIDERS'. If set to 'false', the 'auth_source' is set to RPC. Due to the nature of Terraform, simply changing 'use_auth_provider' from 'false' to 'true' or the other way around will not change the value of the 'auth_source' parameter because Terrafrom will keep holding the previous value. Therefore it is advisable to always specify the value of 'auth_source'."
           default: false
         auth_source:
           type: "string"
@@ -655,32 +655,32 @@ components:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_read_write` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with NFS read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_read_write' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         nfs_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with NFS read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_read_only` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with NFS read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_read_only' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         smb_read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with SMB read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `smb_read_write` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with SMB read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'smb_read_write' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         smb_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with SMB read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `smb_read_only` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with SMB read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'smb_read_only' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         s3_read_write:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with S3 read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `s3_read_write` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with S3 read/write permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 's3_read_write' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         s3_read_only:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with S3 read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `s3_read_only` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with S3 read-only permissions. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 's3_read_only' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         trash_access:
           type: "array"
           items:
@@ -696,17 +696,17 @@ components:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with the no-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_no_squash` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with the no-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_no_squash' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         nfs_root_squash:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with the root squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_root_squash` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with the root squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_root_squash' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         nfs_all_squash:
           type: "array"
           items:
             type: "string"
-          description: "Hosts with the all-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if `nfs_all_squash` is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
+          description: "Hosts with the all-squash policy. When creating a new view policy, if this value is not set, then an empty list is sent to the VAST cluster, resulting in an empty list of addresses. However, during an update, if 'nfs_all_squash' is removed from the resource, nothing is changed to preserve Terraform default behavior in such cases. If you need to change the value to an empty list, specify this parameter and set it to []."
         s3_bucket_full_control:
           type: "string"
           description: "Hosts with full permissions"
@@ -774,7 +774,7 @@ components:
           type: "array"
           items:
             type: "integer"
-          description: "A comma-separated list of virtual IP pool IDs. This attribute conflicts with `vippool_permissions` and cannot be supplied together with it. Also, due to the lack of ability to configure virtual IP pool permissions using this attibute, the pool permissions are always defined as read/write."
+          description: "A comma-separated list of virtual IP pool IDs. This attribute conflicts with 'vippool_permissions' and cannot be supplied together with it. Also, due to the lack of ability to configure virtual IP pool permissions using this attibute, the pool permissions are always defined as read/write."
         nfs_minimal_protection_level:
           type: "string"
           description: "NFSv4.1 minimal protection level."
@@ -799,13 +799,13 @@ components:
           description: "Protocols to audit."
         data_create_delete:
           type: "boolean"
-          description: "If `true`, logs operations that create or delete files, directories, or objects."
+          description: "If 'true', logs operations that create or delete files, directories, or objects."
         data_modify:
           type: "boolean"
-          description: "If `true`, logs operations that modify data or metadata."
+          description: "If 'true', logs operations that modify data or metadata."
         data_read:
           type: "boolean"
-          description: "If `true`, logs operations that read data or metadata."
+          description: "If 'true', logs operations that read data or metadata."
         log_full_path:
           type: "boolean"
           description: "Enables or disables logging of full Element Store path to the requested resource."
@@ -835,10 +835,10 @@ components:
           description: "Allows or prohibits object names that contain “//“ or “/../“ and are incompatible with other protocols."
         smb_is_ca:
           type: "boolean"
-          description: "If `true`, the SMB share exposed by the view is set as continuously available, which allows SMBv3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event."
+          description: "If 'true', the SMB share exposed by the view is set as continuously available, which allows SMBv3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event."
         nfs_case_insensitive:
           type: "boolean"
-          description: "If `true`, forces case insensitivity for NFSv3 and NFSv4."
+          description: "If 'true', forces case insensitivity for NFSv3 and NFSv4."
         enable_access_to_snapshot_dir_in_subdirs:
           type: "boolean"
           description: "Specifies whether to make the .snapshot directory visible in subdirectories of the view."
@@ -847,7 +847,7 @@ components:
           description: "Specifies whether to make the .snapshot directory visible in subdirectories of the view."
         nfs_enforce_tls:
           type: "boolean"
-          description: "If `true`, NFSv3 and NFSv4.1 client mounts are accepted only if they are TLS-encrypted. Use only with `nfs_minimal_protection_level` set to `System` or `None`."
+          description: "If 'true', NFSv3 and NFSv4.1 client mounts are accepted only if they are TLS-encrypted. Use only with 'nfs_minimal_protection_level' set to 'System' or 'None'."
         protocols_audit:
           type: "object"
           $ref: "#/components/schemas/ProtocolsAudit"
@@ -857,7 +857,7 @@ components:
           items:
             type: "object"
             $ref: "#/components/schemas/PermissionsPerVipPool"
-          description: "A list of virtual IP pool permissions. This attribute conflicts with `vip_pools` and cannot be supplied together with it."
+          description: "A list of virtual IP pool permissions. This attribute conflicts with 'vip_pools' and cannot be supplied together with it."
         # permission_per_vip_pool:
         #   type: "object"
         #   additionalProperties:
@@ -919,13 +919,13 @@ components:
           description: "IP ranges."
         vms_preferred:
           type: "boolean"
-          description: "If `true`, the CNodes included in this virtual IP pool are handled as preferred CNodes during VMS host election."
+          description: "If 'true', the CNodes included in this virtual IP pool are handled as preferred CNodes during VMS host election."
         enabled:
           type: "boolean"
           description: "Enables or disables the virtual IP pool."
         port_membership:
           type: "string"
-          description: "The port(s) on the CNode that this pool will use: `Right`, `Left` or `All`."
+          description: "The port(s) on the CNode that this pool will use: 'Right', 'Left' or 'All'."
         active_interfaces:
           type: "integer"
           description: "The number of active interfaces."
@@ -941,7 +941,7 @@ components:
         tenant_id:
           type: "integer"
           format: "int64"
-          description: "The ID of the tenant associated with the virtual IP pool. An ID of `0` (zero) means the virtual IP pool is available for all tenants."
+          description: "The ID of the tenant associated with the virtual IP pool. An ID of '0' (zero) means the virtual IP pool is available for all tenants."
         active_cnode_ids:
           type: "array"
           items:
@@ -1243,7 +1243,7 @@ components:
           type: "array"
           items:
             type: "string"
-          description: "A list of URIs of LDAP servers (Domain Controllers in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format `<scheme>://<address>`. `<address>` can be either a DNS name or an IP address, for example: `ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2`."
+          description: "A list of URIs of LDAP servers (Domain Controllers in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format '<scheme>://<address>'. '<address>' can be either a DNS name or an IP address, for example: 'ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2'."
         port:
           type: "integer"
           description: "LDAP server port. 389 (LDAP)  636 (LDAPS)"
@@ -1340,7 +1340,7 @@ components:
           default: "uid"
         use_auto_discovery:
           type: "boolean"
-          description: "If `true`, Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If `false`, queries are restricted to the joined domain and URIs must be provided in `urls`."
+          description: "If 'true', Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If 'false', queries are restricted to the joined domain and URIs must be provided in 'urls'."
         use_ldaps:
           type: "boolean"
           description: "Specifies whether to use LDAPS for auto-discovery."
@@ -1351,7 +1351,7 @@ components:
         query_posix_attributes_from_gc:
           type: boolean
           default: false
-          description: "If `true`, users/groups from non-joined domain POSIX attributes are supported. If `false`, POSIX attributes of users/groups from non-joined domain are not supported."
+          description: "If 'true', users/groups from non-joined domain POSIX attributes are supported. If 'false', POSIX attributes of users/groups from non-joined domain are not supported."
     S3LifeCycleRule:
       type: "object"
       properties:
@@ -1385,7 +1385,7 @@ components:
           description: "The expiration date of the object."
         expired_obj_delete_marker:
           type: "boolean"
-          description: "If `true`, removes expired object delete markers."
+          description: "If 'true', removes expired object delete markers."
         noncurrent_days:
           type: "integer"
           description: "Number of days after which objects become non-current."
@@ -1445,7 +1445,7 @@ components:
         tenant_id:
           type: integer
           format: int64
-          description: "When setting `is_default`, this is the tenant for which the policy will be used as the default user QoS policy."
+          description: "When setting 'is_default', this is the tenant for which the policy will be used as the default user QoS policy."
         attached_users_identifiers:
           type: "array"
           items:
@@ -1453,7 +1453,7 @@ components:
           description: "A list of local user IDs to which this QoS policy applies."
         is_default:
           type: boolean
-          description: "Specifies whether this QoS policy is to be used as the default QoS policy per user for this tenant. Setting this attribute requires that `tenant_id` is also supplied."
+          description: "Specifies whether this QoS policy is to be used as the default QoS policy per user for this tenant. Setting this attribute requires that 'tenant_id' is also supplied."
         io_size_bytes:
           type: "integer"
           format: "int64"
@@ -1629,7 +1629,7 @@ components:
           description: "The type of identifier used to identify the user."
         identifier_value:
           type: string
-          description: "The identifier of type specified in `identifier_type`."
+          description: "The identifier of type specified in 'identifier_type'."
     S3Policy:
       required:
       - "enabled"
@@ -1683,7 +1683,7 @@ components:
           description: ""
         ip:
           type: "string"
-          description: "The IP address being used, bond of `ip1` and `ip2`."
+          description: "The IP address being used, bond of 'ip1' and 'ip2'."
         ip1:
           type: "string"
           description: "First internal IP address."
@@ -1817,7 +1817,7 @@ components:
           description: "The tenant ID to use."
         indestructible:
           type: "boolean"
-          description: "If `true`, the snapshot is indestructable."
+          description: "If 'true', the snapshot is indestructable."
     GlobalLocalSnapshot:
       type: "object"
       properties:
@@ -2066,11 +2066,11 @@ components:
         use_auto_discovery:
           type: "boolean"
           default: false
-          description: "If `true`, Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If `false`, queries are restricted to the joined domain and DCs must be provided in the URLs field."
+          description: "If 'true', Active Directory Domain Controllers (DCs) and Active Directory domains are automatically discovered. Queries extend beyond the joined domain to all domains in the forest. If 'false', queries are restricted to the joined domain and DCs must be provided in the URLs field."
         use_ldaps:
           type: "boolean"
           default: false
-          description: "Specifies whether to use LDAPS for auto-discovery. To enable use of LDAPS, also set `use_auto_discovery` to `true`."
+          description: "Specifies whether to use LDAPS for auto-discovery. To enable use of LDAPS, also set 'use_auto_discovery' to 'true'."
         port:
           type: "int"
           default: 389
@@ -2101,7 +2101,7 @@ components:
         use_tls:
           type: "boolean"
           default: false
-          description: "Set to `true` to enable use of TLS to secure communication between the VAST cluster and the Active Directory server."
+          description: "Set to 'true' to enable use of TLS to secure communication between the VAST cluster and the Active Directory server."
         tls_certificate:
           type: "string"
           description: "TLS certificate to use for verifying the remote Active Directory server’s TLS certificate."
@@ -2111,17 +2111,17 @@ components:
           description: "Specifies whether to resolve Active Directory netgroups into hostnames."
         gid_number:
           type: "string"
-          description: "The attribute of a user entry on the Active Directory server that contains the UID number, if different from `uidNumber`. Often, when binding the VAST cluster to Active Directory, this does not need to be set."
+          description: "The attribute of a user entry on the Active Directory server that contains the UID number, if different from 'uidNumber'. Often, when binding the VAST cluster to Active Directory, this does not need to be set."
         use_multi_forest:
           type: "boolean"
           default: false
           description: "Allows or prohibits access for users from trusted domains on other forests."
         uid:
           type: "string"
-          description: "The attribute of a user entry on the Active Directory server that contains the user name, if different from `uid`. When binding the VAST cluster to Active Directory, you may need to set this to `sAMAccountname`."
+          description: "The attribute of a user entry on the Active Directory server that contains the user name, if different from 'uid'. When binding the VAST cluster to Active Directory, you may need to set this to 'sAMAccountname'."
         uid_number:
           type: "string"
-          description: "The attribute of a user entry on the Active Directory server that contains the UID number, if different from `uidNumber`. Often when binding the VAST cluster to Active Directory, this does not need to be set."
+          description: "The attribute of a user entry on the Active Directory server that contains the UID number, if different from 'uidNumber'. Often when binding the VAST cluster to Active Directory, this does not need to be set."
         match_user:
           type: "string"
           description: "The attribute to use when querying a provider for a user that matches a user that has already been retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved."
@@ -2130,16 +2130,16 @@ components:
           description: "Specifies the attribute which represents the value of the Active Directory group’s member property."
         uid_member:
           type: "string"
-          description: "The attribute of a group entry on the Active Directory server that contains names of group members, if different from `memberUid`. When binding the VAST cluster to Active Directory, you may need to set this to `memberUID`."
+          description: "The attribute of a group entry on the Active Directory server that contains names of group members, if different from 'memberUid'. When binding the VAST cluster to Active Directory, you may need to set this to 'memberUID'."
         posix_account:
           type: "string"
-          description: "The object class that defines a user entry on the Active Directory server, if different from `posixAccount`. When binding the VAST cluster to Active Directory, set this parameter to `user` to ensure that authorization works properly."
+          description: "The object class that defines a user entry on the Active Directory server, if different from 'posixAccount'. When binding the VAST cluster to Active Directory, set this parameter to 'user' to ensure that authorization works properly."
         posix_group:
           type: "string"
-          description: "The object class that defines a group entry on the Active Directory server, if different from `posixGroup`. When binding the VAST cluster to Active Directory, set this parameter to `group` to ensure that authorization works properly."
+          description: "The object class that defines a group entry on the Active Directory server, if different from 'posixGroup'. When binding the VAST cluster to Active Directory, set this parameter to 'group' to ensure that authorization works properly."
         username_property_name:
           type: "string"
-          description: "The attribute to use for querying users in VMS user-initated user queries. Default is `name`. Sometimes it can be set to `cn`."
+          description: "The attribute to use for querying users in VMS user-initated user queries. Default is 'name'. Sometimes it can be set to 'cn'."
         user_login_name:
           type: "string"
           description: "Specifies the attribute used to query Active Directory for the user login name in NFS ID mapping."
@@ -2160,7 +2160,7 @@ components:
           type: "array"
           items:
             type: "string"
-          description: "A comma-separated list of URIs of Active Directory servers in the format `SCHEME://ADDRESS`. The order of listing defines the priority order. The URI with the highest priority that has a good health status is used."
+          description: "A comma-separated list of URIs of Active Directory servers in the format 'SCHEME://ADDRESS'. The order of listing defines the priority order. The URI with the highest priority that has a good health status is used."
     ProtocolsAudit:
       type: "object"
       properties:
@@ -2174,7 +2174,7 @@ components:
           default: false
         log_full_path:
           type: "boolean"
-          description: "If `true` (default), enables logging of full Element Store path to the requested resource. May affect performance. If `false`, the view path is recorded."
+          description: "If 'true' (default), enables logging of full Element Store path to the requested resource. May affect performance. If 'false', the view path is recorded."
           default: true
         log_username:
           type: "boolean"
@@ -2220,7 +2220,7 @@ components:
           description: "Log line prefix to add"
         key_format:
           type: "string"
-          description: "The format for log object keys: `SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]`, `PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]` where the partitioning is done based on the time when the logged events occurred, `PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]` where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: `SIMPLE_PREFIX`."
+          description: "The format for log object keys: 'SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]', 'PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]' where the partitioning is done based on the time when the logged events occurred, 'PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString]' where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: 'SIMPLE_PREFIX'."
           enum: [ SIMPLE_PREFIX, PARTITIONED_PREFIX_EVENT_TIME, PARTITIONED_PREFIX_DELIVERY_TIME ]
           default: "SIMPLE_PREFIX"
     Realm:
