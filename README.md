@@ -132,3 +132,23 @@ version_validation_mode = "warn"
 While it is common to submit Bugs/Feature Requests using github issues,
 we would rather if you open a Bug/Feature Request to Vast Data support at customer.support@vastdata.com
 
+
+# How to release
+
+## Prerequisites
+1. Make sure you're added to the organization (you should be by default)
+2. Make sure that your GPG key is added to VAST Data Terraform registry organization
+3. Set your GPG key (`gpg -k`) in `Makefile` for variable `$TF_GPG_SIG`
+
+## Process
+1. Checkout latest `origin/main`
+2. Tag the commit you want to release with `v1.2.3`
+3. Push the tag `git push origin tag v1.2.3`
+4. Set the same tag in `user_agent_version` file (this is to double-check that you're releasing correct version)
+5. Run `make pack-all-archs`
+   1. it should ask you for password for your GPG key
+6. Run `make github-pre-release`
+   1. you'll be presented with a link to a pre-release
+   2. make sure you're releasing what you want
+7. Edit the pre-release and uncheck `pre-release` and check `latest release`
+8. https://registry.terraform.io/namespaces/vast-data should automatically pick up the change
