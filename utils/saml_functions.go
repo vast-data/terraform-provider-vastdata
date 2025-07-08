@@ -154,7 +154,7 @@ func SamlUpdateFunc(ctx context.Context, _client interface{}, attr map[string]in
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH to path \"%v\"", pathWithVmsId))
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH with payload: %v", string(marshalledBody)))
-	response, err := client.Patch(ctx, pathWithVmsId, query, bytes.NewReader(marshalledBody), map[string]string{})
+	response, err := client.Post(ctx, pathWithVmsId, query, bytes.NewReader(marshalledBody), map[string]string{})
 	if err != nil {
 		return nil, err
 	}
