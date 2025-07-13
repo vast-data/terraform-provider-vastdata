@@ -301,7 +301,10 @@ func dataSourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface
 	domain_name := d.Get("domain_name")
 	values.Add("domain_name", fmt.Sprintf("%v", domain_name))
 
-	response, err := client.Get(ctx, utils.GenPath("ldaps"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"ldaps",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -313,7 +316,7 @@ func dataSourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface
 
 	}
 	resource_l := []api_latest.Ldap{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

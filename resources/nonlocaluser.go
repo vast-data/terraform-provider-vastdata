@@ -260,7 +260,7 @@ func resourceNonLocalUserRead(ctx context.Context, d *schema.ResourceData, m int
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -482,7 +482,7 @@ func resourceNonLocalUserImporter(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	var resourceList []api_latest.NonLocalUser
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err

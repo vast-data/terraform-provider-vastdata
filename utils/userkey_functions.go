@@ -107,7 +107,7 @@ func disableKeyIfneeded(ctx context.Context, _client interface{}, path, access_k
 		return nil, err
 	}
 	tflog.Debug(ctx, fmt.Sprintf("USERKEY: Disabling key with paylod %v", string(b)))
-	return client.Patch(ctx, path, bytes.NewReader(b), map[string]string{})
+	return client.Patch(ctx, path, "", bytes.NewReader(b), map[string]string{})
 }
 
 func CreateUserKeyFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
@@ -121,7 +121,7 @@ func CreateUserKeyFunc(ctx context.Context, _client interface{}, attr map[string
 	path := createUserKeyPath((*attributes)["path"], data["user_id"])
 	tflog.Debug(ctx, fmt.Sprintf("Creating UserKey for user with id:%s , path:%s", data["user_id"], path))
 	//The API needs to send an empty POST object
-	response, response_err := client.Post(ctx, path, bytes.NewReader([]byte("{}")), map[string]string{})
+	response, response_err := client.Post(ctx, path, "", bytes.NewReader([]byte("{}")), map[string]string{})
 	if response_err != nil {
 		return nil, response_err
 	}
@@ -156,7 +156,7 @@ func UpdateUserKeyFunc(ctx context.Context, _client interface{}, attr map[string
 		return nil, err
 	}
 	tflog.Debug(ctx, fmt.Sprintf("USERKEY: Update payload", string(b)))
-	return client.Patch(ctx, key_path, bytes.NewReader(b), headers)
+	return client.Patch(ctx, key_path, "", bytes.NewReader(b), headers)
 
 }
 

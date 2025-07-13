@@ -2325,3 +2325,45 @@ components:
             items:
               type: "string"
             description: "A list of granted permissions returned from the VMS."
+    Saml:
+      type: "object"
+      properties:
+        id:
+          type: string
+          description: "Internal (Terraform) ID of SAML"
+        vms_id:
+          type: integer
+          description: "VMS ID"
+        idp_name:
+          type: string
+          description: "SAML IDP name"
+        encrypt_assertion:
+          type: boolean
+          description: "Set to true if the IdP encrypts the assertion. If true, an encryption certificate and key must be uploaded. Use encryption_saml_crt and encryption_saml_key to provide the required certificate and key. Default: false. Set to false to disable encryption."
+        encryption_saml_crt:
+          type: string
+          description: Specifies the encryption certificate file content to upload. Required if encrypt_assertion is true.
+        encryption_saml_key:
+          type: string
+          description: Specifies the encryption key file content to upload. Required if encrypt_assertion is true.
+        force_authn:
+          type: boolean
+          description: "Set to true to force authentication with the IDP even if there is an active session with the IdP for the user. Default: false."
+        idp_entityid:
+          type: string
+          description: A unique identifier for the IdP instance
+        idp_metadata:
+          type: string
+          description: Use local metadata. Supply local metadata XML.
+        idp_metadata_url:
+          type: string
+          description: "Use metadata located at specified remote URL. For example: 'https://dev-12914105.okta.com/app/exke7ia133bKXWP2g5d7/sso/saml/metadata'"
+        signing_cert:
+          type: string
+          description: Specifies the certificate file content to use for requiring signed responses from the IdP. Required if want_assertions_or_response_signed is true.
+        signing_key:
+          type: string
+          description: Specifies the key file content to use for requiring signed responses from the IdP. Required if want_assertions_or_response_signed is true.
+        want_assertions_or_response_signed:
+          type: boolean
+          description: "Set to true to require a signed response or assertion from the IdP. VMS then fails the user authentication if an unsigned response is received. If true, upload a certificate and key. Use signing_cert and signing_key to provide certificate and key. Default: false."

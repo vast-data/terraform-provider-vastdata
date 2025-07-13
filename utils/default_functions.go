@@ -70,7 +70,7 @@ func DefaultCreateFunc(ctx context.Context, _client interface{}, attr map[string
 		return nil, marshallingError
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling POST to path \"%v\"", (*attributes)["path"]))
-	return client.Post(ctx, (*attributes)["path"], bytes.NewReader(b), map[string]string{})
+	return client.Post(ctx, (*attributes)["path"], "", bytes.NewReader(b), map[string]string{})
 }
 
 type UpdateFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, *schema.ResourceData, map[string]string) (*http.Response, error)
@@ -88,7 +88,7 @@ func DefaultUpdateFunc(ctx context.Context, _client interface{}, attr map[string
 	}
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH to path \"%v\"", updatePath))
 	tflog.Debug(ctx, fmt.Sprintf("Calling PATCH with payload: %v", string(b)))
-	return client.Patch(ctx, updatePath, bytes.NewReader(b), map[string]string{})
+	return client.Patch(ctx, updatePath, "", bytes.NewReader(b), map[string]string{})
 }
 
 type DeleteFuncType func(context.Context, interface{}, map[string]interface{}, map[string]interface{}, map[string]string) (*http.Response, error)
