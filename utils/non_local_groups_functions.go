@@ -23,7 +23,7 @@ func decomposeNonLocalGroupId(id string) (int, int, string, error) {
 	if len(split) != 3 {
 		return 0, 0, "", fmt.Errorf("invalid NonLocalUser ID: %s", id)
 	}
-	uid, err := strconv.Atoi(split[0])
+	gid, err := strconv.Atoi(split[0])
 	if err != nil {
 		return 0, 0, "", err
 	}
@@ -32,7 +32,7 @@ func decomposeNonLocalGroupId(id string) (int, int, string, error) {
 		return 0, 0, "", err
 	}
 	contextValue := split[2]
-	return uid, tenantId, contextValue, nil
+	return gid, tenantId, contextValue, nil
 }
 
 func NonLocalGroupCreateFunc(ctx context.Context, _client interface{}, attr map[string]interface{}, data map[string]interface{}, headers map[string]string) (*http.Response, error) {
@@ -128,7 +128,11 @@ func mimicListResponseForSingularNonLocalGroup(ctx context.Context, response *ht
 		tflog.Error(ctx, fmt.Sprintf("Resonse From Cluster %v", string(body)))
 		return nil, err
 	}
-	gid := int((*unmarshalledBody)["gid"].(float64))
+	gidFloat, ok := (*unmarshalledBody)["gid"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("unable to convert gid to int, value: %v", (*unmarshalledBody)["gid"])
+	}
+	gid := int(gidFloat)
 	tenantId, _ := strconv.Atoi(response.Request.URL.Query().Get("tenant_id"))
 	contextValue := response.Request.URL.Query().Get("context")
 	id := getNonLocalGroupId(gid, tenantId, contextValue)
