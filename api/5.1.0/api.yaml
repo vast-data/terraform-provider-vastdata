@@ -107,7 +107,7 @@ components:
           type: "array"
           items:
             type: "string"
-            enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4]
+            enum: [SMB,S3,ENDPOINT,DATABASE,NFS,NFS4,KAFKA]
           description: "Protocols exposed by this view."
         share:
           type: "string"
@@ -188,7 +188,7 @@ components:
         s3_object_ownership_rule:
           type: "string"
           enum: [ None, BucketOwnerPreferred, ObjectWriter, BucketOwnerEnforced ]
-          Description: "S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: 'BucketOwnerEnforced' - The bucket owner has full control over any object in the bucket. 'ObjectWriter' - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. 'BucketOwnerPreferred' - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. 'None' - S3 Object Ownership is disabled for the bucket."
+          description: "S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: 'BucketOwnerEnforced' - The bucket owner has full control over any object in the bucket. 'ObjectWriter' - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. 'BucketOwnerPreferred' - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. 'None' - S3 Object Ownership is disabled for the bucket."
         locking:
           type: "boolean"
           description: "Enables or disables Write Once Read Many (WORM) locking."
@@ -200,7 +200,17 @@ components:
           items:
             type: "string"
           description: "A list of Attribute-Based Access Control (ABAC) tags. This option can be used only when using SMB/NFSv4 protocols."
-
+        kafka_vip_pools:
+          type: "array"
+          items:
+            type: "integer"
+          description: "For Kafka-enabled views, an array of IDs of Virtual IP pools used to access event topics exposed by the view. The specified virtual IP pool must belong to the same tenant as the Kafka-enabled view. Must also not be a virtual IP pool that is excluded by the view policy’s virtual IP pool association."
+        kafka_rejoin_group_timeout_sec:
+          type: "integer"
+          description: "Kafka rejoin group timeout, in seconds."
+        kafka_first_join_group_timeout_sec:
+          type: "integer"
+          description: "Kafka first join group timeout, in seconds."
     ViewCreate:
       type: "object"
       required:
