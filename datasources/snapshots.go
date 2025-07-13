@@ -25,7 +25,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the snapshot`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the snapshot.`,
 			},
 
 			"guid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the snapshot`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the snapshot.`,
 			},
 
 			"expiration_time": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The snapshot's expiration time.`,
 			},
 
 			"name": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.`,
 			},
 
 			"path": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from.`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID to use.`,
 			},
 
 			"indestructible": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceSnapshot() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', the snapshot is indestructable.`,
 			},
 		},
 	}

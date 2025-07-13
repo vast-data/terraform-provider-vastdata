@@ -23,24 +23,24 @@ data "vastdata_user" "user1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the user
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the user.
 
 ### Read-Only
 
-- `allow_create_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow create bucket
-- `allow_delete_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allow delete bucket
-- `gids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary GID list
-- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Group Count
-- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) List of supplementary Group list
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the user
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq id given to user
-- `leading_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user leading unix GID
-- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group GID
-- `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Leading Group Name
-- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) IS this a local user
-- `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user primary group SID
-- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) List S3 policies IDs
-- `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is S3 superuser
-- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user SID
-- `sids` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) supplementary SID list
-- `uid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user unix UID
+- `allow_create_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits bucket creation by the user.
+- `allow_delete_bucket` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Allows or prohibits bucket deletion by the user.
+- `gids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary GIDs.
+- `group_count` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Group count.
+- `groups` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary groups.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the user.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the user.
+- `leading_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's leading Unix GID.
+- `leading_group_gid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The GID of the leading group.
+- `leading_group_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the leading group.
+- `local` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', the user is a local user.
+- `primary_group_sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's primary group SID.
+- `s3_policies_ids` (List of Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of identity policy IDs.
+- `s3_superuser` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', the user is an S3 superuser.
+- `sid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's SID.
+- `sids` (List of String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A list of supplementary SIDs.
+- `uid` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The user's Unix UID.

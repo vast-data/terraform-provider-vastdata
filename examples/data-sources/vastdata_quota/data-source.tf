@@ -1,9 +1,9 @@
-#When there is only one quota with that name at the entire cluster
+#When there is only one quota with that name on the entire cluster
 data "vastdata_quota" "quota1" {
   name = "quota1"
 }
 
-#When there is more than one quota with that name at the cluster with differant tenant id
+#When there is more than one quota with that name on the cluster, with different tenant ID
 
 resource "vastdata_tenant" "tenant1" {
   name = "tenant01"

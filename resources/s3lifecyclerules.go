@@ -45,7 +45,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("S3LifeCycleRule").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique name.`,
 		},
 
 		"guid": {
@@ -81,7 +81,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The minimum size of the object`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The minimum size of the object.`,
 		},
 
 		"max_size": {
@@ -91,7 +91,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The maximum size of the object`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The maximum size of the object.`,
 		},
 
 		"expiration_days": {
@@ -101,7 +101,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days from creation until an object expires`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days from creation until an object expires.`,
 		},
 
 		"expiration_date": {
@@ -111,7 +111,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The expiration date of the object`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The expiration date of the object.`,
 		},
 
 		"expired_obj_delete_marker": {
@@ -121,7 +121,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Remove expired objects delete markers`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', removes expired object delete markers.`,
 		},
 
 		"noncurrent_days": {
@@ -131,7 +131,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Number of days after objects become noncurrent`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Number of days after which objects become non-current.`,
 		},
 
 		"newer_noncurrent_versions": {
@@ -141,7 +141,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of newer versions to retain`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of newer versions to retain.`,
 		},
 
 		"abort_mpu_days_after_initiation": {
@@ -151,7 +151,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days until expiration after an incomplete multipart upload`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of days until expiration after an incomplete multipart upload.`,
 		},
 
 		"view_path": {
@@ -161,7 +161,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path of the related View`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path of the view to which the lifecycle rule applies.`,
 		},
 
 		"view_id": {
@@ -171,7 +171,7 @@ func getResourceS3LifeCycleRuleSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the related View`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the view to which the lifecycle rule applies.`,
 		},
 	}
 }

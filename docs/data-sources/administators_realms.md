@@ -23,10 +23,10 @@ data "vastdata_administators_realms" "realm01" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.2.0) A uniqe name of the realm
+- `name` (String) (Valid for versions: 5.2.0) The unique name of the realm.
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.2.0) A uniqe GUID assigned to the realm
+- `guid` (String) (Valid for versions: 5.2.0) The unique GUID of the realm.
 - `id` (String) The ID of this resource.
-- `object_types` (List of String) (Valid for versions: 5.2.0) List of allowed permissions Allowed Values are [cnodegroup managedapplication managedapplicationset alarm event eventdefinition eventdefinitionconfig cbox cnode carrier cluster dbox dnode dtray ebox fan host nic nvram psu port rack ssd subnetmanager switch dns globalsnapstream kafkabroker nativereplicationremotetarget protectedpath protectionpolicy qospolicy quota quotaentityinfo replicationrestorepoint replicationstream replicationtarget s3lifecyclerule snapshot userquota vip vippool view viewpolicy monitor activedirectory encryptedpath encryptiongroup group indestructibility ldap manager nis permission realm role s3policy tenant user vms callhomeconfig challengetoken env license module supportbundle systemsettingsdiff]
+- `object_types` (List of String) (Valid for versions: 5.2.0) A list of permissions granted. Allowed Values are [cnodegroup managedapplication managedapplicationset alarm event eventdefinition eventdefinitionconfig cbox cnode carrier cluster dbox dnode dtray ebox fan host nic nvram psu port rack ssd subnetmanager switch dns globalsnapstream kafkabroker nativereplicationremotetarget protectedpath protectionpolicy qospolicy quota quotaentityinfo replicationrestorepoint replicationstream replicationtarget s3lifecyclerule snapshot userquota vip vippool view viewpolicy monitor activedirectory encryptedpath encryptiongroup group indestructibility ldap manager nis permission realm role s3policy tenant user vms callhomeconfig challengetoken env license module supportbundle systemsettingsdiff]

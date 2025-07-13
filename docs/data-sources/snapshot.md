@@ -13,12 +13,12 @@ description: |-
 ## Example Usage
 
 ```terraform
-#When there is only one snapshot with that name at the entire cluster
+#When there is only one snapshot with that name on the entire cluster
 data "vastdata_snapshot" "snapshot1" {
   name = "snapshot01"
 }
 
-#When there is more than one snapshot with that name at the cluster with differant tenant id
+#When there is more than one snapshot with that name on the cluster, with different tenant ID
 
 resource "vastdata_tenant" "tenant1" {
   name = "tenant01"
@@ -41,16 +41,16 @@ data "vastdata_snapshot" "snapshot1" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.
 
 ### Optional
 
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant id to use
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID to use.
 
 ### Read-Only
 
-- `expiration_time` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) When will this sanpshot expire
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the snapshot
-- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) A unique id given to the snapshot
-- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Is it indestructable
-- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from
+- `expiration_time` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The snapshot's expiration time.
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the snapshot.
+- `id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the snapshot.
+- `indestructible` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', the snapshot is indestructable.
+- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The path to make snapshot from.

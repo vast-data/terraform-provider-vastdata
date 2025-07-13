@@ -47,7 +47,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalUser identifier`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The ID of the non-local user.`,
 		},
 
 		"uid": {
@@ -55,7 +55,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("uid"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The user's Unix UID.`,
 		},
 
 		"username": {
@@ -65,7 +65,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Username of the Non-Local User`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The  username of the non-local user.`,
 		},
 
 		"allow_create_bucket": {
@@ -75,7 +75,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Allow create bucket`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits bucket creation by the user.`,
 		},
 
 		"allow_delete_bucket": {
@@ -85,7 +85,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Allow delete bucket`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits bucket deletion by the user.`,
 		},
 
 		"tenant_id": {
@@ -93,7 +93,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("tenant_id"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID.`,
 		},
 
 		"s3_policies_ids": {
@@ -105,7 +105,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.1.0,5.2.0) List S3 policies IDs`,
+			Description:           `(Valid for versions: 5.1.0,5.2.0) A list of identity policy IDs.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -117,7 +117,7 @@ func getResourceNonLocalUserSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUser").GetConflictingFields("context"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Valid values: 'ad', 'nis' and 'ldap'.`,
 		},
 	}
 }

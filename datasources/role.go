@@ -25,7 +25,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the role`,
+				Description: `(Valid for versions: 5.2.0) The unique GUID  of the role.`,
 			},
 
 			"name": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniqe name of the role`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the role.`,
 			},
 
 			"permissions_list": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of permissions granted. Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -53,7 +53,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of granted permissions returned from the VMS.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -65,7 +65,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of tenants to which this role is associated with`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of tenants the role is associated with.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -77,7 +77,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is an admin role`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the role is an admin role.`,
 			},
 
 			"is_default": &schema.Schema{
@@ -85,7 +85,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the role is a default role`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the role is a default role.`,
 			},
 
 			"ldap_groups": &schema.Schema{
@@ -93,7 +93,7 @@ func DataSourceRole() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP group(s) associated with the role. Members of the specified groups on a connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) LDAP group(s) associated with the role. Members of the specified groups on the connected LDAP/Active Directory provider can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

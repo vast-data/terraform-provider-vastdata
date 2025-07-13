@@ -3,17 +3,17 @@
 page_title: "vastdata_quota Resource - terraform-provider-vastdata"
 subcategory: ""
 description: |-
-  This is a quota
+  This is a quota.
 ---
 
 # vastdata_quota (Resource)
 
-This is a quota
+This is a quota.
 
 ## Example Usage
 
 ```terraform
-#Create a quota with user & group quota
+#Create a quota with user and group quota limits
 resource "vastdata_view_policy" "example" {
   name   = "example"
   flavor = "NFS"
@@ -72,47 +72,47 @@ resource "vastdata_quota" "quota2" {
 
 ### Required
 
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota name.
 
 ### Optional
 
-- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster
-- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster ID
-- `default_email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The default Email if there is no suffix and no address in the providers
+- `cluster` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.
+- `cluster_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster ID.
+- `default_email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The default email address used if there is no suffix specified and no address can be found in the providers.
 - `default_group_quota` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--default_group_quota))
 - `default_user_quota` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--default_user_quota))
-- `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enable alarms when users or groups are exceeding their limit
+- `enable_alarms` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables alarms when users or groups are exceeding their limits.
 - `enable_email_providers` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `grace_period` (String)
 - `group_quotas` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--group_quotas))
-- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit
-- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit.
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit.
 - `is_user_quota` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `num_blocked_users` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `num_exceeded_users` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Directory path
-- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used capacity out of the hard limit
-- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percent of used inodes out of the hard limit
+- `path` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Directory path.
+- `percent_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percentage of used capacity out of the hard limit.
+- `percent_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Percentage of used inodes out of the hard limit.
 - `pretty_state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit
-- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit.
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit.
 - `state` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID
-- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant Name
-- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time
-- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes
-- `used_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in TB
-- `used_effective_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in bytes
-- `used_effective_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in TB
-- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes
+- `tenant_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant ID.
+- `tenant_name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant name.
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time.
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes.
+- `used_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in TB.
+- `used_effective_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in bytes.
+- `used_effective_capacity_tb` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used effective capacity in TB.
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes.
 - `user_quotas` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--user_quotas))
 
 ### Read-Only
 
-- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota guid
+- `guid` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota GUID.
 - `id` (String) The ID of this resource.
-- `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
+- `pretty_grace_period` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The quota enforcement pretty grace period in seconds, minutes, hours or days. Example: 90m
 
 <a id="nestedblock--default_group_quota"></a>
 ### Nested Schema for `default_group_quota`
@@ -120,11 +120,11 @@ resource "vastdata_quota" "quota2" {
 Optional:
 
 - `grace_period` (String)
-- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The size hard limit in bytes
-- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit in inode number
-- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The system ID of the quota
-- `sof_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The sof limit of inodes number
-- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The size soft limit in bytes
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit for capacity in bytes.
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit for the number of inodes.
+- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The system ID of the quota.
+- `sof_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The soft limit for the number of inodes.
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The soft limit for capacity in bytes.
 
 
 <a id="nestedblock--default_user_quota"></a>
@@ -133,11 +133,11 @@ Optional:
 Optional:
 
 - `grace_period` (String)
-- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The size hard limit in bytes
-- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit in inode number
-- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The system ID of the quota
-- `sof_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The sof limit of inodes number
-- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The size soft limit in bytes
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit for capacity in bytes.
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The hard limit for the number of inodes.
+- `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The system ID of the quota.
+- `sof_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The soft limit for the number of inodes.
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) The soft limit for capacity in bytes.
 
 
 <a id="nestedblock--group_quotas"></a>
@@ -147,15 +147,15 @@ Optional:
 
 - `entity` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--group_quotas--entity))
 - `grace_period` (String)
-- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit
-- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit.
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit for the number of inodes.
 - `is_accountable` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit
-- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit
-- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time
-- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes
-- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit.
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit for the number of inodes.
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time.
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes.
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes.
 
 <a id="nestedblock--group_quotas--entity"></a>
 ### Nested Schema for `group_quotas.entity`
@@ -169,7 +169,7 @@ Optional:
 - `email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `identifier_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `is_group` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the entity
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the entity.
 - `vast_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 
 
@@ -181,15 +181,15 @@ Optional:
 
 - `entity` (Block List) (Valid for versions: 5.0.0,5.1.0,5.2.0) (see [below for nested schema](#nestedblock--user_quotas--entity))
 - `grace_period` (String)
-- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit
-- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard inodes quota limit
+- `hard_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit.
+- `hard_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Hard quota limit for the number of inodes.
 - `is_accountable` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `quota_system_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit
-- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft inodes quota limit
-- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time
-- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes
-- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes
+- `soft_limit` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit.
+- `soft_limit_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Soft quota limit for the number of inodes.
+- `time_to_block` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) Grace period expiration time.
+- `used_capacity` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used capacity in bytes.
+- `used_inodes` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0) Used inodes.
 
 <a id="nestedblock--user_quotas--entity"></a>
 ### Nested Schema for `user_quotas.entity`
@@ -203,7 +203,7 @@ Optional:
 - `email` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `identifier_type` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 - `is_group` (Boolean) (Valid for versions: 5.0.0,5.1.0,5.2.0)
-- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the entity
+- `name` (String) (Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the entity.
 - `vast_id` (Number) (Valid for versions: 5.0.0,5.1.0,5.2.0)
 
 ## Import

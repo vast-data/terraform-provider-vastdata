@@ -47,7 +47,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A unique guid given to the global snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the global snapshot.`,
 		},
 
 		"name": {
@@ -55,7 +55,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("name"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the snapshot.`,
 		},
 
 		"loanee_tenant_id": {
@@ -63,7 +63,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("loanee_tenant_id"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID of the target`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The tenant ID on the destination peer.`,
 		},
 
 		"loanee_root_path": {
@@ -71,7 +71,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("loanee_root_path"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on a Target`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The path where to store the snapshot on the destination peer.`,
 		},
 
 		"loanee_snapshot_id": {
@@ -79,7 +79,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("GlobalLocalSnapshot").GetConflictingFields("loanee_snapshot_id"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The id of the local snapshot`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the local snapshot.`,
 		},
 
 		"enabled": {
@@ -89,7 +89,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Is the snapshot enabled`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Sets the snapshot to be enabled or disabled.`,
 
 			Default: true,
 		},
@@ -109,7 +109,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("name"),
 
 						Required:    true,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Ten name of the remote Tenant`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The name of the remote tenant.`,
 					},
 
 					"guid": {
@@ -117,7 +117,7 @@ func getResourceGlobalLocalSnapshotSchema() map[string]*schema.Schema {
 						ConflictsWith: codegen_configs.GetResourceByName("GlobalSnapshotOwnerTenant").GetConflictingFields("guid"),
 
 						Required:    true,
-						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant guid`,
+						Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The remote tenant GUID.`,
 					},
 				},
 			},

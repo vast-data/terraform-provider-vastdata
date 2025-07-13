@@ -25,7 +25,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq id given to the tenant`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the tenant.`,
 			},
 
 			"guid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the tenant`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the tenant.`,
 			},
 
 			"name": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the tenant`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the tenant.`,
 			},
 
 			"use_smb_privileged_user": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Enables SMB privileged user`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables SMB privileged user.`,
 			},
 
 			"smb_privileged_user_name": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) An optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'.`,
 			},
 
 			"use_smb_privileged_group": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Enables SMB privileged user group`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables SMB privileged user group.`,
 			},
 
 			"smb_privileged_group_sid": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) An optional custom SID to specify a non-default SMB privileged group. If not set, the SMB privileged group is the Backup Operators domain group.`,
 			},
 
 			"smb_privileged_group_full_access": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) If 'true', the SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. If 'false', the privileged group has read-only access.`,
 			},
 
 			"smb_administrators_group_name": &schema.Schema{
@@ -89,7 +89,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) An optional custom name to specify a non-default privileged group. If not set, the privileged group is the Backup Operators domain group.`,
 			},
 
 			"default_others_share_level_perm": &schema.Schema{
@@ -97,7 +97,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default Share-level permissions for Others Allowed Values are [READ CHANGE FULL]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Default share-level permissions for others. Allowed Values are [READ CHANGE FULL]`,
 			},
 
 			"trash_gid": &schema.Schema{
@@ -105,7 +105,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GID with permissions to the trash folder`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A GID with permissions to the trash folder.`,
 			},
 
 			"client_ip_ranges": &schema.Schema{
@@ -113,7 +113,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Array of source IP ranges to allow for the tenant.`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) An array of source IP ranges to allow for the tenant.`,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -138,7 +138,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) POSIX primary provider type Allowed Values are [NONE LDAP NIS AD LOCAL]`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The POSIX primary provider type. Allowed Values are [NONE LDAP NIS AD LOCAL]`,
 			},
 
 			"ad_provider_id": &schema.Schema{
@@ -146,7 +146,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) AD provider ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the Active Directory provider.`,
 			},
 
 			"ldap_provider_id": &schema.Schema{
@@ -154,7 +154,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Open-LDAP provider ID specified separately by the user`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The ID of the OpenLDAP provider specified separately by the user.`,
 			},
 
 			"nis_provider_id": &schema.Schema{
@@ -162,7 +162,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) NIS provider ID`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The NIS provider ID.`,
 			},
 
 			"encryption_crn": &schema.Schema{
@@ -170,7 +170,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Tenant's encryption group unique identifier`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the tenant's encryption group.`,
 			},
 
 			"is_nfsv42_supported": &schema.Schema{
@@ -178,7 +178,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Enable NFSv4.2`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables NFSv4.2.`,
 			},
 
 			"allow_locked_users": &schema.Schema{
@@ -186,7 +186,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.`,
 			},
 
 			"allow_disabled_users": &schema.Schema{
@@ -194,7 +194,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    false,
 				Required:    false,
 				Optional:    true,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Allow IO from users whose Active Directory accounts are explicitly disabled.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Allows or prohibits IO from users whose Active Directory accounts are explicitly disabled.`,
 			},
 
 			"use_smb_native": &schema.Schema{
@@ -202,7 +202,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) Use native SMB authentication`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Enables or disables use of native SMB authentication.`,
 			},
 
 			"vippool_names": &schema.Schema{
@@ -210,7 +210,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) An array of VIP Pool names attached to this tenant.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) An array of names of virtual IP pools attached to the tenant.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -222,7 +222,7 @@ func DataSourceTenant() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) An array of VIP Pool ids to attach to tenant.`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) An array of IDs of virtual IP pools attached to the tenant.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,

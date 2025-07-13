@@ -25,7 +25,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq id given to the vippool`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique ID of the virtual IP pool.`,
 			},
 
 			"guid": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq guid given to the vippool`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique GUID of the virtual IP pool.`,
 			},
 
 			"name": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A uniq name given to the vippool`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The unique name of the virtual IP pool.`,
 			},
 
 			"subnet_cidr": &schema.Schema{
@@ -49,7 +49,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 Subnet CIDR prefix (bits number)`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv4 subnet CIDR prefix (number of bits).`,
 			},
 
 			"subnet_cidr_ipv6": &schema.Schema{
@@ -57,7 +57,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 Subnet CIDR prefix (bits number)`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IPv6 subnet CIDR prefix (number of bits).`,
 			},
 
 			"gw_ip": &schema.Schema{
@@ -65,7 +65,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IP Address`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IPv4 address.`,
 			},
 
 			"gw_ipv6": &schema.Schema{
@@ -73,7 +73,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) GW IPv6 Address`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Gateway IPv6 address.`,
 			},
 
 			"vlan": &schema.Schema{
@@ -81,7 +81,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VIPPool VLAN`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The VLAN of the virtual IP pool.`,
 			},
 
 			"state": &schema.Schema{
@@ -97,7 +97,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of cnodes comprising cnode group`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IDs of CNodes comprising the CNode group.`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeInt,
@@ -109,7 +109,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent Cluster`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Parent cluster.`,
 			},
 
 			"url": &schema.Schema{
@@ -133,7 +133,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Role`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Role.`,
 			},
 
 			"ip_ranges": &schema.Schema{
@@ -141,7 +141,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) IP ranges.`,
 
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -166,7 +166,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, CNodes participating in the vip pool are preferred in VMS host election`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If 'true', the CNodes included in this virtual IP pool are handled as preferred CNodes during VMS host election.`,
 			},
 
 			"enabled": &schema.Schema{
@@ -174,7 +174,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) True for enable, False for disable`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables the virtual IP pool.`,
 			},
 
 			"port_membership": &schema.Schema{
@@ -182,7 +182,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The port on the CNode this pool will use. Right, left or all`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The port(s) on the CNode that this pool will use: 'Right', 'Left' or 'All'.`,
 			},
 
 			"active_interfaces": &schema.Schema{
@@ -190,7 +190,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Numver of active interfaces`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The number of active interfaces.`,
 			},
 
 			"enable_l3": &schema.Schema{
@@ -198,7 +198,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables L3 CNode access`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Enables or disables L3 CNode access.`,
 			},
 
 			"vast_asn": &schema.Schema{
@@ -206,7 +206,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) VAST ASN.`,
 			},
 
 			"peer_asn": &schema.Schema{
@@ -214,7 +214,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN`,
+				Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Peer ASN.`,
 			},
 
 			"tenant_id": &schema.Schema{
@@ -222,7 +222,7 @@ func DataSourceVipPool() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.1.0,5.2.0) The Tenant id to which this Vip Pool is assigned to , if set to 0 it means all tenants`,
+				Description: `(Valid for versions: 5.1.0,5.2.0) The ID of the tenant associated with the virtual IP pool. An ID of '0' (zero) means the virtual IP pool is available for all tenants.`,
 			},
 
 			"active_cnode_ids": &schema.Schema{

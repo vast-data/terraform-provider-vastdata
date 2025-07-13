@@ -27,19 +27,19 @@ resource "vastdata_non_local_group" "ExternalGroup" {
 
 ### Required
 
-- `context` (String) (Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'
-- `gid` (Number) (Valid for versions: 5.1.0,5.2.0) Group GID
-- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID
+- `context` (String) (Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Valid values: 'ad', 'nis' and 'ldap'.
+- `gid` (Number) (Valid for versions: 5.1.0,5.2.0) Group GID.
+- `tenant_id` (Number) (Valid for versions: 5.1.0,5.2.0) Tenant ID.
 
 ### Optional
 
-- `groupname` (String) (Valid for versions: 5.1.0,5.2.0) Groupname
-- `s3_policies_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) List S3 policies IDs
-- `sid` (String) (Valid for versions: 5.1.0,5.2.0) Group SID
+- `groupname` (String) (Valid for versions: 5.1.0,5.2.0) Group name.
+- `s3_policies_ids` (List of Number) (Valid for versions: 5.1.0,5.2.0) A list of identity policy IDs.
+- `sid` (String) (Valid for versions: 5.1.0,5.2.0) Group SID.
 
 ### Read-Only
 
-- `id` (String) (Valid for versions: 5.1.0,5.2.0) The NonLocalGroup identifier
+- `id` (String) (Valid for versions: 5.1.0,5.2.0) The ID of the non-local group.
 
 ## Import
 

@@ -47,7 +47,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the manager`,
+			Description: `(Valid for versions: 5.2.0) The unique GUID of the manager.`,
 		},
 
 		"username": {
@@ -55,7 +55,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("Manager").GetConflictingFields("username"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The username of the manager.`,
 		},
 
 		"password": {
@@ -78,7 +78,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user firstname`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The manager's first name.`,
 		},
 
 		"last_name": {
@@ -88,7 +88,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The user last name`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) The manager's last name.`,
 		},
 
 		"permissions_list": {
@@ -100,7 +100,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:              true,
 			Optional:              true,
 			Sensitive:             false,
-			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
+			Description:           `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of permissions granted. Allowed Values are [create_support create_settings create_security create_monitoring create_logical create_hardware create_events create_database create_applications view_support view_settings view_security view_monitoring view_logical view_hardware view_events view_applications view_database edit_support edit_settings edit_security edit_monitoring edit_logical edit_hardware edit_events edit_database edit_applications delete_support delete_settings delete_security delete_monitoring delete_logical delete_hardware delete_events delete_applications delete_database]`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,
@@ -114,7 +114,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of roles ids`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of role IDs.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -128,7 +128,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) Disable password expiration`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, the password does not expire.`,
 		},
 
 		"is_temporary_password": {
@@ -138,7 +138,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If this set to true next time that a user will login he will be promped to replace his password`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) If true, a prompt to replace the password will be displayed next time the user logs in.`,
 		},
 
 		"permissions": {
@@ -148,7 +148,7 @@ func getResourceManagerSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) List of allowed permissions returned from the VMS`,
+			Description: `(Valid for versions: 5.0.0,5.1.0,5.2.0) A list of granted permissions returned from the VMS.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeString,

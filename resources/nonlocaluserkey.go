@@ -40,7 +40,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The Access key unique identifier`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The unique ID of the access key.`,
 		},
 
 		"uid": {
@@ -48,7 +48,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("uid"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The user unix UID`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The user's Unix UID.`,
 		},
 
 		"access_key": {
@@ -58,7 +58,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The access id of the user key`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The user's access key.`,
 		},
 
 		"secret_key": {
@@ -68,7 +68,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The secret id of the user key`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The user's secret key.`,
 		},
 
 		"pgp_public_key": {
@@ -78,7 +78,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The PGP public key at ascii armor format to encrypt the secret id returned from vast cluster, if this option is set than the encrypted_secret_key will be returned and secret_key will be empty, changing it after apply will have no affect`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The PGP public key in the ASCII armor format to encrypt the secret key returned by the VAST cluster. If this option is set, the 'encrypted_secret_key' will be returned, while 'secret_key' will be empty. Changing this after apply will have no effect.`,
 			ForceNew:    true,
 		},
 
@@ -89,7 +89,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The secret id returned from the vast cluster encrypted with the public key provided at pgp_public_key`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The secret key returned from the VAST cluster. This key is encrypted with the public key that was supplied in 'pgp_public_key'.`,
 		},
 
 		"tenant_id": {
@@ -97,7 +97,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalUserKey").GetConflictingFields("tenant_id"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID.`,
 		},
 
 		"enabled": {
@@ -107,7 +107,7 @@ func getResourceNonLocalUserKeySchema() map[string]*schema.Schema {
 			Computed:    false,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Should the key be enabled or disabled`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Sets the key to be enabled or disabled.`,
 
 			Default: true,
 		},

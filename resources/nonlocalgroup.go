@@ -47,7 +47,7 @@ func getResourceNonLocalGroupSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    false,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) The NonLocalGroup identifier`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) The ID of the non-local group.`,
 		},
 
 		"gid": {
@@ -55,7 +55,7 @@ func getResourceNonLocalGroupSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalGroup").GetConflictingFields("gid"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Group GID`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Group GID.`,
 		},
 
 		"sid": {
@@ -65,7 +65,7 @@ func getResourceNonLocalGroupSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Group SID`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Group SID.`,
 		},
 
 		"groupname": {
@@ -75,7 +75,7 @@ func getResourceNonLocalGroupSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Groupname`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Group name.`,
 		},
 
 		"tenant_id": {
@@ -83,7 +83,7 @@ func getResourceNonLocalGroupSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalGroup").GetConflictingFields("tenant_id"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Tenant ID.`,
 		},
 
 		"s3_policies_ids": {
@@ -93,7 +93,7 @@ func getResourceNonLocalGroupSchema() map[string]*schema.Schema {
 			Computed:    true,
 			Optional:    true,
 			Sensitive:   false,
-			Description: `(Valid for versions: 5.1.0,5.2.0) List S3 policies IDs`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) A list of identity policy IDs.`,
 
 			Elem: &schema.Schema{
 				Type: schema.TypeInt,
@@ -105,7 +105,7 @@ func getResourceNonLocalGroupSchema() map[string]*schema.Schema {
 			ConflictsWith: codegen_configs.GetResourceByName("NonLocalGroup").GetConflictingFields("context"),
 
 			Required:    true,
-			Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Available: 'ad', 'nis' and 'ldap'`,
+			Description: `(Valid for versions: 5.1.0,5.2.0) Context from which the user originates. Valid values: 'ad', 'nis' and 'ldap'.`,
 		},
 	}
 }

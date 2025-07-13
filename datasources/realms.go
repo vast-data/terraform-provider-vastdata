@@ -25,7 +25,7 @@ func DataSourceRealm() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) A uniqe GUID assigned to the realm`,
+				Description: `(Valid for versions: 5.2.0) The unique GUID of the realm.`,
 			},
 
 			"name": &schema.Schema{
@@ -33,7 +33,7 @@ func DataSourceRealm() *schema.Resource {
 				Computed:    false,
 				Required:    true,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) A uniqe name of the realm`,
+				Description: `(Valid for versions: 5.2.0) The unique name of the realm.`,
 			},
 
 			"object_types": &schema.Schema{
@@ -41,7 +41,7 @@ func DataSourceRealm() *schema.Resource {
 				Computed:    true,
 				Required:    false,
 				Optional:    false,
-				Description: `(Valid for versions: 5.2.0) List of allowed permissions Allowed Values are [cnodegroup managedapplication managedapplicationset alarm event eventdefinition eventdefinitionconfig cbox cnode carrier cluster dbox dnode dtray ebox fan host nic nvram psu port rack ssd subnetmanager switch dns globalsnapstream kafkabroker nativereplicationremotetarget protectedpath protectionpolicy qospolicy quota quotaentityinfo replicationrestorepoint replicationstream replicationtarget s3lifecyclerule snapshot userquota vip vippool view viewpolicy monitor activedirectory encryptedpath encryptiongroup group indestructibility ldap manager nis permission realm role s3policy tenant user vms callhomeconfig challengetoken env license module supportbundle systemsettingsdiff]`,
+				Description: `(Valid for versions: 5.2.0) A list of permissions granted. Allowed Values are [cnodegroup managedapplication managedapplicationset alarm event eventdefinition eventdefinitionconfig cbox cnode carrier cluster dbox dnode dtray ebox fan host nic nvram psu port rack ssd subnetmanager switch dns globalsnapstream kafkabroker nativereplicationremotetarget protectedpath protectionpolicy qospolicy quota quotaentityinfo replicationrestorepoint replicationstream replicationtarget s3lifecyclerule snapshot userquota vip vippool view viewpolicy monitor activedirectory encryptedpath encryptiongroup group indestructibility ldap manager nis permission realm role s3policy tenant user vms callhomeconfig challengetoken env license module supportbundle systemsettingsdiff]`,
 
 				Elem: &schema.Schema{
 					Type: schema.TypeString,

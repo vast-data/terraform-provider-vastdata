@@ -10,10 +10,8 @@ resource "vastdata_administators_managers" "managerC" {
   permissions_list = ["create_monitoring"]
 }
 
-#Since version 5.2.0 reamls are supported and can be referanced by a manager
-#you can specify 4 types of actions refering to realms create,delete,view,edit
-#in order to cofigure the action specify <action>_<realm name>.
-#Ex: if the realm name is realm01 in order to configure edit for this realm add the following to the permissions_list attribute edit_realm01
+#Starting with version 5.2.0, a role can reference one or more realms. You can specify 4 types of actions referring to realms: create, delete, view, edit. To configure the action, specify <action>_<realm name>.
+#For example, to configure edit for a realm named `realm01`, add the following to the `permissions_list` attribute: `edit_realm01`
 
 resource "vastdata_administators_realms" "realmc" {
   name         = "realmc"
