@@ -486,6 +486,34 @@ func DataSourceView() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
+
+			"kafka_vip_pools": &schema.Schema{
+				Type:        schema.TypeList,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) For Kafka-enabled views, an array of IDs of Virtual IP pools used to access event topics exposed by the view. The specified virtual IP pool must belong to the same tenant as the Kafka-enabled view. Must also not be a virtual IP pool that is excluded by the view policy’s virtual IP pool association.`,
+
+				Elem: &schema.Schema{
+					Type: schema.TypeInt,
+				},
+			},
+
+			"kafka_rejoin_group_timeout_sec": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Kafka rejoin group timeout, in seconds.`,
+			},
+
+			"kafka_first_join_group_timeout_sec": &schema.Schema{
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Required:    false,
+				Optional:    false,
+				Description: `(Valid for versions: 5.1.0,5.2.0) Kafka first join group timeout, in seconds.`,
+			},
 		},
 	}
 }
@@ -1077,6 +1105,42 @@ func dataSourceViewRead(ctx context.Context, d *schema.ResourceData, m interface
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Error occurred setting value to \"abe_protocols\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "KafkaVipPools", resource.KafkaVipPools))
+
+	err = d.Set("kafka_vip_pools", utils.FlattenListOfPrimitives(&resource.KafkaVipPools))
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"kafka_vip_pools\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "KafkaRejoinGroupTimeoutSec", resource.KafkaRejoinGroupTimeoutSec))
+
+	err = d.Set("kafka_rejoin_group_timeout_sec", resource.KafkaRejoinGroupTimeoutSec)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"kafka_rejoin_group_timeout_sec\"",
+			Detail:   err.Error(),
+		})
+	}
+
+	tflog.Info(ctx, fmt.Sprintf("%v - %v", "KafkaFirstJoinGroupTimeoutSec", resource.KafkaFirstJoinGroupTimeoutSec))
+
+	err = d.Set("kafka_first_join_group_timeout_sec", resource.KafkaFirstJoinGroupTimeoutSec)
+
+	if err != nil {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  "Error occurred setting value to \"kafka_first_join_group_timeout_sec\"",
 			Detail:   err.Error(),
 		})
 	}

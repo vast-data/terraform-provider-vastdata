@@ -74,6 +74,16 @@ var _ = Describe(" View", func() {
    "default_retention_period": "string",
    "files_retention_mode": "string",
    "guid": "string",
+   "kafka_first_join_group_timeout_sec": 100,
+   "kafka_rejoin_group_timeout_sec": 100,
+   "kafka_vip_pools": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+   ],
    "logical_capacity": 100,
    "max_retention_period": "string",
    "min_retention_period": "string",

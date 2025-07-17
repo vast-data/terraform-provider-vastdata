@@ -78,7 +78,8 @@ type View struct {
 	// Relevant if locking is enabled. Required if 's3_locks_retention_mode' is set to 'GOVERNANCE' or 'COMPLIANCE'. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
 	DefaultRetentionPeriod string `json:"default_retention_period,omitempty"`
 	// Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default retention period, after which they are unlocked. Specify as an integer value followed by a letter for the time unit (h - hours, d - days, y - years). Example: 2h (2 hours).
-	AutoCommit            string `json:"auto_commit,omitempty"`
+	AutoCommit string `json:"auto_commit,omitempty"`
+	// S3 Object Ownership lets you set ownership of objects uploaded to a given bucket and to determine whether ACLs are used to control access to objects within this bucket. A bucket can be configured with one of the following object ownership rules: 'BucketOwnerEnforced' - The bucket owner has full control over any object in the bucket. 'ObjectWriter' - The user that uploads an object has full control over this object. ACLs can be used to let other users access the object. 'BucketOwnerPreferred' - The bucket owner has full control over new objects uploaded to the bucket by other users. ACLs can be used to control access to the objects. 'None' - S3 Object Ownership is disabled for the bucket.
 	S3ObjectOwnershipRule string `json:"s3_object_ownership_rule,omitempty"`
 	// Enables or disables Write Once Read Many (WORM) locking.
 	Locking bool `json:"locking,omitempty"`
@@ -91,4 +92,10 @@ type View struct {
 	AbeMaxDepth int32 `json:"abe_max_depth,omitempty"`
 	// The protocols for which Access-Based Enumeration (ABE) is enabled. Valid values: [ NFS, SMB, NFS4, S3 ]
 	AbeProtocols []string `json:"abe_protocols,omitempty"`
+	// For Kafka-enabled views, an array of IDs of Virtual IP pools used to access event topics exposed by the view. The specified virtual IP pool must belong to the same tenant as the Kafka-enabled view. Must also not be a virtual IP pool that is excluded by the view policy’s virtual IP pool association.
+	KafkaVipPools []int32 `json:"kafka_vip_pools,omitempty"`
+	// Kafka rejoin group timeout, in seconds.
+	KafkaRejoinGroupTimeoutSec int32 `json:"kafka_rejoin_group_timeout_sec,omitempty"`
+	// Kafka first join group timeout, in seconds.
+	KafkaFirstJoinGroupTimeoutSec int32 `json:"kafka_first_join_group_timeout_sec,omitempty"`
 }
