@@ -18,7 +18,7 @@ func S3PolicyReSendEnable(m map[string]interface{}, i interface{}, ctx context.C
 	id := fmt.Sprintf("%v", d.Id())
 	z := map[string]interface{}{"enabled": enabled}
 	b, _ := json.Marshal(z)
-	_, err := client.Patch(ctx, GenPath(fmt.Sprintf("%v/%v", "s3policies", id)), bytes.NewReader(b), map[string]string{})
+	_, err := client.Patch(ctx, GenPath(fmt.Sprintf("%v/%v", "s3policies", id)), "", bytes.NewReader(b), map[string]string{})
 	if err != nil {
 		return m, err
 	}

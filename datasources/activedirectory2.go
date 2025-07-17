@@ -301,7 +301,10 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 	machine_account_name := d.Get("machine_account_name")
 	values.Add("machine_account_name", fmt.Sprintf("%v", machine_account_name))
 
-	response, err := client.Get(ctx, utils.GenPath("activedirectory"), values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"activedirectory",
+	)
+	response, err := client.Get(ctx, utils.GenPath(_path), values.Encode(), map[string]string{})
 	tflog.Info(ctx, response.Request.URL.String())
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
@@ -313,7 +316,7 @@ func dataSourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData,
 
 	}
 	resource_l := []api_latest.ActiveDirectory2{}
-	body, err := datasource_config.ResponseProcessingFunc(ctx, response)
+	body, err := datasource_config.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{

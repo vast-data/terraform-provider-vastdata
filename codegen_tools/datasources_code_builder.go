@@ -115,6 +115,15 @@ func BuildTemplateFromModelName(n string, indent int) string {
 	return BuildTemplate(model, indent)
 }
 
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
+
 func BuildDataSourcesList(datasources_templates []codegen_configs.ResourceTemplateV2) string {
 	var b bytes.Buffer
 	datasources :=
@@ -152,10 +161,15 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
      client:=m.(*vast_client.VMSSession)
      values := url.Values{}
      datasource_config := codegen_configs.GetDataSourceByName("{{ .ResourceName }}")
-     {{ range $i,$v := .RequiredIdentifierFields.ToArray }} 
-     {{$v}}:=d.Get("{{$v}}") 
-     values.Add("{{$v}}",fmt.Sprintf("%v",{{$v}}))
-     {{ end }}
+	{{ $pathFields := $.PathIdentifierFields }}
+	{{ $requiredFields := .RequiredIdentifierFields.ToArray }}
+	{{ range $i, $v := $requiredFields }}
+	  {{ if or (not $pathFields) (not (contains $pathFields.ToArray $v)) }}
+		{{ $val := printf "%s" $v }}
+		{{ $val }} := d.Get("{{ $val }}")
+		values.Add("{{ $val }}", fmt.Sprintf("%v", {{ $val }}))
+	  {{ end }}
+	{{ end }}
      {{ range $i,$v := .OptionalIdentifierFields.ToArray }} 
      if d.HasChanges("{{$v}}") {
          {{$v}}:=d.Get("{{$v}}")
@@ -163,7 +177,15 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
          values.Add("{{$v}}",fmt.Sprintf("%v",{{$v}}))
      }
      {{ end }}
-     response,err:=client.Get(ctx,utils.GenPath("{{.Path}}"),values.Encode(), map[string]string{})
+	_path := fmt.Sprintf(
+		"{{.Path}}", 
+		{{ if $pathFields }}
+			{{ range $i, $v := $pathFields.ToArray }}
+		d.Get("{{ printf "%s" $v }}"),
+			{{ end }}
+		{{ end }}
+	)
+     response,err:=client.Get(ctx,utils.GenPath(_path),values.Encode(), map[string]string{})
      tflog.Info(ctx,response.Request.URL.String())
      if err!=nil {
         diags = append(diags, diag.Diagnostic {
@@ -175,7 +197,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
 
      }
      resource_l:=[]api_latest.{{.ResourceName}}{}
-     body,err:=datasource_config.ResponseProcessingFunc(ctx,response)
+     body,err:=datasource_config.ResponseProcessingFunc(ctx,response,d)
 
      if err!=nil {
          diags = append(diags, diag.Diagnostic {
@@ -283,6 +305,7 @@ func dataSource{{ .ResourceName }}Read(ctx context.Context, d *schema.ResourceDa
 	if !exists {
 		funcMap["BuildTemplateFromModelName"] = BuildTemplateFromModelName
 	}
+	funcMap["contains"] = contains
 
 	t := template.Must(template.New("read_function").Funcs(funcMap).Parse(read_function))
 	err := t.Execute(&b, r)

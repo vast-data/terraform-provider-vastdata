@@ -845,7 +845,7 @@ func resourceActiveDirectory2Read(ctx context.Context, d *schema.ResourceData, m
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -1061,7 +1061,7 @@ func resourceActiveDirectory2Importer(ctx context.Context, d *schema.ResourceDat
 	}
 
 	var resourceList []api_latest.ActiveDirectory2
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err

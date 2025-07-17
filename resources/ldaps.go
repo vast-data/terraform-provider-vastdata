@@ -833,7 +833,7 @@ func resourceLdapRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diags
 	} else {
 		tflog.Info(ctx, response.Request.URL.String())
-		body, err = resourceConfig.ResponseProcessingFunc(ctx, response)
+		body, err = resourceConfig.ResponseProcessingFunc(ctx, response, d)
 		if err != nil {
 			diags = append(diags, diag.Diagnostic{
 				Severity: diag.Error,
@@ -1049,7 +1049,7 @@ func resourceLdapImporter(ctx context.Context, d *schema.ResourceData, m interfa
 	}
 
 	var resourceList []api_latest.Ldap
-	body, err := resourceConfig.ResponseProcessingFunc(ctx, response)
+	body, err := resourceConfig.ResponseProcessingFunc(ctx, response, d)
 
 	if err != nil {
 		return result, err

@@ -101,8 +101,8 @@ func (s *VMSSession) Get(ctx context.Context, path string, query string, headers
 	return validateResponse(response, responseError, 200, 201, 204)
 }
 
-func (s *VMSSession) Post(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
-	fullURL := buildUrl(s, path, "")
+func (s *VMSSession) Post(ctx context.Context, path string, query string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
+	fullURL := buildUrl(s, path, query)
 	_url := fullURL.String()
 	req, err := http.NewRequest("POST", _url, body)
 
@@ -128,9 +128,9 @@ func (s *VMSSession) Put(ctx context.Context, path string, body io.Reader, heade
 	return validateResponse(response, responseError, 200, 201, 204)
 }
 
-func (s *VMSSession) Patch(ctx context.Context, path string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
-	fullURL := buildUrl(s, path, "")
-	_url := fmt.Sprintf("%s/", fullURL.String())
+func (s *VMSSession) Patch(ctx context.Context, path string, query string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
+	fullURL := buildUrl(s, path, query)
+	_url := fullURL.String()
 	req, err := http.NewRequest("PATCH", _url, body)
 	err = setupHeaders(ctx, s, req, headers)
 	if err != nil {
@@ -143,7 +143,7 @@ func (s *VMSSession) Patch(ctx context.Context, path string, body io.Reader, hea
 
 func (s *VMSSession) Delete(ctx context.Context, path, query string, body io.Reader, headers map[string]string) (response *http.Response, err error) {
 	fullURL := buildUrl(s, path, query)
-	_url := fmt.Sprintf("%s/", fullURL.String())
+	_url := fullURL.String()
 	req, err := http.NewRequest("DELETE", _url, body)
 	err = setupHeaders(ctx, s, req, headers)
 	if err != nil {

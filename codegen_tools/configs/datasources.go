@@ -2,13 +2,13 @@ package configs
 
 import (
 	api_latest "github.com/vast-data/terraform-provider-vastdata/codegen/latest"
-	utils "github.com/vast-data/terraform-provider-vastdata/utils"
+	"github.com/vast-data/terraform-provider-vastdata/utils"
 )
 
-var datasources_map map[string]ResourceTemplateV2 = map[string]ResourceTemplateV2{}
+var datasourcesMap = map[string]ResourceTemplateV2{}
 
 var DatasourcesTemplates = []ResourceTemplateV2{
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Cnode",
 		Path:                     ToStringPointer("cnodes"),
 		Model:                    api_latest.Cnode{},
@@ -20,7 +20,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_cnode",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "QosPolicy",
 		Path:                     ToStringPointer("qospolicies"),
 		Model:                    api_latest.QosPolicy{},
@@ -32,7 +32,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_qos_policy",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "QosDynamicLimits",
 		Path:                     nil,
 		Model:                    api_latest.QosDynamicLimits{},
@@ -44,7 +44,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "QosStaticLimits",
 		Path:                     nil,
 		Model:                    api_latest.QosStaticLimits{},
@@ -56,7 +56,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Quota",
 		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.Quota{},
@@ -69,7 +69,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         true,
 		DataSourceName:           "vastdata_quota",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "DefaultQuota",
 		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.DefaultQuota{},
@@ -82,7 +82,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_quota",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "UserQuota",
 		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.UserQuota{},
@@ -95,7 +95,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_quota",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "QuotaEntityInfo",
 		Path:                     ToStringPointer("quotas"),
 		Model:                    api_latest.QuotaEntityInfo{},
@@ -108,7 +108,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_quota",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Dns",
 		Path:                     ToStringPointer("dns"),
 		Model:                    api_latest.Dns{},
@@ -116,12 +116,12 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"cnode_ids": []string{"id"}},
+		ListsNamesMap:            map[string][]string{"cnode_ids": {"id"}},
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_dns",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "VipPool",
 		Path:                     ToStringPointer("vippools"),
 		Model:                    api_latest.VipPool{},
@@ -129,12 +129,12 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"ip_ranges": []string{"start_ip", "end_ip"}, "cnode_ids": []string{"id"}},
+		ListsNamesMap:            map[string][]string{"ip_ranges": {"start_ip", "end_ip"}, "cnode_ids": {"id"}},
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_vip_pool",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ViewPolicy",
 		Path:                     ToStringPointer("viewpolicies"),
 		Model:                    api_latest.ViewPolicy{},
@@ -142,17 +142,17 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet("RemoteMapping", "ProtocolsAudit", "Created"),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap: map[string][]string{"nfs_read_write": []string{"address"},
-			"nfs_root_squash": []string{"address"},
-			"read_write":      []string{"address"},
-			"s3_read_write":   []string{"address"},
-			"smb_read_write":  []string{"address"}},
+		ListsNamesMap: map[string][]string{"nfs_read_write": {"address"},
+			"nfs_root_squash": {"address"},
+			"read_write":      {"address"},
+			"s3_read_write":   {"address"},
+			"smb_read_write":  {"address"}},
 		Generate:         true,
 		ResponseGetByURL: false,
 		DataSourceName:   "vastdata_view_policy",
 	},
 
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Group",
 		Path:                     ToStringPointer("groups"),
 		Model:                    api_latest.Group{},
@@ -160,12 +160,12 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"s3_policies_ids": []string{"policy"}},
+		ListsNamesMap:            map[string][]string{"s3_policies_ids": {"policy"}},
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_group",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "User",
 		Path:                     ToStringPointer("users"),
 		Model:                    api_latest.User{},
@@ -173,12 +173,12 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"access_keys": []string{"access_key", "enabled"}},
+		ListsNamesMap:            map[string][]string{"access_keys": {"access_key", "enabled"}},
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_user",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "NonLocalUser",
 		Path:                     ToStringPointer("users/query"),
 		Model:                    api_latest.NonLocalUser{},
@@ -193,7 +193,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_non_local_user",
 		ResponseProcessingFunc:   utils.NonLocalUserProcessingFunc,
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "NonLocalGroup",
 		Path:                     ToStringPointer("groups/query"),
 		Model:                    api_latest.NonLocalGroup{},
@@ -207,7 +207,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_non_local_group",
 		ResponseProcessingFunc:   utils.NonLocalGroupProcessingFunc,
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "View",
 		Path:                     ToStringPointer("views"),
 		Model:                    api_latest.View{},
@@ -220,7 +220,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_view",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ViewShareAcl",
 		Path:                     ToStringPointer("views"),
 		Model:                    api_latest.ViewShareAcl{},
@@ -233,7 +233,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ShareAcl",
 		Path:                     ToStringPointer("views"),
 		Model:                    api_latest.ShareAcl{},
@@ -247,7 +247,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "",
 	},
 
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Nis",
 		Path:                     ToStringPointer("nis"),
 		Model:                    api_latest.Nis{},
@@ -255,12 +255,12 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("domain_name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"hosts": []string{"host"}},
+		ListsNamesMap:            map[string][]string{"hosts": {"host"}},
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_nis",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Tenant",
 		Path:                     ToStringPointer("tenants"),
 		Model:                    api_latest.Tenant{},
@@ -268,16 +268,16 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet("Created", "SyncTime"),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"client_ip_ranges": []string{"start_ip", "end_ip"}},
+		ListsNamesMap:            map[string][]string{"client_ip_ranges": {"start_ip", "end_ip"}},
 		Generate:                 true,
 		ResponseGetByURL:         false,
 		DataSourceName:           "vastdata_tenant",
-		ListFields: map[string][]FakeField{"client_ip_ranges": []FakeField{
-			FakeField{Name: "start_ip", Description: "The first ip of the range"},
-			FakeField{Name: "end_ip", Description: "The last ip of the range"}}},
+		ListFields: map[string][]FakeField{"client_ip_ranges": {
+			{Name: "start_ip", Description: "The first ip of the range"},
+			{Name: "end_ip", Description: "The last ip of the range"}}},
 	},
 
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Ldap",
 		Path:                     ToStringPointer("ldaps"),
 		Model:                    api_latest.Ldap{},
@@ -285,11 +285,11 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("domain_name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"urls": []string{"url"}},
+		ListsNamesMap:            map[string][]string{"urls": {"url"}},
 		Generate:                 true,
 		DataSourceName:           "vastdata_ldap",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "S3LifeCycleRule",
 		Path:                     ToStringPointer("s3lifecyclerules"),
 		Model:                    api_latest.S3LifeCycleRule{},
@@ -302,7 +302,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_s3_life_cycle_rule",
 		ResponseProcessingFunc:   utils.ProcessingResultsListResponse,
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ActiveDirectory",
 		Path:                     ToStringPointer("activedirectory"),
 		Model:                    api_latest.ActiveDirectory{},
@@ -310,11 +310,11 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("machine_account_name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"preferred_dc_list": []string{"dc"}},
+		ListsNamesMap:            map[string][]string{"preferred_dc_list": {"dc"}},
 		Generate:                 true,
 		DataSourceName:           "vastdata_active_directory",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "S3Policy",
 		Path:                     ToStringPointer("s3userpolicies"),
 		Model:                    api_latest.S3Policy{},
@@ -322,11 +322,11 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreFields:             NewStringSet(),
 		RequiredIdentifierFields: NewStringSet("name"),
 		OptionalIdentifierFields: NewStringSet(),
-		ListsNamesMap:            map[string][]string{"users": []string{"user"}, "groups": []string{"group"}},
+		ListsNamesMap:            map[string][]string{"users": {"user"}, "groups": {"group"}},
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_policy",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ProtectedPath",
 		Path:                     ToStringPointer("protectedpaths"),
 		Model:                    api_latest.ProtectedPath{},
@@ -338,7 +338,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_protected_path",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Snapshot",
 		Path:                     ToStringPointer("snapshots"),
 		Model:                    api_latest.Snapshot{},
@@ -350,7 +350,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_snapshot",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "GlobalSnapshot",
 		Path:                     ToStringPointer("globalsnapstreams"),
 		Model:                    api_latest.GlobalSnapshot{},
@@ -362,7 +362,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_global_snapshot",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ReplicationPeers",
 		Path:                     ToStringPointer("nativereplicationremotetargets"),
 		Model:                    api_latest.ReplicationPeers{},
@@ -374,7 +374,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_replication_peers",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ProtectionPolicy",
 		Path:                     ToStringPointer("protectionpolicies"),
 		Model:                    api_latest.ProtectionPolicy{},
@@ -386,7 +386,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_protection_policy",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ProtectionPolicySchedule",
 		Path:                     nil,
 		Model:                    api_latest.ProtectionPolicySchedule{},
@@ -398,7 +398,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "S3replicationPeers",
 		Path:                     ToStringPointer("replicationtargets"),
 		Model:                    api_latest.S3replicationPeers{},
@@ -410,7 +410,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_s3_replication_peers",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ActiveDirectory2",
 		Path:                     ToStringPointer("activedirectory"),
 		Model:                    api_latest.ActiveDirectory2{},
@@ -424,7 +424,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		IgnoreUpdates:            NewStringSet("bindpw"),
 		DataSourceName:           "vastdata_active_directory2",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "ProtocolsAudit",
 		Path:                     nil,
 		Model:                    api_latest.ProtocolsAudit{},
@@ -436,7 +436,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "PermissionsPerVipPool",
 		Path:                     ToStringPointer("permissions_per_vip_pool"),
 		Model:                    api_latest.PermissionsPerVipPool{},
@@ -449,7 +449,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "BucketLogging",
 		Path:                     ToStringPointer("bucket_logging"),
 		Model:                    api_latest.BucketLogging{},
@@ -462,7 +462,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "QoSStaticTotalLimits",
 		Path:                     ToStringPointer(""),
 		Model:                    api_latest.QoSStaticTotalLimits{},
@@ -475,7 +475,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "QoSDynamicTotalLimits",
 		Path:                     ToStringPointer(""),
 		Model:                    api_latest.QoSDynamicTotalLimits{},
@@ -488,7 +488,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "QosUser",
 		Path:                     ToStringPointer(""),
 		Model:                    api_latest.QosUser{},
@@ -501,7 +501,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		ResponseGetByURL:         false,
 		DataSourceName:           "",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Realm",
 		Path:                     ToStringPointer("realms"),
 		Model:                    api_latest.Realm{},
@@ -513,7 +513,7 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		Generate:                 true,
 		DataSourceName:           "vastdata_administators_realms",
 	},
-	ResourceTemplateV2{
+	{
 		ResourceName:             "Role",
 		Path:                     ToStringPointer("roles"),
 		Model:                    api_latest.Role{},
@@ -527,17 +527,33 @@ var DatasourcesTemplates = []ResourceTemplateV2{
 		DataSourceName:           "vastdata_administators_roles",
 		AfterReadFunc:            utils.RoleAfterReadFunc,
 	},
+	{
+		ResourceName:             "Saml",
+		Path:                     ToStringPointer("vms/%v/saml_config"),
+		Model:                    api_latest.Saml{},
+		DestFile:                 ToStringPointer("samls.go"),
+		IgnoreFields:             NewStringSet("Id"),
+		RequiredIdentifierFields: NewStringSet("idp_name", "vms_id"),
+		PathIdentifierFields:     NewStringSet("vms_id"),
+		OptionalIdentifierFields: NewStringSet(),
+		SensitiveFields:          NewStringSet("encryption_saml_crt", "encryption_saml_key", "signing_cert", "signing_key"),
+		ListsNamesMap:            map[string][]string{},
+		Generate:                 true,
+		ForceNewFields:           NewStringSet(),
+		DataSourceName:           "vastdata_saml",
+		ResponseProcessingFunc:   utils.SamlProcessingFunc,
+	},
 }
 
 func init() {
 	for _, r := range DatasourcesTemplates {
 		r.SetFunctions()
-		datasources_map[r.ResourceName] = r
+		datasourcesMap[r.ResourceName] = r
 	}
 }
 
 func GetDataSourceByName(name string) *ResourceTemplateV2 {
-	resource, exists := datasources_map[name]
+	resource, exists := datasourcesMap[name]
 	if exists {
 		return &resource
 	}
