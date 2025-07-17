@@ -137,7 +137,11 @@ func mimicListResponseForSingularNonLocalUser(ctx context.Context, response *htt
 		tflog.Error(ctx, fmt.Sprintf("Resonse From Cluster %v", string(body)))
 		return nil, err
 	}
-	uid := int((*unmarshalledBody)["uid"].(float64))
+	uidFloat, ok := (*unmarshalledBody)["uid"].(float64)
+	if !ok {
+		return nil, fmt.Errorf("unable to convert uid to int, value: %v", (*unmarshalledBody)["uid"])
+	}
+	uid := int(uidFloat)
 	tenantId, _ := strconv.Atoi(response.Request.URL.Query().Get("tenant_id"))
 	contextValue := response.Request.URL.Query().Get("context")
 	id := getNonLocalUserId(uid, tenantId, contextValue)
