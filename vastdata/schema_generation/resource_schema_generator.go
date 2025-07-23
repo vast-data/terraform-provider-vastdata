@@ -27,6 +27,13 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		return getResourceSchemaForCustom(hints)
 	}
 
+	if hints.SchemaRef == nil {
+		return nil, fmt.Errorf("schema reference is required but was nil")
+	}
+	if hints.SchemaRef.Create == nil {
+		return nil, fmt.Errorf("create schema reference is required but was nil")
+	}
+
 	resourcePath := hints.SchemaRef.Create.Path
 	resourceMethod := hints.SchemaRef.Create.Method
 	if resourcePath == "" {

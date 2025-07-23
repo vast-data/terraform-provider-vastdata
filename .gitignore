@@ -33,3 +33,17 @@ go.work.sum
 /venv/
 /examples/terraform.tfstate
 /examples/terraform.tfstate.backup
+
+# Test artifacts and reports
+coverage/
+benchmarks/
+profiles/
+logs/
+*.test
+*.prof
+*.html
+
+# Temporary test files
+*_test_temp*
+test_*.tmp
+/.history/

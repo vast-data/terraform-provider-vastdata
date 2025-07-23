@@ -1,6 +1,15 @@
 # Terraform Provider Vastdata
 
-The VastData Terrafrom provider is a provider to manage VastData clusters [resources](./resources).
+[![CI](https://github.com/vast-data/terraform-provider-vastdata/workflows/CI/badge.svg)](https://github.com/vast-data/terraform-provider-vastdata/actions/workflows/ci.yml)
+[![Release](https://github.com/vast-data/terraform-provider-vastdata/workflows/Release/badge.svg)](https://github.com/vast-data/terraform-provider-vastdata/actions/workflows/release.yml)
+[![License: Apache2](https://img.shields.io/badge/License-Apache2-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Go Report Card](https://goreportcard.com/badge/github.com/vast-data/terraform-provider-vastdata)](https://goreportcard.com/report/github.com/vast-data/terraform-provider-vastdata)
+[![Coverage Status](https://codecov.io/gh/vast-data/terraform-provider-vastdata/branch/main/graph/badge.svg)](https://codecov.io/gh/vast-data/terraform-provider-vastdata)
+[![Go Reference](https://pkg.go.dev/badge/github.com/vast-data/terraform-provider-vastdata.svg)](https://pkg.go.dev/github.com/vast-data/terraform-provider-vastdata)
+[![Terraform Registry](https://img.shields.io/badge/terraform-registry-blue.svg)](https://registry.terraform.io/providers/vast-data/vastdata/latest)
+[![Latest Release](https://img.shields.io/github/v/release/vast-data/terraform-provider-vastdata)](https://github.com/vast-data/terraform-provider-vastdata/releases/latest)
+
+The VastData Terraform provider is a provider to manage VastData clusters [resources](./resources).
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**

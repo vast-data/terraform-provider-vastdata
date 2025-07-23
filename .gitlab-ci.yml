@@ -1,4 +1,18 @@
 # Copyright (c) HashiCorp, Inc.
+#
+# GitLab CI Pipeline for VastData Terraform Provider
+# 
+# Pipeline stages:
+# - build: Comprehensive testing (vet, fmt, unit tests, benchmarks) + cross-platform builds
+# - test: Additional quality assurance testing with detailed coverage reporting  
+# - release: Manual release to GitHub
+#
+# Key improvements:
+# - go vet and go fmt validation
+# - Comprehensive test suite with race detection
+# - Performance benchmarks
+# - Test coverage reporting (HTML + Cobertura for GitLab)
+# - Enhanced error reporting with emojis for better visibility
 
 stages:
   - build
@@ -18,12 +32,58 @@ build_terraform_provider: &build_terraform_provider
   stage: build
   script: |
     set -x
-    make test
+    
+    # Run comprehensive testing pipeline
+    echo "🔍 Running go vet..."
+    make vet || {
+      echo "❌ go vet failed - please fix the issues"
+      exit 1
+    }
+    
+    echo "🧹 Running go fmt check..."
+    make fmt || {
+      echo "❌ Code formatting issues found - please run 'make fmt'"
+      exit 1
+    }
+    
+    echo "🧪 Running comprehensive test suite..."
+    make test || {
+      echo "❌ Tests failed"
+      exit 1
+    }
+    
+    echo "⚡ Running unit tests with race detection..."
+    make test-unit || {
+      echo "❌ Unit tests with race detection failed"
+      exit 1
+    }
+    
+    echo "🏃 Running performance benchmarks..."
+    make test-benchmarks || {
+      echo "⚠️  Benchmarks failed (non-blocking)"
+    }
+    
+    echo "📊 Generating test coverage report..."
+    make test-coverage || {
+      echo "⚠️  Coverage report generation failed (non-blocking)"
+    }
+    
+    # Generate cobertura coverage report for GitLab
+    if [ -f "coverage/coverage.out" ]; then
+      echo "🔄 Converting coverage to cobertura format for GitLab..."
+      go install github.com/boumenot/gocover-cobertura@latest
+      gocover-cobertura < coverage/coverage.out > coverage/coverage.xml || {
+        echo "⚠️  Cobertura conversion failed (non-blocking)"
+      }
+    fi
+    
+    echo "✅ All tests passed!"
     
     # Check for uncommitted changes in generated docs
+    echo "📝 Checking generated documentation..."
     make generate-docs
     git diff --exit-code || {
-      echo "Docs changed. Please run 'make generate-docs' and commit the changes."
+      echo "❌ Docs changed. Please run 'make generate-docs' and commit the changes."
       exit 1
     }
     
@@ -65,8 +125,15 @@ build_terraform_provider: &build_terraform_provider
     paths:
       - artifacts/*.zip
       - artifacts/schemas.yaml
+      - coverage/coverage.html
+      - coverage/coverage.out
+      - benchmarks/
     expire_in: 10 days
     when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
   tags:
     - vast-dev-builder
 
@@ -74,13 +141,52 @@ build_terraform_provider: &build_terraform_provider
 build_terraform_provider [stable]:
   <<: *build_terraform_provider
   artifacts:
-    name: "terraform-bundles-$CI_PIPELINE_ID"
+    name: "terraform-bundles-stable-$CI_PIPELINE_ID"
     paths:
       - artifacts/*.zip
       - artifacts/schemas.yaml
+      - coverage/coverage.html
+      - coverage/coverage.out
+      - benchmarks/
     when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
   when: manual
 
+
+test_terraform_provider:
+  stage: test
+  script: |
+    set -x
+    echo "🧪 Running comprehensive test suite for quality assurance..."
+    
+    # Run all test categories
+    echo "📋 Running all test categories..."
+    make test-all || {
+      echo "❌ Comprehensive test suite failed"
+      exit 1
+    }
+    
+    # Generate detailed coverage report
+    echo "📊 Generating detailed coverage analysis..."
+    make test-coverage-open || true
+    
+    echo "✅ All quality assurance tests passed!"
+  artifacts:
+    name: "test-results-$CI_PIPELINE_ID"
+    paths:
+      - coverage/
+      - benchmarks/
+    expire_in: 5 days
+    when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
+  tags:
+    - vast-dev-builder
 
 e2e_terraform_sanity:
   stage: test

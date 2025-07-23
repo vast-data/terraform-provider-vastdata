@@ -1,0 +1,92 @@
+name: Tag Release from VERSION File
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'version/VERSION'
+
+jobs:
+  tag:
+    name: Create Git Tag from VERSION File
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: get_version
+        run: |
+          version=$(cat version/VERSION | tr -d '[:space:]')
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Version found: $version"
+
+      - name: Validate version format
+        run: |
+          version=${{ steps.get_version.outputs.version }}
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            echo "Invalid version format: $version"
+            echo "Expected format: x.y.z or x.y.z-suffix"
+            exit 1
+          fi
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          git fetch --tags
+          tag_exists=$(git tag -l "v${{ steps.get_version.outputs.version }}")
+          if [ -z "$tag_exists" ]; then
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.get_version.outputs.version }} does not exist, will create it"
+          else
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.get_version.outputs.version }} already exists, skipping"
+          fi
+
+      - name: Validate changes since last tag
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          # Get the latest tag
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -n "$latest_tag" ]; then
+            echo "Latest tag: $latest_tag"
+            echo "Changes since $latest_tag:"
+            git log --oneline "$latest_tag"..HEAD
+            
+            # Check if there are any changes
+            if [ $(git rev-list --count "$latest_tag"..HEAD) -eq 0 ]; then
+              echo "No changes since last tag. Skipping tag creation."
+              exit 1
+            fi
+          else
+            echo "No previous tags found. This will be the first tag."
+          fi
+
+      - name: Create and push tag
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          tag_name="v${{ steps.get_version.outputs.version }}"
+          
+          # Create annotated tag with release notes
+          git tag -a "$tag_name" -m "Release $tag_name
+
+          VastData Terraform Provider $tag_name
+          
+          This release was automatically created from version/VERSION file.
+          
+          Changes:
+          $(git log --oneline $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD | head -10)
+          "
+          
+          git push origin "$tag_name"
+          
+          echo "✅ Successfully created and pushed tag: $tag_name"
+          echo "🚀 GitHub Release workflow will be triggered automatically"

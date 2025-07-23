@@ -1,0 +1,223 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    name: Test Before Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+
+    - name: Run comprehensive test suite
+      run: |
+        make vet
+        make fmt
+        make test
+        make test-unit
+        make test-benchmarks
+
+    - name: Validate examples
+      run: |
+        echo "Validating Terraform examples before release..."
+        for example_dir in examples/resources/*/; do
+          if [ -f "$example_dir/basic.tf" ]; then
+            echo "Validating: $(basename "$example_dir")"
+            cd "$example_dir"
+            terraform init -backend=false
+            terraform validate
+            cd - > /dev/null
+          fi
+        done
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+
+    - name: Import GPG key
+      uses: crazy-max/ghaction-import-gpg@v6
+      id: import_gpg
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+
+    - name: Build cross-platform provider binaries
+      run: |
+        mkdir -p dist
+        PLATFORMS="linux/amd64 darwin/amd64 darwin/arm64 windows/amd64"
+        
+        for PLATFORM in $PLATFORMS; do
+          OS=$(echo $PLATFORM | cut -d/ -f1)
+          ARCH=$(echo $PLATFORM | cut -d/ -f2)
+          EXT=""
+          if [ "$OS" = "windows" ]; then
+            EXT=".exe"
+          fi
+        
+          OUT_DIR="dist/${OS}_${ARCH}"
+          BIN_NAME="terraform-provider-vastdata_${{ github.ref_name }}_${OS}_${ARCH}${EXT}"
+        
+          mkdir -p "$OUT_DIR"
+          echo "Building for $OS/$ARCH"
+          GOOS=$OS GOARCH=$ARCH make VERSION=${{ github.ref_name }} build
+          
+          cp "build/${OS}_${ARCH}/terraform-provider-vastdata${EXT}" "$OUT_DIR/$BIN_NAME"
+          
+          # Create provider package structure for Terraform Registry
+          (
+            cd "$OUT_DIR"
+            zip "../terraform-provider-vastdata_${{ github.ref_name }}_${OS}_${ARCH}.zip" "$BIN_NAME"
+          )
+        done
+
+    - name: Generate provider manifest
+      run: |
+        cat > dist/terraform-provider-vastdata_${{ github.ref_name }}_manifest.json << 'EOF'
+        {
+          "version": 1,
+          "metadata": {
+            "protocol_versions": ["6.0"]
+          }
+        }
+        EOF
+
+    - name: Generate checksums
+      run: |
+        cd dist
+        sha256sum *.zip > terraform-provider-vastdata_${{ github.ref_name }}_SHA256SUMS
+        cat terraform-provider-vastdata_${{ github.ref_name }}_SHA256SUMS
+
+    - name: Sign checksums
+      run: |
+        cd dist
+        gpg --detach-sign --armor terraform-provider-vastdata_${{ github.ref_name }}_SHA256SUMS
+
+    - name: Get Latest Tag
+      run: echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+
+    - name: Extract Changelog for Release
+      id: changelog
+      run: |
+        if [ -f CHANGELOG.md ]; then
+          # Extract changelog for this version using multiple formats
+          TAG="${{ env.TAG_NAME }}"
+          VERSION="${TAG#v}"  # Remove 'v' prefix for version matching
+          
+          # Try different changelog formats
+          echo "Extracting changelog for version $VERSION..."
+          
+          # Format 1: ## Version 1.0.0 or ## v1.0.0
+          awk -v tag="## Version $VERSION" '
+          BEGIN { found=0 }
+          $0 ~ tag { found=1; next }
+          found && /^## (Version |v|\[)/ { exit }
+          found { print }
+          ' CHANGELOG.md > release_notes.md
+          
+          # Format 2: ## [1.0.0] or ## [v1.0.0] (if first attempt was empty)
+          if [ ! -s release_notes.md ]; then
+            awk -v tag="## \\[$VERSION\\]" '
+            BEGIN { found=0 }
+            $0 ~ tag { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+            ' CHANGELOG.md > release_notes.md
+          fi
+          
+          # Format 3: ## v1.0.0 (if still empty)
+          if [ ! -s release_notes.md ]; then
+            awk -v tag="## $TAG" '
+            BEGIN { found=0 }
+            $0 ~ tag { found=1; next }
+            found && /^## / { exit }
+            found { print }
+            ' CHANGELOG.md > release_notes.md
+          fi
+          
+          # If still no content found, create default content
+          if [ ! -s release_notes.md ]; then
+            echo "## Changes in $TAG" > release_notes.md
+            echo "" >> release_notes.md
+            echo "See [commits](https://github.com/${{ github.repository }}/commits/$TAG) for details." >> release_notes.md
+          else
+            echo "Successfully extracted changelog for $TAG"
+          fi
+        else
+          echo "## Release ${{ github.ref_name }}" > release_notes.md
+          echo "" >> release_notes.md
+          echo "VastData Terraform Provider release." >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Installation" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "This provider can be installed automatically via Terraform Registry:" >> release_notes.md
+          echo "" >> release_notes.md
+          echo '```hcl' >> release_notes.md
+          echo 'terraform {' >> release_notes.md
+          echo '  required_providers {' >> release_notes.md
+          echo '    vastdata = {' >> release_notes.md
+          echo '      source = "vast-data/vastdata"' >> release_notes.md
+          echo '      version = "${{ github.ref_name }}"' >> release_notes.md
+          echo '    }' >> release_notes.md
+          echo '  }' >> release_notes.md
+          echo '}' >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "No CHANGELOG.md found. See [commits](https://github.com/${{ github.repository }}/commits/${{ github.ref_name }}) for details." >> release_notes.md
+        fi
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: ${{ github.ref_name }}
+        body_path: release_notes.md
+        draft: false
+        prerelease: ${{ contains(github.ref_name, '-') }}
+        files: |
+          dist/*.zip
+          dist/*_SHA256SUMS*
+          dist/*_manifest.json
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish to Terraform Registry
+      run: |
+        echo "🚀 Release ${{ github.ref_name }} created successfully!"
+        echo "📦 Provider binaries and checksums have been uploaded to the GitHub release."
+        echo "🌐 The Terraform Registry will automatically pick up this release within 10 minutes."
+        echo ""
+        echo "Users can now install this version with:"
+        echo ""
+        echo "terraform {"
+        echo "  required_providers {"
+        echo "    vastdata = {"
+        echo '      source = "vast-data/vastdata"'
+        echo '      version = "${{ github.ref_name }}"'
+        echo "    }"
+        echo "  }"
+        echo "}" 

@@ -25,6 +25,13 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 		return getDatasourceSchemaForCustom(hints)
 	}
 
+	if hints.SchemaRef == nil {
+		return nil, fmt.Errorf("schema reference is required but was nil")
+	}
+	if hints.SchemaRef.Read == nil {
+		return nil, fmt.Errorf("read schema reference is required but was nil")
+	}
+
 	resourcePath := hints.SchemaRef.Read.Path
 	resourceMethod := hints.SchemaRef.Read.Method
 	if resourcePath == "" {
