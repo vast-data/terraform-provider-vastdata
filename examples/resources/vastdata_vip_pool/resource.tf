@@ -1,86 +1,61 @@
-#Basic defenition of VIP pool 
-resource "vastdata_vip_pool" "pool1" {
-  name        = "pool1"
+
+resource "vastdata_vip_pool" "vastdb_vippool" {
+  name        = "vastdb_vippool"
   role        = "PROTOCOLS"
   subnet_cidr = "24"
-  ip_ranges {
-    end_ip   = "11.0.0.40"
-    start_ip = "11.0.0.20"
-  }
 
-  ip_ranges {
-    start_ip = "11.0.0.5"
-    end_ip   = "11.0.0.10"
-  }
+  ip_ranges = [
+    ["11.0.0.6", "11.0.0.10"],
+  ]
 }
 
-#Setting up VIP pool related tenant can be done in 2 ways.
-#It is advisable to select only one method per tenant,vippool combination.
+# ---------------------
+# Complete examples
+# ---------------------
 
-#Define VIP pool setting up the tenant_id of it using vastdata_tenant resource 
-resource "vastdata_vip_pool" "pool1" {
-  name        = "pool1"
+
+resource "vastdata_vip_pool" "vastdb_vippool" {
+  name        = "vastdb_vippool"
   role        = "PROTOCOLS"
   subnet_cidr = "24"
-  ip_ranges {
-    end_ip   = "11.0.0.40"
-    start_ip = "11.0.0.20"
-  }
 
-  ip_ranges {
-    start_ip = "11.0.0.5"
-    end_ip   = "11.0.0.10"
-  }
+  ip_ranges = [
+    ["11.0.0.6", "11.0.0.10"],
+    ["11.0.0.20", "11.0.0.40"]
+  ]
 }
 
-resource "vastdata_tenant" "tenant1" {
-  name        = "tenant01"
-  vippool_ids = [vastdata_vip_pool.pool1.id]
-  client_ip_ranges {
-    start_ip = "192.168.0.100"
-    end_ip   = "192.168.0.200"
-  }
+# --------------------
+
+
+resource "vastdata_vip_pool" "vastdb_vippool" {
+  name                      = "vastdb_vippool"
+  role                      = "PROTOCOLS"
+  subnet_cidr               = "24"
+  enable_weighted_balancing = true
+  ip_ranges = [
+    ["11.0.0.50", "11.0.0.80"],
+  ]
 }
 
+# --------------------
 
-#Define VIP pool setting up the tenant_id using the tenent_id attribute.
-resource "vastdata_vip_pool" "pool1" {
-  name        = "pool1"
-  role        = "PROTOCOLS"
-  subnet_cidr = "24"
-  tenant_id   = vastdata_tenant.tenant1.id
-  ip_ranges {
-    end_ip   = "11.0.0.40"
-    start_ip = "11.0.0.20"
-  }
 
-  ip_ranges {
-    start_ip = "11.0.0.5"
-    end_ip   = "11.0.0.10"
-  }
+data "vastdata_tenant" "vastdb_tenant" {
+  name = "default"
 }
 
-resource "vastdata_tenant" "tenant1" {
-  name = "tenant01"
-  client_ip_ranges {
-    start_ip = "192.168.0.100"
-    end_ip   = "192.168.0.200"
-  }
+resource "vastdata_vip_pool" "vastdb_vippool" {
+  name          = "vastdb_vippool"
+  role          = "PROTOCOLS"
+  tenant_id     = data.vastdata_tenant.vastdb_tenant.id
+  domain_name   = "vastdb.example.com"
+  vms_preferred = true
+  subnet_cidr   = "24"
+  ip_ranges = [
+    ["11.0.0.50", "11.0.0.80"],
+  ]
 }
 
-#Define a VIP pool for all tenants by setting tenant_id = 0
-resource "vastdata_vip_pool" "pool1" {
-  name        = "pool1"
-  role        = "PROTOCOLS"
-  subnet_cidr = "24"
-  tenant_id   = 0
-  ip_ranges {
-    end_ip   = "11.0.0.40"
-    start_ip = "11.0.0.20"
-  }
+# --------------------
 
-  ip_ranges {
-    start_ip = "11.0.0.5"
-    end_ip   = "11.0.0.10"
-  }
-}

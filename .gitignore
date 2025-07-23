@@ -2,7 +2,6 @@
 #*
 *#*
 build/*
-user_agent_version
 
 # IDE
 .idea
@@ -30,3 +29,7 @@ go.work.sum
 
 # env file
 .env
+/artifacts/
+/venv/
+/examples/terraform.tfstate
+/examples/terraform.tfstate.backup
