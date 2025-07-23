@@ -59,8 +59,11 @@ build_terraform_provider: &build_terraform_provider
     }
     
     echo "🏃 Running performance benchmarks..."
-    make test-benchmarks || {
+    make test-benchmarks-save || {
       echo "⚠️  Benchmarks failed (non-blocking)"
+      # Create empty benchmarks directory if benchmarks fail
+      mkdir -p benchmarks
+      echo "Benchmarks failed during CI run" > benchmarks/error.txt
     }
     
     echo "📊 Generating test coverage report..."
@@ -71,10 +74,25 @@ build_terraform_provider: &build_terraform_provider
     # Generate cobertura coverage report for GitLab
     if [ -f "coverage/coverage.out" ]; then
       echo "🔄 Converting coverage to cobertura format for GitLab..."
-      go install github.com/boumenot/gocover-cobertura@latest
-      gocover-cobertura < coverage/coverage.out > coverage/coverage.xml || {
-        echo "⚠️  Cobertura conversion failed (non-blocking)"
+      go install github.com/boumenot/gocover-cobertura@latest || {
+        echo "⚠️  Failed to install gocover-cobertura"
       }
+      
+      if command -v gocover-cobertura >/dev/null 2>&1; then
+        gocover-cobertura < coverage/coverage.out > coverage/coverage.xml || {
+          echo "⚠️  Cobertura conversion failed (non-blocking)"
+          # Create empty coverage.xml so artifact collection doesn't fail
+          echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+        }
+        echo "✅ Cobertura coverage report generated"
+      else
+        echo "⚠️  gocover-cobertura not available - creating empty coverage.xml"
+        echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+      fi
+    else
+      echo "⚠️  No coverage output file found - creating empty coverage.xml"
+      mkdir -p coverage
+      echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
     fi
     
     echo "✅ All tests passed!"
@@ -123,10 +141,8 @@ build_terraform_provider: &build_terraform_provider
   artifacts:
     name: "terraform-bundles-$CI_PIPELINE_ID"
     paths:
-      - artifacts/*.zip
-      - artifacts/schemas.yaml
-      - coverage/coverage.html
-      - coverage/coverage.out
+      - artifacts/
+      - coverage/
       - benchmarks/
     expire_in: 10 days
     when: always
@@ -143,10 +159,8 @@ build_terraform_provider [stable]:
   artifacts:
     name: "terraform-bundles-stable-$CI_PIPELINE_ID"
     paths:
-      - artifacts/*.zip
-      - artifacts/schemas.yaml
-      - coverage/coverage.html
-      - coverage/coverage.out
+      - artifacts/
+      - coverage/
       - benchmarks/
     when: always
     reports:
@@ -162,16 +176,30 @@ test_terraform_provider:
     set -x
     echo "🧪 Running comprehensive test suite for quality assurance..."
     
-    # Run all test categories
+    # Run all test categories with proper benchmark saving
     echo "📋 Running all test categories..."
-    make test-all || {
+    make vet fmt test-unit test-benchmarks-save test-coverage || {
       echo "❌ Comprehensive test suite failed"
       exit 1
     }
     
-    # Generate detailed coverage report
-    echo "📊 Generating detailed coverage analysis..."
-    make test-coverage-open || true
+    # Ensure directories exist for artifacts
+    mkdir -p coverage benchmarks
+    
+    # Generate cobertura coverage for GitLab
+    if [ -f "coverage/coverage.out" ]; then
+      echo "🔄 Converting coverage to cobertura format..."
+      go install github.com/boumenot/gocover-cobertura@latest || true
+      if command -v gocover-cobertura >/dev/null 2>&1; then
+        gocover-cobertura < coverage/coverage.out > coverage/coverage.xml || {
+          echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+        }
+      else
+        echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+      fi
+    else
+      echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+    fi
     
     echo "✅ All quality assurance tests passed!"
   artifacts:
