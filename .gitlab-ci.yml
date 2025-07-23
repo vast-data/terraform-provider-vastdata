@@ -1,0 +1,125 @@
+# Copyright (c) HashiCorp, Inc.
+
+stages:
+  - build
+  - test
+  - release
+
+# source: packaging/ci.Dockerfile
+image: 110450271409.dkr.ecr.eu-west-1.amazonaws.com/dev/terraform-plugin:CI-2025-06-06
+
+variables:
+#  ORION_BRANCH: comet/master  TODO: use this branch once lb_terraform_sanity [from-upstream] is merged.
+  ORION_BRANCH: SKIPCI/vlad/terrafrorm_plugin_tests
+  INSTALL_IMAGE: "prev_version"
+
+
+build_terraform_provider: &build_terraform_provider
+  stage: build
+  script: |
+    set -x
+    make test
+    
+    # Check for uncommitted changes in generated docs
+    make generate-docs
+    git diff --exit-code || {
+      echo "Docs changed. Please run 'make generate-docs' and commit the changes."
+      exit 1
+    }
+    
+    # generate artifacts for the provider
+    mkdir -p artifacts
+    PLATFORMS="linux/amd64 darwin/amd64 windows/amd64"
+    
+    for PLATFORM in $PLATFORMS; do
+      OS=$(echo $PLATFORM | cut -d/ -f1)
+      ARCH=$(echo $PLATFORM | cut -d/ -f2)
+      EXT=""
+      if [ "$OS" = "windows" ]; then
+        EXT=".exe"
+      fi
+    
+      OUT_DIR="artifacts/${OS}_${ARCH}"
+      BIN_NAME="terraform-provider-vastdata${EXT}"
+      SCHEMAS_FILE="artifacts/schemas.yaml"
+    
+      mkdir -p "$OUT_DIR"
+      echo "Building for $OS/$ARCH"
+      make GOOS=$OS GOARCH=$ARCH VERSION=$CI_PIPELINE_ID build
+    
+      cp "build/${OS}_${ARCH}/$BIN_NAME" "$OUT_DIR/"
+      make show r automation > $SCHEMAS_FILE
+      make show d automation >> $SCHEMAS_FILE
+      sed -i '/^Running show with/d' $SCHEMAS_FILE
+    
+      (
+        cd "$OUT_DIR"
+        zip "../${OS}_${ARCH}.zip" "$BIN_NAME"
+      )
+    done
+    
+    # zip examples of resources and data-sources for running in e2e tests
+    zip -r artifacts/examples.zip examples/resources examples/data-sources
+  artifacts:
+    name: "terraform-bundles-$CI_PIPELINE_ID"
+    paths:
+      - artifacts/*.zip
+      - artifacts/schemas.yaml
+    expire_in: 10 days
+    when: always
+  tags:
+    - vast-dev-builder
+
+
+build_terraform_provider [stable]:
+  <<: *build_terraform_provider
+  artifacts:
+    name: "terraform-bundles-$CI_PIPELINE_ID"
+    paths:
+      - artifacts/*.zip
+      - artifacts/schemas.yaml
+    when: always
+  when: manual
+
+
+e2e_terraform_sanity:
+  stage: test
+  when: manual
+  trigger:
+    project: dev/orion
+    branch: $ORION_BRANCH
+    strategy: depend
+  allow_failure: true
+  variables:
+    VAST_upgrade_to: $INSTALL_IMAGE
+    VAST_COMET__KWARG: terraform_plugin_version=${CI_PIPELINE_ID}
+    TRIGGER: "lb_terraform_sanity [from-upstream]"
+
+
+# TODO: need to add GITLAB_USER_EMAIL, GITLAB_USER_NAME, and GITHUB_TOKEN variables to the CI/CD settings in GitLab.
+release_terraform_plugin:
+  image:
+    name: alpine/git
+    entrypoint: [""]
+  only:
+    - tags
+  stage: release
+  before_script:
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - git config --global user.name "$GITLAB_USER_NAME"
+  script: |
+    set -x
+    TAG=$(git describe --tags --abbrev=0)
+    TARGET_BRANCH=main
+    git remote add github https://oauth2:$GITHUB_TOKEN@github.com/vast-data/terraform-provider-vastdata.git || true    
+    git fetch github $TARGET_BRANCH
+    git checkout -B $TARGET_BRANCH FETCH_HEAD
+    git checkout $CI_COMMIT_SHA -- .
+    git commit --allow-empty -am "Terraform Plugin - $TAG
+    
+      (from $CI_COMMIT_SHA)"
+    
+    git push -f --tags github HEAD:$TARGET_BRANCH
+  when: manual
+  tags:
+    - vast-dev-builder

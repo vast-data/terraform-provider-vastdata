@@ -1,28 +1,44 @@
-#Create a user named example with uid of 9000
+
+# Create a user with a specific UID.
 resource "vastdata_user" "example-user" {
   name = "example"
   uid  = 9000
 }
 
-#Create a user named user1 with leading group & supplementary groups
-resource "vastdata_group" "group2" {
-  name = "group2"
-  gid  = 2000
-}
-
-resource "vastdata_group" "group4" {
-  name = "group4"
-  gid  = 4000
-}
+# ---------------------
+# Complete examples
+# ---------------------
 
 
-resource "vastdata_user" "user1" {
-  name        = "user1"
-  uid         = 3000
-  leading_gid = resource.vastdata_group.group1.gid
+resource "vastdata_user" "vastdb_user" {
+  name = "vastdb_user"
+  uid  = 30109
   gids = [
-    resource.vastdata_group.group2.gid,
-    resource.vastdata_group.group4.gid
+    1001
   ]
-
 }
+
+# --------------------
+
+
+resource "vastdata_group" "vastdb_group" {
+  name = "vastdb_group"
+  gid  = 30097
+}
+
+resource "vastdata_user" "vastdb_user" {
+  name                = "vastdb_user"
+  uid                 = 30109
+  local               = true
+  allow_create_bucket = true
+  allow_delete_bucket = true
+  s3_superuser        = false
+  leading_gid         = vastdata_group.vastdb_group.gid
+  gids = [
+    1001,
+    vastdata_group.vastdb_group.gid
+  ]
+}
+
+# --------------------
+
