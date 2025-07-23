@@ -16,7 +16,7 @@
 
 stages:
   - build
-  - test
+  - test  # e2e testing only
   - release
 
 # source: packaging/ci.Dockerfile
@@ -169,53 +169,6 @@ build_terraform_provider [stable]:
         path: coverage/coverage.xml
   when: manual
 
-
-test_terraform_provider:
-  stage: test
-  script: |
-    set -x
-    echo "🧪 Running comprehensive test suite for quality assurance..."
-    
-    # Run all test categories with proper benchmark saving
-    echo "📋 Running all test categories..."
-    make vet fmt test-unit test-benchmarks-save test-coverage || {
-      echo "❌ Comprehensive test suite failed"
-      exit 1
-    }
-    
-    # Ensure directories exist for artifacts
-    mkdir -p coverage benchmarks
-    
-    # Generate cobertura coverage for GitLab
-    if [ -f "coverage/coverage.out" ]; then
-      echo "🔄 Converting coverage to cobertura format..."
-      go install github.com/boumenot/gocover-cobertura@latest || true
-      if command -v gocover-cobertura >/dev/null 2>&1; then
-        gocover-cobertura < coverage/coverage.out > coverage/coverage.xml || {
-          echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
-        }
-      else
-        echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
-      fi
-    else
-      echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
-    fi
-    
-    echo "✅ All quality assurance tests passed!"
-  artifacts:
-    name: "test-results-$CI_PIPELINE_ID"
-    paths:
-      - coverage/
-      - benchmarks/
-    expire_in: 5 days
-    when: always
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage/coverage.xml
-  tags:
-    - vast-dev-builder
-
 e2e_terraform_sanity:
   stage: test
   when: manual
@@ -235,15 +188,30 @@ release_terraform_plugin:
   image:
     name: alpine/git
     entrypoint: [""]
-  only:
-    - tags
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: manual
   stage: release
   before_script:
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
   script: |
     set -x
+    
+    # Ensure this tag was created from the main branch
+    echo "Checking if tag was created from main branch..."
+    git fetch origin main:main
     TAG=$(git describe --tags --abbrev=0)
+    
+    # Check if the tag points to a commit that exists in main branch
+    if ! git merge-base --is-ancestor $CI_COMMIT_SHA main; then
+      echo "❌ Error: Tag $TAG was not created from the main branch"
+      echo "Tags for release must be created from the main branch only"
+      exit 1
+    fi
+    
+    echo "✅ Tag $TAG was created from main branch, proceeding with release..."
+    
     TARGET_BRANCH=main
     git remote add github https://oauth2:$GITHUB_TOKEN@github.com/vast-data/terraform-provider-vastdata.git || true    
     git fetch github $TARGET_BRANCH
