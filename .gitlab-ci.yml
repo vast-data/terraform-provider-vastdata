@@ -156,6 +156,34 @@ build_terraform_provider: &build_terraform_provider
 
 build_terraform_provider [stable]:
   <<: *build_terraform_provider
+  before_script:
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - git config --global user.name "$GITLAB_USER_NAME"
+  after_script:
+    - |
+      # Create and push git tag from VERSION file after successful build
+      echo "🏷️  Creating git tag from version/VERSION..."
+      if [ -f "version/VERSION" ]; then
+        VERSION=$(cat version/VERSION | tr -d '\n' | tr -d ' ')
+        TAG="v${VERSION}"
+        
+        echo "📋 Version found: $VERSION"
+        echo "🏷️  Creating tag: $TAG"
+        
+        # Check if tag already exists
+        if git rev-parse "$TAG" >/dev/null 2>&1; then
+          echo "⚠️  Tag $TAG already exists, skipping tag creation"
+        else
+          git tag -a "$TAG" -m "Release $TAG - Automated release from stable build job. Pipeline ID: $CI_PIPELINE_ID, Commit: $CI_COMMIT_SHA, Branch: $CI_COMMIT_REF_NAME"
+          
+          git push origin "$TAG"
+          echo "✅ Successfully created and pushed tag: $TAG"
+        fi
+      else
+        echo "❌ version/VERSION file not found!"
+      fi
+      
+      echo "🎉 Stable build and tagging completed successfully!"
   artifacts:
     name: "terraform-bundles-stable-$CI_PIPELINE_ID"
     paths:
