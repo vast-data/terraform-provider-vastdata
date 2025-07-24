@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, terraform_plugin_framework_based_provider ]
+  pull_request:
+    branches: [ main, terraform_plugin_framework_based_provider ]
+
+env:
+  GO_VERSION: '1.22'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ['1.21', '1.22']
+    
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Cache Go modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-${{ matrix.go-version }}-
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Run go vet
+      run: make vet
+
+    - name: Check code formatting
+      run: make fmt
+
+    - name: Run comprehensive test suite
+      run: make test
+
+    - name: Run unit tests with race detection
+      run: make test-unit
+
+    - name: Run performance benchmarks
+      run: make test-benchmarks
+
+    - name: Generate test coverage report
+      run: make test-coverage
+
+    - name: Upload coverage reports to Codecov
+      if: matrix.go-version == '1.22'
+      uses: codecov/codecov-action@v4
+      with:
+        file: coverage/coverage.out
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+
+    - name: Upload coverage artifacts
+      if: matrix.go-version == '1.22'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: |
+          coverage/coverage.out
+          coverage/coverage.html
+
+    - name: Upload benchmark results
+      if: matrix.go-version == '1.22'
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: benchmarks/
+
+  build:
+    name: Build Provider
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Cache Go modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ env.GO_VERSION }}-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-${{ env.GO_VERSION }}-
+
+    - name: Build provider binary
+      run: make build
+
+    - name: Test provider examples
+      run: |
+        echo "Testing Terraform configuration examples..."
+        for example_dir in examples/resources/*/; do
+          if [ -f "$example_dir/basic.tf" ]; then
+            echo "Validating example: $(basename "$example_dir")"
+            cd "$example_dir"
+            terraform init -backend=false
+            terraform validate
+            cd - > /dev/null
+          fi
+        done
+
+    - name: Generate documentation
+      run: make generate-docs
+
+    - name: Check for uncommitted documentation changes
+      run: |
+        git diff --exit-code || {
+          echo "Documentation is out of date. Please run 'make generate-docs' and commit the changes."
+          exit 1
+        }
+
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "~1.5"
+
+    - name: Build provider
+      run: make build
+
+    - name: Run acceptance tests
+      run: |
+        echo "Note: Acceptance tests require VAST cluster access"
+        echo "These tests are disabled in CI due to external dependencies"
+        echo "Run 'make testacc' locally with proper VAST_* environment variables"

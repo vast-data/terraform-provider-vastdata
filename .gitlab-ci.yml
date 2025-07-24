@@ -1,8 +1,22 @@
 # Copyright (c) HashiCorp, Inc.
+#
+# GitLab CI Pipeline for VastData Terraform Provider
+# 
+# Pipeline stages:
+# - build: Comprehensive testing (vet, fmt, unit tests, benchmarks) + cross-platform builds
+# - test: Additional quality assurance testing with detailed coverage reporting  
+# - release: Manual release to GitHub
+#
+# Key improvements:
+# - go vet and go fmt validation
+# - Comprehensive test suite with race detection
+# - Performance benchmarks
+# - Test coverage reporting (HTML + Cobertura for GitLab)
+# - Enhanced error reporting with emojis for better visibility
 
 stages:
   - build
-  - test
+  - test  # e2e testing only
   - release
 
 # source: packaging/ci.Dockerfile
@@ -18,12 +32,76 @@ build_terraform_provider: &build_terraform_provider
   stage: build
   script: |
     set -x
-    make test
+    
+    # Run comprehensive testing pipeline
+    echo "🔍 Running go vet..."
+    make vet || {
+      echo "❌ go vet failed - please fix the issues"
+      exit 1
+    }
+    
+    echo "🧹 Running go fmt check..."
+    make fmt || {
+      echo "❌ Code formatting issues found - please run 'make fmt'"
+      exit 1
+    }
+    
+    echo "🧪 Running comprehensive test suite..."
+    make test || {
+      echo "❌ Tests failed"
+      exit 1
+    }
+    
+    echo "⚡ Running unit tests with race detection..."
+    make test-unit || {
+      echo "❌ Unit tests with race detection failed"
+      exit 1
+    }
+    
+    echo "🏃 Running performance benchmarks..."
+    make test-benchmarks-save || {
+      echo "⚠️  Benchmarks failed (non-blocking)"
+      # Create empty benchmarks directory if benchmarks fail
+      mkdir -p benchmarks
+      echo "Benchmarks failed during CI run" > benchmarks/error.txt
+    }
+    
+    echo "📊 Generating test coverage report..."
+    make test-coverage || {
+      echo "⚠️  Coverage report generation failed (non-blocking)"
+    }
+    
+    # Generate cobertura coverage report for GitLab
+    if [ -f "coverage/coverage.out" ]; then
+      echo "🔄 Converting coverage to cobertura format for GitLab..."
+      go install github.com/boumenot/gocover-cobertura@latest || {
+        echo "⚠️  Failed to install gocover-cobertura"
+      }
+      
+      if command -v gocover-cobertura >/dev/null 2>&1; then
+        gocover-cobertura < coverage/coverage.out > coverage/coverage.xml || {
+          echo "⚠️  Cobertura conversion failed (non-blocking)"
+          # Create empty coverage.xml so artifact collection doesn't fail
+          echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+        }
+        echo "✅ Cobertura coverage report generated"
+      else
+        echo "⚠️  gocover-cobertura not available - creating empty coverage.xml"
+        echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+      fi
+    else
+      echo "⚠️  No coverage output file found - creating empty coverage.xml"
+      mkdir -p coverage
+      echo '<?xml version="1.0" encoding="UTF-8"?><coverage></coverage>' > coverage/coverage.xml
+    fi
+    
+    echo "✅ All tests passed!"
     
     # Check for uncommitted changes in generated docs
+    echo "📝 Checking generated documentation..."
     make generate-docs
     git diff --exit-code || {
-      echo "Docs changed. Please run 'make generate-docs' and commit the changes."
+      echo "❌ Docs changed. Please run 'make generate-docs' and commit the changes."
       exit 1
     }
     
@@ -63,24 +141,61 @@ build_terraform_provider: &build_terraform_provider
   artifacts:
     name: "terraform-bundles-$CI_PIPELINE_ID"
     paths:
-      - artifacts/*.zip
-      - artifacts/schemas.yaml
+      - artifacts/
+      - coverage/
+      - benchmarks/
     expire_in: 10 days
     when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
   tags:
     - vast-dev-builder
 
 
 build_terraform_provider [stable]:
   <<: *build_terraform_provider
+  before_script:
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - git config --global user.name "$GITLAB_USER_NAME"
+  after_script:
+    - |
+      # Create and push git tag from VERSION file after successful build
+      echo "🏷️  Creating git tag from version/VERSION..."
+      if [ -f "version/VERSION" ]; then
+        VERSION=$(cat version/VERSION | tr -d '\n' | tr -d ' ')
+        TAG="v${VERSION}"
+        
+        echo "📋 Version found: $VERSION"
+        echo "🏷️  Creating tag: $TAG"
+        
+        # Check if tag already exists
+        if git rev-parse "$TAG" >/dev/null 2>&1; then
+          echo "⚠️  Tag $TAG already exists, skipping tag creation"
+        else
+          git tag -a "$TAG" -m "Release $TAG - Automated release from stable build job. Pipeline ID: $CI_PIPELINE_ID, Commit: $CI_COMMIT_SHA, Branch: $CI_COMMIT_REF_NAME"
+          
+          git push origin "$TAG"
+          echo "✅ Successfully created and pushed tag: $TAG"
+        fi
+      else
+        echo "❌ version/VERSION file not found!"
+      fi
+      
+      echo "🎉 Stable build and tagging completed successfully!"
   artifacts:
-    name: "terraform-bundles-$CI_PIPELINE_ID"
+    name: "terraform-bundles-stable-$CI_PIPELINE_ID"
     paths:
-      - artifacts/*.zip
-      - artifacts/schemas.yaml
+      - artifacts/
+      - coverage/
+      - benchmarks/
     when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
   when: manual
-
 
 e2e_terraform_sanity:
   stage: test
@@ -101,15 +216,30 @@ release_terraform_plugin:
   image:
     name: alpine/git
     entrypoint: [""]
-  only:
-    - tags
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: manual
   stage: release
   before_script:
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
   script: |
     set -x
+    
+    # Ensure this tag was created from the main branch
+    echo "Checking if tag was created from main branch..."
+    git fetch origin main:main
     TAG=$(git describe --tags --abbrev=0)
+    
+    # Check if the tag points to a commit that exists in main branch
+    if ! git merge-base --is-ancestor $CI_COMMIT_SHA main; then
+      echo "❌ Error: Tag $TAG was not created from the main branch"
+      echo "Tags for release must be created from the main branch only"
+      exit 1
+    fi
+    
+    echo "✅ Tag $TAG was created from main branch, proceeding with release..."
+    
     TARGET_BRANCH=main
     git remote add github https://oauth2:$GITHUB_TOKEN@github.com/vast-data/terraform-provider-vastdata.git || true    
     git fetch github $TARGET_BRANCH
