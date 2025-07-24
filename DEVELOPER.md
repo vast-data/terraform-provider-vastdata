@@ -404,10 +404,10 @@ make gen-openapi-tar [orion base path]/management/api/vast_doc.yaml
 NOTE: you need to install `ruamel.yaml` using command `pip install ruamel.yaml`
 
 After running this command, you should see the following two files in your current working directory:
-- openapi.json
-- openapi.tar.gz
+- api.json
+- api.tar.gz
 
-We only need openapi.tar.gz.
+We only need api.tar.gz.
 Move it to: `vastdata/client/api/5.3.0/api.tar.gz`
 
 ##### Make sure newly generated shema can be parsed properly

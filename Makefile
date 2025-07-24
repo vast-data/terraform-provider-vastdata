@@ -231,51 +231,43 @@ ifeq (gen-openapi-tar, $(firstword $(MAKECMDGOALS)))
   $(foreach arg,$(runargs),$(eval $(arg):;@true))
 endif
 
-#   Convert an OpenAPI YAML file to an OpenAPI v3 tarball and JSON file.
+# Enhanced OpenAPI conversion with validation and auto-fixes
+#
+#   This target uses the enhanced Python converter that:
+#     - Validates Swagger schemas and identifies common issues
+#     - Automatically fixes known problems (null properties, missing types)  
+#     - Provides detailed debugging information
+#     - Converts to OpenAPI v3 using the Go converter
+#     - Creates final outputs: api.json and api.tar.gz
+#
 #   Usage:
-#     make gen-openapi-tar runargs=<path>
+#     make gen-openapi-tar <path> [options]
 #
 #   Arguments:
 #     <path> - Required. Path to the Swagger/OpenAPI YAML file.
 #
-#   This target:
-#     - Converts the YAML file to Swagger JSON using Python.
-#     - Converts Swagger JSON to OpenAPI v3 using Go.
-#     - Creates a tarball containing the final JSON.
-#     - Copies both `openapi.tar.gz` and `openapi.json` to the current directory.
+#   Options:
+#     --debug        - Enable detailed debugging output
+#     --no-auto-fix  - Disable automatic fixes (validation only)
+#     --output-dir   - Custom output directory for intermediate files
 #
 #   Examples:
-#     make gen-openapi-tar runargs=./specs/swagger.yaml
-#     make gen-openapi-tar runargs=/tmp/vast-openapi.yaml
+#     make gen-openapi-tar ./specs/swagger.yaml
+#     make gen-openapi-tar /tmp/vast-openapi.yaml --debug
+#     make gen-openapi-tar ./specs/swagger.yaml --no-auto-fix
 gen-openapi-tar:
-	@if [ -z "$(word 1, $(runargs))" ]; then \
-		echo "Usage: make gen-openapi-tar runargs=<path_to_yaml>"; \
-		echo "Example: make gen-openapi-tar runargs=./specs/swagger.yaml"; \
+	@set -e; \
+	args="$(runargs)"; \
+	if [ -z "$$args" ]; then \
+		echo "❌ Usage: make gen-openapi-tar <path> [options]"; \
+		echo "   Example: make gen-openapi-tar /path/to/swagger.yaml --debug"; \
+		echo "   Options: --debug --no-auto-fix --output-dir /custom/dir"; \
 		exit 1; \
 	fi; \
-	\
-	INPUT_YAML="$(word 1, $(runargs))"; \
-	\
-	if [ ! -f "$$INPUT_YAML" ]; then \
-		echo "Error: File $$INPUT_YAML does not exist"; \
-		exit 1; \
-	fi; \
-	\
-	echo "Converting $$INPUT_YAML to OpenAPI v3 tarball..."; \
-	\
-	TMP_DIR=$$(mktemp -d); \
-	SWAGGER_JSON="$$TMP_DIR/swagger.json"; \
-	OPENAPI_JSON="$$TMP_DIR/api.json"; \
-	\
-	python3 misc/yaml2json.py "$$INPUT_YAML" "$$SWAGGER_JSON" && \
-	go run misc/convert_to_v3.go "$$SWAGGER_JSON" "$$OPENAPI_JSON" && \
-	\
-	(cd "$$TMP_DIR" && tar -czf api.tar.gz api.json) && \
-	cp "$$TMP_DIR/api.tar.gz" ./openapi.tar.gz && \
-	cp "$$OPENAPI_JSON" ./openapi.json && \
-	\
-	echo "Created openapi.tar.gz and openapi.json" && \
-	rm -rf "$$TMP_DIR"
+	echo "🚀 Running enhanced OpenAPI conversion with validation and auto-fixes..."; \
+	python3 $(CURDIR)/misc/convert_swagger_with_fixes.py $$args --dest-dir $(CURDIR); \
+	echo "✅ Enhanced conversion completed!"
+
 
 # Help target
 help:
@@ -310,7 +302,7 @@ help:
 	@echo "Utility targets:"
 	@echo "  show <type> [filter]    - Show resource/datasource schemas"
 	@echo "  generate-docs           - Generate documentation"
-	@echo "  gen-openapi-tar <path>  - Convert OpenAPI YAML to tarball"
+	@echo "  gen-openapi-tar <path> [options] - Convert OpenAPI YAML to tarball with validation & auto-fixes"
 	@echo "  help                    - Show this help message"
 	@echo ""
 	@echo "Examples:"
