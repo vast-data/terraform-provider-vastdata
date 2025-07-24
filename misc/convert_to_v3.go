@@ -18,11 +18,24 @@ import (
 )
 
 func main() {
-	// Input and output paths
-	inputPath := "/tmp/apiconv/swagger.json"
-	outputDir := "/tmp/apiconv"
+	// Get paths from environment variables or use defaults
+	inputPath := os.Getenv("INPUT_PATH")
+	if inputPath == "" {
+		inputPath = "/tmp/apiconv/swagger.json"
+	}
+
+	outputDir := os.Getenv("OUTPUT_DIR")
+	if outputDir == "" {
+		outputDir = "/tmp/apiconv"
+	}
+
 	jsonOut := filepath.Join(outputDir, "api.json")
 	tarOut := filepath.Join(outputDir, "api.tar.gz")
+
+	// Ensure output directory exists
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		log.Fatalf("❌ Failed to create output directory: %v", err)
+	}
 
 	// Read Swagger v2 (OpenAPI 2.0) JSON
 	data, err := os.ReadFile(inputPath)
