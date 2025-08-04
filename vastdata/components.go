@@ -42,6 +42,8 @@ var allTFComponents = []TFManager{
 	&ProtectionPolicy{},
 	&KafkaBroker{},
 	&BlockHostMapping{},
+	&EventDefinition{},
+	&EventDefinitionConfig{},
 	//&BlockHost{},
 	//&Volume{},
 }
