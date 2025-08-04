@@ -231,6 +231,11 @@ ifeq (gen-openapi-tar, $(firstword $(MAKECMDGOALS)))
   $(foreach arg,$(runargs),$(eval $(arg):;@true))
 endif
 
+ifeq (validate-api, $(firstword $(MAKECMDGOALS)))
+  runargs := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
+  $(foreach arg,$(runargs),$(eval $(arg):;@true))
+endif
+
 # Enhanced OpenAPI conversion with validation and auto-fixes
 #
 #   This target uses the enhanced Python converter that:
@@ -268,6 +273,34 @@ gen-openapi-tar:
 	python3 $(CURDIR)/misc/convert_swagger_with_fixes.py $$args --dest-dir $(CURDIR); \
 	echo "✅ Enhanced conversion completed!"
 
+# Validate Swagger/OpenAPI schema
+#
+# Usage: make validate-api <path> [options]
+#
+# Arguments:
+#   <path>         - Path to Swagger/OpenAPI YAML or JSON file
+#
+# Options:
+#   --debug        - Enable detailed debugging output
+#   --json-output  - Export JSON report to specified file
+#
+# Examples:
+#   make validate-api ./specs/swagger.yaml
+#   make validate-api /tmp/api.yaml --debug
+#   make validate-api ./api.yaml --json-output report.json
+validate-api:
+	@set -e; \
+	args="$(runargs)"; \
+	if [ -z "$$args" ]; then \
+		echo "❌ Usage: make validate-api <path> [options]"; \
+		echo "   Example: make validate-api /path/to/swagger.yaml --debug"; \
+		echo "   Options: --debug --json-output <file>"; \
+		exit 1; \
+	fi; \
+	echo "🔍 Running Swagger/OpenAPI schema validation..."; \
+	python3 $(CURDIR)/misc/validate_swagger.py $$args; \
+	echo "✅ Validation completed!"
+
 
 # Help target
 help:
@@ -303,6 +336,7 @@ help:
 	@echo "  show <type> [filter]    - Show resource/datasource schemas"
 	@echo "  generate-docs           - Generate documentation"
 	@echo "  gen-openapi-tar <path> [options] - Convert OpenAPI YAML to tarball with validation & auto-fixes"
+	@echo "  validate-api <path> [options]    - Validate Swagger/OpenAPI schema with detailed diagnostics"
 	@echo "  help                    - Show this help message"
 	@echo ""
 	@echo "Examples:"
