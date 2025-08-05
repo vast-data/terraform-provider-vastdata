@@ -58,12 +58,6 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 		)
 	}
 
-	//// Will be computed fields (Response schema definition)
-	//schemaRef, err := client.GetSchema_GET_StatusOk(resourcePath)
-	//if err != nil {
-	//	return nil, err
-	//}
-
 	// Will be write-only fields (Query parameters) unless present in Response schema
 	params, err := client.QueryParametersGET(resourcePath)
 	if err != nil {
@@ -72,11 +66,11 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 
 	// Extract main schema attributes
 	allProps := map[string]*SchemaEntry{}
-	if readSchemaRef.Value != nil {
-		addSchemaEntries(readSchemaRef.Value.Properties, readSchemaRef.Value.Required, hints, allProps, false, true, true, false, false, false)
-	}
 
-	// Add query parameters as optional+write-only inputs
+	// First, add query parameters with correct required status
+	requiredParams := []string{}
+	paramSchemas := map[string]*openapi3.SchemaRef{}
+
 	for _, p := range params {
 		if !isPrimitive(p.Schema.Value) {
 			// We search only for primitive types
@@ -86,14 +80,24 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 		if contains(excludeSearchParams, name) {
 			continue
 		}
-		if _, exists := allProps[name]; exists {
-			continue
-		}
 		if p.Schema == nil || p.Schema.Value == nil || p.Schema.Value.Type == nil || len(*p.Schema.Value.Type) == 0 {
 			continue
 		}
-		addSchemaEntries(map[string]*openapi3.SchemaRef{name: buildTmpSchemaRefFromParam(p)}, []string{}, hints, allProps, false, true, false, false, false, false)
 
+		paramSchemas[name] = buildTmpSchemaRefFromParam(p)
+
+		// Check if parameter is required
+		if p.Required {
+			requiredParams = append(requiredParams, name)
+		}
+	}
+
+	// Add query parameters with proper required status
+	addSchemaEntries(paramSchemas, requiredParams, hints, allProps, false, true, false, false, false, false)
+
+	// Then, add response schema properties as computed fields (ignore response required fields)
+	if readSchemaRef.Value != nil {
+		addSchemaEntries(readSchemaRef.Value.Properties, []string{}, hints, allProps, false, true, true, false, false, false)
 	}
 
 	attrs := buildDatasourceAttributesFromMap(ctx, allProps, hints)
