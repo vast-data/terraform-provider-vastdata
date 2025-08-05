@@ -53,8 +53,8 @@ var allTFComponents = []TFManager{
 	&LocalProvider{},
 	&ApiToken{},
 	&Vms{},
+	&Volume{},
 	//&BlockHost{},
-	//&Volume{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate

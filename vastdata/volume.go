@@ -23,7 +23,8 @@ func (m *Volume) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: VolumeSchemaRef,
+			SchemaRef:      VolumeSchemaRef,
+			ReadOnlyFields: []string{"tenant_id"},
 		},
 	)}
 }
