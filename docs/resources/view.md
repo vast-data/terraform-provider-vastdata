@@ -160,11 +160,12 @@ resource "vastdata_view" "vastdb_view" {
 
 ### Required
 
-- `create_dir` (Boolean) Create a directory at the specified path. Set to true if the specified path does not exist.
 - `path` (String) The full Element Store path to from the top level of the storage system on the cluster to the location that you want to expose. Begin with '/'. Do not include a trailing slash.
+- `policy_id` (Number) Every view must be attached to one view policy, which specifies further configurations. Specify by view policy ID which view policy should be used for the view.
 
 ### Optional
 
+- `abac_tags` (Set of String) list of ABAC tags
 - `abe_max_depth` (Number) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.
 - `abe_protocols` (Set of String) The protocols for which Access-Based Enumeration (ABE) is enabled
 - `alias` (String) Relevant if NFS is included in the protocols array. An alias for the mount path of an NFSv3 export. The alias must begin with a forward slash ('/') and must consist of only ASCII characters. If specified, the alias that can be used by NFSv3 clients to mount the view.
@@ -177,6 +178,7 @@ resource "vastdata_view" "vastdb_view" {
 - `bucket_logging` (Attributes) (see [below for nested schema](#nestedatt--bucket_logging))
 - `bucket_owner` (String) Specifies a user to be the bucket owner. Specify as user name. Must be specified if S3 Bucket is included in protocols.
 - `cluster_id` (Number) Cluster ID
+- `create_dir` (Boolean) Create a directory at the specified path. Set to true if the specified path does not exist.
 - `create_dir_acl` (Attributes Set) Define ACL for the newly created dir (see [below for nested schema](#nestedatt--create_dir_acl))
 - `create_dir_mode` (Number) Unix permissions mode for the new dir
 - `default_retention_period` (String) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
@@ -194,12 +196,12 @@ resource "vastdata_view" "vastdb_view" {
 - `max_retention_period` (String) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
 - `min_retention_period` (String) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
 - `name` (String) A name for the view
+- `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.
 - `owner` (String) The owner of the folder. Specify the owner using the attribute type set by owner_type. You can specify a group as the owner, as supported by SMB. To enable setting a group as the owner, set owner_is_group=true. In all cases, set owning_group also.
 - `owner_is_group` (Boolean) Set to true if passing a group as the owner of the folder. This feature is used to enable setting a group as the owner, as supported by SMB.
 - `owner_type` (String) The type of attribute used to specify owner.
 - `owning_group` (String) The owning group of the folder.
 - `owning_group_type` (String) The type of attribute to use to specify the owning group of the folder.
-- `policy_id` (Number) Every view must be attached to one view policy, which specifies further configurations. Specify by view policy ID which view policy should be used for the view.
 - `protocols` (Set of String) Protocols enabled for access to the view. 'NFS' enables access from NFS version 3, 'NFS4' enables access from NFS version 4.1 and 4.2, S3' creates an S3 bucket on the view, 'ENDPOINT' creates an S3 endpoint, used as template for views created via S3 RPCs, DATABASE exposes the view as a VAST database. KAFKA enables events related to elements on the view path to be published to the VAST Event Broker. BLOCK exposes the view as a block storage subsystem.
 - `qos_policy` (String) QoS Policy
 - `qos_policy_id` (Number) Associates a QoS policy with the view.
@@ -215,7 +217,6 @@ resource "vastdata_view" "vastdb_view" {
 
 ### Read-Only
 
-- `abac_tags` (Set of String) Comma separated tags.
 - `bulk_permission_update_progress` (Number) Progress
 - `bulk_permission_update_state` (String) State
 - `cluster` (String) Parent Cluster
@@ -285,8 +286,8 @@ Optional:
 - `grantee` (String) Type of grantee
 - `name` (String) Name of the grantee
 - `perm` (String) Permission to grant to the grantee
-- `sid_str` (String) Grantee’s SID
-- `uid_or_gid` (Number) Grantee’s uid (if user) or gid (if group)
+- `sid_str` (String) Grantee`s SID
+- `uid_or_gid` (Number) Grantee`s uid (if user) or gid (if group)
 
 
 

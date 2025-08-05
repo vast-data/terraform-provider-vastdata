@@ -19,8 +19,6 @@ description: |-
 
 - `name` (String)
 - `source_dir` (String) A path on the local cluster to protect. A snapshot of the specified path will be taken periodically on the schedule configured in the specified protection policy.
-- `target_exported_dir` (String) A path on a remote peer to which to replicate.
-- `tenant_id` (String) Tenant ID of the tenant on the local cluster to which the source_dir belongs.
 
 ### Optional
 
@@ -33,6 +31,8 @@ description: |-
 - `remote_tenant_guid` (String) Tenant GUID of the remote peer tenant to which to replicate
 - `sync_disconnect_time` (Number) A period of time, in seconds, without communication between sync replication peers, after which the peers are disconnected.
 - `sync_interval` (Number) Replication group sync interval
+- `target_exported_dir` (String) A path on a remote peer to which to replicate.
+- `tenant_id` (String) Tenant ID of the tenant on the local cluster to which the source_dir belongs.
 
 ### Read-Only
 

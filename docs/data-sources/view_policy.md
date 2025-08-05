@@ -56,6 +56,7 @@ description: |-
 - `log_username` (Boolean) Log username
 - `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
 - `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
+- `nfs_enforce_tls_relaxed` (Boolean) Whether to relax TLS enforcement by not requiring TLS for auxiliary NFSv3 sub-protocols | (MOUNT, NLM, NSM, RQUOTA, NFSACL)
 - `nfs_minimal_protection_level` (String) Minimal Protection Level for NFSv4 client mounts: 'KRB_AUTH_ONLY' allows client mounts with Kerberos authentication only (using the RPCSEC_GSS authentication service), 'SYSTEM' allows client mounts using either the AUTH_SYS RCP security flavor (the traditional default NFS authentication scheme) or with Kerberos authentication, 'NONE' (default) allows client mounts with the AUTH_NONE (anonymous access), or AUTH_SYS RCP security flavors, or with Kerberos authentication.
 - `nfs_posix_acl` (Boolean) True if support is enabled for extended POSIX Access Control Lists (ACL) for NFSv3 clients.
 - `nfs_read_only` (String) Hosts with NFS read only permissions
@@ -63,8 +64,19 @@ description: |-
 - `path_length` (String) How to determine the maximum allowed path component name length. 'LCD' (default): Imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. 'YOYO': Imposes no limitation beyond that of the client protocol.
 - `pretty_atime_frequency` (String)
 - `pretty_auth_source` (String)
+- `s3_bucket_full_control` (String) Hosts with full permissions
+- `s3_bucket_listing` (String) Hosts with full permissions
+- `s3_bucket_read` (String) Hosts with full permissions
+- `s3_bucket_read_acp` (String) Hosts with full permissions
+- `s3_bucket_write` (String) Hosts with full permissions
+- `s3_bucket_write_acp` (String) Hosts with full permissions
 - `s3_flavor_allow_free_listing` (Boolean) Allow NFS clients freely list bucket views and their subdirectories, regardless of individual object permissions.
 - `s3_flavor_detect_full_pathname` (Boolean) When this flag is enabled in S3 flavor, NFS access to objects is determined based on the full resource names specified in the identity policies. When disabled, only the bucket name is compared to the identity policy.
+- `s3_object_full_control` (String) Hosts with full permissions
+- `s3_object_read` (String) Hosts with full permissions
+- `s3_object_read_acp` (String) Hosts with full permissions
+- `s3_object_write` (String) Hosts with full permissions
+- `s3_object_write_acp` (String) Hosts with full permissions
 - `s3_special_chars_support` (Boolean) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols
 - `serves_tenant` (String) Filter by served tenants. Accepts tenant ID or "all" for all served tenants.
 - `smb_directory_mode` (Number) Default unix type permissions on new folder

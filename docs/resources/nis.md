@@ -24,12 +24,12 @@ description: |-
 ### Required
 
 - `domain_name` (String) The NIS domain name shared by all the NIS servers and clients on your network.
-- `ips` (Set of String) IP addresses of NIS master and slave servers.
-- `name` (String) NIS name
 
 ### Optional
 
 - `hosts` (Set of String) Host names of NIS master and slave servers.
+- `ips` (Set of String) IP addresses of NIS master and slave servers.
+- `name` (String) NIS name
 - `servers` (Set of String) NIS master and slave servers (limited to ten servers). You can specify each server by its IP or host name, up to 48 characters. Separate hosts with commas.
 
 ### Read-Only

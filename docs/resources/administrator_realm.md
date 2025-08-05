@@ -60,3 +60,12 @@ resource "vastdata_administrator_realm" "vastdb_realm" {
 
 - `guid` (String)
 - `id` (Number) The ID of this resource.
+- `tenant` (Attributes) (see [below for nested schema](#nestedatt--tenant))
+
+<a id="nestedatt--tenant"></a>
+### Nested Schema for `tenant`
+
+Read-Only:
+
+- `id` (Number) Tenant ID
+- `name` (String) Tenant Name

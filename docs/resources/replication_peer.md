@@ -49,12 +49,12 @@ resource "vastdata_replication_peer" "vastdb_replication_peer" {
 
 - `leading_vip` (String) Any one of the IP addresses that belong to the remote peer's replication VIP pool. This IP is used for the initial connection between the peers. Once the connection is established, the peers share their external network topology and form multiple connections between the VIPs.
 - `name` (String)
-- `password` (String) Not in use
 - `pool_id` (Number) The ID of the local replication VIP Pool to use for the replication connection with the remote peer.
 
 ### Optional
 
 - `mss` (Number) Maximum segment size (MSS), in bytes, that the peer can receive in a single TCP segment.
+- `password` (String) Not in use
 - `peer_certificate` (String) Not in use
 - `secure_mode` (String) Secure mode: NONE=no encryption on the replication connection. SECURE=Replication to this peer will be encrypted over the wire with mTLS. Requires a certificate, key and root certificate to be uploaded to VMS on each peer cluster. Upload mTLS certificates with PATCH /clusters/{id}/.
 - `transport_mode` (String) Transport mode: TCP for FIPS compliance, QUIC is not FIPS compliance but good for lower latency in high-latency networks.

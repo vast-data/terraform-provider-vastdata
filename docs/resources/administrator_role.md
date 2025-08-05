@@ -75,14 +75,9 @@ resource "vastdata_administrator_role" "vastdb_role" {
 - `ldap_groups` (Set of String) Optionally specify LDAP group(s) to associate with the role. A group can be any user group on an LDAP-based provider, including Active Directory. The provider must be connected to the cluster. If the role is for tenant admins, the provider must be connected to the specific tenant. Members of the specified groups can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.
 - `object_id` (Number) Object ID. Used to specify a particular object to limit the role to.
 - `object_type` (String) Object type. Used to specify a particular object to limit the role to.
-- `permissions` (String) Permission type. Used to assign all the permissions of given type to a role.
-Can be used together with `realm` to narrow resulting permissions list (logical AND).
-Ignored if provided along with `permissions_list`.
-Note, that this is a legacy name, which does not correspond to the output schema's `permissions`.
+- `permissions` (String) Permission type. Used to assign all the permissions of given type to a role. Can be used together with `realm` to narrow resulting permissions list (logical AND). Ignored if provided along with `permissions_list`. Note, that this is a legacy name, which does not correspond to the output schema's `permissions`.
 - `permissions_list` (Set of String) To list permission codenames, run /permissions/get. Takes precedence over `permissions` or `realm`.
-- `realm` (String) Realm name. Used to assigned all the permissions of given realm to a role.
-Can be used together with `permissions` to narrow resulting permissions list (logical AND).
-Ignored if provided along with `permissions_list`.
+- `realm` (String) Realm name. Used to assigned all the permissions of given realm to a role. Can be used together with `permissions` to narrow resulting permissions list (logical AND). Ignored if provided along with `permissions_list`.
 - `tenant_id` (Number) Pass this parameter to create a role for managers with user_type=TENANT_ADMIN (tenant admin users). Specifies the ID of a single tenant to associate with the role. If not specified, the role is a cluster admin role.  Corresponds to `tenant` in the output schema.
 - `tenant_ids` (Set of Number) Specifies IDs of tenants to associate with the role. Corresponds to `tenants` in the output schema.
 
@@ -92,9 +87,19 @@ Ignored if provided along with `permissions_list`.
 - `id` (Number) The ID of this resource.
 - `is_admin` (Boolean) Is the role is an admin role
 - `is_default` (Boolean) True if default role. Default role cannot be deleted.
+- `managers` (Attributes Set) Managers to which the role is granted (see [below for nested schema](#nestedatt--managers))
 - `tenant` (Attributes) (see [below for nested schema](#nestedatt--tenant))
 - `tenant_names` (String) Tenant names for the role
 - `tenants` (Set of Number) Tenants for the role
+
+<a id="nestedatt--managers"></a>
+### Nested Schema for `managers`
+
+Read-Only:
+
+- `id` (Number)
+- `username` (String)
+
 
 <a id="nestedatt--tenant"></a>
 ### Nested Schema for `tenant`

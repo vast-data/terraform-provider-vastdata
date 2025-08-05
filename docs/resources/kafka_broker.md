@@ -3,12 +3,12 @@
 page_title: "vastdata_kafka_broker Resource - vastdata"
 subcategory: ""
 description: |-
-  
+  KafkaBrokerConfig
 ---
 
 # vastdata_kafka_broker (Resource)
 
-
+KafkaBrokerConfig
 
 ## Example Usage
 

@@ -63,7 +63,6 @@ resource "vastdata_user" "vastdb_user" {
 ### Required
 
 - `name` (String) User name
-- `uid` (Number) NFS UID
 
 ### Optional
 
@@ -74,6 +73,7 @@ resource "vastdata_user" "vastdb_user" {
 - `local` (Boolean) Not in use
 - `local_provider_id` (Number) The ID of the local provider to which to add the user
 - `s3_superuser` (Boolean) Set to true to give the user S3 superuser permission. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
+- `uid` (Number) NFS UID
 
 ### Read-Only
 

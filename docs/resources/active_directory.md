@@ -17,24 +17,23 @@ description: |-
 
 ### Required
 
-- `machine_account_name` (String) The name for the machine object representing the VAST Cluster to be created within the OU
+- `ldap_id` (String) ID of the LDAP configuration for binding to the LDAP domain of the Active Directory server.
 
 ### Optional
 
-- `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check
-- `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check
+- `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check.
+- `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check.
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
 - `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
-- `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory domain to join.
-- `domains_with_posix_attributes` (String) Allows to enumerate specific domains for POSIX attributes
-in case posix_attributes_source is set to SPECIFIC_DOMAINS.
+- `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory.
+- `domains_with_posix_attributes` (String) Allows to enumerate specific domains for POSIX attributes in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `gid_number` (String) Override 'gidNumber' as the attribute of a group entry that contains the group's GID number. When binding VAST Cluster to AD, you may need to set this to 'gidnumber' (case sensitive).
-- `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping.
-Applicable only with Active Directory and NFSv4.
+- `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `ma_pwd_change_frequency` (String) Machine Account password change frequency.
 - `ma_pwd_update_time` (String) Machine Account password update time.
+- `machine_account_name` (String) The name for the machine object representing the VAST Cluster to be created within the OU.
 - `mail_property_name` (String)
 - `match_user` (String) The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.
 - `method` (String) The authentication method configured on the LDAP server for authenticating clients.
@@ -45,7 +44,9 @@ Applicable only with Active Directory and NFSv4.
 - `posix_account` (String) Override 'posixAccount'as the object class that defines a user entry on the LDAP server. When binding VAST Cluster to AD, set this parameter to 'user' in order for authorization to work properly.
 - `posix_attributes_source` (String) Defines which domains POSIX attributes will be supported from.
 - `posix_group` (String) Override 'posixGroup' as the object class that defines a group entry on the LDAP server. When binding VAST Cluster to AD, set this parameter to 'group' in order for authorization to work properly.
+- `preferred_dc_list` (Set of String) Specify multiple DCs using 'urls' parameter in LDAP configuration.
 - `query_groups_mode` (String) A mode setting for how groups are queried: Set to COMPATIBLE to look up user groups using the 'memberOf' and 'memberUid' attributes. Set to RFC2307BIS_ONLY to look up user groups using only the 'memberOf' attribute. Set to RFC2307_ONLY to look up user groups using only the 'memberUid' attribute. Set to NONE not to look up user groups other than by leading GID and primary group SID.
+- `query_posix_attributes_from_gc` (Boolean) When set to True - users/groups from non-joined domain POSIX attributes are supported, when set to False - Posix attributes of users/groups from non-joined domain are not supported. As a condition Global catalog needs to be configured to support Posix attributes. (deprecated since 4.6)
 - `reverse_lookup` (Boolean) resolve netgroups into hostnames
 - `scheduled_ma_pwd_change_enabled` (Boolean) Enables scheduled Machine Account password change.
 - `searchbase` (String) The entry in the LDAP directory tree to use as a starting point for user queries.
@@ -55,8 +56,7 @@ Applicable only with Active Directory and NFSv4.
 - `uid` (String) Override 'uid' as the attribute of a user entry on the LDAP server that contains the user name. When binding VAST Cluster to AD, you may need to set this to 'sAMAccountname'.
 - `uid_member` (String) Override 'memberUid' as the attribute of a group entry on the LDAP server that contains names of group members. When binding VAST Cluster to AD, you may need to set this to 'memberUID'
 - `uid_member_value_property_name` (String)
-- `uid_number` (String) Override 'uidNumber' as the attribute of a user entry on the LDAP server that contains the UID number.
-Often when binding VAST Cluster to Active Directory this does not need to be set.
+- `uid_number` (String) Override 'uidNumber' as the attribute of a user entry on the LDAP server that contains the UID number. Often when binding VAST Cluster to Active Directory this does not need to be set.
 - `url` (String) LDAP server URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. Example: ldap://ldap.company.com
 - `urls` (Set of String) Comma separated list of URIs of LDAP servers in the format <scheme>://<address>. The order of listing defines the priority order. The URI with highest priority that has a good health status is used.
 - `use_auto_discovery` (Boolean) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
@@ -64,8 +64,7 @@ Often when binding VAST Cluster to Active Directory this does not need to be set
 - `use_multi_forest` (Boolean) Allow access for users from trusted domains on other forests.
 - `use_posix` (Boolean) POSIX support
 - `use_tls` (Boolean) Set to true to enable use of TLS to secure communication between VAST Cluster and the LDAP server.
-- `user_login_name` (String) The attribute used to query Active Directory for the user login name in NFS ID mapping.
-Applicable only with Active Directory and NFSv4.
+- `user_login_name` (String) The attribute used to query Active Directory for the user login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
 - `username_property_name` (String) The attribute to use for querying users in VMS user-initated user queries. Default is 'name'. Sometimes set to 'cn'
 
 ### Read-Only
@@ -75,7 +74,6 @@ Applicable only with Active Directory and NFSv4.
 - `id` (Number) The ID of this resource.
 - `last_ma_pwd_renewal_status` (Attributes) Last Active Directory machine account password renewal status (see [below for nested schema](#nestedatt--last_ma_pwd_renewal_status))
 - `ldap` (Attributes) (see [below for nested schema](#nestedatt--ldap))
-- `ldap_id` (Number)
 - `name` (String)
 - `state` (String) Active Directory state
 - `tenant_id` (Number)
@@ -95,6 +93,11 @@ Read-Only:
 
 <a id="nestedatt--ldap"></a>
 ### Nested Schema for `ldap`
+
+Required:
+
+- `searchbase` (String) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only
+- `urls` (Set of String) Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format SCHEME://ADDRESS. ADDRESS can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
 
 Read-Only:
 
@@ -125,8 +128,10 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `posix_group` (String)
 - `posix_primary_provider` (Boolean) POSIX primary provider
 - `query_groups_mode` (String) Query group mode
+- `query_posix_attributes_from_gc` (Boolean) When set to True - users/groups from non-joined domain POSIX attributes are supported,
+when set to False - Posix attributes of users/groups from non-joined domain are not supported.
+As a condition Global catalog needs to be configured to support Posix attributes. (deprecated since 4.6)
 - `reverse_lookup` (Boolean) Resolve LDAP netgroups into hostnames
-- `searchbase` (String) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only
 - `state` (String)
 - `super_admin_groups` (Set of String) List of groups on the LDAP provider. Members of these groups can log into VMS as cluster admin users.
 - `tenant_id` (Number) Tenant ID
@@ -137,7 +142,6 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `uid_member_value_property_name` (String) The attribute which represents the value of the LDAP group's member property.
 - `uid_number` (String)
 - `url` (String) Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format SCHEME://ADDRESS. ADDRESS can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
-- `urls` (Set of String) Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format SCHEME://ADDRESS. ADDRESS can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
 - `use_auto_discovery` (Boolean) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
 - `use_ldaps` (Boolean) Use LDAPS for auto-Discovery. To activate, set use-auto-discovery to true also.
 - `use_multi_forest` (Boolean) Allow access for users from trusted domains on other forests.

@@ -83,6 +83,7 @@ resource "vastdata_administrator_manager" "vastdb_manager" {
 ### Required
 
 - `password` (String, Sensitive) Manager's password
+- `roles` (Set of Number) Joins manager to specified roles. Specify as an array of role IDs, separated by commas.
 - `username` (String) Manager's user name
 
 ### Optional
@@ -91,7 +92,6 @@ resource "vastdata_administrator_manager" "vastdb_manager" {
 - `is_temporary_password` (Boolean) Sets the password to be temporary. Expiration of temporary passwords is controlled by the tmp_pwd_expiration_timeout setting, which you can modify and retrieve through the /vms/{id}/pwd_settings/ path.
 - `last_name` (String) Manager's last name
 - `password_expiration_disabled` (Boolean) Password expiration is disabled
-- `roles` (Set of Number) Joins manager to specified roles. Specify as an array of role IDs, separated by commas.
 - `tenant_id` (Number) Tenant ID. If user_type is TENANT_ADMIN, specify the ID of the tenant to which to grant admin access.
 - `user_type` (String) Manager user type. SUPER_ADMIN aka 'cluster admin' = VMS manager users who can log into the cluster VMS to manage the cluster. TENANT_ADMIN=VMS manager users who can log into a specific tenant's VMS to manage that tenant.
 
