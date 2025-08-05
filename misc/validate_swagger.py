@@ -40,7 +40,7 @@ class SwaggerValidator:
         }
         print(f"{icons.get(level, '')} {message}")
 
-    def report_issue(self, severity, location, issue_type, description, current_value=None, expected_value=None, context=None):
+    def report_issue(self, severity, location, issue_type, description, current_value=None, expected_value=None, context=None, blocks_compilation=False):
         """Report a detailed issue with the schema"""
         issue = {
             "severity": severity,  # "error", "warning", "info"
@@ -49,7 +49,8 @@ class SwaggerValidator:
             "description": description,  # Human readable description
             "current_value": current_value,  # What we found
             "expected_value": expected_value,  # What should be there
-            "context": context  # Additional context
+            "context": context,  # Additional context
+            "blocks_compilation": blocks_compilation  # Whether this prevents OpenAPI conversion
         }
         self.detailed_issues.append(issue)
         
@@ -264,7 +265,8 @@ class SwaggerValidator:
                     f"Property '{prop_name}' has null schema",
                     current_value="null",
                     expected_value="schema object with type, description, etc.",
-                    context="Properties cannot be null, they need proper schema definitions"
+                    context="Properties cannot be null, they need proper schema definitions",
+                    blocks_compilation=True
                 )
                 continue
 
@@ -274,7 +276,8 @@ class SwaggerValidator:
                     f"Property '{prop_name}' schema is not an object",
                     current_value=f"{type(prop_schema).__name__}: {prop_schema}",
                     expected_value="schema object",
-                    context="Property schemas must be objects with type, description, etc."
+                    context="Property schemas must be objects with type, description, etc.",
+                    blocks_compilation=True
                 )
                 continue
 
@@ -286,7 +289,8 @@ class SwaggerValidator:
                     f"Property '{prop_name}' has 'required' field - this should be at schema level",
                     current_value=required_value,
                     expected_value="Remove from property, add to schema-level required array",
-                    context="'required' should be an array at the schema level, not a field in individual properties"
+                    context="'required' should be an array at the schema level, not a field in individual properties",
+                    blocks_compilation=True
                 )
 
             # Check for nested type issues
@@ -336,7 +340,8 @@ class SwaggerValidator:
                 "Array schema has 'properties' field - arrays should use 'items'",
                 current_value=schema['properties'],
                 expected_value="Remove 'properties', use 'items' instead",
-                context="Arrays define their element schema with 'items', not 'properties'"
+                context="Arrays define their element schema with 'items', not 'properties'",
+                blocks_compilation=True
             )
 
         # Check for missing or invalid items
@@ -369,7 +374,8 @@ class SwaggerValidator:
                 "Array schema has 'required' field - arrays cannot have required properties",
                 current_value=required_value,
                 expected_value="Remove 'required' field or move to items schema if applicable",
-                context="Only object schemas can have required fields, not arrays"
+                context="Only object schemas can have required fields, not arrays",
+                blocks_compilation=True
             )
 
     def _validate_object_schema(self, schema, location):
@@ -497,7 +503,8 @@ class SwaggerValidator:
                     "Parameter 'required' field must be a boolean",
                     current_value=f"{type(required_value).__name__}: {required_value}",
                     expected_value="true or false",
-                    context="Parameter required field should be boolean, not array or other type"
+                    context="Parameter required field should be boolean, not array or other type",
+                    blocks_compilation=True
                 )
 
         # Check body parameter schema
@@ -536,16 +543,57 @@ class SwaggerValidator:
         print("📋 SWAGGER/OPENAPI SCHEMA VALIDATION REPORT")
         print("="*80)
         
-        # Group issues by severity
+        # Group issues by severity and compilation-blocking status
         errors = [i for i in self.detailed_issues if i["severity"] == "error"]
         warnings = [i for i in self.detailed_issues if i["severity"] == "warning"]
         info = [i for i in self.detailed_issues if i["severity"] == "info"]
+        
+        # Critical issues that prevent OpenAPI conversion/compilation
+        critical_issues = [i for i in self.detailed_issues if i.get("blocks_compilation", False)]
         
         print(f"\n📊 SUMMARY:")
         print(f"   🚨 Errors: {len(errors)}")
         print(f"   ⚠️  Warnings: {len(warnings)}")
         print(f"   ℹ️  Info: {len(info)}")
+        print(f"   💥 CRITICAL (Blocks Compilation): {len(critical_issues)}")
         print(f"   📝 Total Issues: {len(self.detailed_issues)}")
+        
+        # Show critical issues first if any exist
+        if critical_issues:
+            print(f"\n💥 CRITICAL COMPILATION-BLOCKING ISSUES ({len(critical_issues)}):")
+            print("="*80)
+            print("❗ These issues MUST be fixed before OpenAPI v3 conversion will work!")
+            print("-" * 80)
+            
+            # Group critical issues by type
+            critical_by_type = {}
+            for issue in critical_issues:
+                issue_type = issue["issue_type"]
+                if issue_type not in critical_by_type:
+                    critical_by_type[issue_type] = []
+                critical_by_type[issue_type].append(issue)
+            
+            for issue_type, type_issues in critical_by_type.items():
+                print(f"\n  💥 {issue_type.replace('_', ' ').title()} ({len(type_issues)} issues):")
+                
+                # Show first 5 critical issues of each type
+                for i, issue in enumerate(type_issues[:5], 1):
+                    print(f"\n    {i}. Location: {issue['location']}")
+                    print(f"       Description: {issue['description']}")
+                    
+                    if issue['current_value'] is not None:
+                        current_str = str(issue['current_value'])
+                        if len(current_str) > 100:
+                            current_str = current_str[:97] + "..."
+                        print(f"       Current Value: {current_str}")
+                    
+                    if issue['expected_value'] is not None:
+                        print(f"       Expected: {issue['expected_value']}")
+                
+                if len(type_issues) > 5:
+                    print(f"\n    ... and {len(type_issues) - 5} more critical {issue_type.replace('_', ' ')} issues")
+            
+            print("\n" + "="*80)
         
         for severity, issues, icon in [("ERROR", errors, "🚨"), ("WARNING", warnings, "⚠️"), ("INFO", info, "ℹ️")]:
             if not issues:
@@ -589,8 +637,50 @@ class SwaggerValidator:
         print("💡 RECOMMENDATIONS:")
         print("="*80)
         
-        # Provide specific recommendations based on issue types
+        # Show critical compilation-blocking recommendations first
+        critical_types = set(issue["issue_type"] for issue in critical_issues)
+        if critical_types:
+            print("\n💥 CRITICAL FIXES REQUIRED FOR COMPILATION:")
+            print("-" * 50)
+            
+            if "invalid_required_field" in critical_types:
+                print("\n🚨 Fix Required Field Issues (CRITICAL):")
+                print("   - Remove 'required: true/false' from individual properties")
+                print("   - Add 'required: [\"prop1\", \"prop2\"]' at the schema level instead")
+                print("   - Example: Move 'required: true' from property to schema-level array")
+                
+            if "array_properties" in critical_types:
+                print("\n🚨 Fix Array Schema Issues (CRITICAL):")
+                print("   - Remove 'properties' field from array schemas")
+                print("   - Use 'items' to define the schema of array elements")
+                print("   - Arrays cannot have 'properties', only 'items'")
+                
+            if "parameter_required" in critical_types:
+                print("\n🚨 Fix Parameter Required Fields (CRITICAL):")
+                print("   - Change parameter 'required' from array to boolean")
+                print("   - Example: Change 'required: [\"username\", \"password\"]' to 'required: true'")
+                
+            if "invalid_array_required" in critical_types:
+                print("\n🚨 Fix Array Required Fields (CRITICAL):")
+                print("   - Remove 'required' field from array schemas")
+                print("   - Move required fields to the items schema if needed")
+                print("   - Only object schemas can have required fields")
+                
+            if "null_property_schema" in critical_types:
+                print("\n🚨 Fix Null Property Schemas (CRITICAL):")
+                print("   - Replace null property values with proper schema objects")
+                print("   - Add 'type', 'description' and other schema fields")
+                
+            if "invalid_property_schema" in critical_types:
+                print("\n🚨 Fix Invalid Property Schemas (CRITICAL):")
+                print("   - Convert string property values to proper schema objects")
+                print("   - Property schemas must be objects with 'type', 'description', etc.")
+        
+        # Provide general recommendations based on all issue types
         issue_types = set(issue["issue_type"] for issue in self.detailed_issues)
+        
+        print(f"\n📚 GENERAL RECOMMENDATIONS:")
+        print("-" * 50)
         
         if "invalid_required_field" in issue_types:
             print("\n🔧 Required Field Issues:")
@@ -621,14 +711,18 @@ class SwaggerValidator:
 
     def export_json_report(self, output_file):
         """Export detailed report as JSON"""
+        critical_issues = [i for i in self.detailed_issues if i.get("blocks_compilation", False)]
+        
         report = {
             "file": str(self.input_file),
             "summary": {
                 "total_issues": len(self.detailed_issues),
                 "errors": len([i for i in self.detailed_issues if i["severity"] == "error"]),
                 "warnings": len([i for i in self.detailed_issues if i["severity"] == "warning"]),
-                "info": len([i for i in self.detailed_issues if i["severity"] == "info"])
+                "info": len([i for i in self.detailed_issues if i["severity"] == "info"]),
+                "critical_compilation_blocking": len(critical_issues)
             },
+            "critical_issues": critical_issues,
             "issues": self.detailed_issues
         }
         
