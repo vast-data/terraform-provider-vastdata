@@ -285,7 +285,10 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			// For other resources please implement CreateResource to avoid entering this branch.
 			createParamsDiff := diffMap(createParams, record.(Record))
 			if len(createParamsDiff) > 0 {
-				id := record.(Record).RecordID()
+				id, exists := record.(Record)["id"]
+				if !exists {
+					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
+				}
 				// Send only difference between current record from vast and createParams.
 				if record, err = api.UpdateWithContext(ctx, id, createParamsDiff); err == nil {
 					r.checkIntegrity(ctx, record.(Record), createParamsDiff)
@@ -318,7 +321,10 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		updateParams := tfState.GetReadEditOnlyParams()
 		if len(updateParams) > 0 {
 			tflog.Debug(ctx, fmt.Sprintf("Create[%s]: Update 'EditOnly' fields.", managerName))
-			id := record.(Record).RecordID()
+			id, exists := record.(Record)["id"]
+			if !exists {
+				panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
+			}
 			_, err = api.UpdateWithContext(ctx, id, updateParams)
 			for k, v := range updateParams {
 				record.(Record)[k] = v // Update record with new values.
@@ -508,7 +514,10 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		}
 		// !NOTE: default implementation works only for resources with 'id' field.
 		// For other resources please implement CreateResource to avoid entering this branch.
-		id := record.(Record).RecordID()
+		id, exists := record.(Record)["id"]
+		if !exists {
+			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field.", managerName))
+		}
 		updateParams := planTfState.DiffFields(tfState, is.FilterOr, nil, is.SearchOptional, is.SearchRequired)
 		if transformer, ok := stateManger.(TransformRequestBody); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformRequestBody[%s]: do.", managerName))

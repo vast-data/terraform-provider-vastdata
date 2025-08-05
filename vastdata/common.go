@@ -211,7 +211,7 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 	if idExists {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
 		// If the ID is set, we assume it's a direct call by ID
-		record, err = api.GetByIdWithContext(ctx, is.Must(toInt(id)))
+		record, err = api.GetByIdWithContext(ctx, id)
 	}
 	// Attempt 2: get resource by GUID.
 	if (!idExists || expectStatusCodes(err, http.StatusNotFound)) && guidExists {
@@ -279,7 +279,6 @@ func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithCont
 	if id, ok := searchParams["id"]; ok {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
 		// If the ID is set, we assume it's a direct call by ID
-		id := is.Must(toInt(id))
 		_, err = api.DeleteByIdWithContext(ctx, id, deleteParams)
 	} else {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: no ID found, using search params.", op, managerName))

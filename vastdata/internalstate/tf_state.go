@@ -6,12 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
-	"strings"
 
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -332,23 +333,6 @@ func (s *TFState) TfSet(path string) types.Set {
 		s.convPanic(fmt.Sprintf("not a types.Set at %q", path))
 	}
 	return set
-}
-
-func (s *TFState) ResourceID() int64 {
-	// Special case for easy retrieving for resource IDs from state.
-	id, ok := s.Raw["id"]
-	if !ok {
-		return 0
-	}
-	switch v := id.(type) {
-	case types.Int64:
-		return v.ValueInt64()
-	case types.Float64:
-		return int64(v.ValueFloat64())
-	default:
-		s.convPanic(fmt.Sprintf("ResourceID: expected types.Int64 or float64, got %T", id))
-		return 0
-	}
 }
 
 func (s *TFState) ResourceGUID() string {
@@ -741,9 +725,14 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		searchParams = sp
 	}
 	// Try go get resource ID and GUID from current state
-	if idFromState := s.ResourceID(); idFromState != 0 {
+	if idFromState, ok := s.Raw["id"]; ok {
 		tflog.Debug(ctx, "++ 'search by ID'")
-		searchParams["id"] = idFromState
+		// Convert the ID to raw value for search params
+		if idType, ok := s.TypeMap["id"]; ok {
+			searchParams["id"] = ConvertAttrValueToRaw(idFromState, idType)
+		} else {
+			searchParams["id"] = idFromState
+		}
 	}
 	if guid := s.ResourceGUID(); guid != "" {
 		tflog.Debug(ctx, "++ 'search by GUID'")
