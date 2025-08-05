@@ -284,14 +284,19 @@ class SwaggerValidator:
             # Check for invalid required fields in properties
             if 'required' in prop_schema:
                 required_value = prop_schema['required']
-                self.report_issue(
-                    "error", prop_location, "invalid_required_field",
-                    f"Property '{prop_name}' has 'required' field - this should be at schema level",
-                    current_value=required_value,
-                    expected_value="Remove from property, add to schema-level required array",
-                    context="'required' should be an array at the schema level, not a field in individual properties",
-                    blocks_compilation=True
-                )
+                prop_type = prop_schema.get('type')
+                
+                # Only flag as error if this is not an object schema with a valid required array
+                # Object schemas can legitimately have required arrays listing their required properties
+                if prop_type != 'object' or not isinstance(required_value, list):
+                    self.report_issue(
+                        "error", prop_location, "invalid_required_field",
+                        f"Property '{prop_name}' has invalid 'required' field",
+                        current_value=required_value,
+                        expected_value="For object types: array of required property names. For other types: remove required field",
+                        context="Only object schemas can have 'required' arrays. Non-object properties should not have 'required' fields",
+                        blocks_compilation=True
+                    )
 
             # Check for nested type issues
             if 'type' in prop_schema:
@@ -576,8 +581,8 @@ class SwaggerValidator:
             for issue_type, type_issues in critical_by_type.items():
                 print(f"\n  💥 {issue_type.replace('_', ' ').title()} ({len(type_issues)} issues):")
                 
-                # Show first 5 critical issues of each type
-                for i, issue in enumerate(type_issues[:5], 1):
+                # Show ALL critical issues (don't collapse them)
+                for i, issue in enumerate(type_issues, 1):
                     print(f"\n    {i}. Location: {issue['location']}")
                     print(f"       Description: {issue['description']}")
                     
@@ -589,9 +594,6 @@ class SwaggerValidator:
                     
                     if issue['expected_value'] is not None:
                         print(f"       Expected: {issue['expected_value']}")
-                
-                if len(type_issues) > 5:
-                    print(f"\n    ... and {len(type_issues) - 5} more critical {issue_type.replace('_', ' ')} issues")
             
             print("\n" + "="*80)
         
