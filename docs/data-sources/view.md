@@ -18,6 +18,7 @@ description: |-
 ### Required
 
 - `path` (String) The Element Store path exposed by the view. Begin with a forward slash. Do not include a trailing slash
+- `policy_id` (Number) The ID of the associated view policy
 
 ### Optional
 
@@ -56,12 +57,11 @@ description: |-
 - `max_retention_period` (String) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
 - `min_retention_period` (String) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
 - `name` (String)
+- `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.
 - `nqn` (String) Applicable to subsystem (block protocol enabled) views. The subsystem's NVMe Qualified Name. A unique identifier used to identify the subsystem in NVMe operations.
 - `physical_capacity` (Number) Physical Capacity consumed by view
 - `policy` (String) The name of the associated view policy
-- `policy__id` (String) Filter by view policy ID
 - `policy__name` (String) Filter by view policy name
-- `policy_id` (Number) The ID of the associated view policy
 - `qos_policy` (String) QoS Policy
 - `qos_policy_id` (Number) QoS Policy ID
 - `s3_locks_retention_mode` (String) The retention mode for new object versions stored in this bucket. You can override this if you upload a new object version with an explicit retention mode and period.
@@ -131,9 +131,9 @@ Read-Only:
 - `fqdn` (String) FQDN of the chosen grantee
 - `grantee` (String) grantee type
 - `name` (String) name of the chosen grantee
-- `perm` (String) Grantee’s permissions
-- `sid_str` (String) grantee’s SID
-- `uid_or_gid` (Number) grantee’s uid (if user) or gid (if group)
+- `perm` (String) Grantee`s permissions
+- `sid_str` (String) grantee`s SID
+- `uid_or_gid` (Number) grantee`s uid (if user) or gid (if group)
 
 
 

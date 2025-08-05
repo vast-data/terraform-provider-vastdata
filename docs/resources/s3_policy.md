@@ -100,11 +100,11 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
 
 - `name` (String) A name for the S3 identity policy
 - `policy` (String) JSON policy
-- `tenant_id` (Number) Tenant ID
 
 ### Optional
 
 - `enabled` (Boolean)
+- `tenant_id` (Number) Tenant ID
 
 ### Read-Only
 

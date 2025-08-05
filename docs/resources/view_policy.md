@@ -73,6 +73,7 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `nfs_all_squash` (Set of String) Specify which NFS client hosts have all squash. With all squash, all client users are mapped to nobody for all file and folder management operations on the export. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
 - `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
+- `nfs_enforce_tls_relaxed` (Boolean) Whether to relax TLS enforcement by not requiring TLS for auxiliary NFSv3 sub-protocols | (MOUNT, NLM, NSM, RQUOTA, NFSACL)
 - `nfs_minimal_protection_level` (String) For a policy intended for use with NFSv4-enabled views, sets the Minimal Protection Level for NFSv4 client mounts: 'KRB_AUTH_ONLY' allows client mounts with Kerberos authentication only (using the RPCSEC_GSS authentication service), 'SYSTEM' allows client mounts using either the AUTH_SYS RCP security flavor (the traditional default NFS authentication scheme) or with Kerberos authentication, 'NONE' (default) allows client mounts with the AUTH_NONE (anonymous access), or AUTH_SYS RCP security flavors, or with Kerberos authentication.
 - `nfs_no_squash` (Set of String) Specify which NFS client hosts have no squash. With no squash, all operations are supported. Use this option if you trust the root user not to perform operations that will corrupt data. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `nfs_posix_acl` (Boolean) Enables full support of extended POSIX Access Control Lists (ACL).
@@ -85,6 +86,8 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `protocols_audit` (Attributes) Specify audit options to enable them for all attached views in addition to auditing options that are enabled globably on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read_only` (Set of String) Specify which NFS client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `read_write` (Set of String) Specify which NFS client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
+- `s3_flavor_allow_free_listing` (Boolean) Allow NFS clients freely list bucket views and their subdirectories, regardless of individual object permissions.
+- `s3_flavor_detect_full_pathname` (Boolean) When this flag is enabled in S3 flavor, NFS access to objects is determined based on the full resource names specified in the identity policies. When disabled, only the bucket name is compared to the identity policy.
 - `s3_read_only` (Set of String) Specify which S3 client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `s3_read_write` (Set of String) Specify which S3 client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `s3_special_chars_support` (Boolean) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols
@@ -124,8 +127,16 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `pretty_atime_frequency` (String)
 - `pretty_auth_source` (String)
 - `read` (Set of String) Hosts with read permissions
-- `s3_flavor_allow_free_listing` (Boolean) Allow NFS clients freely list bucket views and their subdirectories, regardless of individual object permissions.
-- `s3_flavor_detect_full_pathname` (Boolean) When this flag is enabled in S3 flavor, NFS access to objects is determined based on the full resource names specified in the identity policies. When disabled, only the bucket name is compared to the identity policy.
+- `s3_bucket_listing` (String) Hosts with full permissions
+- `s3_bucket_read` (String) Hosts with full permissions
+- `s3_bucket_read_acp` (String) Hosts with full permissions
+- `s3_bucket_write` (String) Hosts with full permissions
+- `s3_bucket_write_acp` (String) Hosts with full permissions
+- `s3_object_full_control` (String) Hosts with full permissions
+- `s3_object_read` (String) Hosts with full permissions
+- `s3_object_read_acp` (String) Hosts with full permissions
+- `s3_object_write` (String) Hosts with full permissions
+- `s3_object_write_acp` (String) Hosts with full permissions
 - `smb_directory_mode_padded` (String) Default unix type permissions on new folder
 - `smb_file_mode_padded` (String) Default unix type permissions on new file
 - `sync` (String) Synchronization state with leader

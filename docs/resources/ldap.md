@@ -17,40 +17,40 @@ description: |-
 
 ### Required
 
-- `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
-- `domain_name` (String) FQDN of Active Directory domain. Must be resolvable in DNS
-- `method` (String) The authentication method configured on the LDAP server for authenticating clients.
-- `port` (Number) The port of the remote LDAP server. Typical values: 389, 636.
+- `searchbase` (String) The entry in the LDAP directory tree to use as a starting point for user queries.
+- `urls` (Set of String) Comma separated list of URIs of LDAP servers in the format SCHEME://ADDRESS. The order of listing defines the priority order. The URI with highest priority that has a good health status is used.
 
 ### Optional
 
-- `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check
-- `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check
+- `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check.
+- `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check.
 - `advanced_filter` (String) Use this parameter to specify manual filters for the BaseDN. This is useful when accounts are distributed across OUs and the baseDN needs to be wide to include all accounts, while there are also accounts that you would like to exclude from user queries.
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
-- `domains_with_posix_attributes` (String) Allows to enumerate specific domains for POSIX attributes
-in case posix_attributes_source is set to SPECIFIC_DOMAINS.
+- `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
+- `domain_name` (String) FQDN of Active Directory domain. Must be resolvable in DNS.
+- `domains_with_posix_attributes` (String) Allows to enumerate specific domains for POSIX attributes in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `gid_number` (String) The attribute of a group entry on the LDAP server that contains the GID number of a group, if different from 'gidNumber'. When binding VAST Cluster to AD, you may need to set this to 'gidnumber' (case sensitive).
 - `group_login_name` (String) Specifies the attribute used to query Active Directory for the group login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `mail_property_name` (String) Specifies the attribute to use for the user's email address.
 - `match_user` (String) The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.
+- `method` (String) The authentication method configured on the LDAP server for authenticating clients.
 - `monitor_action` (String) The type of periodic health check that VAST Cluster performs for the Active Directory provider. PING (default, less overhead and impact on the provider) = pings the provider. BIND = binds to the provider.
+- `port` (Number) The port of the remote LDAP server. Typical values: 389, 636.
 - `posix_account` (String) The object class that defines a user entry on the LDAP server, if different from 'posixAccount'. When binding VAST Cluster to AD, set this parameter to 'user' in order for authorization to work properly.
 - `posix_attributes_source` (String) Defines which domains POSIX attributes will be supported from.
 - `posix_group` (String) The object class that defines a group entry on the LDAP server, if different from 'posixGroup'. When binding VAST Cluster to AD, set this parameter to 'group' in order for authorization to work properly.
 - `query_groups_mode` (String) A mode setting for how groups are queried: Set to COMPATIBLE to look up user groups using the 'memberOf' and 'memberUid' attributes. Set to RFC2307BIS_ONLY to look up user groups using only the 'memberOf' attribute. Set to RFC2307_ONLY to look up user groups using only the 'memberUid' attribute. Set to NONE not to look up user groups other than by leading GID and primary group SID.
+- `query_posix_attributes_from_gc` (Boolean) When set to True - users/groups from non-joined domain POSIX attributes are supported, when set to False - Posix attributes of users/groups from non-joined domain are not supported. As a condition Global catalog needs to be configured to support Posix attributes. (deprecated since 4.6)
 - `reverse_lookup` (Boolean) Resolve LDAP netgroups into hostnames
-- `searchbase` (String) The entry in the LDAP directory tree to use as a starting point for user queries.
 - `super_admin_groups` (Set of String) List of groups on the LDAP provider. Members of these groups can log into VMS as cluster admin users.
-- `tls_certificate` (String) TLS certificate to use for verifying the remote LDAP server's TLS certificate.
+- `tls_certificate` (String) TLS certificate to use for verifying the remote LDAP server''s TLS certificate.
 - `uid` (String) The attribute of a user entry on the LDAP server that contains the user name, if different from 'uid'  When binding VAST Cluster to AD, you may need to set this to 'sAMAccountname'.
 - `uid_member` (String) The attribute of a group entry on the LDAP server that contains names of group members, if different from 'memberUid'. When binding VAST Cluster to AD, you may need to set this to 'memberUID'.
 - `uid_member_value_property_name` (String) Specifies the attribute which represents the value of the LDAP group's member property.
 - `uid_number` (String) The attribute of a user entry on the LDAP server that contains the UID number, if different from 'uidNumber'. Often when binding VAST Cluster to Active Directory this does not need to be set.
 - `url` (String) LDAP server URI in the format SCHEME://ADDRESS. ADDRESS can be either a DNS name or an IP address. Example: ldap://ldap.company.com
-- `urls` (Set of String) Comma separated list of URIs of LDAP servers in the format SCHEME://ADDRESS. The order of listing defines the priority order. The URI with highest priority that has a good health status is used.
 - `use_auto_discovery` (Boolean) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
 - `use_ldaps` (Boolean) Use LDAPS for Auto-Discovery
 - `use_multi_forest` (Boolean) Allow access for users from trusted domains on other forests.

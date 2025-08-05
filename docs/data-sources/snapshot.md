@@ -18,6 +18,7 @@ description: |-
 ### Required
 
 - `name` (String)
+- `path` (String) Snapshot path
 
 ### Optional
 
@@ -30,7 +31,6 @@ description: |-
 - `indestructible` (Boolean) Protected from accidental or malicious deletion by the indestructibility feature. Authorized unlocking of the cluster's indestructibility mechanism is required to do any of the following: deleting the snapshot, shortening its expiration time or disabling this setting.
 - `locked` (Boolean) Lock the snapshot from being deleted by cleanup
 - `name__contains` (String) Filter by part of snapshot name
-- `path` (String) Snapshot path
 - `policy` (String) Associated snapshot policy
 - `policy_id` (Number) Associated snapshot policy ID
 - `protection_policy` (String) Protection Policy Name

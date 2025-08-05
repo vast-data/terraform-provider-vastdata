@@ -17,20 +17,21 @@ description: |-
 
 ### Required
 
-- `guid` (String) QoS Policy guid
 - `name` (String)
-- `policy_type` (String) QOS Policy type - VIEW or USER
 
 ### Optional
 
+- `guid` (String) QoS Policy guid
 - `io_size_bytes` (Number) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
 - `is_default` (Boolean) Is default User QOS Policy
 - `is_gold` (Boolean) Grants priority QoS over views that do not have this setting enabled
 - `limit_by` (String) Specifies which performance parameter(s) are limited by the policy. BW_IOPS=The policy limits service according to bandwidth (BW) and IO per second (IOPS). BW=The policy limits service according to BW only. IOPS=The policy limits service according to IOPS only.
 - `mode` (String) The mode of provisioning quality of service per view. STATIC=read and/or write BW and/or IOPS may be limited to a set maximum limit. USED_CAPACITY=BW and IOPS may be limited set per unit of used logical capacity. Static limits are also configurable and define boundaries of performance allowance. PROVISIONED_CAPACITY=BW and IOPS may be limited per unit of logical capacity, as provisioned by the soft limit of a quota on the view path. Static limits are also configurable and define boundaries of performance allowance.
+- `policy_type` (String) QOS Policy type - VIEW or USER
+- `s3_connections_limit` (Number) Maximum number of allowed S3 connections, 0 means unlimited
 - `tenant_id` (Number) Tenant ID
 - `tenant_name` (String) Tenant Name
-- `use_total_limits` (Boolean) If true - total limits are used instead of separate read/write limits
+- `use_total_limits` (Boolean) If true - total limits are used instead of separate read/write limits.
 
 ### Read-Only
 
@@ -38,6 +39,7 @@ description: |-
 - `capacity_limits` (Attributes) (see [below for nested schema](#nestedatt--capacity_limits))
 - `capacity_total_limits` (Attributes) (see [below for nested schema](#nestedatt--capacity_total_limits))
 - `id` (Number) The ID of this resource.
+- `static_limits` (Attributes) (see [below for nested schema](#nestedatt--static_limits))
 - `static_total_limits` (Attributes) (see [below for nested schema](#nestedatt--static_total_limits))
 
 <a id="nestedatt--attached_users"></a>
@@ -73,6 +75,29 @@ Read-Only:
 
 - `max_bw_mbps_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
 - `max_iops_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
+
+
+<a id="nestedatt--static_limits"></a>
+### Nested Schema for `static_limits`
+
+Required:
+
+- `burst_reads_bw_mb` (Number) Burst reads BW Mb
+- `burst_reads_iops` (Number) Burst reads IOPS
+- `burst_reads_loan_iops` (Number) Burst reads loan IOPS
+- `burst_reads_loan_mb` (Number) Burst reads loan Mb
+- `burst_writes_bw_mb` (Number) Burst writes BW Mb
+- `burst_writes_iops` (Number) Burst writes IOPS
+- `burst_writes_loan_iops` (Number) Burst writes loan IOPS
+- `burst_writes_loan_mb` (Number) Burst writes loan Mb
+- `max_reads_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_reads_iops` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_iops` (Number) Maximal amount of performance to provide when there is no resource contention
+- `min_reads_bw_mbps` (Number) Minimal amount of performance to provide when there is resource contention
+- `min_reads_iops` (Number) Minimal amount of performance to provide when there is resource contention
+- `min_writes_bw_mbps` (Number) Minimal amount of performance to provide when there is resource contention
+- `min_writes_iops` (Number) Minimal amount of performance to provide when there is resource contention
 
 
 <a id="nestedatt--static_total_limits"></a>

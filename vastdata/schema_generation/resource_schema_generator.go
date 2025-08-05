@@ -9,6 +9,9 @@ package schema_generation
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
@@ -16,8 +19,6 @@ import (
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
-	"net/http"
-	"strings"
 )
 
 func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schema, error) {
@@ -451,7 +452,7 @@ func buildResourceAttribute(
 		return injectModifiers(att, name, hints)
 
 	case openapi3.TypeArray:
-		itemSchema := resolveComposedSchema(schema.Items.Value)
+		itemSchema := resolveComposedSchema(resolveAllRefs(schema.Items))
 		if itemSchema == nil || itemSchema.Type == nil || len(*itemSchema.Type) == 0 {
 			panic("invalid item schema for array")
 		}
@@ -496,7 +497,7 @@ func buildResourceAttribute(
 			}
 
 		case openapi3.TypeArray:
-			inner := resolveComposedSchema(itemSchema.Items.Value)
+			inner := resolveComposedSchema(resolveAllRefs(itemSchema.Items))
 			innerType := buildAttrTypeFromSchema(inner)
 
 			if isOrdered {
@@ -553,7 +554,7 @@ func buildResourceAttribute(
 
 	case openapi3.TypeObject:
 		if schema.AdditionalProperties.Schema != nil {
-			valSchema := resolveComposedSchema(schema.AdditionalProperties.Schema.Value)
+			valSchema := resolveComposedSchema(resolveAllRefs(schema.AdditionalProperties.Schema))
 			if valSchema.Type != nil && (*valSchema.Type)[0] == openapi3.TypeObject && len(valSchema.Properties) == 0 {
 				warnWithContext(ctx, fmt.Sprintf("Skipping. Map value schema for %q is empty object", name))
 				return nil

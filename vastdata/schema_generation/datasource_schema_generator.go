@@ -9,11 +9,12 @@ package schema_generation
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	"github.com/getkin/kin-openapi/openapi3"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
-	"net/http"
 )
 
 var excludeSearchParams = []string{"page", "page_size", "sync", "created", "sync_time"}
@@ -238,7 +239,7 @@ func buildDatasourceAttribute(
 		}
 
 	case openapi3.TypeArray:
-		itemSchema := resolveComposedSchema(schema.Items.Value)
+		itemSchema := resolveComposedSchema(resolveAllRefs(schema.Items))
 		if itemSchema == nil || itemSchema.Type == nil || len(*itemSchema.Type) == 0 {
 			panic("invalid item schema for array")
 		}
@@ -275,7 +276,7 @@ func buildDatasourceAttribute(
 			}
 
 		case openapi3.TypeArray:
-			inner := resolveComposedSchema(itemSchema.Items.Value)
+			inner := resolveComposedSchema(resolveAllRefs(itemSchema.Items))
 			innerType := buildAttrTypeFromSchema(inner)
 
 			if isOrdered {
@@ -313,7 +314,7 @@ func buildDatasourceAttribute(
 
 	case openapi3.TypeObject:
 		if schema.AdditionalProperties.Schema != nil {
-			valSchema := resolveComposedSchema(schema.AdditionalProperties.Schema.Value)
+			valSchema := resolveComposedSchema(resolveAllRefs(schema.AdditionalProperties.Schema))
 			if valSchema.Type != nil && (*valSchema.Type)[0] == openapi3.TypeObject && len(valSchema.Properties) == 0 {
 				warnWithContext(ctx, fmt.Sprintf("Skipping. Map value schema for %q is empty object", name))
 				return nil

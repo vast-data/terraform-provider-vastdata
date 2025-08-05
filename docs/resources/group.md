@@ -36,11 +36,11 @@ resource "vastdata_group" "vastdb_group" {
 
 ### Required
 
+- `gid` (Number) group GID
 - `name` (String) group name
 
 ### Optional
 
-- `gid` (Number) group GID
 - `local_provider_id` (Number) Local provider ID
 - `sid` (String) group SID
 

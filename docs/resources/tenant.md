@@ -71,6 +71,7 @@ resource "vastdata_tenant" "vastdb_tenant" {
 - `client_ip_ranges` (List of List of String) Array of ranges of client IPs to be served by the tenant. For client requests made to a VIP that belongs to a VIP Pool that is not associated to a specific tenant, the client's source IP is checked against the Client IPs that are defined within each tenant. That check determines access. The client IPs that you associate with each tenant must be unique per tenant.
 - `default_others_share_level_perm` (String) Default Share-level permissions for Others
 - `domain_name` (String) Domain name to incorporate into the VMS tenant login page URL.
+- `encryption_crn` (String) Tenant's encryption group unique identifier (deprecated)
 - `encryption_group` (String) Tenant's encryption group unique identifier
 - `identity_provider_name` (String) The ID of a SAML provider configured on the cluster. Connects the specified provider to the tenant.
 - `is_nfsv42_supported` (Boolean) Enable NFSv4.2
@@ -80,6 +81,7 @@ resource "vastdata_tenant" "vastdb_tenant" {
 - `nis_provider_id` (Number) The ID of a NIS provider configured on the cluster. Enables the specified provider for the tenant.
 - `posix_primary_provider` (String) Specifies which provider takes precedence over other providers in case of any conflicts between attribute values when user information is retrieved from the providers. Relevant only if more than one provider is enabled for the tenant.
 - `preferred_owning_group` (String) Set to prefer GID of the user as the owning group of the file
+- `qos` (Attributes) (see [below for nested schema](#nestedatt--qos))
 - `require_smb_signing` (Boolean) Require SMB signing
 - `smb_administrators_group_name` (String) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.
 - `smb_privileged_group_full_access` (Boolean) True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.
@@ -90,7 +92,6 @@ resource "vastdata_tenant" "vastdb_tenant" {
 - `use_smb_native` (Boolean) Use native SMB authentication
 - `use_smb_privileged_group` (Boolean) Enables SMB privileged user group
 - `use_smb_privileged_user` (Boolean) Enables SMB privileged user
-- `vippool_ids` (Set of Number) An array of VIP Pool ids to attach to tenant
 
 ### Read-Only
 
@@ -102,8 +103,10 @@ resource "vastdata_tenant" "vastdb_tenant" {
 - `guid` (String) Tenant guid
 - `id` (Number) The ID of this resource.
 - `ldap_title` (String)
+- `local_provider` (Attributes) (see [below for nested schema](#nestedatt--local_provider))
 - `local_provider_title` (String) The local provider associated with the tenant
 - `nis_title` (String)
+- `smb_allowed` (Boolean)
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
 - `title` (String)
@@ -123,6 +126,42 @@ Optional:
 - `notify_soft_limit` (Boolean) Notify on reaching soft limit
 - `soft_limit` (Number) Capacity soft limit for the tenant
 - `soft_limit_inodes` (Number) Soft limit on the number of files or directories for the tenant
+
+
+<a id="nestedatt--qos"></a>
+### Nested Schema for `qos`
+
+Optional:
+
+- `static_limits` (Attributes) Performance limits per view. Maximum limits define maximum provisioning in the absence of resource contention. Valid values: 0-4294967296. 0 means unlimited. (see [below for nested schema](#nestedatt--qos--static_limits))
+
+<a id="nestedatt--qos--static_limits"></a>
+### Nested Schema for `qos.static_limits`
+
+Optional:
+
+- `burst_reads_bw_mb` (Number) Burst reads BW Mb
+- `burst_reads_iops` (Number) Burst reads IOPS
+- `burst_reads_loan_iops` (Number) Burst reads loan IOPS
+- `burst_reads_loan_mb` (Number) Burst reads loan Mb
+- `burst_writes_bw_mb` (Number) Burst writes BW Mb
+- `burst_writes_iops` (Number) Burst writes IOPS
+- `burst_writes_loan_iops` (Number) Burst writes loan IOPS
+- `burst_writes_loan_mb` (Number) Burst writes loan Mb
+- `max_reads_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_reads_iops` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_iops` (Number) Maximal amount of performance to provide when there is no resource contention
+
+
+
+<a id="nestedatt--local_provider"></a>
+### Nested Schema for `local_provider`
+
+Read-Only:
+
+- `id` (Number) ID of the local provider
+- `name` (String) Name of the local provider
 
 
 <a id="nestedatt--vippools"></a>

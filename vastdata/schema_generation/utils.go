@@ -5,6 +5,8 @@ package schema_generation
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -19,7 +21,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"strings"
 )
 
 type TFStateHints = is.TFStateHints
@@ -257,12 +258,12 @@ func buildAttrTypeFromSchema(schema *openapi3.Schema) attr.Type {
 			panic("array schema missing items")
 		}
 		return types.SetType{
-			ElemType: buildAttrTypeFromSchema(resolveComposedSchema(schema.Items.Value)),
+			ElemType: buildAttrTypeFromSchema(resolveComposedSchema(resolveAllRefs(schema.Items))),
 		}
 	case openapi3.TypeObject:
 		attrTypes := make(map[string]attr.Type)
 		for name, prop := range schema.Properties {
-			attrTypes[name] = buildAttrTypeFromSchema(resolveComposedSchema(prop.Value))
+			attrTypes[name] = buildAttrTypeFromSchema(resolveComposedSchema(resolveAllRefs(prop)))
 		}
 		return types.ObjectType{AttrTypes: attrTypes}
 	default:

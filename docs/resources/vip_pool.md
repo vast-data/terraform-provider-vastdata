@@ -79,40 +79,42 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
 
 ### Required
 
+- `end_ip` (String) Not currently in use. Use ip_ranges instead.
+- `start_ip` (String) Not currently in use. Use ip_ranges instead.
 - `subnet_cidr` (Number) The subnet expressed as a CIDR index (number of bits in each IP that belong to the subnet)
 
 ### Optional
 
-- `bgp_config_id` (Number) The ID of the BGP configuration to use for layer 3 connectivity configuration
+- `bgp_config_id` (Number) The ID of the BGP configuration to use for layer 3 connectivity configuration.
 - `cluster_id` (Number)
 - `cnode_ids` (String) Dedicates a specific group of CNodes to the VIP pool. List the IDs of the CNodes. Separate IDs by commas. This is a way to dedicate a specific set of CNodes to a specific set of client hosts or applications. Overridden if cnode_names is passed.
 - `cnode_names` (String) Dedicates a specific group of CNodes to the VIP pool. List the names of the CNodes. Separate names by commas. This is a way to dedicate a specific set of CNodes to a specific set of client hosts or applications. Overrides cnode_ids.
 - `domain_name` (String) Domain name for the VAST DNS server. If a DNS configuration exists, the domain suffix defined in the DNS server configuration is appended to this domain name to form a FQDN which the DNS server resolves to this VIP pool.
 - `enable_l3` (Boolean) Enables L3 networking, in which the cluster's CNodes act as Border Gateway Protocol (BGP) peers belonging to a VAST Autonomous system (AS) which is  connected to the client network's AS
 - `enable_weighted_balancing` (Boolean) Enable weighted balancing
-- `enabled` (Boolean) Set to false to disable the pool
-- `end_ip` (String) Not currently in use. Use ip_ranges instead.
-- `gw_ip` (String) The IP address of a local gateway device if client traffic is routed through one
-- `gw_ipv6` (String) The IP address of a local gateway device if client traffic is routed through one
+- `enabled` (Boolean) Set to false to disable the pool.
+- `gw_ip` (String) The IP address of a local gateway device if client traffic is routed through one.
+- `gw_ipv6` (String) The IP address of a local gateway device if client traffic is routed through one.
 - `ip_ranges` (List of List of String) Array of IP ranges to include in the vippool.
 - `name` (String)
 - `peer_asn` (Number) The client network's ASN. Must not be equal to vast_asn. Applicable only if enable_ls is true.
 - `port_membership` (String) Allocates left, right or all CNode ports to the VIP pool. Allocating the left port and the right port in different VIP pools enables the CNodes to be connected to multiple networks simultaneously. Default: all
 - `role` (String) 'PROTOCOLS' dedicates the VIP pool to client traffic from all of the supported access protocols (NFSv3, NFSv4.2, SMBv2, S3, Database). At least one VIP pool must be created to enable client access. 'REPLICATION' dedicates the VIP pool for connectivity with an async replication peer cluster. This is needed for async  replication. 'BIG_CATALOG' dedicates the VIP pool to VAST Catalog query access from the client network.
 - `serves_tenant` (String) Filter by served tenants. Accepts tenant ID or "all" for all served tenants.
-- `start_ip` (String) Not currently in use. Use ip_ranges instead.
 - `subnet_cidr_ipv6` (Number) The subnet expressed as a CIDR index (number of bits in each IP that belong to the subnet)
 - `tenant_id` (Number) Tenant ID
 - `vast_asn` (Number) The cluster's ASN. Must not be equal to peer_asn. Applicable only if enable_ls is true.
 - `vlan` (Number) To tag the VIP pool with a specific VLAN on the data network, specify the VLAN (0-4096). The VIP pool will be exposed only to the specified VLAN on the client network.
-- `vms_preferred` (Boolean) If true, CNodes participating in the vip pool are preferred in VMS host election
+- `vms_preferred` (Boolean) If true, CNodes participating in the vip pool are preferred in VMS host election.
 
 ### Read-Only
 
 - `active_cnode_ids` (Set of Number) IDs of active CNodes
 - `active_interfaces` (Number) Number of active interfaces
+- `bgp_config_guid` (String) BGP Configuration GUID
+- `bgp_config_name` (String) BGP Configuration Name
 - `cluster` (String) Parent cluster
-- `cnodes` (Set of String)
+- `cnodes` (Set of String) Names of cnodes comprising cnode group
 - `guid` (String) Global unique ID
 - `id` (Number) VIP Pool ID
 - `ranges_summary` (String) IP ranges

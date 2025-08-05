@@ -115,18 +115,19 @@ resource "vastdata_qos_policy" "vastdb_qos_policy" {
 
 ### Optional
 
-- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy (see [below for nested schema](#nestedatt--attached_users))
+- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy. (see [below for nested schema](#nestedatt--attached_users))
 - `capacity_limits` (Attributes) Performance limits per unit of either used logical capacity or provisioned capacity, depending on the mode. Units are stated per limit. Valid values: 0-4294967296. 0 means unlimited. (see [below for nested schema](#nestedatt--capacity_limits))
 - `capacity_total_limits` (Attributes) (see [below for nested schema](#nestedatt--capacity_total_limits))
 - `is_default` (Boolean) Is default User QOS Policy
-- `is_gold` (Boolean) Grants priority QoS over views that do not have this setting enabled
+- `is_gold` (Boolean) Grants priority QoS over views that do not have this setting enabled.
 - `limit_by` (String) Specifies which performance parameter(s) are limited by the policy. BW_IOPS=The policy limits service according to bandwidth (BW) and IO per second (IOPS). BW=The policy limits service according to BW only. IOPS=The policy limits service according to IOPS only.
 - `mode` (String) QoS provisioning mode
 - `policy_type` (String) QOS Policy type
+- `s3_connections_limit` (Number) Maximum number of allowed S3 connections, 0 means unlimited
 - `static_limits` (Attributes) (see [below for nested schema](#nestedatt--static_limits))
 - `static_total_limits` (Attributes) (see [below for nested schema](#nestedatt--static_total_limits))
 - `tenant_id` (Number) Tenant ID
-- `use_total_limits` (Boolean)
+- `use_total_limits` (Boolean) If true - total limits are used instead of separate read/write limits.
 
 ### Read-Only
 

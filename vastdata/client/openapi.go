@@ -8,10 +8,11 @@ import (
 	"compress/gzip"
 	"embed"
 	"fmt"
-	"github.com/getkin/kin-openapi/openapi3"
 	"io"
 	"strings"
 	"sync"
+
+	"github.com/getkin/kin-openapi/openapi3"
 )
 
 var (
@@ -368,6 +369,17 @@ func ResolveComposedSchema(schema *openapi3.Schema) *openapi3.Schema {
 			Description:  schema.Description,
 			ExternalDocs: schema.ExternalDocs,
 		}
+
+		// First, copy properties from the original schema itself
+		for name, prop := range schema.Properties {
+			merged.Properties[name] = prop
+		}
+		merged.Required = append(merged.Required, schema.Required...)
+		if schema.Type != nil && len(*schema.Type) > 0 {
+			merged.Type = schema.Type
+		}
+
+		// Then, merge properties from allOf sub-schemas
 		for _, subRef := range schema.AllOf {
 			sub := ResolveAllRefs(subRef)
 			if sub == nil {

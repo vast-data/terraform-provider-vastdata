@@ -63,7 +63,7 @@ resource "vastdata_s3_life_cycle_rule" "vastdb_s3_lifecycle_rule" {
 
 ### Required
 
-- `name` (String) A name for the rule
+- `name` (String) A name for the rule.
 - `view_id` (String) ID of the view on a specific bucket. The rule will apply to objects within that specific bucket.
 
 ### Optional

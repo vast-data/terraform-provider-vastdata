@@ -130,9 +130,9 @@ resource "vastdata_nonlocal_user_key" "vastdb_nonlocal_user_key" {
 
 - `enabled` (Boolean) Whether the key is enabled.
 - `pgp_public_key` (String, Sensitive) Optional PGP public key to encrypt the secret key.
-- `sid` (String) User SID
+- `sid` (String) User SID. Required if UID is not provided
 - `tenant_id` (Number) Tenant ID
-- `uid` (Number) NFS uid
+- `uid` (Number) NFS UID. Required if SID is not provided
 - `username` (String) Username
 
 ### Read-Only

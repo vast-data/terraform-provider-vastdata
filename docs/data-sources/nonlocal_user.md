@@ -32,6 +32,7 @@ description: |-
 - `name` (String)
 - `primary_group_name` (String)
 - `primary_group_sid` (String)
+- `s3_connections_count` (Number)
 - `s3_superuser` (Boolean)
 - `s3_vid` (Number)
 - `sid` (String)
