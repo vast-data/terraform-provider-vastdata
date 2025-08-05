@@ -54,6 +54,7 @@ var allTFComponents = []TFManager{
 	&ApiToken{},
 	&Vms{},
 	&Volume{},
+	&BgpConfig{},
 	//&BlockHost{},
 }
 
