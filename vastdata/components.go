@@ -52,6 +52,7 @@ var allTFComponents = []TFManager{
 	&LocalS3Key{},
 	&LocalProvider{},
 	&ApiToken{},
+	&Vms{},
 	//&BlockHost{},
 	//&Volume{},
 }

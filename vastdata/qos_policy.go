@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-const QosPolicyResourcePath = "qospolicies"
-
 var QosPolicySchemaRef = is.NewSchemaReference(
 	http.MethodPost,
 	"qospolicies",
