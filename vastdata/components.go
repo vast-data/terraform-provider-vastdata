@@ -47,6 +47,7 @@ var allTFComponents = []TFManager{
 	&EncryptionGroup{},
 	&EncryptionGroupControl{},
 	&UserCopy{},
+	&FolderReadOnly{},
 	//&BlockHost{},
 	//&Volume{},
 }
