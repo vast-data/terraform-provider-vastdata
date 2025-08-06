@@ -50,6 +50,7 @@ var allTFComponents = []TFManager{
 	&FolderReadOnly{},
 	&UserTenantData{},
 	&LocalS3Key{},
+	&LocalProvider{},
 	//&BlockHost{},
 	//&Volume{},
 }
