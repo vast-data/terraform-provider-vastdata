@@ -48,6 +48,12 @@ var (
 	isApiError        = vast_client.IsApiError
 )
 
+type ForceCleanState struct{}
+
+func (ForceCleanState) Error() string {
+	return "force-clean-state"
+}
+
 // Helpers
 var (
 	toInt   func(val any) (int64, error)             = is.ToInt
