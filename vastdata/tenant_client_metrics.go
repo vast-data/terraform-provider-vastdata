@@ -4,9 +4,10 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -69,11 +70,14 @@ func (m *TenantClientMetrics) ReadDatasource(ctx context.Context, rest *VMSRest)
 }
 
 func (m *TenantClientMetrics) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	return m.updateClientMetrics(ctx, rest)
+	ts := m.tfstate
+	return ensureTenantClientMetricsUpdatedWith(ctx, ts, ts, rest)
 }
 
 func (m *TenantClientMetrics) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
-	return m.updateClientMetrics(ctx, rest)
+	stateTs := m.tfstate
+	planTs := plan.(*TenantClientMetrics).TfState()
+	return ensureTenantClientMetricsUpdatedWith(ctx, stateTs, planTs, rest)
 }
 
 func (m *TenantClientMetrics) DeleteResource(ctx context.Context, rest *VMSRest) error {
@@ -81,33 +85,28 @@ func (m *TenantClientMetrics) DeleteResource(ctx context.Context, rest *VMSRest)
 	return nil
 }
 
-// updateClientMetrics updates the client metrics settings for a tenant
-func (m *TenantClientMetrics) updateClientMetrics(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	tenantId := m.tfstate.Int64("tenant_id")
+// ensureTenantClientMetricsUpdatedWith verifies if the given TenantClientMetrics (looked up by state)
+// needs to be updated with new fields and performs the update if necessary.
+//
+// This is used in both CreateResource and UpdateResource for TenantClientMetrics.
+func ensureTenantClientMetricsUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
+	// Get tenant ID from tfstate
+	tenantId := stateTs.Int64("tenant_id")
 	if tenantId == 0 {
 		return nil, fmt.Errorf("failed to get tenant ID: tenant ID is empty")
 	}
 
 	// Create params with the client metrics configuration
 	params := params{}
-	if ok := m.tfstate.SetToMapIfAvailable(
+	if ok := fieldsTs.SetToMapIfAvailable(
 		params,
 		"config",
 		"user_defined_columns",
 	); ok {
 		// Use the custom API method to update client metrics
-		record, err := rest.Tenants.UpdateClientMetricsWithContext(ctx, tenantId, params)
-		if err != nil {
-			return nil, fmt.Errorf("failed to update client metrics: %w", err)
-		}
-		return record, nil
+		return rest.Tenants.UpdateClientMetricsWithContext(ctx, tenantId, params)
 	}
 
 	// If no fields to update, just get the current client metrics
-	record, err := rest.Tenants.GetClientMetricsWithContext(ctx, tenantId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get client metrics: %w", err)
-	}
-
-	return record, nil
+	return rest.Tenants.GetClientMetricsWithContext(ctx, tenantId)
 }

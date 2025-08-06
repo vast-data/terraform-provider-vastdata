@@ -147,6 +147,23 @@ func validateNoneOf(tf *is.TFState, fields ...string) error {
 	return nil
 }
 
+func ensureNotChanged(tfState *is.TFState, planTfState *is.TFState, fields ...string) error {
+	for _, field := range fields {
+		if !tfState.IsKnownAndNotNull(field) {
+			continue
+		}
+		if !tfState.Get(field).Equal(planTfState.Get(field)) {
+			return fmt.Errorf(
+				"field %q is immutable, current value: %v, planned value: %v",
+				field,
+				tfState.Get(field),
+				planTfState.Get(field),
+			)
+		}
+	}
+	return nil
+}
+
 // ----------------------------------
 // Query Resources and Search Parameters
 // ----------------------------------

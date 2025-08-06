@@ -60,6 +60,8 @@ var allTFComponents = []TFManager{
 	&TenantClientMetrics{},
 	&TenantConfiguredIdp{},
 	&S3ReplicationPeer{},
+	&SamlConfig{},
+	&VmsConfiguredIdps{},
 	//&BlockHost{},
 }
 
