@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 resource "vastdata_nis" "vastdb_nis" {
   name        = "vastdb_nis"

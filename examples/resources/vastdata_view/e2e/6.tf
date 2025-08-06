@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 data "vastdata_user" "vastdb_user" {
   name = "runner"

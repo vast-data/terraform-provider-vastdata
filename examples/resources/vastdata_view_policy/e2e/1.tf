@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 data "vastdata_vip_pool" "vastdb_vippool" {
   name = "vippool-1"

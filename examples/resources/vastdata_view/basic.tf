@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 resource "vastdata_view" "vastdb_view" {
   path       = "/vastdb_view/example"

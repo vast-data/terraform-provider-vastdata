@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 resource "vastdata_s3_life_cycle_rule" "vastdb_s3_lifecycle_rule" {
   name                      = "vastdb_s3_lifecycle_rule"

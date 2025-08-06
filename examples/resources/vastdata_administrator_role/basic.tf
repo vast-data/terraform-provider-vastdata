@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 resource "vastdata_administrator_role" "vastdb_role" {
   name        = "vastdb_role"

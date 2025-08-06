@@ -52,6 +52,10 @@ func (m *EncryptionGroupControl) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.EncryptionGroups
 }
 
+func (m *EncryptionGroupControl) ValidateResourceConfig(context.Context) error {
+	return validateOneOf(m.tfstate, "revoke", "deactivate", "reinstate", "rotate_key")
+}
+
 func (m *EncryptionGroupControl) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	return m.performAction(ctx, rest)
 }

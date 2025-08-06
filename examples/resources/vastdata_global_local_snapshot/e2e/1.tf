@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 data "vastdata_view_policy" "vastdb_policy" {
   name = "default"

@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 resource "vastdata_quota" "vastdb_quota" {
   name            = "vastdb_quota_example"
