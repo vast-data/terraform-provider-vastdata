@@ -46,6 +46,7 @@ var allTFComponents = []TFManager{
 	&EventDefinitionConfig{},
 	&EncryptionGroup{},
 	&EncryptionGroupControl{},
+	&UserCopy{},
 	//&BlockHost{},
 	//&Volume{},
 }
