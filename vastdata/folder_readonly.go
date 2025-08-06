@@ -76,10 +76,10 @@ func (m *FolderReadOnly) ReadDatasource(ctx context.Context, rest *VMSRest) (Dis
 
 func (m *FolderReadOnly) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	record, err := m.ReadDatasource(ctx, rest)
-	if err := ignoreStatusCodes(err, http.StatusBadRequest, http.StatusNotFound); err != nil {
-		return nil, err
+	if err = ignoreStatusCodes(err, http.StatusBadRequest, http.StatusNotFound); err == nil {
+		return nil, ForceCleanState{}
 	}
-	return record, nil
+	return record, err
 }
 
 func (m *FolderReadOnly) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

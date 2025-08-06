@@ -4,6 +4,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -401,7 +402,7 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 	}
 
 	if err != nil {
-		if isNotFoundErr(err) || expectStatusCodes(err, http.StatusNotFound) {
+		if isNotFoundErr(err) || expectStatusCodes(err, http.StatusNotFound) || errors.As(err, &ForceCleanState{}) {
 			// Ignore not found errors.
 			// The next terraform plan will recreate the resource.
 			tflog.Warn(ctx,
