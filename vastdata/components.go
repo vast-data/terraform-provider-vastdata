@@ -57,6 +57,8 @@ var allTFComponents = []TFManager{
 	&BgpConfig{},
 	&S3PolicyAttachment{},
 	&TenantEncryptionGroupControl{},
+	&TenantClientMetrics{},
+	&TenantConfiguredIdp{},
 	//&BlockHost{},
 }
 
