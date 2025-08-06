@@ -114,7 +114,7 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	}
 
 	// Generic timeout. Should be enough for all API operations.
-	restTimeout := time.Minute * 2
+	restTimeout := time.Minute * 4
 	vmsRest, err := client.NewRest(host, port, username, password, apiToken, !skipSSL, p.version, restTimeout)
 	if err != nil {
 		resp.Diagnostics.AddError(
