@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 resource "vastdata_s3_policy" "vastdb_s3policy" {
   name      = "vastdb_s3policy"

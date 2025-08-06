@@ -1,2 +1,1 @@
-# Copyright (c) HashiCorp, Inc.
 

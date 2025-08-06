@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 resource "vastdata_snapshot" "vastdb_snapshot" {
   name = "vastdb_snapshot"

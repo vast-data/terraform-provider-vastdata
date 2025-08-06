@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 data "vastdata_tenant" "vastdb_default_tenant" {
   name = "default"

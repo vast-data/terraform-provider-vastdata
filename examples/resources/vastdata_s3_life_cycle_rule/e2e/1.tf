@@ -1,4 +1,3 @@
-# Copyright (c) HashiCorp, Inc.
 
 data "vastdata_view_policy" "vastdb_view_policy_s3_default" {
   name = "s3_default_policy"
