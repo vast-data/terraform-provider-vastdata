@@ -3,12 +3,13 @@
 package internalstate
 
 import (
+	"math/big"
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/stretchr/testify/require"
-	"math/big"
-	"testing"
 )
 
 func TestBuildAttrValueFromAny_ArbitraryToString(t *testing.T) {
@@ -158,4 +159,342 @@ func TestTfTypeToAttrType_Object(t *testing.T) {
 	obj := val.(types.Object)
 	require.Equal(t, "Alice", obj.Attributes()["name"].(types.String).ValueString())
 	require.Equal(t, int64(30), obj.Attributes()["age"].(types.Int64).ValueInt64())
+}
+
+func TestConvertAttrValueToRaw_SetOfObjects(t *testing.T) {
+	// Create an object type for user quota
+	objType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"entity_identifier": types.StringType,
+			"guid":              types.StringType,
+			"id":                types.Int64Type,
+			"identifier":        types.StringType,
+			"identifier_type":   types.StringType,
+			"is_group":          types.BoolType,
+			"name":              types.StringType,
+			"path":              types.StringType,
+		},
+	}
+
+	// Create a set type containing objects
+	setType := types.SetType{ElemType: objType}
+
+	// Create an object with some values
+	obj1 := types.ObjectValueMust(objType.AttrTypes, map[string]attr.Value{
+		"entity_identifier": types.StringValue("user1"),
+		"guid":              types.StringValue("guid1"),
+		"id":                types.Int64Value(1),
+		"identifier":        types.StringValue("user1"),
+		"identifier_type":   types.StringValue("name"),
+		"is_group":          types.BoolValue(false),
+		"name":              types.StringValue("User One"),
+		"path":              types.StringValue("/path1"),
+	})
+
+	// Create a set with the object
+	set := types.SetValueMust(setType.ElemType, []attr.Value{obj1})
+
+	// Convert to raw
+	raw := ConvertAttrValueToRaw(set, setType)
+
+	// Should be a slice of maps
+	require.IsType(t, []any{}, raw)
+	result := raw.([]any)
+	require.Len(t, result, 1)
+
+	// The first element should be a map
+	require.IsType(t, map[string]any{}, result[0])
+	objMap := result[0].(map[string]any)
+
+	// Check that the object fields are preserved
+	require.Equal(t, "user1", objMap["entity_identifier"])
+	require.Equal(t, "guid1", objMap["guid"])
+	require.Equal(t, int64(1), objMap["id"])
+	require.Equal(t, "user1", objMap["identifier"])
+	require.Equal(t, "name", objMap["identifier_type"])
+	require.Equal(t, false, objMap["is_group"])
+	require.Equal(t, "User One", objMap["name"])
+	require.Equal(t, "/path1", objMap["path"])
+}
+
+func TestConvertAttrValueToRaw_SetOfEmptyObjects(t *testing.T) {
+	// Create an object type for user quota
+	objType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"entity_identifier": types.StringType,
+			"guid":              types.StringType,
+			"id":                types.Int64Type,
+			"identifier":        types.StringType,
+			"identifier_type":   types.StringType,
+			"is_group":          types.BoolType,
+			"name":              types.StringType,
+			"path":              types.StringType,
+		},
+	}
+
+	// Create a set type containing objects
+	setType := types.SetType{ElemType: objType}
+
+	// Create an empty object (all fields null)
+	obj1 := types.ObjectValueMust(objType.AttrTypes, map[string]attr.Value{
+		"entity_identifier": types.StringNull(),
+		"guid":              types.StringNull(),
+		"id":                types.Int64Null(),
+		"identifier":        types.StringNull(),
+		"identifier_type":   types.StringNull(),
+		"is_group":          types.BoolNull(),
+		"name":              types.StringNull(),
+		"path":              types.StringNull(),
+	})
+
+	// Create a set with the empty object
+	set := types.SetValueMust(setType.ElemType, []attr.Value{obj1})
+
+	// Convert to raw
+	raw := ConvertAttrValueToRaw(set, setType)
+
+	// Should be a slice of maps
+	require.IsType(t, []any{}, raw)
+	result := raw.([]any)
+	require.Len(t, result, 1)
+
+	// The first element should be a map
+	require.IsType(t, map[string]any{}, result[0])
+	objMap := result[0].(map[string]any)
+
+	// Check that the object fields are preserved (even if null)
+	require.Contains(t, objMap, "entity_identifier")
+	require.Contains(t, objMap, "guid")
+	require.Contains(t, objMap, "id")
+	require.Contains(t, objMap, "identifier")
+	require.Contains(t, objMap, "identifier_type")
+	require.Contains(t, objMap, "is_group")
+	require.Contains(t, objMap, "name")
+	require.Contains(t, objMap, "path")
+
+	// All values should be nil for null fields
+	require.Nil(t, objMap["entity_identifier"])
+	require.Nil(t, objMap["guid"])
+	require.Nil(t, objMap["id"])
+	require.Nil(t, objMap["identifier"])
+	require.Nil(t, objMap["identifier_type"])
+	require.Nil(t, objMap["is_group"])
+	require.Nil(t, objMap["name"])
+	require.Nil(t, objMap["path"])
+}
+
+func TestConvertAttrValueToRaw_SetOfObjectsWithNullFields(t *testing.T) {
+	// Create an object type for user quota
+	objType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"entity_identifier": types.StringType,
+			"guid":              types.StringType,
+			"id":                types.Int64Type,
+			"identifier":        types.StringType,
+			"identifier_type":   types.StringType,
+			"is_group":          types.BoolType,
+			"name":              types.StringType,
+			"path":              types.StringType,
+		},
+	}
+
+	// Create a set type containing objects
+	setType := types.SetType{ElemType: objType}
+
+	// Create an object with all null fields
+	obj1 := types.ObjectValueMust(objType.AttrTypes, map[string]attr.Value{
+		"entity_identifier": types.StringNull(),
+		"guid":              types.StringNull(),
+		"id":                types.Int64Null(),
+		"identifier":        types.StringNull(),
+		"identifier_type":   types.StringNull(),
+		"is_group":          types.BoolNull(),
+		"name":              types.StringNull(),
+		"path":              types.StringNull(),
+	})
+
+	// Create a set with the object
+	set := types.SetValueMust(setType.ElemType, []attr.Value{obj1})
+
+	// Convert to raw
+	raw := ConvertAttrValueToRaw(set, setType)
+
+	// Should be a slice of maps
+	require.IsType(t, []any{}, raw)
+	result := raw.([]any)
+	require.Len(t, result, 1)
+
+	// The first element should be a map with all null values
+	require.IsType(t, map[string]any{}, result[0])
+	objMap := result[0].(map[string]any)
+
+	// Check that the object fields are preserved (even if null)
+	require.Contains(t, objMap, "entity_identifier")
+	require.Contains(t, objMap, "guid")
+	require.Contains(t, objMap, "id")
+	require.Contains(t, objMap, "identifier")
+	require.Contains(t, objMap, "identifier_type")
+	require.Contains(t, objMap, "is_group")
+	require.Contains(t, objMap, "name")
+	require.Contains(t, objMap, "path")
+
+	// All values should be nil for null fields
+	require.Nil(t, objMap["entity_identifier"])
+	require.Nil(t, objMap["guid"])
+	require.Nil(t, objMap["id"])
+	require.Nil(t, objMap["identifier"])
+	require.Nil(t, objMap["identifier_type"])
+	require.Nil(t, objMap["is_group"])
+	require.Nil(t, objMap["name"])
+	require.Nil(t, objMap["path"])
+}
+
+func TestConvertAttrValueToRaw_UserQuotasExample(t *testing.T) {
+	// This test demonstrates the fix for the original issue where user_quotas
+	// was being converted to [{}] instead of preserving the object structure
+
+	// Create an object type for user quota (matching the real schema)
+	objType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"entity_identifier": types.StringType,
+			"guid":              types.StringType,
+			"id":                types.Int64Type,
+			"identifier":        types.StringType,
+			"identifier_type":   types.StringType,
+			"is_group":          types.BoolType,
+			"name":              types.StringType,
+			"path":              types.StringType,
+		},
+	}
+
+	// Create a set type containing objects
+	setType := types.SetType{ElemType: objType}
+
+	// Create an object with all null fields (like in the original issue)
+	obj1 := types.ObjectValueMust(objType.AttrTypes, map[string]attr.Value{
+		"entity_identifier": types.StringNull(),
+		"guid":              types.StringNull(),
+		"id":                types.Int64Null(),
+		"identifier":        types.StringNull(),
+		"identifier_type":   types.StringNull(),
+		"is_group":          types.BoolNull(),
+		"name":              types.StringNull(),
+		"path":              types.StringNull(),
+	})
+
+	// Create a set with the object
+	set := types.SetValueMust(setType.ElemType, []attr.Value{obj1})
+
+	// Convert to raw
+	raw := ConvertAttrValueToRaw(set, setType)
+
+	// Should be a slice of maps
+	require.IsType(t, []any{}, raw)
+	result := raw.([]any)
+	require.Len(t, result, 1)
+
+	// The first element should be a map with all null values preserved
+	require.IsType(t, map[string]any{}, result[0])
+	objMap := result[0].(map[string]any)
+
+	// Check that the object fields are preserved (even if null)
+	require.Contains(t, objMap, "entity_identifier")
+	require.Contains(t, objMap, "guid")
+	require.Contains(t, objMap, "id")
+	require.Contains(t, objMap, "identifier")
+	require.Contains(t, objMap, "identifier_type")
+	require.Contains(t, objMap, "is_group")
+	require.Contains(t, objMap, "name")
+	require.Contains(t, objMap, "path")
+
+	// All values should be nil for null fields
+	require.Nil(t, objMap["entity_identifier"])
+	require.Nil(t, objMap["guid"])
+	require.Nil(t, objMap["id"])
+	require.Nil(t, objMap["identifier"])
+	require.Nil(t, objMap["identifier_type"])
+	require.Nil(t, objMap["is_group"])
+	require.Nil(t, objMap["name"])
+	require.Nil(t, objMap["path"])
+}
+
+func TestConvertAttrValueToRaw_UserQuotasWithRealValues(t *testing.T) {
+	// This test reproduces the actual issue where user_quotas with real values
+	// are being converted to empty objects
+
+	// Create the entity object type
+	entityType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"name":            types.StringType,
+			"email":           types.StringType,
+			"identifier":      types.StringType,
+			"identifier_type": types.StringType,
+			"is_group":        types.BoolType,
+		},
+	}
+
+	// Create the user_quota object type
+	userQuotaType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"entity":       entityType,
+			"grace_period": types.StringType,
+			"hard_limit":   types.Int64Type,
+			"soft_limit":   types.Int64Type,
+		},
+	}
+
+	// Create a set type containing user_quota objects
+	setType := types.SetType{ElemType: userQuotaType}
+
+	// Create an entity with real values
+	entity := types.ObjectValueMust(entityType.AttrTypes, map[string]attr.Value{
+		"name":            types.StringValue("tfzealous-kingfisher"),
+		"email":           types.StringValue("user1@example.com"),
+		"identifier":      types.StringValue("tfzealous-kingfisher"),
+		"identifier_type": types.StringValue("username"),
+		"is_group":        types.BoolValue(false),
+	})
+
+	// Create a user_quota with real values
+	userQuota := types.ObjectValueMust(userQuotaType.AttrTypes, map[string]attr.Value{
+		"entity":       entity,
+		"grace_period": types.StringValue("02:00:00"),
+		"hard_limit":   types.Int64Value(15000),
+		"soft_limit":   types.Int64Value(15000),
+	})
+
+	// Create a set with the user_quota
+	set := types.SetValueMust(setType.ElemType, []attr.Value{userQuota})
+
+	// Convert to raw
+	raw := ConvertAttrValueToRaw(set, setType)
+
+	// Should be a slice of maps
+	require.IsType(t, []any{}, raw)
+	result := raw.([]any)
+	require.Len(t, result, 1)
+
+	// The first element should be a map with the actual values
+	require.IsType(t, map[string]any{}, result[0])
+	objMap := result[0].(map[string]any)
+
+	// Check that the user_quota fields are preserved
+	require.Contains(t, objMap, "entity")
+	require.Contains(t, objMap, "grace_period")
+	require.Contains(t, objMap, "hard_limit")
+	require.Contains(t, objMap, "soft_limit")
+
+	// Check the actual values
+	require.Equal(t, "02:00:00", objMap["grace_period"])
+	require.Equal(t, int64(15000), objMap["hard_limit"])
+	require.Equal(t, int64(15000), objMap["soft_limit"])
+
+	// Check the entity values
+	entityMap, ok := objMap["entity"].(map[string]any)
+	require.True(t, ok)
+	require.Equal(t, "tfzealous-kingfisher", entityMap["name"])
+	require.Equal(t, "user1@example.com", entityMap["email"])
+	require.Equal(t, "tfzealous-kingfisher", entityMap["identifier"])
+	require.Equal(t, "username", entityMap["identifier_type"])
+	require.Equal(t, false, entityMap["is_group"])
 }

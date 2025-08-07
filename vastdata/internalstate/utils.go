@@ -4,13 +4,14 @@ package internalstate
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/types"
-	vast_client "github.com/vast-data/go-vast-client"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	vast_client "github.com/vast-data/go-vast-client"
 )
 
 type Record = vast_client.Record

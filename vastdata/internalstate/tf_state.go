@@ -335,14 +335,6 @@ func (s *TFState) TfSet(path string) types.Set {
 	return set
 }
 
-func (s *TFState) ResourceGUID() string {
-	// Special case for easy retrieving for resource GUIDs from state.
-	if _, ok := s.Raw["guid"]; ok {
-		return s.String("guid")
-	}
-	return "" // Return empty string if "guid" is not found in state.
-}
-
 func (s *TFState) IsNull(path string) bool {
 	return s.Get(path).IsNull()
 }
@@ -726,18 +718,15 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		searchParams = sp
 	}
 	// Try go get resource ID and GUID from current state
-	if idFromState, ok := s.Raw["id"]; ok {
+	if idFromState, ok := s.Raw["id"]; ok && !idFromState.IsNull() && !idFromState.IsUnknown() {
 		tflog.Debug(ctx, "++ 'search by ID'")
 		// Convert the ID to raw value for search params
-		if idType, ok := s.TypeMap["id"]; ok {
-			searchParams["id"] = ConvertAttrValueToRaw(idFromState, idType)
-		} else {
-			searchParams["id"] = idFromState
-		}
+		searchParams["id"] = ConvertAttrValueToRaw(idFromState, s.Type("id"))
 	}
-	if guid := s.ResourceGUID(); guid != "" {
+
+	if guid, ok := s.Raw["guid"]; ok && !guid.IsNull() && !guid.IsUnknown() {
 		tflog.Debug(ctx, "++ 'search by GUID'")
-		searchParams["guid"] = guid
+		searchParams["guid"] = ConvertAttrValueToRaw(guid, s.Type("guid"))
 	}
 
 	searchParams.Update(s.GetReadOnlySearchParams(), false)
