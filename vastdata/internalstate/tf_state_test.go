@@ -1208,3 +1208,177 @@ func TestSetMethodWithNonSliceValues(t *testing.T) {
 }
 
 // TestSetMethodWithComplexSliceTypes and TestSetMethodEdgeCases removed - Set method should not automatically convert slices
+
+func TestGetFilteredValues_SetOfObjectsWithNullFields(t *testing.T) {
+	// Create an object type for user quota (matching the actual Terraform structure)
+	entityType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"name":            types.StringType,
+			"email":           types.StringType,
+			"identifier":      types.StringType,
+			"identifier_type": types.StringType,
+			"is_group":        types.BoolType,
+		},
+	}
+
+	userQuotaType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"entity":       entityType,
+			"grace_period": types.StringType,
+			"hard_limit":   types.Int64Type,
+			"soft_limit":   types.Int64Type,
+		},
+	}
+
+	// Create a set type containing objects
+	setType := types.SetType{ElemType: userQuotaType}
+
+	// Create an object with all null fields
+	entity := types.ObjectValueMust(entityType.AttrTypes, map[string]attr.Value{
+		"name":            types.StringNull(),
+		"email":           types.StringNull(),
+		"identifier":      types.StringNull(),
+		"identifier_type": types.StringNull(),
+		"is_group":        types.BoolNull(),
+	})
+
+	obj1 := types.ObjectValueMust(userQuotaType.AttrTypes, map[string]attr.Value{
+		"entity":       entity,
+		"grace_period": types.StringNull(),
+		"hard_limit":   types.Int64Null(),
+		"soft_limit":   types.Int64Null(),
+	})
+
+	// Create a set with the object
+	set := types.SetValueMust(setType.ElemType, []attr.Value{obj1})
+
+	// Create TFState
+	state := &TFState{
+		Raw: map[string]attr.Value{
+			"user_quotas": set,
+		},
+		Meta: map[string]attrMeta{
+			"user_quotas": {Optional: true},
+		},
+		TypeMap: map[string]attr.Type{
+			"user_quotas": setType,
+		},
+		Enabled: true,
+	}
+
+	// Test without SearchEmpty flag (default behavior)
+	result := state.GetFilteredValues(FilterOr, nil, SearchOptional)
+
+	// The result should contain user_quotas
+	require.Contains(t, result, "user_quotas")
+
+	// The user_quotas should be a slice
+	userQuotas, ok := result["user_quotas"].([]any)
+	require.True(t, ok)
+	require.Len(t, userQuotas, 1)
+
+	// The first element should be a map with null values removed
+	objMap, ok := userQuotas[0].(map[string]any)
+	require.True(t, ok)
+
+	// Since all fields are null, only the entity field should remain as an empty map
+	// This is the correct behavior - null fields are removed but object structure is preserved
+	require.Contains(t, objMap, "entity")
+	entityMap, ok := objMap["entity"].(map[string]any)
+	require.True(t, ok)
+	require.Empty(t, entityMap)
+}
+
+func TestGetFilteredValues_UserQuotasWithRealValues(t *testing.T) {
+	// This test reproduces the actual issue where user_quotas with real values
+	// are being converted to empty objects in GetFilteredValues
+
+	// Create the entity object type
+	entityType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"name":            types.StringType,
+			"email":           types.StringType,
+			"identifier":      types.StringType,
+			"identifier_type": types.StringType,
+			"is_group":        types.BoolType,
+		},
+	}
+
+	// Create the user_quota object type (matching the actual Terraform structure)
+	userQuotaType := types.ObjectType{
+		AttrTypes: map[string]attr.Type{
+			"entity":       entityType,
+			"grace_period": types.StringType,
+			"hard_limit":   types.Int64Type,
+			"soft_limit":   types.Int64Type,
+		},
+	}
+
+	// Create a set type containing user_quota objects
+	setType := types.SetType{ElemType: userQuotaType}
+
+	// Create an entity with real values
+	entity := types.ObjectValueMust(entityType.AttrTypes, map[string]attr.Value{
+		"name":            types.StringValue("tfzealous-kingfisher"),
+		"email":           types.StringValue("user1@example.com"),
+		"identifier":      types.StringValue("tfzealous-kingfisher"),
+		"identifier_type": types.StringValue("username"),
+		"is_group":        types.BoolValue(false),
+	})
+
+	// Create a user_quota with real values
+	userQuota := types.ObjectValueMust(userQuotaType.AttrTypes, map[string]attr.Value{
+		"entity":       entity,
+		"grace_period": types.StringValue("02:00:00"),
+		"hard_limit":   types.Int64Value(15000),
+		"soft_limit":   types.Int64Value(15000),
+	})
+
+	// Create a set with the user_quota
+	set := types.SetValueMust(setType.ElemType, []attr.Value{userQuota})
+
+	// Create TFState
+	state := &TFState{
+		Raw: map[string]attr.Value{
+			"user_quotas": set,
+		},
+		Meta: map[string]attrMeta{
+			"user_quotas": {Optional: true},
+		},
+		TypeMap: map[string]attr.Type{
+			"user_quotas": setType,
+		},
+		Enabled: true,
+	}
+
+	// Test GetFilteredValues
+	result := state.GetFilteredValues(FilterOr, nil, SearchOptional)
+
+	// Debug: print the result
+	fmt.Printf("Result: %+v\n", result)
+
+	// The result should contain user_quotas
+	require.Contains(t, result, "user_quotas")
+
+	// The user_quotas should contain the real values, not empty objects
+	userQuotas, ok := result["user_quotas"].([]any)
+	require.True(t, ok)
+	require.Len(t, userQuotas, 1)
+
+	// Check that the first element has the expected structure
+	firstQuota, ok := userQuotas[0].(map[string]any)
+	require.True(t, ok)
+	require.Contains(t, firstQuota, "entity")
+	require.Contains(t, firstQuota, "grace_period")
+	require.Contains(t, firstQuota, "hard_limit")
+	require.Contains(t, firstQuota, "soft_limit")
+}
+
+// Mock schema for testing
+type mockSchema struct {
+	attributes map[string]attr.Type
+}
+
+func (m *mockSchema) GetAttributes() map[string]attr.Type {
+	return m.attributes
+}

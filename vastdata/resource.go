@@ -6,6 +6,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
-	"net/http"
 )
 
 type Resource struct {
@@ -756,6 +757,7 @@ func (r *Resource) checkIntegrity(
 			mismatches = append(mismatches, diff...)
 		}
 	}
+
 	if len(mismatches) > 0 {
 		// Most likely it is VMS bug or OpenAPI schema mismatch.
 		//IOW field that should not be marked as available for request are actually marked. (RequestBody model)
