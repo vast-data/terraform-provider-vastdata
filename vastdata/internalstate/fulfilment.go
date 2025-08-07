@@ -4,12 +4,13 @@ package internalstate
 
 import (
 	"fmt"
+	"math/big"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
-	"math/big"
 )
 
 func getNestedAttributes(attr any) map[string]any {
@@ -265,7 +266,16 @@ func tfTypeToAttrType(t attr.Type, val tftypes.Value) (attr.Value, error) {
 	case types.Int64Type.String():
 		var f *big.Float
 		if err := val.As(&f); err != nil {
-			return nil, fmt.Errorf("int64.As (from number): %w", err)
+			// Try to convert from string to number (for import scenarios)
+			var s string
+			if err := val.As(&s); err != nil {
+				return nil, fmt.Errorf("int64.As (from number or string): %w", err)
+			}
+			// Parse string as float, then convert to int64
+			f = new(big.Float)
+			if _, ok := f.SetString(s); !ok {
+				return nil, fmt.Errorf("failed to parse string %q as number", s)
+			}
 		}
 		i, _ := f.Int64()
 		return types.Int64Value(i), nil
@@ -273,7 +283,16 @@ func tfTypeToAttrType(t attr.Type, val tftypes.Value) (attr.Value, error) {
 	case types.Float64Type.String():
 		var bf *big.Float
 		if err := val.As(&bf); err != nil {
-			return nil, fmt.Errorf("float64.As (from number): %w", err)
+			// Try to convert from string to number (for import scenarios)
+			var s string
+			if err := val.As(&s); err != nil {
+				return nil, fmt.Errorf("float64.As (from number or string): %w", err)
+			}
+			// Parse string as float
+			bf = new(big.Float)
+			if _, ok := bf.SetString(s); !ok {
+				return nil, fmt.Errorf("failed to parse string %q as number", s)
+			}
 		}
 		f, _ := bf.Float64()
 		return types.Float64Value(f), nil

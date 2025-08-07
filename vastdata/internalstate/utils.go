@@ -33,6 +33,13 @@ func ToInt(val any) (int64, error) {
 		idInt = int64(v)
 	case int:
 		idInt = int64(v)
+	case string:
+		// Parse string as int64 for import scenarios
+		parsed, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse string %q as int64: %w", v, err)
+		}
+		idInt = parsed
 	default:
 		return 0, fmt.Errorf("unexpected type %T for int. Value = %v", v, val)
 	}

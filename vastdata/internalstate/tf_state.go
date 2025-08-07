@@ -259,6 +259,27 @@ func (s *TFState) convPanic(msg string) {
 	))
 }
 
+// --- Helper Functions ---
+
+// HasAttribute checks if a schema has a specific attribute
+func (s *TFState) HasAttribute(attributeName string) bool {
+	if !s.Enabled {
+		return false
+	}
+
+	if schema, ok := s.Schema.(rschema.Schema); ok {
+		_, exists := schema.Attributes[attributeName]
+		return exists
+	}
+
+	if schema, ok := s.Schema.(dsschema.Schema); ok {
+		_, exists := schema.Attributes[attributeName]
+		return exists
+	}
+
+	return false
+}
+
 // --- Getters ---
 
 func (s *TFState) String(path string) string {
@@ -392,6 +413,21 @@ func (s *TFState) Set(key string, value any) {
 	destType := s.Type(key)
 
 	val := Must(BuildAttrValueFromAny(destType, value))
+	s.Raw[key] = val
+}
+
+// SetOrAdd sets a value in the state, adding the key to Raw if it doesn't exist
+// This is useful for import operations where we need to set values that aren't in the initial state
+func (s *TFState) SetOrAdd(key string, value any) {
+	s.assertEnabled()
+
+	// Get the type for this key from the schema
+	destType := s.Type(key)
+
+	// Convert the value to the appropriate type
+	val := Must(BuildAttrValueFromAny(destType, value))
+
+	// Set the value in Raw (this will add the key if it doesn't exist)
 	s.Raw[key] = val
 }
 

@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -23,6 +24,18 @@ type Datasource struct {
 
 func (d *Datasource) EmptyManager() DataSourceManager {
 	return d.newManager(nil, nil)
+}
+
+func (d *Datasource) ManagerWithSchemaOnly(ctx context.Context) (DataSourceManager, error) {
+	// Get schema for the datasource to create a proper manager
+	emptyManager := d.newManager(nil, nil)
+	hints := emptyManager.TfState().Hints
+	schema, err := schema_generation.GetDatasourceSchema(ctx, hints)
+	if err != nil {
+		return nil, err
+	}
+	// Create a new manager with the schema
+	return d.newManager(nil, *schema), nil
 }
 
 func (d *Datasource) NewManager(config tfsdk.Config) DataSourceManager {
@@ -68,10 +81,7 @@ func (d *Datasource) metadataImpl(_ context.Context, req datasource.MetadataRequ
 }
 
 func (d *Datasource) schemaImpl(ctx context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	manager := d.EmptyManager()
-	hints := manager.TfState().Hints
-
-	schema, err := schema_generation.GetDatasourceSchema(ctx, hints)
+	manager, err := d.ManagerWithSchemaOnly(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("error getting schema for %q datasource.", d.managerName),
@@ -79,7 +89,8 @@ func (d *Datasource) schemaImpl(ctx context.Context, _ datasource.SchemaRequest,
 		)
 		return
 	}
-	resp.Schema = *schema
+
+	resp.Schema = manager.TfState().Schema.(dschema.Schema)
 }
 
 func (d *Datasource) configureImpl(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
