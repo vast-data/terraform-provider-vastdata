@@ -9,9 +9,11 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	vast_client "github.com/vast-data/go-vast-client"
 )
@@ -1381,4 +1383,187 @@ type mockSchema struct {
 
 func (m *mockSchema) GetAttributes() map[string]attr.Type {
 	return m.attributes
+}
+
+func TestTFState_HasAttribute(t *testing.T) {
+	tests := []struct {
+		name          string
+		schema        any
+		attributeName string
+		expected      bool
+	}{
+		{
+			name: "resource schema with id attribute",
+			schema: rschema.Schema{
+				Attributes: map[string]rschema.Attribute{
+					"id":   rschema.Int64Attribute{Optional: true},
+					"name": rschema.StringAttribute{Optional: true},
+				},
+			},
+			attributeName: "id",
+			expected:      true,
+		},
+		{
+			name: "resource schema without id attribute",
+			schema: rschema.Schema{
+				Attributes: map[string]rschema.Attribute{
+					"name": rschema.StringAttribute{Optional: true},
+				},
+			},
+			attributeName: "id",
+			expected:      false,
+		},
+		{
+			name: "datasource schema with id attribute",
+			schema: dsschema.Schema{
+				Attributes: map[string]dsschema.Attribute{
+					"id":   dsschema.Int64Attribute{Optional: true},
+					"name": dsschema.StringAttribute{Optional: true},
+				},
+			},
+			attributeName: "id",
+			expected:      true,
+		},
+		{
+			name: "datasource schema without id attribute",
+			schema: dsschema.Schema{
+				Attributes: map[string]dsschema.Attribute{
+					"name": dsschema.StringAttribute{Optional: true},
+				},
+			},
+			attributeName: "id",
+			expected:      false,
+		},
+		{
+			name:          "disabled TFState",
+			schema:        nil,
+			attributeName: "id",
+			expected:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var tfState *TFState
+			if tt.schema == nil {
+				tfState = NewTFStateMust(nil, nil, nil)
+			} else {
+				tfState = NewTFStateMust(nil, tt.schema, nil)
+			}
+
+			result := tfState.HasAttribute(tt.attributeName)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestTFState_SetOrAdd(t *testing.T) {
+	tests := []struct {
+		name     string
+		schema   rschema.Schema
+		key      string
+		value    any
+		expected attr.Value
+	}{
+		{
+			name: "set int64 value",
+			schema: rschema.Schema{
+				Attributes: map[string]rschema.Attribute{
+					"id": rschema.Int64Attribute{Optional: true},
+				},
+			},
+			key:      "id",
+			value:    int64(123),
+			expected: types.Int64Value(123),
+		},
+		{
+			name: "set string value",
+			schema: rschema.Schema{
+				Attributes: map[string]rschema.Attribute{
+					"name": rschema.StringAttribute{Optional: true},
+				},
+			},
+			key:      "name",
+			value:    "test-name",
+			expected: types.StringValue("test-name"),
+		},
+		{
+			name: "set bool value",
+			schema: rschema.Schema{
+				Attributes: map[string]rschema.Attribute{
+					"enabled": rschema.BoolAttribute{Optional: true},
+				},
+			},
+			key:      "enabled",
+			value:    true,
+			expected: types.BoolValue(true),
+		},
+		{
+			name: "add new key that doesn't exist in Raw",
+			schema: rschema.Schema{
+				Attributes: map[string]rschema.Attribute{
+					"id": rschema.Int64Attribute{Optional: true},
+				},
+			},
+			key:      "id",
+			value:    int64(456),
+			expected: types.Int64Value(456),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create TFState with empty Raw map to test SetOrAdd
+			tfState := NewTFStateMust(map[string]attr.Value{}, tt.schema, nil)
+
+			// Set the value using SetOrAdd
+			tfState.SetOrAdd(tt.key, tt.value)
+
+			// Verify the value was set correctly
+			result := tfState.Get(tt.key)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestTFState_SetOrAdd_WithExistingValue(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":   rschema.Int64Attribute{Optional: true},
+			"name": rschema.StringAttribute{Optional: true},
+		},
+	}
+
+	// Create TFState with existing values
+	initialRaw := map[string]attr.Value{
+		"name": types.StringValue("initial-name"),
+	}
+	tfState := NewTFStateMust(initialRaw, schema, nil)
+
+	// Add a new key that doesn't exist in Raw
+	tfState.SetOrAdd("id", int64(789))
+
+	// Verify both existing and new values are correct
+	assert.Equal(t, types.StringValue("initial-name"), tfState.Get("name"))
+	assert.Equal(t, types.Int64Value(789), tfState.Get("id"))
+}
+
+func TestTFState_SetOrAdd_OverwriteExistingValue(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id": rschema.Int64Attribute{Optional: true},
+		},
+	}
+
+	// Create TFState with existing value
+	initialRaw := map[string]attr.Value{
+		"id": types.Int64Value(123),
+	}
+	tfState := NewTFStateMust(initialRaw, schema, nil)
+
+	// Overwrite the existing value
+	tfState.SetOrAdd("id", int64(456))
+
+	// Verify the value was overwritten
+	assert.Equal(t, types.Int64Value(456), tfState.Get("id"))
 }

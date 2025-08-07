@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -14,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
@@ -27,6 +29,18 @@ type Resource struct {
 
 func (r *Resource) EmptyManager() ResourceManager {
 	return r.newManager(nil, nil)
+}
+
+func (r *Resource) ManagerWithSchemaOnly(ctx context.Context) (ResourceManager, error) {
+	// Get schema for the resource to create a proper manager
+	emptyManager := r.newManager(nil, nil)
+	hints := emptyManager.TfState().Hints
+	schema, err := schema_generation.GetResourceSchema(ctx, hints)
+	if err != nil {
+		return nil, err
+	}
+	// Create a new manager with the schema
+	return r.newManager(nil, *schema), nil
 }
 
 func (r *Resource) NewManager(state any) ResourceManager {
@@ -120,10 +134,7 @@ func (r *Resource) metadataImpl(_ context.Context, req resource.MetadataRequest,
 }
 
 func (r *Resource) schemaImpl(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	manager := r.EmptyManager()
-	hints := manager.TfState().Hints
-
-	schema, err := schema_generation.GetResourceSchema(ctx, hints)
+	manager, err := r.ManagerWithSchemaOnly(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("error fetching OpenAPI schema for %q resource.", r.managerName),
@@ -131,7 +142,8 @@ func (r *Resource) schemaImpl(ctx context.Context, _ resource.SchemaRequest, res
 		)
 		return
 	}
-	resp.Schema = *schema
+
+	resp.Schema = manager.TfState().Schema.(rschema.Schema)
 }
 
 func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
@@ -144,7 +156,7 @@ func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureReques
 func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	var (
 		rest        = r.client
-		manager     = r.EmptyManager()
+		manager, _  = r.ManagerWithSchemaOnly(ctx)
 		managerName = r.managerName
 		tfState     = manager.TfState()
 		err         error
@@ -170,7 +182,73 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		tflog.Debug(ctx, fmt.Sprintf("ImportResourceState[%s]: do.", managerName))
 		_, err = imp.ImportResourceState(ctx, rest)
 	} else {
-		resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+		// Custom import logic for resources with 'id' field
+		idField := "id"
+		if !tfState.HasAttribute(idField) {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ImportState[%s]: missing 'id' field in schema.", managerName),
+				fmt.Sprintf("The 'id' field is required for importing the %q resource. This resource does not support import operations.", managerName),
+			)
+			return
+		}
+
+		// Get the import ID from the request
+		importID := req.ID
+		if importID == "" {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ImportState[%s]: missing import ID.", managerName),
+				fmt.Sprintf("An import ID is required for importing the %q resource.", managerName),
+			)
+			return
+		}
+
+		// Check if the ID field is an integer type or string type
+		idType := tfState.Type(idField)
+		if idType.Equal(types.Int64Type) {
+			// Convert string to int64
+			idInt64, err := strconv.ParseInt(importID, 10, 64)
+			if err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
+					fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
+				)
+				return
+			}
+
+			// Set the ID in the state
+			tfState.SetOrAdd(idField, types.Int64Value(idInt64))
+			tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: converted import ID %q to int64 %d", managerName, importID, idInt64))
+		} else if idType.Equal(types.StringType) {
+			// For string ID fields, use the import ID as-is
+			tfState.SetOrAdd(idField, types.StringValue(importID))
+			tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: using import ID %q as string", managerName, importID))
+		} else {
+			// For other ID field types, use the default passthrough
+			resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
+			return
+		}
+
+		// Try to read the resource to populate the state
+		if reader, ok := manager.(ReadResource); ok {
+			tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: reading resource after ID conversion.", managerName))
+			_, err = reader.ReadResource(ctx, rest)
+			if err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("ImportState[%s]: failed to read imported resource.", managerName),
+					fmt.Sprintf("Failed to read the imported resource: %s", err.Error()),
+				)
+				return
+			}
+		}
+
+		// Set the state in the response
+		if err = tfState.SetState(ctx, &resp.State); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ImportState[%s]: failed to set state.", managerName),
+				fmt.Sprintf("Failed to set the imported state: %s", err.Error()),
+			)
+			return
+		}
 	}
 
 	if err != nil {
