@@ -24,7 +24,8 @@ func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema a
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: ActiveDirectorySchemaRef,
+			SchemaRef:        ActiveDirectorySchemaRef,
+			SearchableFields: []string{"ldap_id", "domain_name", "machine_account_name"},
 		},
 	)}
 }
