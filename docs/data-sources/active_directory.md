@@ -17,10 +17,10 @@ description: |-
 
 ### Optional
 
-- `domain_name` (String) FQDN of the domain.
+- `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory. This parameter is required unless ldap_id is provided.
 - `enabled` (Boolean) enabled/disabled
 - `guid` (String) GUID
-- `ldap_id` (Number)
+- `ldap_id` (Number) ID of the LDAP configuration for binding to the LDAP domain of the Active Directory server. This parameter is required unless domain_name is provided.
 - `ma_pwd_change_frequency` (String) Frequency for scheduled password change for the VAST Cluster Active Directory machine account password.
 - `ma_pwd_update_time` (String) Machine Account password update time.
 - `machine_account_name` (String) Name of the computer object/machine account to add. Recommended to be the name of the cluster.
