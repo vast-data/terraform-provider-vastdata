@@ -62,7 +62,7 @@ var allTFComponents = []TFManager{
 	&S3ReplicationPeer{},
 	&SamlConfig{},
 	&VmsConfiguredIdps{},
-	//&BlockHost{},
+	&BlockHost{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
