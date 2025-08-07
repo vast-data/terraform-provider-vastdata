@@ -9,11 +9,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+	"strings"
+
 	vastdata "github.com/vast-data/terraform-provider-vastdata/vastdata"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
-	"os"
-	"strings"
 )
 
 var (
@@ -65,7 +66,17 @@ func printDataSourceSchemas(filter string, automation bool) {
 			panic(err)
 		}
 
-		fmt.Printf("%s: # Datasource (%s)\n", resourceName, hints.SchemaRef.Read.Path)
+		// Handle custom datasources that don't have SchemaRef
+		var pathInfo string
+		if hints.TFStateHintsForCustom != nil {
+			pathInfo = "custom"
+		} else if hints.SchemaRef != nil && hints.SchemaRef.Read != nil {
+			pathInfo = hints.SchemaRef.Read.Path
+		} else {
+			pathInfo = "unknown"
+		}
+
+		fmt.Printf("%s: # Datasource (%s)\n", resourceName, pathInfo)
 		visualization := is.BuildDataSourceAttributesString(schema.Attributes, automation, 2)
 		fmt.Println(visualization)
 		fmt.Println()
@@ -99,7 +110,17 @@ func printResourceSchemas(filter string, automation bool) {
 			panic(err)
 		}
 
-		fmt.Printf("%s: # Resource (%s)\n", is.SnakeCaseName(manager), resourceName)
+		// Handle custom resources that don't have SchemaRef
+		var pathInfo string
+		if hints.TFStateHintsForCustom != nil {
+			pathInfo = "custom"
+		} else if hints.SchemaRef != nil && hints.SchemaRef.Create != nil {
+			pathInfo = hints.SchemaRef.Create.Path
+		} else {
+			pathInfo = "unknown"
+		}
+
+		fmt.Printf("%s: # Resource (%s)\n", is.SnakeCaseName(manager), pathInfo)
 		visualization := is.BuildResourceAttributesString(schema.Attributes, automation, 2)
 		fmt.Println(visualization)
 		fmt.Println()

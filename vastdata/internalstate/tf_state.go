@@ -398,6 +398,7 @@ func (s *TFState) Set(key string, value any) {
 		s.convPanic(fmt.Sprintf("Set: key %q not found in state", key))
 	}
 	destType := s.Type(key)
+
 	val := Must(BuildAttrValueFromAny(destType, value))
 	s.Raw[key] = val
 }
