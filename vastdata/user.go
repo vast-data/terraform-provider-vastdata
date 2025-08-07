@@ -3,6 +3,8 @@ package provider
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"net/http"
 )
@@ -25,6 +27,14 @@ func (m *User) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 		&is.TFStateHints{
 			SchemaRef:       UserSchemaRef,
 			SensitiveFields: []string{"password"},
+			AdditionalSchemaAttributes: map[string]any{
+				"s3_policies_ids": rschema.SetAttribute{
+					ElementType: types.Int64Type,
+					Optional:    true,
+					Computed:    true,
+					Description: "S3 policies IDs, denoting which S3 identity policies are associated with the user. The user is granted and denied S3 permissions according to the associated S3 identity policies.",
+				},
+			},
 		},
 	)}
 }

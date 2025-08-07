@@ -21,8 +21,6 @@ resource "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
 # Complete examples
 # ---------------------
 
-
-
 data "vastdata_tenant" "vastdb_tenant" {
   name = "default"
 }
