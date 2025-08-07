@@ -1,5 +1,3 @@
-
-
 data "vastdata_tenant" "vastdb_tenant" {
   name = "default"
 }

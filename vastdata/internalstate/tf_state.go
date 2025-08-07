@@ -40,27 +40,19 @@ const (
 	SearchEmpty
 )
 
-// CommonVastUniqueIdentifiers
-// Fields that uniquely identify a single record.
-// NOTE: for instance "name" cannot identify a record uniquely
-// because some resources could have the same names but different tenants
-var CommonVastUniqueIdentifiers = []string{
-	"gid", "uid",
-}
-
 // CommonSearchableFields defines a set of standard fields that are commonly
 // searchable across most VAST API resources. These fields are typically used
 // in query parameters.
 // But using just one of them sometimes is not enough to identify a record.
 // For instance many subsystems (views with BLOCK protocol) can have the same name but different tenants.
 var CommonSearchableFields = []string{
-	"name", "path", "tenant_id", "tenant_name", "bucket",
+	"name", "path", "tenant_id", "tenant_name", "bucket", "gid", "uid",
 }
 
-type FilterTagCombinaton int
+type FilterTagCombination int
 
 const (
-	FilterOr FilterTagCombinaton = iota
+	FilterOr FilterTagCombination = iota
 	FilterAnd
 )
 
@@ -100,7 +92,7 @@ type attrMeta struct {
 
 // satisfyFieldFilterFlag returns true if the attribute matches the given flags,
 // based on the combination mode (AND or OR).
-func (meta attrMeta) satisfyFieldFilterFlag(comb FilterTagCombinaton, flags ...FieldFilterFlag) bool {
+func (meta attrMeta) satisfyFieldFilterFlag(comb FilterTagCombination, flags ...FieldFilterFlag) bool {
 	matches := func(f FieldFilterFlag) bool {
 		switch f {
 		case SearchRequired:
@@ -597,7 +589,7 @@ func (s *TFState) CopyNonEmptyFieldsTo(other *TFState) {
 // Returns:
 //   - map[string]any: a map of field names to their converted raw values, filtered based on metadata and value presence.
 func (s *TFState) GetFilteredValues(
-	comb FilterTagCombinaton,
+	comb FilterTagCombination,
 	fieldSet *FieldSet,
 	flags ...FieldFilterFlag,
 ) map[string]any {
@@ -650,7 +642,7 @@ func (s *TFState) GetAllValues() map[string]any {
 
 func (s *TFState) DiffFields(
 	other *TFState,
-	comb FilterTagCombinaton,
+	comb FilterTagCombination,
 	fields []string,
 	flags ...FieldFilterFlag,
 
@@ -718,18 +710,6 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 
 	searchParams := make(vast_client.Params)
 	if sp := s.GetFilteredValues(
-		FilterOr,
-		&FieldSet{
-			Include: CommonVastUniqueIdentifiers,
-		},
-		SearchRequired,
-		SearchOptional,
-		SearchSearchable,
-	); len(sp) > 0 {
-		// Take record by common unique identifiers.
-		tflog.Debug(ctx, "++ 'common-vast-identifiers'")
-		searchParams = sp
-	} else if sp := s.GetFilteredValues(
 		FilterOr,
 		&FieldSet{
 			Include: CommonSearchableFields,

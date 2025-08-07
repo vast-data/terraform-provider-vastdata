@@ -23,7 +23,8 @@ func (m *Ldap) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: LdapSchemaRef,
+			SchemaRef:        LdapSchemaRef,
+			SearchableFields: []string{"domain_name"},
 		},
 	)}
 }
