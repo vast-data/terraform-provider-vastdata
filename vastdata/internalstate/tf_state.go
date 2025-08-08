@@ -47,7 +47,13 @@ const (
 // But using just one of them sometimes is not enough to identify a record.
 // For instance many subsystems (views with BLOCK protocol) can have the same name but different tenants.
 var CommonSearchableFields = []string{
-	"name", "path", "tenant_id", "tenant_name", "bucket", "gid", "uid",
+	"name", "path", "bucket", "gid", "uid",
+}
+
+// AdditionalSearchableFields If exists these fields are also used for search.
+// Should be always added to search fields
+var AdditionalSearchableFields = []string{
+	"guid", "id", "tenant_id", "tenant_name",
 }
 
 type FilterTagCombination int
@@ -122,6 +128,10 @@ func (meta attrMeta) satisfyFieldFilterFlag(comb FilterTagCombination, flags ...
 			return !meta.Searchable
 		case SearchEmpty:
 			return false
+		case SearchPrimitivesOnly:
+			// This flag is enforced via type checks in callers (e.g., GetFilteredValues).
+			// It has no bearing on attribute metadata, so treat as neutral true here.
+			return true
 		default:
 			panic(fmt.Sprintf("unknown search context flag: %d", f))
 		}
@@ -739,33 +749,26 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		// Get all params required + searchable for search.
 		tflog.Debug(ctx, "++ 'required+searchable'")
 		searchParams = sp
-	}
-	// Try go get resource ID and GUID from current state
-	if idFromState, ok := s.Raw["id"]; ok && !idFromState.IsNull() && !idFromState.IsUnknown() {
-		tflog.Debug(ctx, "++ 'search by ID'")
-		// Convert the ID to raw value for search params
-		searchParams["id"] = ConvertAttrValueToRaw(idFromState, s.Type("id"))
+	} else if sp := s.GetFilteredValues(
+		FilterOr,
+		nil,
+		SearchOptional,
+		SearchPrimitivesOnly,
+	); len(sp) > 0 {
+		// Get all optional fields that are primitive types (string, int, bool) for search.
+		tflog.Debug(ctx, "++ 'search by all non-primitive fields'")
+		searchParams = sp
 	}
 
-	if guid, ok := s.Raw["guid"]; ok && !guid.IsNull() && !guid.IsUnknown() {
-		tflog.Debug(ctx, "++ 'search by GUID'")
-		searchParams["guid"] = ConvertAttrValueToRaw(guid, s.Type("guid"))
+	for _, field := range AdditionalSearchableFields {
+		// Try go get resource ID and GUID and other additional fields from current state
+		if val, ok := s.Raw[field]; ok && !val.IsNull() && !val.IsUnknown() {
+			tflog.Debug(ctx, fmt.Sprintf("++ 'search by %s'", field))
+			searchParams[field] = ConvertAttrValueToRaw(val, s.Type(field))
+		}
 	}
 
 	searchParams.Update(s.GetReadOnlySearchParams(), false)
-
-	if len(searchParams) == 0 {
-		// Still no search params, try to get all non-primitive fields
-		tflog.Debug(ctx, "++ 'search by all non-primitive fields'")
-		if sp := s.GetFilteredValues(
-			FilterOr,
-			nil,
-			SearchOptional,
-			SearchPrimitivesOnly,
-		); len(sp) > 0 {
-			searchParams = sp
-		}
-	}
 
 	return searchParams
 
