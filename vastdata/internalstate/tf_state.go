@@ -38,6 +38,7 @@ const (
 	SearchNotSearchable
 	SearchNotWriteOnly
 	SearchEmpty
+	SearchPrimitivesOnly // Indicates that only primitive types (string, int, bool) should be considered
 )
 
 // CommonSearchableFields defines a set of standard fields that are commonly
@@ -596,6 +597,7 @@ func (s *TFState) GetFilteredValues(
 	s.assertEnabled()
 
 	searchEmpty := contains(flags, SearchEmpty)
+	primitivesOnly := contains(flags, SearchPrimitivesOnly)
 
 	result := make(map[string]any)
 
@@ -605,6 +607,11 @@ func (s *TFState) GetFilteredValues(
 		}
 
 		valType := s.Type(k)
+
+		if primitivesOnly && !isPrimitiveType(valType) {
+			continue
+		}
+
 		meta, ok := s.Meta[k]
 		if !ok || !meta.satisfyFieldFilterFlag(comb, flags...) {
 			continue
@@ -746,6 +753,19 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 	}
 
 	searchParams.Update(s.GetReadOnlySearchParams(), false)
+
+	if len(searchParams) == 0 {
+		// Still no search params, try to get all non-primitive fields
+		tflog.Debug(ctx, "++ 'search by all non-primitive fields'")
+		if sp := s.GetFilteredValues(
+			FilterOr,
+			nil,
+			SearchOptional,
+			SearchPrimitivesOnly,
+		); len(sp) > 0 {
+			searchParams = sp
+		}
+	}
 
 	return searchParams
 

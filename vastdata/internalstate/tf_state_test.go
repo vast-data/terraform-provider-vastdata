@@ -472,6 +472,41 @@ func TestGetFilteredValues(t *testing.T) {
 	}
 }
 
+func TestGetFilteredValues_PrimitivesOnly(t *testing.T) {
+	// Build a small state with a primitive and a complex field
+	raw := map[string]attr.Value{
+		"name": types.StringValue("alpha"),
+		"config": types.ObjectValueMust(map[string]attr.Type{
+			"enabled": types.BoolType,
+		}, map[string]attr.Value{
+			"enabled": types.BoolValue(true),
+		}),
+	}
+	meta := map[string]attrMeta{
+		"name":   {Optional: true},
+		"config": {Optional: true},
+	}
+	typeMap := map[string]attr.Type{
+		"name":   types.StringType,
+		"config": types.ObjectType{AttrTypes: map[string]attr.Type{"enabled": types.BoolType}},
+	}
+
+	state := &TFState{Raw: raw, Meta: meta, TypeMap: typeMap, Enabled: true}
+
+	// Without the flag, both should appear
+	got := state.GetFilteredValues(FilterOr, nil, SearchOptional)
+	require.Equal(t, map[string]any{
+		"name":   "alpha",
+		"config": map[string]any{"enabled": true},
+	}, got)
+
+	// With the primitives-only flag, only the primitive should remain
+	got = state.GetFilteredValues(FilterOr, nil, SearchOptional, SearchPrimitivesOnly)
+	require.Equal(t, map[string]any{
+		"name": "alpha",
+	}, got)
+}
+
 func TestGetFilteredValues2(t *testing.T) {
 	tests := []struct {
 		name   string

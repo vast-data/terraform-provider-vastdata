@@ -3,11 +3,13 @@
 package internalstate
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stretchr/testify/require"
 	"reflect"
 	"sort"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetType_ReturnsElemTypeForDoublePointer(t *testing.T) {
@@ -277,4 +279,21 @@ func TestSet_NewSetFromAny_InvalidElementType(t *testing.T) {
 	_, err := NewSetFromAny[int64](input)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "cannot convert")
+}
+
+func Test_isPrimitiveType(t *testing.T) {
+	t.Run("primitive types", func(t *testing.T) {
+		require.True(t, isPrimitiveType(types.StringType))
+		require.True(t, isPrimitiveType(types.BoolType))
+		require.True(t, isPrimitiveType(types.Int64Type))
+		require.True(t, isPrimitiveType(types.Float64Type))
+		require.True(t, isPrimitiveType(types.NumberType))
+	})
+
+	t.Run("non primitive types", func(t *testing.T) {
+		require.False(t, isPrimitiveType(types.ListType{ElemType: types.StringType}))
+		require.False(t, isPrimitiveType(types.SetType{ElemType: types.StringType}))
+		require.False(t, isPrimitiveType(types.MapType{ElemType: types.StringType}))
+		require.False(t, isPrimitiveType(types.ObjectType{AttrTypes: map[string]attr.Type{"a": types.StringType}}))
+	})
 }
