@@ -204,7 +204,6 @@ Optional:
 - `id` (Number)
 - `identifier` (String)
 - `identifier_type` (String)
-- `is_group` (Boolean)
 - `name` (String) The name
 - `path` (String)
 
@@ -219,6 +218,5 @@ Optional:
 - `id` (Number)
 - `identifier` (String)
 - `identifier_type` (String)
-- `is_group` (Boolean)
 - `name` (String) The name
 - `path` (String)
