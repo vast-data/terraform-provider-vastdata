@@ -11,6 +11,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	vast_client "github.com/vast-data/go-vast-client"
 )
 
@@ -99,6 +100,19 @@ func contains[T comparable](list []T, key T) bool {
 		}
 	}
 	return false
+}
+
+// isPrimitiveType reports whether the given Terraform framework type is a
+// primitive type we consider for simple filtering/searching.
+// For our purposes, primitives are limited to: string, bool, int64, and numeric (float/number).
+// Container and complex types (list, set, map, object, tuple, dynamic) are treated as non-primitive.
+func isPrimitiveType(t attr.Type) bool {
+	switch t.(type) {
+	case basetypes.StringType, basetypes.BoolType, basetypes.Int64Type, basetypes.Float64Type, basetypes.NumberType, basetypes.Int32Type, basetypes.Float32Type:
+		return true
+	default:
+		return false
+	}
 }
 
 var pathPartRegex = regexp.MustCompile(`([^[.\]]+)|\[(\d+)\]`)

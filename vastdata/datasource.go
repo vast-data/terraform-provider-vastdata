@@ -212,6 +212,7 @@ func (d *Datasource) checkNonEmptyFields(ctx context.Context, manager DataSource
 			is.SearchEmpty,
 			is.SearchOptional,
 			is.SearchRequired,
+			is.SearchPrimitivesOnly,
 		)
 		keys := make([]string, 0, len(availableParams))
 		for k := range availableParams {
