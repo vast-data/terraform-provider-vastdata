@@ -51,7 +51,8 @@ func (m *NonlocalGroup) NewDatasourceManager(raw map[string]attr.Value, schema a
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: NonlocalGroupSchemaRef,
+			SchemaRef:      NonlocalGroupSchemaRef,
+			ReadOnlyFields: []string{"context"},
 			AdditionalSchemaAttributes: map[string]any{
 				"name": dschema.StringAttribute{
 					Optional:    false,

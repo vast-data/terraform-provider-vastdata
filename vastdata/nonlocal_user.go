@@ -58,7 +58,8 @@ func (m *NonlocalUser) NewDatasourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: NonlocalUserSchemaRef,
+			SchemaRef:      NonlocalUserSchemaRef,
+			ReadOnlyFields: []string{"context", "vid"},
 			AdditionalSchemaAttributes: map[string]any{
 				"access_keys": dschema.SetNestedAttribute{
 					Computed:    true,
