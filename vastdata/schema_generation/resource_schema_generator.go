@@ -174,9 +174,13 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 
 				if diffReason, ok := compareSchemaValues(existing.Prop, ref.Value); ok {
 					if !existing.Required {
-						// Just re-assign with computed=True - means fields is returned by API response so it is computed.
-						// NOTE: field cannot be computed and required at the same time.
-						existing.Computed = true
+						// Field is present in both POST and GET with identical schema.
+						// Normally mark as computed, unless explicitly overridden by hints.NotComputedSchemaFields.
+						if hints != nil && contains(hints.NotComputedSchemaFields, name) {
+							existing.Computed = false
+						} else {
+							existing.Computed = true
+						}
 					}
 
 				} else {

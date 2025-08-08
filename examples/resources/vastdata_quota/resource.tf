@@ -1,4 +1,3 @@
-
 resource "vastdata_quota" "vastdb_quota" {
   name            = "vastdb_quota_example"
   default_email   = "user@example.com"

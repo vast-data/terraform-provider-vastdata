@@ -147,6 +147,60 @@ func validateNoneOf(tf *is.TFState, fields ...string) error {
 	return nil
 }
 
+// ValidateFieldIsOneOf ensures that the specified field in allows only a limited set of valid values.
+func ValidateFieldIsOneOf[T string | int64 | float64](tfState *is.TFState, field string, validValues ...T) error {
+	if !tfState.IsKnownAndNotNull(field) {
+		return nil // Field is not set, no validation needed
+	}
+
+	var value T
+	switch any(value).(type) {
+	case string:
+		value = any(tfState.String(field)).(T)
+	case int64:
+		value = any(tfState.Int64(field)).(T)
+	case float64:
+		value = any(tfState.Float64(field)).(T)
+	default:
+		return fmt.Errorf("unsupported type for validation: %T", value)
+	}
+
+	for _, validValue := range validValues {
+		if value == validValue {
+			return nil // Valid value found
+		}
+	}
+
+	return fmt.Errorf("field %q must be one of %v, but got '%v'", field, validValues, value)
+}
+
+// ValidateFieldIsNoneOf ensures that the specified field in allows none of the invalid values.
+func ValidateFieldIsNoneOf[T string | int64 | float64](tfState *is.TFState, field string, invalidValues ...T) error {
+	if !tfState.IsKnownAndNotNull(field) {
+		return nil // Field is not set, no validation needed
+	}
+
+	var value T
+	switch any(value).(type) {
+	case string:
+		value = any(tfState.String(field)).(T)
+	case int64:
+		value = any(tfState.Int64(field)).(T)
+	case float64:
+		value = any(tfState.Float64(field)).(T)
+	default:
+		return fmt.Errorf("unsupported type for validation: %T", value)
+	}
+
+	for _, invalidValue := range invalidValues {
+		if value == invalidValue {
+			return fmt.Errorf("field %q must not be one of %v, but got '%v'", field, invalidValues, value)
+		}
+	}
+
+	return nil
+}
+
 func ensureNotChanged(tfState *is.TFState, planTfState *is.TFState, fields ...string) error {
 	for _, field := range fields {
 		if !tfState.IsKnownAndNotNull(field) {

@@ -54,7 +54,7 @@ func (m *TenantEncryptionGroupControl) API(rest *VMSRest) VastResourceAPIWithCon
 }
 
 func (m *TenantEncryptionGroupControl) ValidateResourceConfig(context.Context) error {
-	return validateOneOf(m.tfstate, "revoke", "deactivate", "reinstate", "rotate_key")
+	return ValidateFieldIsOneOf(m.tfstate, "action", "revoke", "deactivate", "reinstate", "rotate_key")
 }
 
 func (m *TenantEncryptionGroupControl) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
