@@ -48,7 +48,7 @@ type TFStateHints struct {
 	// by the backend and thus should not be treated as computed.
 	NotComputedSchemaFields []string
 
-	// WriteOnlyFields indicates fields only for search IOW only read operations.
+	// ReadOnlyFields indicates fields only for search IOW only read operations.
 	ReadOnlyFields []string
 
 	// WriteOnlyFields indicates fields whose values Terraform will not store

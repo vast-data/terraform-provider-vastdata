@@ -1,6 +1,4 @@
-
-resource "vastdata_nis" "vastdb_nis" {
-  name        = "vastdb_nis"
-  domain_name = "my.nis.domain.example.com"
-  ips         = ["1.1.1.1", "2.2.2.2"]
+resource "vastdata_dns" "vastdb_dns" {
+  name = "dns-1"
+  vip  = "192.168.10.50"
 }

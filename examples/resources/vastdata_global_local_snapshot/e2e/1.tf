@@ -1,4 +1,3 @@
-
 data "vastdata_view_policy" "vastdb_policy" {
   name = "default"
 }
@@ -21,7 +20,7 @@ resource "vastdata_snapshot" "vastdb_snapshot" {
 }
 
 
-resource "global_local_snapshot" "vastdb_local_snapshot" {
+resource "vastdata_global_local_snapshot" "vastdb_local_snapshot" {
   name               = "vastdb_local_snapshot"
   loanee_root_path   = "/vastdb_local_snapshot"
   enabled            = true
