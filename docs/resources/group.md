@@ -42,6 +42,7 @@ resource "vastdata_group" "vastdb_group" {
 ### Optional
 
 - `local_provider_id` (Number) Local provider ID
+- `s3_policies_ids` (Set of Number) list of s3 policy ids
 - `sid` (String) group SID
 
 ### Read-Only
@@ -50,7 +51,6 @@ resource "vastdata_group" "vastdb_group" {
 - `id` (Number) The ID of this resource.
 - `local_provider` (Attributes) (see [below for nested schema](#nestedatt--local_provider))
 - `s3_policies` (Attributes Set) (see [below for nested schema](#nestedatt--s3_policies))
-- `s3_policies_ids` (Set of Number) S3 policies IDs
 - `title` (String)
 - `url` (String)
 
