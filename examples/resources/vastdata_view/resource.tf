@@ -45,7 +45,6 @@ resource "vastdata_view" "vastdb_view" {
 
 # --------------------
 
-
 data "vastdata_user" "vastdb_user" {
   name = "runner"
 }
