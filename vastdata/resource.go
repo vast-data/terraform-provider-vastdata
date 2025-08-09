@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -159,6 +160,7 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		manager, _  = r.ManagerWithSchemaOnly(ctx)
 		managerName = r.managerName
 		tfState     = manager.TfState()
+		hints       = tfState.Hints
 		err         error
 	)
 
@@ -182,50 +184,109 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		tflog.Debug(ctx, fmt.Sprintf("ImportResourceState[%s]: do.", managerName))
 		_, err = imp.ImportResourceState(ctx, rest)
 	} else {
-		// Custom import logic for resources with 'id' field
-		idField := "id"
-		if !tfState.HasAttribute(idField) {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("ImportState[%s]: missing 'id' field in schema.", managerName),
-				fmt.Sprintf("The 'id' field is required for importing the %q resource. This resource does not support import operations.", managerName),
-			)
-			return
-		}
-
-		// Get the import ID from the request
+		// If hints.ImportFields is provided, allow composite import using those fields.
+		// Supported formats for req.ID when multiple fields:
+		//   1) key=value pairs separated by ',', ';' (order-insensitive)
+		//      example: "gid=1001,tenant_id=7,context=ad"
+		//   2) ordered values separated by ',', ';', or '|' (order matches hints.ImportFields)
+		//      example: "1001|7|ad" for ImportFields ["gid","tenant_id","context"]
 		importID := req.ID
 		if importID == "" {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: missing import ID.", managerName),
-				fmt.Sprintf("An import ID is required for importing the %q resource.", managerName),
+				fmt.Sprintf("An import ID or composite import key is required for importing the %q resource.", managerName),
 			)
 			return
 		}
 
-		// Check if the ID field is an integer type or string type
-		idType := tfState.Type(idField)
-		if idType.Equal(types.Int64Type) {
-			// Convert string to int64
-			idInt64, err := strconv.ParseInt(importID, 10, 64)
-			if err != nil {
+		if hints != nil && len(hints.ImportFields) > 0 {
+			if err := parseAndApplyCompositeImport(importID, hints.ImportFields, tfState, func(k string, v attr.Value) {
+				tfState.SetOrAdd(k, v)
+			}); err != nil {
 				resp.Diagnostics.AddError(
-					fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
-					fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
+					fmt.Sprintf("ImportState[%s]: invalid composite import id.", managerName),
+					err.Error(),
 				)
 				return
 			}
-
-			// Set the ID in the state
-			tfState.SetOrAdd(idField, types.Int64Value(idInt64))
-			tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: converted import ID %q to int64 %d", managerName, importID, idInt64))
-		} else if idType.Equal(types.StringType) {
-			// For string ID fields, use the import ID as-is
-			tfState.SetOrAdd(idField, types.StringValue(importID))
-			tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: using import ID %q as string", managerName, importID))
 		} else {
-			// For other ID field types, use the default passthrough
-			resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
-			return
+			// Default: import by single 'id' field
+			idField := "id"
+			if !tfState.HasAttribute(idField) {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("ImportState[%s]: missing 'id' field in schema.", managerName),
+					fmt.Sprintf("The 'id' field is required for default import of the %q resource, or specify hints.ImportFields for composite import.", managerName),
+				)
+				return
+			}
+			// Support key=value syntax for id as well, e.g., "id=777"
+			if strings.Contains(importID, "=") {
+				parts := strings.SplitN(importID, "=", 2)
+				if len(parts) == 2 && strings.TrimSpace(parts[0]) == idField {
+					idVal := strings.TrimSpace(parts[1])
+					idType := tfState.Type(idField)
+					if idType.Equal(types.Int64Type) {
+						idInt64, err := strconv.ParseInt(idVal, 10, 64)
+						if err != nil {
+							resp.Diagnostics.AddError(
+								fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
+								fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
+							)
+							return
+						}
+						tfState.SetOrAdd(idField, types.Int64Value(idInt64))
+					} else if idType.Equal(types.StringType) {
+						tfState.SetOrAdd(idField, types.StringValue(idVal))
+					} else if idType.Equal(types.BoolType) {
+						bv := strings.EqualFold(idVal, "true") || idVal == "1"
+						tfState.SetOrAdd(idField, types.BoolValue(bv))
+					} else {
+						resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
+						return
+					}
+				} else {
+					// Fallback: interpret entire string as id
+					idType := tfState.Type(idField)
+					if idType.Equal(types.Int64Type) {
+						idInt64, err := strconv.ParseInt(importID, 10, 64)
+						if err != nil {
+							resp.Diagnostics.AddError(
+								fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
+								fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
+							)
+							return
+						}
+						tfState.SetOrAdd(idField, types.Int64Value(idInt64))
+					} else if idType.Equal(types.StringType) {
+						tfState.SetOrAdd(idField, types.StringValue(importID))
+					} else {
+						resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
+						return
+					}
+				}
+			} else {
+				// Simple id token
+				idType := tfState.Type(idField)
+				if idType.Equal(types.Int64Type) {
+					idInt64, err := strconv.ParseInt(importID, 10, 64)
+					if err != nil {
+						resp.Diagnostics.AddError(
+							fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
+							fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
+						)
+						return
+					}
+					tfState.SetOrAdd(idField, types.Int64Value(idInt64))
+				} else if idType.Equal(types.StringType) {
+					tfState.SetOrAdd(idField, types.StringValue(importID))
+				} else if idType.Equal(types.BoolType) {
+					bv := strings.EqualFold(importID, "true") || importID == "1"
+					tfState.SetOrAdd(idField, types.BoolValue(bv))
+				} else {
+					resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
+					return
+				}
+			}
 		}
 
 		// Try to read the resource to populate the state
@@ -735,6 +796,110 @@ func (r *Resource) validateConfigImpl(ctx context.Context, req resource.Validate
 // ---------------------------------------
 //      HELPER FUNCTIONS
 // ---------------------------------------
+
+// parseAndApplyCompositeImport parses a composite import string into values for the given fields
+// and invokes set(key, value) with properly typed Terraform attr values.
+// Accepted formats:
+//   - key=value pairs separated by ',' or ';' (order-insensitive)
+//   - ordered values separated by ',', ';', or '|' matching fields order
+func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.TFState, set func(string, attr.Value)) error {
+	kv := make(map[string]string)
+	s := strings.TrimSpace(importID)
+	if s == "" {
+		return fmt.Errorf("empty import id")
+	}
+
+	if strings.Contains(s, "=") {
+		// key=value list
+		sep := ","
+		if strings.Contains(s, ";") {
+			sep = ";"
+		}
+		parts := strings.Split(s, sep)
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			kvParts := strings.SplitN(p, "=", 2)
+			if len(kvParts) != 2 {
+				return fmt.Errorf("segment %q is not in key=value form", p)
+			}
+			key := strings.TrimSpace(kvParts[0])
+			val := strings.TrimSpace(kvParts[1])
+			kv[key] = val
+		}
+	} else {
+		// Ordered values
+		hasPipe := strings.Contains(s, "|")
+		hasSemicolon := strings.Contains(s, ";")
+		hasComma := strings.Contains(s, ",")
+		if !hasPipe && !hasSemicolon && !hasComma {
+			// Single token provided without delimiters. If schema has 'id', treat this as ID.
+			if tfState.HasAttribute("id") {
+				t := tfState.Type("id")
+				if t.Equal(types.Int64Type) {
+					n, perr := strconv.ParseInt(s, 10, 64)
+					if perr != nil {
+						return fmt.Errorf("invalid int64 for 'id': %v", perr)
+					}
+					set("id", types.Int64Value(n))
+					return nil
+				}
+				if t.Equal(types.StringType) {
+					set("id", types.StringValue(s))
+					return nil
+				}
+				if t.Equal(types.BoolType) {
+					bv := strings.EqualFold(s, "true") || s == "1"
+					set("id", types.BoolValue(bv))
+					return nil
+				}
+				// Fallback: set as string
+				set("id", types.StringValue(s))
+				return nil
+			}
+		}
+		delim := ","
+		if hasPipe {
+			delim = "|"
+		} else if hasSemicolon {
+			delim = ";"
+		}
+		values := strings.Split(s, delim)
+		if len(values) != len(fields) {
+			return fmt.Errorf("expected %d values for fields %v, got %d", len(fields), fields, len(values))
+		}
+		for i, f := range fields {
+			kv[f] = strings.TrimSpace(values[i])
+		}
+	}
+
+	// Set parsed fields with type coercion and schema validation
+	for f, val := range kv {
+		if !tfState.HasAttribute(f) {
+			return fmt.Errorf("field %q is not present in the schema", f)
+		}
+		t := tfState.Type(f)
+		switch {
+		case t.Equal(types.Int64Type):
+			n, perr := strconv.ParseInt(val, 10, 64)
+			if perr != nil {
+				return fmt.Errorf("invalid int64 for %q: %v", f, perr)
+			}
+			set(f, types.Int64Value(n))
+		case t.Equal(types.StringType):
+			set(f, types.StringValue(val))
+		case t.Equal(types.BoolType):
+			bv := strings.EqualFold(val, "true") || val == "1"
+			set(f, types.BoolValue(bv))
+		default:
+			// fallback: attempt passthrough as string
+			set(f, types.StringValue(val))
+		}
+	}
+	return nil
+}
 
 func (r *Resource) getRecordBySearchParams(ctx context.Context, manager, planManager ResourceManager, op string) (DisplayableRecord, error) {
 	var (

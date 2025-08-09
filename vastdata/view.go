@@ -28,6 +28,7 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 		&is.TFStateHints{
 			SchemaRef:        ViewSchemaRef,
 			DeleteOnlyFields: []string{"delete_dir"},
+			ImportFields:     []string{"path", "tenant_name"},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
 				"alias":                    ValidatorPathStartsWithSlash,
