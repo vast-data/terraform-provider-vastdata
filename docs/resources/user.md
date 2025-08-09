@@ -19,6 +19,18 @@ resource "vastdata_user" "example-user" {
   uid  = 9000
 }
 
+
+resource "vastdata_local_provider" "vastdb_local_provider1" {
+  name = "vastdb_local_provider1"
+}
+
+// Create a user with local provider.
+resource "vastdata_user" "vastdb_user1" {
+  name              = "vastdb_user1"
+  uid               = 30117
+  local_provider_id = vastdata_local_provider.vastdb_local_provider1.id
+}
+
 # ---------------------
 # Complete examples
 # ---------------------
@@ -99,17 +111,6 @@ resource "vastdata_user" "vastdb_user" {
   s3_policies_ids = [
     vastdata_s3_policy.vastdb_s3policy.id
   ]
-}
-
-# --------------------
-
-resource "vastdata_local_provider" "vastdb_local_provider1" {
-  name = "vastdb_local_provider1"
-}
-
-resource "vastdata_user" "vastdb_user1" {
-  name              = "vastdb_user1"
-  local_provider_id = vastdata_local_provider.vastdb_local_provider1.id
 }
 
 # --------------------

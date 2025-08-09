@@ -1,4 +1,3 @@
-
 data "vastdata_user" "vastdb_user" {
   name = "runner"
 }
