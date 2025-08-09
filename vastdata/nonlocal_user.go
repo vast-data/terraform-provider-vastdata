@@ -29,6 +29,7 @@ func (m *NonlocalUser) NewResourceManager(raw map[string]attr.Value, schema any)
 		&is.TFStateHints{
 			ReadOnlyFields: []string{"context", "vid"},
 			SchemaRef:      NonlocalUserSchemaRef,
+			ImportFields:   []string{"username", "context", "tenant_id"},
 			AdditionalSchemaAttributes: map[string]any{
 				"access_keys": rschema.SetNestedAttribute{
 					Computed:    true,

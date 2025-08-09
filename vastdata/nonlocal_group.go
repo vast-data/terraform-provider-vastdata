@@ -29,6 +29,7 @@ func (m *NonlocalGroup) NewResourceManager(raw map[string]attr.Value, schema any
 		&is.TFStateHints{
 			SchemaRef:      NonlocalGroupSchemaRef,
 			ReadOnlyFields: []string{"context"},
+			ImportFields:   []string{"groupname", "context", "tenant_id"},
 			AdditionalSchemaAttributes: map[string]any{
 				"name": rschema.StringAttribute{
 					Optional:    false,

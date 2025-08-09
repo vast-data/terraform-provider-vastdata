@@ -15,6 +15,12 @@ type TFStateHints struct {
 	// SchemaRef defines where to get request (create) and response (read) schemas from OpenAPI
 	SchemaRef *SchemaReference
 
+	// ImportFields defines ordered field names used to support composite import IDs.
+	// When an import ID is provided without key=value pairs, it will be split by
+	// a supported delimiter and mapped to these fields in order. When key=value
+	// pairs are provided, any subset and order is accepted; keys must exist in the schema.
+	ImportFields []string
+
 	// SearchableFields lists field names that should be treated as searchable
 	// when constructing lookup parameters (e.g., for API GET calls).
 	SearchableFields []string
