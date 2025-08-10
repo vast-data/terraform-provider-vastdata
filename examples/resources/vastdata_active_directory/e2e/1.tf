@@ -1,3 +1,5 @@
+# ignore:example
+
 resource "vastdata_active_directory" "vastdb_active_directory" {
   machine_account_name = "machine_acc"
   organizational_unit  = "OU=VASTs,OU=VastENG,DC=VastENG,DC=lab"

@@ -24,9 +24,6 @@ func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 		schema,
 		&is.TFStateHints{
 			SchemaRef: QuotaSchemaRef,
-			CommonValidatorsMapping: map[string]string{
-				"grace_period": ValidatorGracePeriodFormat,
-			},
 		},
 	)}
 }
