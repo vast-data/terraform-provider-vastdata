@@ -53,9 +53,16 @@ func main() {
 			if err == nil && len(e2eFiles) > 0 {
 				sort.Strings(e2eFiles)
 
-				// Filter out files where all non-empty lines are commented out (start with '#')
+				// Filter out files explicitly ignored or where all non-empty lines are commented out (start with '#')
 				eligible := make([]string, 0, len(e2eFiles))
 				for _, file := range e2eFiles {
+					// Skip examples explicitly marked to ignore via first non-empty line
+					if ignore, err := hasIgnoreExampleDirective(file); err != nil {
+						return fmt.Errorf("error scanning %s: %w", file, err)
+					} else if ignore {
+						continue
+					}
+
 					hasContent, err := hasUncommentedNonEmptyLine(file)
 					if err != nil {
 						return fmt.Errorf("error scanning %s: %w", file, err)
@@ -133,6 +140,29 @@ func hasUncommentedNonEmptyLine(path string) (bool, error) {
 		if !strings.HasPrefix(trimmed, "#") {
 			return true, nil
 		}
+	}
+	if err := scanner.Err(); err != nil {
+		return false, err
+	}
+	return false, nil
+}
+
+// hasIgnoreExampleDirective returns true if the first non-empty line equals
+// "# ignore:example" (exact match after trimming whitespace).
+func hasIgnoreExampleDirective(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		trimmed := strings.TrimSpace(scanner.Text())
+		if trimmed == "" {
+			continue
+		}
+		return trimmed == "# ignore:example", nil
 	}
 	if err := scanner.Err(); err != nil {
 		return false, err
