@@ -19,22 +19,22 @@ description: |-
 
 # Cluster A
 provider "vastdata" {
+  alias           = "clusterA"
+  host            = "v95"
+  port            = 443
   username        = "admin"
   password        = "123456"
-  port            = 443
-  host            = "v95"
   skip_ssl_verify = true
-  alias           = "clusterA"
 }
 
 # Cluster B
 provider "vastdata" {
+  alias           = "clusterB"
+  host            = "v117"
+  port            = 443
   username        = "admin"
   password        = "123456"
-  port            = 9443
-  host            = "v117"
   skip_ssl_verify = true
-  alias           = "clusterB"
 }
 
 ########################################
@@ -43,24 +43,18 @@ provider "vastdata" {
 
 resource "vastdata_vip_pool" "pool1_clusterA" {
   provider    = vastdata.clusterA
-  name        = "pool1"
+  name        = "gateway-1"
   role        = "REPLICATION"
   subnet_cidr = 24
-
-  ip_ranges = [
-    ["12.0.0.10", "12.0.0.10"]
-  ]
+  ip_ranges   = [["12.0.0.10", "12.0.0.10"]]
 }
 
 resource "vastdata_vip_pool" "pool1_clusterB" {
   provider    = vastdata.clusterB
-  name        = "pool1"
+  name        = "gateway-1"
   role        = "REPLICATION"
   subnet_cidr = 24
-
-  ip_ranges = [
-    ["11.0.0.10", "11.0.0.10"]
-  ]
+  ip_ranges   = [["11.0.0.10", "11.0.0.10"]]
 }
 
 locals {
@@ -89,12 +83,9 @@ data "vastdata_view_policy" "view_policyB" {
 }
 
 resource "vastdata_tenant" "tenant1" {
-  provider = vastdata.clusterB
-  name     = "tenant1"
-
-  client_ip_ranges = [
-    ["192.168.0.100", "192.168.0.200"]
-  ]
+  provider         = vastdata.clusterB
+  name             = "tenant1"
+  client_ip_ranges = [["192.168.0.100", "192.168.0.200"]]
 }
 
 resource "vastdata_view" "view1" {
@@ -112,7 +103,7 @@ resource "vastdata_view" "view1" {
 resource "vastdata_snapshot" "snapshot1" {
   provider        = vastdata.clusterB
   name            = "snapshot1"
-  path            = vastdata_view.view1.path
+  path            = "${vastdata_view.view1.path}/"
   tenant_id       = vastdata_tenant.tenant1.id
   indestructible  = false
   expiration_time = "2023-06-20T12:22:32Z"
@@ -138,7 +129,6 @@ resource "vastdata_global_snapshot" "gsnap1" {
   owner_root_snapshot = {
     name = vastdata_snapshot.snapshot1.name
   }
-
 }
 ```
 

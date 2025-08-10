@@ -1,21 +1,13 @@
+# ignore:example
+
 ########################################
 # Providers
 ########################################
 
-# Cluster A
-provider "vastdata" {
-  alias           = "clusterA"
-  host            = "v95"
-  port            = 443
-  username        = "admin"
-  password        = "123456"
-  skip_ssl_verify = true
-}
-
 # Cluster B
 provider "vastdata" {
   alias           = "clusterB"
-  host            = "v117"
+  host            = "vast_secondary_host"
   port            = 443
   username        = "admin"
   password        = "123456"

@@ -208,6 +208,8 @@ e2e_terraform_sanity:
   variables:
     VAST_upgrade_to: $INSTALL_IMAGE
     VAST_COMET__KWARG: terraform_plugin_version=${CI_PIPELINE_ID}
+    PARENT_REF: $CI_COMMIT_REF_NAME
+    NUM_SYSTEMS: 2
     TRIGGER: "lb_terraform_sanity [from-upstream]"
 
 
