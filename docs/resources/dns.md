@@ -30,7 +30,7 @@ resource "vastdata_dns" "vastdb_dns" {
 ### Optional
 
 - `bgp_config_id` (Number) The ID of the BGP configuration to use for layer 3 connectivity configuration.
-- `cnode_ids` (String) To dedicate a specific group of CNodes to the DNS, list the IDs of the CNodes.
+- `cnode_ids` (Set of Number) To dedicate a specific group of CNodes to the DNS, list the IDs of the CNodes.
 - `domain_suffix` (String) A suffix for domain names. Requests for domain names with this suffix are resolved to the VIPs configured on the cluster.
 - `enable_l3` (Boolean) Enable layer 3 connectivity
 - `enabled` (Boolean) Set to true to enable the DNS service
