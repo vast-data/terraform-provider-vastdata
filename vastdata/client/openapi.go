@@ -356,11 +356,7 @@ func ResolveComposedSchema(schema *openapi3.Schema) *openapi3.Schema {
 	if schema == nil {
 		return nil
 	}
-	if schema.Type != nil && len(*schema.Type) > 0 {
-		return schema
-	}
-
-	// Resolve allOf
+	// Resolve allOf first, regardless of whether Type is set on the current schema.
 	if len(schema.AllOf) > 0 {
 		merged := &openapi3.Schema{
 			Properties:   map[string]*openapi3.SchemaRef{},
@@ -381,7 +377,8 @@ func ResolveComposedSchema(schema *openapi3.Schema) *openapi3.Schema {
 
 		// Then, merge properties from allOf sub-schemas
 		for _, subRef := range schema.AllOf {
-			sub := ResolveAllRefs(subRef)
+			// Resolve refs and also compose nested allOf/anyOf/oneOf
+			sub := ResolveComposedSchema(ResolveAllRefs(subRef))
 			if sub == nil {
 				continue
 			}
@@ -394,6 +391,11 @@ func ResolveComposedSchema(schema *openapi3.Schema) *openapi3.Schema {
 			}
 		}
 		return merged
+	}
+
+	// If there is no composition to resolve, return as-is.
+	if schema.Type != nil && len(*schema.Type) > 0 {
+		return schema
 	}
 
 	// Resolve oneOf or anyOf by picking the first resolvable schema with a type

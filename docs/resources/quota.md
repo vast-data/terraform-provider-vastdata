@@ -99,12 +99,18 @@ resource "vastdata_quota" "vastdb_quota" {
     email           = "user1@example.com"
     identifier_type = "username"
     is_group        = false
+    hard_limit      = 100000
+    soft_limit      = 50000
+    grace_period    = "90m"
   }]
   group_quotas = [{
     name            = vastdata_group.vastdb_quota_group.name
     identifier      = vastdata_group.vastdb_quota_group.name
     identifier_type = "group"
     is_group        = true
+    hard_limit      = 100000
+    soft_limit      = 50000
+    grace_period    = "90m"
   }]
 }
 
@@ -199,13 +205,40 @@ Optional:
 
 Optional:
 
+- `entity` (Attributes) (see [below for nested schema](#nestedatt--group_quotas--entity))
 - `entity_identifier` (String)
+- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
 - `guid` (String) Quota guid
+- `hard_limit` (Number) Hard quota limit
+- `hard_limit_inodes` (Number) Hard inodes quota limit
 - `id` (Number)
 - `identifier` (String)
 - `identifier_type` (String)
+- `is_accountable` (Boolean)
 - `name` (String) The name
 - `path` (String)
+- `percent_capacity` (Number)
+- `percent_inodes` (Number) Percentage of files and directories limit in use
+- `quota_system_id` (Number)
+- `soft_limit` (Number) Soft quota limit
+- `soft_limit_inodes` (Number) Soft inodes quota limit
+- `state` (String)
+- `time_to_block` (String) Grace period expiration time
+- `used_capacity` (Number) Used capacity in bytes
+- `used_inodes` (Number) Used inodes
+
+<a id="nestedatt--group_quotas--entity"></a>
+### Nested Schema for `group_quotas.entity`
+
+Optional:
+
+- `email` (String) The email used to send the user or group notifications of exceeding quota limits.
+- `identifier` (String)
+- `identifier_type` (String)
+- `is_group` (Boolean) True for a group quota. False for a user quota.
+- `name` (String) A user or group name
+- `vast_id` (Number) VAST ID of the user or group with the listed user/group quota
+
 
 
 <a id="nestedatt--user_quotas"></a>
@@ -213,10 +246,36 @@ Optional:
 
 Optional:
 
+- `entity` (Attributes) (see [below for nested schema](#nestedatt--user_quotas--entity))
 - `entity_identifier` (String)
+- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
 - `guid` (String) Quota guid
+- `hard_limit` (Number) Hard quota limit
+- `hard_limit_inodes` (Number) Hard inodes quota limit
 - `id` (Number)
 - `identifier` (String)
 - `identifier_type` (String)
+- `is_accountable` (Boolean)
 - `name` (String) The name
 - `path` (String)
+- `percent_capacity` (Number)
+- `percent_inodes` (Number) Percentage of files and directories limit in use
+- `quota_system_id` (Number)
+- `soft_limit` (Number) Soft quota limit
+- `soft_limit_inodes` (Number) Soft inodes quota limit
+- `state` (String)
+- `time_to_block` (String) Grace period expiration time
+- `used_capacity` (Number) Used capacity in bytes
+- `used_inodes` (Number) Used inodes
+
+<a id="nestedatt--user_quotas--entity"></a>
+### Nested Schema for `user_quotas.entity`
+
+Optional:
+
+- `email` (String) The email used to send the user or group notifications of exceeding quota limits.
+- `identifier` (String)
+- `identifier_type` (String)
+- `is_group` (Boolean) True for a group quota. False for a user quota.
+- `name` (String) A user or group name
+- `vast_id` (Number) VAST ID of the user or group with the listed user/group quota
