@@ -86,7 +86,7 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
 
 - `bgp_config_id` (Number) The ID of the BGP configuration to use for layer 3 connectivity configuration.
 - `cluster_id` (Number)
-- `cnode_ids` (String) Dedicates a specific group of CNodes to the VIP pool. List the IDs of the CNodes. Separate IDs by commas. This is a way to dedicate a specific set of CNodes to a specific set of client hosts or applications. Overridden if cnode_names is passed.
+- `cnode_ids` (Set of Number) Dedicates a specific group of CNodes to the VIP pool. List the IDs of the CNodes. Separate IDs by commas. This is a way to dedicate a specific set of CNodes to a specific set of client hosts or applications. Overridden if cnode_names is passed.
 - `cnode_names` (String) Dedicates a specific group of CNodes to the VIP pool. List the names of the CNodes. Separate names by commas. This is a way to dedicate a specific set of CNodes to a specific set of client hosts or applications. Overrides cnode_ids.
 - `domain_name` (String) Domain name for the VAST DNS server. If a DNS configuration exists, the domain suffix defined in the DNS server configuration is appended to this domain name to form a FQDN which the DNS server resolves to this VIP pool.
 - `enable_l3` (Boolean) Enables L3 networking, in which the cluster's CNodes act as Border Gateway Protocol (BGP) peers belonging to a VAST Autonomous system (AS) which is  connected to the client network's AS
