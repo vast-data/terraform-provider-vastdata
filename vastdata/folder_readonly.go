@@ -28,6 +28,7 @@ func (m *FolderReadOnly) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
+			Importable: &notImportable,
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
 				Description: "Make a Folder Read-Only",
 				SchemaAttributes: map[string]any{

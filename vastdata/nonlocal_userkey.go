@@ -29,6 +29,7 @@ func (m *NonlocalUserKey) NewResourceManager(raw map[string]attr.Value, schema a
 		raw,
 		schema,
 		&is.TFStateHints{
+			Importable:           &notImportable,
 			SchemaRef:            NonlocalUserKeySchemaRef,
 			SensitiveFields:      []string{"secret_key"},
 			ExcludedSchemaFields: []string{"login_name"},

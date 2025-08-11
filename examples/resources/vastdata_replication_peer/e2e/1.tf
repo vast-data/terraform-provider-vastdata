@@ -34,5 +34,4 @@ resource "vastdata_replication_peer" "vastdb_replication_peer" {
   password    = "####Wwww11111"
   leading_vip = vastdata_vip_pool.vastdb_replication_poolB.start_ip
   pool_id     = vastdata_vip_pool.vastdb_replication_poolA.id
-  # Always created on clusterA
 }

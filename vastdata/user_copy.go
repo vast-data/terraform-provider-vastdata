@@ -27,7 +27,8 @@ func (m *UserCopy) NewResourceManager(raw map[string]attr.Value, schema any) Res
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: UserCopySchemaRef,
+			Importable: &notImportable,
+			SchemaRef:  UserCopySchemaRef,
 		},
 	)}
 }
@@ -40,7 +41,7 @@ func (m *UserCopy) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Users
 }
 
-func (m *UserCopy) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+func (m *UserCopy) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
 	return nil, nil
 }
 

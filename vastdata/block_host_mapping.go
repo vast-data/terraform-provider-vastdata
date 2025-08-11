@@ -3,6 +3,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -55,6 +56,9 @@ func (m *BlockHostMapping) API(rest *VMSRest) VastResourceAPIWithContext {
 }
 
 func (m *BlockHostMapping) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	if !m.tfstate.IsKnownAndNotNull("volume_id") || !m.tfstate.IsKnownAndNotNull("host_id") {
+		return nil, errors.New("volume_id and host_id must be known and not null for BlockHostMapping")
+	}
 	volumeId := m.tfstate.Int64("volume_id")
 	hostId := m.tfstate.Int64("host_id")
 	return rest.BlockHostMappings.GetWithContext(ctx, params{"volume__id": volumeId, "block_host__id": hostId})

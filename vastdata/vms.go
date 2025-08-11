@@ -79,11 +79,12 @@ func (m *Vms) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecor
 				return nil, fmt.Errorf("failed to get VMS by name: %w", err)
 			}
 			ts.Set("id", record.RecordID())
+			return record, nil
 		} else {
 			return nil, fmt.Errorf("VMS ID or name must be provided to read the resource")
 		}
 	}
-	return nil, nil
+	return rest.Vms.GetByIdWithContext(ctx, m.tfstate.Int64("id"))
 }
 
 func (m *Vms) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
