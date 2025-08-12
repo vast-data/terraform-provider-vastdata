@@ -80,7 +80,6 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
 ### Required
 
 - `ip_ranges` (List of List of String) Array of IP ranges to include in the vippool.
-- `subnet_cidr` (Number) The subnet expressed as a CIDR index (number of bits in each IP that belong to the subnet)
 
 ### Optional
 
@@ -101,6 +100,7 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
 - `role` (String) 'PROTOCOLS' dedicates the VIP pool to client traffic from all of the supported access protocols (NFSv3, NFSv4.2, SMBv2, S3, Database). At least one VIP pool must be created to enable client access. 'REPLICATION' dedicates the VIP pool for connectivity with an async replication peer cluster. This is needed for async  replication. 'BIG_CATALOG' dedicates the VIP pool to VAST Catalog query access from the client network.
 - `serves_tenant` (String) Filter by served tenants. Accepts tenant ID or "all" for all served tenants.
 - `start_ip` (String) Not currently in use. Use ip_ranges instead.
+- `subnet_cidr` (Number) The subnet expressed as a CIDR index (number of bits in each IP that belong to the subnet)
 - `subnet_cidr_ipv6` (Number) The subnet expressed as a CIDR index (number of bits in each IP that belong to the subnet)
 - `tenant_id` (Number) Tenant ID
 - `vast_asn` (Number) The cluster's ASN. Must not be equal to peer_asn. Applicable only if enable_ls is true.
