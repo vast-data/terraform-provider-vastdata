@@ -368,8 +368,8 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
-		// On import, populate all fields (not only computed)
-		if err = tfState.FillFromRecordWithComputedOnly(record.(Record), false); err != nil {
+		// On import, populate computed and required fields
+		if err = tfState.FillFromRecordIncludingRequired(record.(Record), true); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: error filling state.", managerName),
 				err.Error(),

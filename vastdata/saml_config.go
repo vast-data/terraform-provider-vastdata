@@ -72,47 +72,12 @@ func (m *SamlConfig) API(rest *VMSRest) VastResourceAPIWithContext {
 }
 
 func (m *SamlConfig) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	if !m.tfstate.IsKnownAndNotNull("vms_id") || !m.tfstate.IsKnownAndNotNull("idp_name") {
+		return nil, fmt.Errorf("vms_id and idp_name must be set to read the SAML configuration")
+	}
 	vmsId := m.tfstate.Int64("vms_id")
 	idpName := m.tfstate.String("idp_name")
-	record, err := rest.SamlConfigs.GetConfigWithContext(ctx, vmsId, idpName)
-	if err != nil {
-		return nil, err
-	}
-
-	// Backend response flattens SAML config across nested keys. Rebuild saml_settings map for TF state.
-	samlSettings := map[string]any{}
-
-	// Extract all fields from sp_settings
-	if sp, ok := record["sp_settings"].(map[string]any); ok {
-		for k, v := range sp {
-			samlSettings[k] = v
-		}
-	}
-
-	// Extract idp_entityid from idp map keyed by entityid
-	if idp, ok := record["idp"].(map[string]any); ok {
-		for entity := range idp {
-			samlSettings["idp_entityid"] = entity
-			break
-		}
-	}
-
-	// Extract idp_metadata_url from metadata.remote[0].url
-	if md, ok := record["metadata"].(map[string]any); ok {
-		if remote, ok := md["remote"].([]any); ok && len(remote) > 0 {
-			if first, ok := remote[0].(map[string]any); ok {
-				if url, ok := first["url"]; ok {
-					samlSettings["idp_metadata_url"] = url
-				}
-			}
-		}
-	}
-
-	if len(samlSettings) > 0 {
-		record["saml_settings"] = samlSettings
-	}
-
-	return record, nil
+	return rest.SamlConfigs.GetConfigWithContext(ctx, vmsId, idpName)
 }
 
 func (m *SamlConfig) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

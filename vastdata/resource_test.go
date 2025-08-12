@@ -508,7 +508,7 @@ func TestDatasource_ManagerWithSchemaOnly_FillsZeroRaw(t *testing.T) {
 
 // --- FillFromRecordWithComputedOnly tests ---
 
-func TestFillFromRecordWithComputedOnly_ComputedOnlyTrue(t *testing.T) {
+func TestFillFromRecordIncludingRequired_ComputedOnlyTrue(t *testing.T) {
 	// Schema: id (computed), title (computed), name (optional)
 	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
 		"id":    rschema.Int64Attribute{Optional: true, Computed: true},
@@ -524,7 +524,7 @@ func TestFillFromRecordWithComputedOnly_ComputedOnlyTrue(t *testing.T) {
 	}
 
 	// computedOnly = true => only computed fields should be set
-	err := tf.FillFromRecordWithComputedOnly(rec, true)
+	err := tf.FillFromRecordIncludingRequired(rec, false)
 	require.NoError(t, err)
 
 	// id and title should be set
@@ -539,7 +539,7 @@ func TestFillFromRecordWithComputedOnly_ComputedOnlyTrue(t *testing.T) {
 	require.True(t, tf.IsNull("name") || tf.IsUnknown("name"))
 }
 
-func TestFillFromRecordWithComputedOnly_ComputedOnlyFalse(t *testing.T) {
+func TestFillFromRecordIncludingRequired_ComputedOnlyFalse(t *testing.T) {
 	// Schema: id (computed), title (computed), name (optional)
 	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
 		"id":    rschema.Int64Attribute{Optional: true, Computed: true},
@@ -555,8 +555,12 @@ func TestFillFromRecordWithComputedOnly_ComputedOnlyFalse(t *testing.T) {
 		"bogus": "skip-me", // unknown key should be ignored
 	}
 
-	// computedOnly = false => all schema fields present in record should be set
-	err := tf.FillFromRecordWithComputedOnly(rec, false)
+	// includeRequired = true => computed + required fields present in record should be set
+	// Simulate name being required in meta
+	m := tf.Meta["name"]
+	m.Required = true
+	tf.Meta["name"] = m
+	err := tf.FillFromRecordIncludingRequired(rec, true)
 	require.NoError(t, err)
 
 	// id
