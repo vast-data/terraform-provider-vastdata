@@ -3,6 +3,7 @@ package provider
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"net/http"
 )
@@ -23,8 +24,16 @@ func (m *Tenant) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:           TenantSchemaRef,
-			PreserveOrderFields: []string{"client_ip_ranges"},
+			SchemaRef:             TenantSchemaRef,
+			DeleteOnlyParamFields: []string{"force"},
+			PreserveOrderFields:   []string{"client_ip_ranges"},
+			AdditionalSchemaAttributes: map[string]any{
+				"force": rschema.BoolAttribute{
+					Optional: true,
+					Description: "If set to true, forces deletion of the tenant even if it has empty subdirectories" +
+						" or other removable remnants. Use with caution, as this will bypass standard cleanup checks.",
+				},
+			},
 		},
 	)}
 }

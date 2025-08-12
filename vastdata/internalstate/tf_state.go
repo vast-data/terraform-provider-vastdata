@@ -733,8 +733,9 @@ func (s *TFState) DiffFields(
 func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params {
 	var exclude []string
 	if s.Hints != nil {
-		exclude = append(exclude, s.Hints.EditOnlyFields...)   // Edit only fields should not be set on creation.
-		exclude = append(exclude, s.Hints.DeleteOnlyFields...) // Delete only fields should not be set on creation.
+		exclude = append(exclude, s.Hints.EditOnlyFields...)        // Edit only fields should not be set on creation.
+		exclude = append(exclude, s.Hints.DeleteOnlyBodyFields...)  // Delete only fields should not be set on creation.
+		exclude = append(exclude, s.Hints.DeleteOnlyParamFields...) // Delete only fields should not be set on creation.
 	}
 
 	searchParams := make(vast_client.Params)
@@ -816,15 +817,31 @@ func (s *TFState) GetReadEditOnlyParams() vast_client.Params {
 	return searchParams
 }
 
-// GetDeleteOnlyParams returns a map of parameters used exclusively for delete operations (delete-only).
+// GetDeleteOnlyBodyParams returns a map of parameters used exclusively for delete operations (delete-only).
 // These fields are not used during normal lifecycle operations, but may be required for safe deletion.
-func (s *TFState) GetDeleteOnlyParams() vast_client.Params {
+func (s *TFState) GetDeleteOnlyBodyParams() vast_client.Params {
 	searchParams := make(vast_client.Params)
-	if s.Hints != nil && len(s.Hints.DeleteOnlyFields) > 0 {
+	if s.Hints != nil && len(s.Hints.DeleteOnlyBodyFields) > 0 {
 		searchParams.Update(s.GetFilteredValues(
 			FilterOr,
 			&FieldSet{
-				Include: s.Hints.DeleteOnlyFields,
+				Include: s.Hints.DeleteOnlyBodyFields,
+			},
+			SearchOptional,
+		), true)
+	}
+	return searchParams
+}
+
+// GetDeleteOnlyQueryParams returns a map of parameters used exclusively for delete operations (delete-only).
+// These fields are not used during normal lifecycle operations, but may be required for safe deletion.
+func (s *TFState) GetDeleteOnlyQueryParams() vast_client.Params {
+	searchParams := make(vast_client.Params)
+	if s.Hints != nil && len(s.Hints.DeleteOnlyParamFields) > 0 {
+		searchParams.Update(s.GetFilteredValues(
+			FilterOr,
+			&FieldSet{
+				Include: s.Hints.DeleteOnlyParamFields,
 			},
 			SearchOptional,
 		), true)
@@ -837,8 +854,9 @@ func (s *TFState) GetCreateParams() vast_client.Params {
 	// Get all params required + optional for creation.
 	var exclude []string
 	if s.Hints != nil {
-		exclude = append(exclude, s.Hints.EditOnlyFields...)   // Edit only fields should not be set on creation.
-		exclude = append(exclude, s.Hints.DeleteOnlyFields...) // Delete only fields should not be set on creation.
+		exclude = append(exclude, s.Hints.EditOnlyFields...)        // Edit only fields should not be set on creation.
+		exclude = append(exclude, s.Hints.DeleteOnlyBodyFields...)  // Delete only fields should not be set on creation.
+		exclude = append(exclude, s.Hints.DeleteOnlyParamFields...) // Delete only fields should not be set on creation.
 	}
 
 	createParams := s.GetFilteredValues(

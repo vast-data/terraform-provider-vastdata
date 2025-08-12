@@ -163,7 +163,7 @@ func (m *NonlocalUserKey) DeleteResource(ctx context.Context, rest *VMSRest) err
 		return err
 	}
 	deleteParams := params{"access_key": accessKey, "uid": ts.Int64("uid")}
-	_, err := rest.NonLocalUserKeys.DeleteNonIdWithContext(ctx, deleteParams)
+	_, err := rest.NonLocalUserKeys.DeleteNonIdWithContext(ctx, nil, deleteParams)
 	if ignoreStatusCodes(err, http.StatusNotFound) != nil {
 		return err
 	}

@@ -344,18 +344,22 @@ func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithCont
 		)
 	}
 
-	var deleteParams map[string]any
-	if len(tfState.Hints.DeleteOnlyFields) > 0 {
-		deleteParams = tfState.GetDeleteOnlyParams()
+	var deleteBodyParams map[string]any
+	var deleteQueryParams map[string]any
+	if len(tfState.Hints.DeleteOnlyBodyFields) > 0 {
+		deleteBodyParams = tfState.GetDeleteOnlyBodyParams()
+	}
+	if len(tfState.Hints.DeleteOnlyParamFields) > 0 {
+		deleteQueryParams = tfState.GetDeleteOnlyQueryParams()
 	}
 
 	if id, ok := searchParams["id"]; ok {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
 		// If the ID is set, we assume it's a direct call by ID
-		_, err = api.DeleteByIdWithContext(ctx, id, deleteParams)
+		_, err = api.DeleteByIdWithContext(ctx, id, deleteQueryParams, deleteBodyParams)
 	} else {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: no ID found, using search params.", op, managerName))
-		_, err = api.DeleteWithContext(ctx, searchParams, deleteParams)
+		_, err = api.DeleteWithContext(ctx, searchParams, deleteQueryParams, deleteBodyParams)
 	}
 	return ignoreStatusCodes(err, http.StatusNotFound)
 
