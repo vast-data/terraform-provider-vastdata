@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -34,8 +35,18 @@ func (d *Datasource) ManagerWithSchemaOnly(ctx context.Context) (DataSourceManag
 	if err != nil {
 		return nil, err
 	}
-	// Create a new manager with the schema
-	return d.newManager(nil, *schema), nil
+	// Create a new manager with the schema and empty Raw filled according to schema types
+	// Build a zeroed attr map matching the schema so TFState has all keys with Null values
+	zeroRaw := make(map[string]attr.Value)
+	switch sch := any(*schema).(type) {
+	case dschema.Schema:
+		for k, a := range sch.Attributes {
+			zeroRaw[k], _ = is.BuildAttrValueFromAny(a.GetType(), nil)
+		}
+	default:
+		// Fallback to passing nil Raw if schema kind unexpected
+	}
+	return d.newManager(zeroRaw, *schema), nil
 }
 
 func (d *Datasource) NewManager(config tfsdk.Config) DataSourceManager {
