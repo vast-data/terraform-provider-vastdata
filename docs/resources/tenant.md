@@ -73,6 +73,7 @@ resource "vastdata_tenant" "vastdb_tenant" {
 - `domain_name` (String) Domain name to incorporate into the VMS tenant login page URL.
 - `encryption_crn` (String) Tenant's encryption group unique identifier (deprecated)
 - `encryption_group` (String) Tenant's encryption group unique identifier
+- `force` (Boolean) If set to true, forces deletion of the tenant even if it has empty subdirectories or other removable remnants. Use with caution, as this will bypass standard cleanup checks.
 - `identity_provider_name` (String) The ID of a SAML provider configured on the cluster. Connects the specified provider to the tenant.
 - `is_nfsv42_supported` (Boolean) Enable NFSv4.2
 - `ldap_provider_id` (Number) The ID of an LDAP provider configured on the cluster. Enables the specified provider for the tenant.

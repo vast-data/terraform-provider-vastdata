@@ -70,8 +70,11 @@ type TFStateHints struct {
 	// For instance some resources have field "enabled" that cannot be set to false along with create (POST) request.
 	EditOnlyFields []string
 
-	// DeleteOnlyFields lists fields that can be provided only during DELETE request.
-	DeleteOnlyFields []string
+	// DeleteOnlyBodyFields lists body fields that can be provided only during DELETE request.
+	DeleteOnlyBodyFields []string
+
+	// DeleteOnlyParamFields lists param fields that can be provided only during DELETE request
+	DeleteOnlyParamFields []string
 
 	// PreserveOrderFields defines fields where the order matters (e.g., for lists instead of sets).
 	PreserveOrderFields []string
