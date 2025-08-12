@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -50,6 +51,13 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 						Computed:    true,
 						Description: "If set to true, the resource will not return an error if the specified S3 policy is already attached to the user or group. This is useful for gracefully handling pre-existing attachments.",
 						Default:     booldefault.StaticBool(false),
+					},
+					"context": rschema.StringAttribute{
+						Optional:    true,
+						Description: "Specify the context for the user/group query.",
+						PlanModifiers: []planmodifiers.String{
+							stringplanmodifier.RequiresReplace(),
+						},
 					},
 				},
 			},
@@ -103,6 +111,7 @@ func (m *S3PolicyAttachment) CreateResource(ctx context.Context, rest *VMSRest) 
 	}
 
 	searchParams := params{key: val}
+	ts.SetToMapIfAvailable(searchParams, "context")
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
@@ -158,6 +167,7 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 	}
 
 	searchParams := params{key: val}
+	ts.SetToMapIfAvailable(searchParams, "context")
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
@@ -216,6 +226,7 @@ func (m *S3PolicyAttachment) DeleteResource(ctx context.Context, rest *VMSRest) 
 	}
 
 	searchParams := params{key: val}
+	ts.SetToMapIfAvailable(searchParams, "context")
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
 		return fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)

@@ -1,4 +1,4 @@
-// // Copyright (c) HashiCorp, Inc.
+// Copyright (c) HashiCorp, Inc.
 package provider
 
 import (
