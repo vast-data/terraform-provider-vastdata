@@ -100,6 +100,7 @@ resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
 
 ### Optional
 
+- `context` (String) Specify the context for the user/group query.
 - `gid` (Number) The GID of the non-local group to attach the policy to.
 - `ignore_present` (Boolean) If set to true, the resource will not return an error if the specified S3 policy is already attached to the user or group. This is useful for gracefully handling pre-existing attachments.
 - `uid` (Number) The UID of the non-local user to attach the policy to.
