@@ -6,6 +6,10 @@ package internalstate
 // Terraform resources and data sources. These hints allow customizing required,
 // optional, excluded, and searchable fields beyond what is defined in the OpenAPI schema.
 type TFStateHints struct {
+	// Importable controls whether the resource supports import operations.
+	// If nil or true, the resource is considered importable by default.
+	// Set to BoolPtr(false) to explicitly disable import for a resource.
+	Importable *bool
 	// TFStateHintsForCustom - presence indicates whether the resource or data source is custom-defined
 	// rather than generated from OpenAPI definitions. Schema generation from OpenAPI
 	// for such resources is skipped, and the hints are used to define the schema.

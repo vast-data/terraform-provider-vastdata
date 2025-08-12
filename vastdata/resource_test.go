@@ -333,3 +333,169 @@ func TestImport_DefaultId_KeyValue_String(t *testing.T) {
 }
 
 // composite import tests moved to dedicated parser tests
+
+func TestImport_KeyValue_MultipleFields(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":        rschema.Int64Attribute{Optional: true, Computed: true},
+		"name":      rschema.StringAttribute{Optional: true, Computed: true},
+		"tenant_id": rschema.Int64Attribute{Optional: true, Computed: true},
+	}}
+	r := buildTestResourceWithSchema(schema, &is.TFStateHints{})
+	req := resource.ImportStateRequest{ID: "name=foo, tenant_id=42"}
+	resp := &resource.ImportStateResponse{}
+	r.importStateImpl(context.Background(), req, resp)
+	require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+	var name types.String
+	var tenantID types.Int64
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("name"), &name).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("tenant_id"), &tenantID).HasError())
+	require.Equal(t, "foo", name.ValueString())
+	require.Equal(t, int64(42), tenantID.ValueInt64())
+}
+
+func TestImport_SingleIdToken_Int64(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id": rschema.Int64Attribute{Optional: true, Computed: true},
+	}}
+	r := buildTestResourceWithSchema(schema, &is.TFStateHints{})
+	req := resource.ImportStateRequest{ID: "1234"}
+	resp := &resource.ImportStateResponse{}
+	r.importStateImpl(context.Background(), req, resp)
+	require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+	var id types.Int64
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("id"), &id).HasError())
+	require.Equal(t, int64(1234), id.ValueInt64())
+}
+
+func TestImport_OrderedWithHints_Pipe(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"gid":       rschema.Int64Attribute{Optional: true, Computed: true},
+		"tenant_id": rschema.Int64Attribute{Optional: true, Computed: true},
+		"context":   rschema.StringAttribute{Optional: true, Computed: true},
+	}}
+	hints := &is.TFStateHints{ImportFields: []string{"gid", "tenant_id", "context"}}
+	r := buildTestResourceWithSchema(schema, hints)
+	req := resource.ImportStateRequest{ID: "1001|22|ad"}
+	resp := &resource.ImportStateResponse{}
+	r.importStateImpl(context.Background(), req, resp)
+	require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+	var gid types.Int64
+	var tenantID types.Int64
+	var contextStr types.String
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("gid"), &gid).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("tenant_id"), &tenantID).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("context"), &contextStr).HasError())
+	require.Equal(t, int64(1001), gid.ValueInt64())
+	require.Equal(t, int64(22), tenantID.ValueInt64())
+	require.Equal(t, "ad", contextStr.ValueString())
+}
+
+func TestImport_NotImportable_Err(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id": rschema.Int64Attribute{Optional: true, Computed: true},
+	}}
+	f := false
+	r := buildTestResourceWithSchema(schema, &is.TFStateHints{Importable: &f})
+	req := resource.ImportStateRequest{ID: "123"}
+	resp := &resource.ImportStateResponse{}
+	r.importStateImpl(context.Background(), req, resp)
+	require.True(t, resp.Diagnostics.HasError())
+}
+
+// fake reader manager to verify read population is called
+type testReaderManager struct{ testManager }
+
+func (m *testReaderManager) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
+	return Record{"id": int64(9), "name": "filled"}, nil
+}
+
+func buildResourceWithReader(schema rschema.Schema) *Resource {
+	return &Resource{
+		newManager: func(raw map[string]attr.Value, s any) ResourceManager {
+			if s == nil {
+				s = schema
+			}
+			return &testReaderManager{testManager{tf: is.NewTFStateMust(raw, s, &is.TFStateHints{TFStateHintsForCustom: &is.TFStateHintsForCustom{SchemaAttributes: map[string]any{"id": schema.Attributes["id"], "name": schema.Attributes["name"]}}})}}
+		},
+		managerName: "test",
+	}
+}
+
+func TestImport_CallsReadAndFillsState(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":   rschema.Int64Attribute{Optional: true, Computed: true},
+		"name": rschema.StringAttribute{Optional: true, Computed: true},
+	}}
+	r := buildResourceWithReader(schema)
+	req := resource.ImportStateRequest{ID: "id=9"}
+	resp := &resource.ImportStateResponse{}
+	r.importStateImpl(context.Background(), req, resp)
+	require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+	var name types.String
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("name"), &name).HasError())
+	require.Equal(t, "filled", name.ValueString())
+}
+
+// --- FillFromRecordWithComputedOnly tests ---
+
+func TestFillFromRecordWithComputedOnly_ComputedOnlyTrue(t *testing.T) {
+	// Schema: id (computed), title (computed), name (optional)
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":    rschema.Int64Attribute{Optional: true, Computed: true},
+		"title": rschema.StringAttribute{Optional: true, Computed: true},
+		"name":  rschema.StringAttribute{Optional: true},
+	}}
+	tf := is.NewTFStateMust(map[string]attr.Value{}, schema, nil)
+
+	rec := Record{
+		"id":    int64(8),
+		"title": "from-backend",
+		"name":  "should-not-be-set",
+	}
+
+	// computedOnly = true => only computed fields should be set
+	err := tf.FillFromRecordWithComputedOnly(rec, true)
+	require.NoError(t, err)
+
+	// id and title should be set
+	// Directly check Raw via helpers
+	// id
+	tfID := tf.Get("id").(types.Int64)
+	require.Equal(t, int64(8), tfID.ValueInt64())
+	// title
+	tfTitle := tf.Get("title").(types.String)
+	require.Equal(t, "from-backend", tfTitle.ValueString())
+	// name should remain null/unknown
+	require.True(t, tf.IsNull("name") || tf.IsUnknown("name"))
+}
+
+func TestFillFromRecordWithComputedOnly_ComputedOnlyFalse(t *testing.T) {
+	// Schema: id (computed), title (computed), name (optional)
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":    rschema.Int64Attribute{Optional: true, Computed: true},
+		"title": rschema.StringAttribute{Optional: true, Computed: true},
+		"name":  rschema.StringAttribute{Optional: true},
+	}}
+	tf := is.NewTFStateMust(map[string]attr.Value{}, schema, nil)
+
+	rec := Record{
+		"id":    int64(9),
+		"title": "from-backend",
+		"name":  "should-be-set",
+		"bogus": "skip-me", // unknown key should be ignored
+	}
+
+	// computedOnly = false => all schema fields present in record should be set
+	err := tf.FillFromRecordWithComputedOnly(rec, false)
+	require.NoError(t, err)
+
+	// id
+	tfID := tf.Get("id").(types.Int64)
+	require.Equal(t, int64(9), tfID.ValueInt64())
+	// title
+	tfTitle := tf.Get("title").(types.String)
+	require.Equal(t, "from-backend", tfTitle.ValueString())
+	// name should be set as well
+	tfName := tf.Get("name").(types.String)
+	require.Equal(t, "should-be-set", tfName.ValueString())
+}

@@ -26,6 +26,8 @@ import (
 	"strings"
 )
 
+var notImportable = false
+
 // Rest Client
 type (
 	VastResourceAPI            = vast_client.VastResourceAPI

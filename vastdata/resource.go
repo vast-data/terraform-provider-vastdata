@@ -164,6 +164,15 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		err         error
 	)
 
+	// Check importable flag (defaults to true)
+	if hints != nil && hints.Importable != nil && !*hints.Importable {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("ImportState[%q]: import not supported.", managerName),
+			"This resource has been marked as not importable.",
+		)
+		return
+	}
+
 	if imp, ok := manager.(PrepareImportResourceState); ok {
 		tflog.Debug(ctx, fmt.Sprintf("PrepareImportResourceState[%s]: do.", managerName))
 		if err = imp.PrepareImportResourceState(ctx, rest); err != nil {
@@ -182,24 +191,72 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 
 	if imp, ok := manager.(ImportResourceState); ok {
 		tflog.Debug(ctx, fmt.Sprintf("ImportResourceState[%s]: do.", managerName))
-		_, err = imp.ImportResourceState(ctx, rest)
+		err = imp.ImportResourceState(ctx, rest)
 	} else {
-		// If hints.ImportFields is provided, allow composite import using those fields.
-		// Supported formats for req.ID when multiple fields:
-		//   1) key=value pairs separated by ',', ';' (order-insensitive)
-		//      example: "gid=1001,tenant_id=7,context=ad"
-		//   2) ordered values separated by ',', ';', or '|' (order matches hints.ImportFields)
-		//      example: "1001|7|ad" for ImportFields ["gid","tenant_id","context"]
+		// Use default import implementation
+		tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: use default import implementation.", managerName))
 		importID := req.ID
-		if importID == "" {
+		if strings.TrimSpace(importID) == "" {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: missing import ID.", managerName),
-				fmt.Sprintf("An import ID or composite import key is required for importing the %q resource.", managerName),
+				fmt.Sprintf("An import ID or key=value list is required for importing the %q resource.", managerName),
 			)
 			return
 		}
 
-		if hints != nil && len(hints.ImportFields) > 0 {
+		if strings.Contains(importID, "=") {
+			// Parse key=value pairs regardless of hints
+			sep := ","
+			if strings.Contains(importID, ";") {
+				sep = ";"
+			}
+			parts := strings.Split(importID, sep)
+			for _, p := range parts {
+				p = strings.TrimSpace(p)
+				if p == "" {
+					continue
+				}
+				kv := strings.SplitN(p, "=", 2)
+				if len(kv) != 2 {
+					resp.Diagnostics.AddError(
+						fmt.Sprintf("ImportState[%s]: invalid segment.", managerName),
+						fmt.Sprintf("Segment %q is not in key=value form", p),
+					)
+					return
+				}
+				key := strings.TrimSpace(kv[0])
+				val := strings.TrimSpace(kv[1])
+				if !tfState.HasAttribute(key) {
+					resp.Diagnostics.AddError(
+						fmt.Sprintf("ImportState[%s]: unknown field.", managerName),
+						fmt.Sprintf("Field %q is not present in the resource schema", key),
+					)
+					return
+				}
+				t := tfState.Type(key)
+				switch {
+				case t.Equal(types.Int64Type):
+					n, convErr := strconv.ParseInt(val, 10, 64)
+					if convErr != nil {
+						resp.Diagnostics.AddError(
+							fmt.Sprintf("ImportState[%s]: invalid integer.", managerName),
+							fmt.Sprintf("Field %q expects int64, got %q: %v", key, val, convErr),
+						)
+						return
+					}
+					tfState.SetOrAdd(key, types.Int64Value(n))
+				case t.Equal(types.BoolType):
+					bv := strings.EqualFold(val, "true") || val == "1"
+					tfState.SetOrAdd(key, types.BoolValue(bv))
+				case t.Equal(types.StringType):
+					tfState.SetOrAdd(key, types.StringValue(val))
+				default:
+					// store as string for unsupported types
+					tfState.SetOrAdd(key, types.StringValue(val))
+				}
+			}
+		} else if hints != nil && len(hints.ImportFields) > 0 && strings.Contains(importID, "|") {
+			// Ordered values mode via hints
 			if err := parseAndApplyCompositeImport(importID, hints.ImportFields, tfState, func(k string, v attr.Value) {
 				tfState.SetOrAdd(k, v)
 			}); err != nil {
@@ -210,105 +267,38 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 				return
 			}
 		} else {
-			// Default: import by single 'id' field
+			// Treat as single ID token
 			idField := "id"
 			if !tfState.HasAttribute(idField) {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("ImportState[%s]: missing 'id' field in schema.", managerName),
-					fmt.Sprintf("The 'id' field is required for default import of the %q resource, or specify hints.ImportFields for composite import.", managerName),
+					fmt.Sprintf("The 'id' field is required for default import of the %q resource.", managerName),
 				)
 				return
 			}
-			// Support key=value syntax for id as well, e.g., "id=777"
-			if strings.Contains(importID, "=") {
-				parts := strings.SplitN(importID, "=", 2)
-				if len(parts) == 2 && strings.TrimSpace(parts[0]) == idField {
-					idVal := strings.TrimSpace(parts[1])
-					idType := tfState.Type(idField)
-					if idType.Equal(types.Int64Type) {
-						idInt64, err := strconv.ParseInt(idVal, 10, 64)
-						if err != nil {
-							resp.Diagnostics.AddError(
-								fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
-								fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
-							)
-							return
-						}
-						tfState.SetOrAdd(idField, types.Int64Value(idInt64))
-					} else if idType.Equal(types.StringType) {
-						tfState.SetOrAdd(idField, types.StringValue(idVal))
-					} else if idType.Equal(types.BoolType) {
-						bv := strings.EqualFold(idVal, "true") || idVal == "1"
-						tfState.SetOrAdd(idField, types.BoolValue(bv))
-					} else {
-						resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
-						return
-					}
-				} else {
-					// Fallback: interpret entire string as id
-					idType := tfState.Type(idField)
-					if idType.Equal(types.Int64Type) {
-						idInt64, err := strconv.ParseInt(importID, 10, 64)
-						if err != nil {
-							resp.Diagnostics.AddError(
-								fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
-								fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
-							)
-							return
-						}
-						tfState.SetOrAdd(idField, types.Int64Value(idInt64))
-					} else if idType.Equal(types.StringType) {
-						tfState.SetOrAdd(idField, types.StringValue(importID))
-					} else {
-						resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
-						return
-					}
-				}
-			} else {
-				// Simple id token
-				idType := tfState.Type(idField)
-				if idType.Equal(types.Int64Type) {
-					idInt64, err := strconv.ParseInt(importID, 10, 64)
-					if err != nil {
-						resp.Diagnostics.AddError(
-							fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
-							fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, err.Error()),
-						)
-						return
-					}
-					tfState.SetOrAdd(idField, types.Int64Value(idInt64))
-				} else if idType.Equal(types.StringType) {
-					tfState.SetOrAdd(idField, types.StringValue(importID))
-				} else if idType.Equal(types.BoolType) {
-					bv := strings.EqualFold(importID, "true") || importID == "1"
-					tfState.SetOrAdd(idField, types.BoolValue(bv))
-				} else {
-					resource.ImportStatePassthroughID(ctx, path.Root(idField), req, resp)
+			idType := tfState.Type(idField)
+			if idType.Equal(types.Int64Type) {
+				idInt64, convErr := strconv.ParseInt(importID, 10, 64)
+				if convErr != nil {
+					resp.Diagnostics.AddError(
+						fmt.Sprintf("ImportState[%s]: invalid import ID format.", managerName),
+						fmt.Sprintf("The import ID %q could not be parsed as an integer: %s", importID, convErr.Error()),
+					)
 					return
 				}
-			}
-		}
-
-		// Try to read the resource to populate the state
-		if reader, ok := manager.(ReadResource); ok {
-			tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: reading resource after ID conversion.", managerName))
-			_, err = reader.ReadResource(ctx, rest)
-			if err != nil {
+				tfState.SetOrAdd(idField, types.Int64Value(idInt64))
+			} else if idType.Equal(types.StringType) {
+				tfState.SetOrAdd(idField, types.StringValue(importID))
+			} else if idType.Equal(types.BoolType) {
+				bv := strings.EqualFold(importID, "true") || importID == "1"
+				tfState.SetOrAdd(idField, types.BoolValue(bv))
+			} else {
 				resp.Diagnostics.AddError(
-					fmt.Sprintf("ImportState[%s]: failed to read imported resource.", managerName),
-					fmt.Sprintf("Failed to read the imported resource: %s", err.Error()),
+					fmt.Sprintf("ImportState[%s]: unsupported id type.", managerName),
+					"Only int, string, or bool id types are supported for import.",
 				)
 				return
 			}
-		}
-
-		// Set the state in the response
-		if err = tfState.SetState(ctx, &resp.State); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("ImportState[%s]: failed to set state.", managerName),
-				fmt.Sprintf("Failed to set the imported state: %s", err.Error()),
-			)
-			return
 		}
 	}
 
@@ -316,6 +306,85 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("error importing %q resource.", managerName),
 			err.Error(),
+		)
+		return
+	}
+
+	// Before reading, allow resource to prepare read (same as in readImpl)
+	if prep, ok := manager.(PrepareReadResource); ok {
+		tflog.Debug(ctx, fmt.Sprintf("PrepareReadResource[%s]: do.", managerName))
+		if err = prep.PrepareReadResource(ctx, rest); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("PrepareReadResource[%q]", managerName),
+				err.Error(),
+			)
+			return
+		}
+	}
+
+	// Populate full state from backend using the same logic as read (without SDK response wrapper)
+	var record DisplayableRecord
+	if reader, ok := manager.(ReadResource); ok {
+		tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: reading resource after key parsing.", managerName))
+		record, err = reader.ReadResource(ctx, rest)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ImportState[%s]: failed to read imported resource.", managerName),
+				err.Error(),
+			)
+			return
+		}
+		if record == nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ImportState[%s]: resource import is not supported for this type.", managerName),
+				"ReadResource returned nil",
+			)
+			return
+		}
+	} else {
+		tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: default read after key parsing.", managerName))
+		record, err = r.getRecordBySearchParams(ctx, manager, nil, "Import")
+		if err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ImportState[%s]: failed to read imported resource.", managerName),
+				err.Error(),
+			)
+			return
+		}
+	}
+
+	if record != nil {
+		if transformer, ok := manager.(TransformResponseRecord); ok {
+			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
+			record = transformer.TransformResponseRecord(record.(Record))
+		}
+		// On import, populate all fields (not only computed)
+		if err = tfState.FillFromRecordWithComputedOnly(record.(Record), false); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ImportState[%s]: error filling state.", managerName),
+				err.Error(),
+			)
+			return
+		}
+	}
+
+	// After read hook (same as in readImpl)
+	if aft, ok := manager.(AfterReadResource); ok {
+		tflog.Debug(ctx, fmt.Sprintf("AfterReadResource[%s]: do.", managerName))
+		if err = aft.AfterReadResource(ctx, rest); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("AfterReadResource[%q]", managerName),
+				err.Error(),
+			)
+			return
+		}
+	}
+
+	// Finally, persist state
+	if err = tfState.SetState(ctx, &resp.State); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("ImportState[%s]: failed to set state.", managerName),
+			fmt.Sprintf("Failed to set the imported state: %s", err.Error()),
 		)
 		return
 	}
@@ -800,8 +869,7 @@ func (r *Resource) validateConfigImpl(ctx context.Context, req resource.Validate
 // parseAndApplyCompositeImport parses a composite import string into values for the given fields
 // and invokes set(key, value) with properly typed Terraform attr values.
 // Accepted formats:
-//   - key=value pairs separated by ',' or ';' (order-insensitive)
-//   - ordered values separated by ',', ';', or '|' matching fields order
+//   - ordered values separated by '|' matching fields order
 func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.TFState, set func(string, attr.Value)) error {
 	kv := make(map[string]string)
 	s := strings.TrimSpace(importID)
@@ -809,70 +877,13 @@ func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.
 		return fmt.Errorf("empty import id")
 	}
 
-	if strings.Contains(s, "=") {
-		// key=value list
-		sep := ","
-		if strings.Contains(s, ";") {
-			sep = ";"
-		}
-		parts := strings.Split(s, sep)
-		for _, p := range parts {
-			p = strings.TrimSpace(p)
-			if p == "" {
-				continue
-			}
-			kvParts := strings.SplitN(p, "=", 2)
-			if len(kvParts) != 2 {
-				return fmt.Errorf("segment %q is not in key=value form", p)
-			}
-			key := strings.TrimSpace(kvParts[0])
-			val := strings.TrimSpace(kvParts[1])
-			kv[key] = val
-		}
-	} else {
-		// Ordered values
-		hasPipe := strings.Contains(s, "|")
-		hasSemicolon := strings.Contains(s, ";")
-		hasComma := strings.Contains(s, ",")
-		if !hasPipe && !hasSemicolon && !hasComma {
-			// Single token provided without delimiters. If schema has 'id', treat this as ID.
-			if tfState.HasAttribute("id") {
-				t := tfState.Type("id")
-				if t.Equal(types.Int64Type) {
-					n, perr := strconv.ParseInt(s, 10, 64)
-					if perr != nil {
-						return fmt.Errorf("invalid int64 for 'id': %v", perr)
-					}
-					set("id", types.Int64Value(n))
-					return nil
-				}
-				if t.Equal(types.StringType) {
-					set("id", types.StringValue(s))
-					return nil
-				}
-				if t.Equal(types.BoolType) {
-					bv := strings.EqualFold(s, "true") || s == "1"
-					set("id", types.BoolValue(bv))
-					return nil
-				}
-				// Fallback: set as string
-				set("id", types.StringValue(s))
-				return nil
-			}
-		}
-		delim := ","
-		if hasPipe {
-			delim = "|"
-		} else if hasSemicolon {
-			delim = ";"
-		}
-		values := strings.Split(s, delim)
-		if len(values) != len(fields) {
-			return fmt.Errorf("expected %d values for fields %v, got %d", len(fields), fields, len(values))
-		}
-		for i, f := range fields {
-			kv[f] = strings.TrimSpace(values[i])
-		}
+	// Ordered values: caller must ensure '|' is present
+	values := strings.Split(s, "|")
+	if len(values) != len(fields) {
+		return fmt.Errorf("expected %d values for fields %v, got %d", len(fields), fields, len(values))
+	}
+	for i, f := range fields {
+		kv[f] = strings.TrimSpace(values[i])
 	}
 
 	// Set parsed fields with type coercion and schema validation

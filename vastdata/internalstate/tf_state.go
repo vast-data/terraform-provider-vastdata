@@ -530,6 +530,13 @@ func (s *TFState) Type(path string) attr.Type {
 }
 
 func (s *TFState) FillFromRecord(record Record) error {
+	return s.FillFromRecordWithComputedOnly(record, true)
+}
+
+// FillFromRecordWithComputedOnly populates TF state from backend record.
+// If computedOnly is true (default behavior), only attributes marked Computed are set.
+// If computedOnly is false, all attributes present in the schema are set when found in the record.
+func (s *TFState) FillFromRecordWithComputedOnly(record Record, computedOnly bool) error {
 	if record == nil {
 		return errors.New("record is nil")
 	}
@@ -538,7 +545,7 @@ func (s *TFState) FillFromRecord(record Record) error {
 		if !ok {
 			continue // silently skip unknown keys
 		}
-		if !s.IsComputed(key) {
+		if computedOnly && !s.IsComputed(key) {
 			// Set only computed fields
 			continue
 		}

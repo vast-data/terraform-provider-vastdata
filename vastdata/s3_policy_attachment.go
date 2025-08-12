@@ -23,6 +23,7 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 		raw,
 		schema,
 		&is.TFStateHints{
+			Importable: &notImportable,
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
 				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid') or a user (identified by 'uid').",
 				SchemaAttributes: map[string]any{
@@ -68,7 +69,7 @@ func (m *S3PolicyAttachment) ValidateResourceConfig(context.Context) error {
 	return validateOneOf(m.tfstate, "gid", "uid")
 }
 
-func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+func (m *S3PolicyAttachment) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
 	return nil, nil
 }
 

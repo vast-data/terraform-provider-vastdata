@@ -4,6 +4,7 @@ package provider
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -153,7 +154,7 @@ type PrepareDeleteResource interface {
 }
 
 type ImportResourceState interface {
-	ImportResourceState(context.Context, *VMSRest) (DisplayableRecord, error)
+	ImportResourceState(context.Context, *VMSRest) error
 }
 
 type CreateResource interface {
