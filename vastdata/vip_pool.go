@@ -23,9 +23,10 @@ func (m *VipPool) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:           VipPoolSchemaRef,
-			ReadOnlyFields:      []string{"serves_tenant"},
-			PreserveOrderFields: []string{"ip_ranges"},
+			SchemaRef:               VipPoolSchemaRef,
+			NotRequiredSchemaFields: []string{"subnet_cidr"},
+			ReadOnlyFields:          []string{"serves_tenant"},
+			PreserveOrderFields:     []string{"ip_ranges"},
 		},
 	)}
 }
