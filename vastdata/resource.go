@@ -40,8 +40,18 @@ func (r *Resource) ManagerWithSchemaOnly(ctx context.Context) (ResourceManager, 
 	if err != nil {
 		return nil, err
 	}
-	// Create a new manager with the schema
-	return r.newManager(nil, *schema), nil
+	// Create a new manager with the schema and empty Raw filled according to schema types
+	// Build a zeroed attr map matching the schema so TFState has all keys with Null values
+	zeroRaw := make(map[string]attr.Value)
+	switch sch := any(*schema).(type) {
+	case rschema.Schema:
+		for k, a := range sch.Attributes {
+			zeroRaw[k], _ = is.BuildAttrValueFromAny(a.GetType(), nil)
+		}
+	default:
+		// Fallback to passing nil Raw if schema kind unexpected
+	}
+	return r.newManager(zeroRaw, *schema), nil
 }
 
 func (r *Resource) NewManager(state any) ResourceManager {

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -434,6 +435,75 @@ func TestImport_CallsReadAndFillsState(t *testing.T) {
 	var name types.String
 	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("name"), &name).HasError())
 	require.Equal(t, "filled", name.ValueString())
+}
+
+// ------------------------------
+// ManagerWithSchemaOnly tests
+// ------------------------------
+
+func TestResource_ManagerWithSchemaOnly_FillsZeroRaw(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":   rschema.Int64Attribute{Optional: true, Computed: true},
+		"name": rschema.StringAttribute{Optional: true, Computed: true},
+	}}
+	r := buildTestResourceWithSchema(schema, &is.TFStateHints{})
+	mgr, err := r.ManagerWithSchemaOnly(context.Background())
+	require.NoError(t, err)
+	tf := mgr.TfState()
+	// keys exist
+	require.True(t, tf.HasAttribute("id"))
+	require.True(t, tf.HasAttribute("name"))
+	// values initialized to Null
+	require.True(t, tf.IsNull("id"))
+	require.True(t, tf.IsNull("name"))
+}
+
+type testDSManager struct{ tf *is.TFState }
+
+func (t *testDSManager) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
+	return t
+}
+func (t *testDSManager) TfState() *is.TFState                      { return t.tf }
+func (t *testDSManager) API(_ *VMSRest) VastResourceAPIWithContext { return nil }
+
+func buildTestDatasourceWithSchema(schema dschema.Schema, hints *is.TFStateHints) *Datasource {
+	return &Datasource{
+		newManager: func(raw map[string]attr.Value, s any) DataSourceManager {
+			localHints := hints
+			if localHints == nil {
+				localHints = &is.TFStateHints{}
+			}
+			localHints.TFStateHintsForCustom = &is.TFStateHintsForCustom{
+				SchemaAttributes: func() map[string]any {
+					out := make(map[string]any, len(schema.Attributes))
+					for k, v := range schema.Attributes {
+						out[k] = v
+					}
+					return out
+				}(),
+			}
+			if s == nil {
+				s = schema
+			}
+			return &testDSManager{tf: is.NewTFStateMust(raw, s, localHints)}
+		},
+		managerName: "test_ds",
+	}
+}
+
+func TestDatasource_ManagerWithSchemaOnly_FillsZeroRaw(t *testing.T) {
+	schema := dschema.Schema{Attributes: map[string]dschema.Attribute{
+		"id":   dschema.Int64Attribute{Optional: true, Computed: true},
+		"name": dschema.StringAttribute{Optional: true, Computed: true},
+	}}
+	d := buildTestDatasourceWithSchema(schema, &is.TFStateHints{})
+	mgr, err := d.ManagerWithSchemaOnly(context.Background())
+	require.NoError(t, err)
+	tf := mgr.TfState()
+	require.True(t, tf.HasAttribute("id"))
+	require.True(t, tf.HasAttribute("name"))
+	require.True(t, tf.IsNull("id"))
+	require.True(t, tf.IsNull("name"))
 }
 
 // --- FillFromRecordWithComputedOnly tests ---
