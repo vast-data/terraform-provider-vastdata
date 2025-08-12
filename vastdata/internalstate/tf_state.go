@@ -530,13 +530,15 @@ func (s *TFState) Type(path string) attr.Type {
 }
 
 func (s *TFState) FillFromRecord(record Record) error {
-	return s.FillFromRecordWithComputedOnly(record, true)
+	return s.FillFromRecordIncludingRequired(record, false)
 }
 
-// FillFromRecordWithComputedOnly populates TF state from backend record.
-// If computedOnly is true (default behavior), only attributes marked Computed are set.
-// If computedOnly is false, all attributes present in the schema are set when found in the record.
-func (s *TFState) FillFromRecordWithComputedOnly(record Record, computedOnly bool) error {
+// FillFromRecordIncludingRequired populates TF state from backend record.
+// Behavior:
+// - Always sets attributes marked Computed.
+// - If includeRequired is true, also sets attributes marked Required (even if not Computed).
+// - Optional non-computed attributes are not set.
+func (s *TFState) FillFromRecordIncludingRequired(record Record, includeRequired bool) error {
 	if record == nil {
 		return errors.New("record is nil")
 	}
@@ -545,9 +547,12 @@ func (s *TFState) FillFromRecordWithComputedOnly(record Record, computedOnly boo
 		if !ok {
 			continue // silently skip unknown keys
 		}
-		if computedOnly && !s.IsComputed(key) {
-			// Set only computed fields
-			continue
+		// Decide whether to set this field
+		if !s.IsComputed(key) {
+			// Not computed: only set if required and includeRequired
+			if !(includeRequired && s.IsRequired(key)) {
+				continue
+			}
 		}
 		val, err := BuildAttrValueFromAny(typ, rawVal)
 		if err != nil {
