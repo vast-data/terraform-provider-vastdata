@@ -33,6 +33,7 @@ resource "vastdata_event_definition" "vastdb_event_definition" {
 - `disable_actions` (Boolean) Set to true to disable alert actions for the event definition.
 - `email_recipients` (Set of String) Comma separated list of email recipients for alarms
 - `enabled` (Boolean) Set to true to enable events, alarms and actions.
+- `id` (Number) Unique identifier for the event definition
 - `internal` (Boolean)
 - `raise_at_count` (Number) Raise an alarm after a specific number of recurrences
 - `severity` (String) The severity of an alarm triggered by this event. INFO means no alarm is triggered.
