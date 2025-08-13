@@ -82,4 +82,29 @@ Optional:
 
 Required:
 
+- `field` (Attributes) Column type (see [below for nested schema](#nestedatt--user_defined_columns--field))
 - `name` (String) Name of the object
+
+<a id="nestedatt--user_defined_columns--field"></a>
+### Nested Schema for `user_defined_columns.field`
+
+Required:
+
+- `column_type` (String)
+- `key_type` (Attributes) Column type for the map key (only when `column_type` is "map") (see [below for nested schema](#nestedatt--user_defined_columns--field--key_type))
+- `value_type` (Attributes) Column type for the map value (only when `column_type` is "map") (see [below for nested schema](#nestedatt--user_defined_columns--field--value_type))
+
+<a id="nestedatt--user_defined_columns--field--key_type"></a>
+### Nested Schema for `user_defined_columns.field.key_type`
+
+Required:
+
+- `column_type` (String) The type of the key (e.g., "string", "bool")
+
+
+<a id="nestedatt--user_defined_columns--field--value_type"></a>
+### Nested Schema for `user_defined_columns.field.value_type`
+
+Required:
+
+- `column_type` (String) The type of the value (e.g., "string", "bool")

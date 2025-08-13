@@ -65,7 +65,7 @@ resource "vastdata_active_directory" "ad1" {
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
 - `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
 - `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory. This parameter is required unless ldap_id is provided.
-- `domains_with_posix_attributes` (String) Allows to enumerate specific domains for POSIX attributes in case posix_attributes_source is set to SPECIFIC_DOMAINS.
+- `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `gid_number` (String) Override 'gidNumber' as the attribute of a group entry that contains the group's GID number. When binding VAST Cluster to AD, you may need to set this to 'gidnumber' (case sensitive).
 - `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
