@@ -70,11 +70,15 @@ type TFStateHints struct {
 	// For instance some resources have field "enabled" that cannot be set to false along with create (POST) request.
 	EditOnlyFields []string
 
-	// DeleteOnlyBodyFields lists body fields that can be provided only during DELETE request.
-	DeleteOnlyBodyFields []string
+	// DeleteOnlyBodyFields maps Terraform attribute names to API body field names
+	// for fields that are only allowed to be sent in DELETE request bodies.
+	// Key: Terraform schema field name; Value: API body field name.
+	DeleteOnlyBodyFields map[string]string
 
-	// DeleteOnlyParamFields lists param fields that can be provided only during DELETE request
-	DeleteOnlyParamFields []string
+	// DeleteOnlyParamFields maps Terraform attribute names to API query parameter names
+	// for fields that are only allowed to be sent as DELETE request query params.
+	// Key: Terraform schema field name; Value: API query parameter name.
+	DeleteOnlyParamFields map[string]string
 
 	// PreserveOrderFields defines fields where the order matters (e.g., for lists instead of sets).
 	PreserveOrderFields []string

@@ -517,8 +517,8 @@ func TestDeleteOnlyParamsAndBody_FromHints(t *testing.T) {
 		"reason":      rschema.StringAttribute{Optional: true},
 	}}
 	hints := &is.TFStateHints{
-		DeleteOnlyBodyFields:  []string{"delete_flag"},
-		DeleteOnlyParamFields: []string{"reason"},
+		DeleteOnlyBodyFields:  map[string]string{"delete_flag": "delete_flag_api"},
+		DeleteOnlyParamFields: map[string]string{"reason": "reason_api"},
 	}
 	r := buildTestResourceWithSchema(schema, hints)
 	mgr, err := r.ManagerWithSchemaOnly(context.Background())
@@ -531,11 +531,11 @@ func TestDeleteOnlyParamsAndBody_FromHints(t *testing.T) {
 
 	// Ensure GetDeleteOnlyBodyParams returns only the body fields
 	body := tf.GetDeleteOnlyBodyParams()
-	require.Equal(t, map[string]any{"delete_flag": "force"}, map[string]any(body))
+	require.Equal(t, map[string]any{"delete_flag_api": "force"}, map[string]any(body))
 
 	// Ensure GetDeleteOnlyQueryParams returns only the param fields
 	qp := tf.GetDeleteOnlyQueryParams()
-	require.Equal(t, map[string]any{"reason": "cleanup"}, map[string]any(qp))
+	require.Equal(t, map[string]any{"reason_api": "cleanup"}, map[string]any(qp))
 }
 
 // --- FillFromRecordWithComputedOnly tests ---
