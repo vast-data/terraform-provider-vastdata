@@ -43,7 +43,7 @@ resource "vastdata_kafka_broker" "vastdb_kafka_broker" {
 <a id="nestedatt--addresses"></a>
 ### Nested Schema for `addresses`
 
-Required:
+Optional:
 
 - `host` (String) IP or hostname of a Kafka broker server
 - `port` (Number) Port of a Kafka broker server

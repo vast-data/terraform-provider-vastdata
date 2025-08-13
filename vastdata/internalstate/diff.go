@@ -50,5 +50,5 @@ func DiffMap[T ~map[string]any](map1, map2 T) map[string]any {
 		}
 	}
 
-	return removeNilValues(diff).(map[string]any)
+	return RemoveNilValues(diff).(map[string]any)
 }

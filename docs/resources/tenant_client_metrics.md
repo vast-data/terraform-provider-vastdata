@@ -28,6 +28,39 @@ resource "vastdata_tenant_client_metrics" "vastdb_tenant_client_metrics" {
 # Complete examples
 # ---------------------
 
+data "vastdata_tenant" "vastdb_tenant" {
+  name = "default"
+}
+
+resource "vastdata_tenant_client_metrics" "vastdb_tenant_client_metrics" {
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
+
+  config = {
+    enabled            = true
+    max_capacity_mb    = 2048
+    retention_time_sec = 172800
+    bucket_owner       = "metrics-user"
+    bucket_name        = "vastdb-metrics"
+  }
+
+  user_defined_columns = [
+    {
+      name = "ENV_USER_ID"
+      field = {
+        column_type = "string"
+      }
+    },
+    {
+      name = "ENV_ACCESS_COUNT"
+      field = {
+        column_type = "int16"
+      }
+    }
+  ]
+}
+
+# --------------------
+
 data "vastdata_user" "vastdb_user" {
   name = "runner"
 }
@@ -88,7 +121,7 @@ Required:
 <a id="nestedatt--user_defined_columns--field"></a>
 ### Nested Schema for `user_defined_columns.field`
 
-Required:
+Optional:
 
 - `column_type` (String)
 - `key_type` (Attributes) Column type for the map key (only when `column_type` is "map") (see [below for nested schema](#nestedatt--user_defined_columns--field--key_type))
@@ -97,7 +130,7 @@ Required:
 <a id="nestedatt--user_defined_columns--field--key_type"></a>
 ### Nested Schema for `user_defined_columns.field.key_type`
 
-Required:
+Optional:
 
 - `column_type` (String) The type of the key (e.g., "string", "bool")
 
@@ -105,6 +138,6 @@ Required:
 <a id="nestedatt--user_defined_columns--field--value_type"></a>
 ### Nested Schema for `user_defined_columns.field.value_type`
 
-Required:
+Optional:
 
 - `column_type` (String) The type of the value (e.g., "string", "bool")

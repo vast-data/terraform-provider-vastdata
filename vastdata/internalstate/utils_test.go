@@ -81,19 +81,19 @@ func TestPartsToStrings_EmptyParts(t *testing.T) {
 
 func TestRemoveNilValues_NestedNilSlice(t *testing.T) {
 	s := []any{nil, []any{nil, 1}, 2}
-	cleaned := removeNilValues(s).([]any)
+	cleaned := RemoveNilValues(s).([]any)
 	require.Equal(t, []any{[]any{1}, 2}, cleaned)
 }
 
 func TestRemoveNilValues_NestedNilMap(t *testing.T) {
 	m := map[string]any{"a": map[string]any{"b": nil, "c": 3}, "d": nil}
-	cleaned := removeNilValues(m).(map[string]any)
+	cleaned := RemoveNilValues(m).(map[string]any)
 	require.Equal(t, map[string]any{"a": map[string]any{"c": 3}}, cleaned)
 }
 
 func TestRemoveNilValues_EmptyMapAndSlice(t *testing.T) {
-	require.Equal(t, map[string]any{}, removeNilValues(map[string]any{}))
-	require.Equal(t, []any{}, removeNilValues([]any{}))
+	require.Equal(t, map[string]any{}, RemoveNilValues(map[string]any{}))
+	require.Equal(t, []any{}, RemoveNilValues([]any{}))
 }
 
 func TestGetType(t *testing.T) {
@@ -173,12 +173,59 @@ func TestRemoveNilValues(t *testing.T) {
 		},
 		"f": []any{nil, "x"},
 	}
-	cleaned := removeNilValues(input).(map[string]any)
+	cleaned := RemoveNilValues(input).(map[string]any)
 
 	require.NotContains(t, cleaned, "a")
 	require.Contains(t, cleaned, "b")
 	require.Equal(t, "value", cleaned["c"].(map[string]any)["e"])
 	require.Equal(t, []any{"x"}, cleaned["f"])
+}
+
+func TestRemoveNilValues_NestedObjectStructure(t *testing.T) {
+	input := map[string]any{
+		"config": map[string]any{
+			"bucket_name":        "vastdb-metrics",
+			"bucket_owner":       "metrics-user",
+			"enabled":            true,
+			"max_capacity_mb":    int64(2048),
+			"retention_time_sec": int64(172800),
+		},
+		"user_defined_columns": []any{
+			map[string]any{
+				"field": map[string]any{
+					"column_type": "integer",
+					"key_type":    nil,
+					"value_type":  nil,
+				},
+				"name": "ENV_ACCESS_COUNT",
+			},
+			map[string]any{
+				"field": map[string]any{
+					"column_type": "string",
+					"key_type":    nil,
+					"value_type":  nil,
+				},
+				"name": "ENV_USER_ID",
+			},
+		},
+	}
+
+	cleaned := RemoveNilValues(input).(map[string]any)
+
+	udc := cleaned["user_defined_columns"].([]any)
+	for _, e := range udc {
+		obj := e.(map[string]any)
+		field := obj["field"].(map[string]any)
+		if _, ok := field["key_type"]; ok {
+			t.Fatalf("key_type should have been removed, found: %v", field["key_type"])
+		}
+		if _, ok := field["value_type"]; ok {
+			t.Fatalf("value_type should have been removed, found: %v", field["value_type"])
+		}
+		if _, ok := field["column_type"]; !ok {
+			t.Fatalf("column_type should remain in field")
+		}
+	}
 }
 
 func TestSet_InstantiateFromNil(t *testing.T) {
