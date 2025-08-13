@@ -25,10 +25,10 @@ func (m *Tenant) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 		schema,
 		&is.TFStateHints{
 			SchemaRef:             TenantSchemaRef,
-			DeleteOnlyParamFields: []string{"force"},
+			DeleteOnlyParamFields: map[string]string{"force_delete": "force"},
 			PreserveOrderFields:   []string{"client_ip_ranges"},
 			AdditionalSchemaAttributes: map[string]any{
-				"force": rschema.BoolAttribute{
+				"force_delete": rschema.BoolAttribute{
 					Optional: true,
 					Description: "If set to true, forces deletion of the tenant even if it has empty subdirectories" +
 						" or other removable remnants. Use with caution, as this will bypass standard cleanup checks.",
