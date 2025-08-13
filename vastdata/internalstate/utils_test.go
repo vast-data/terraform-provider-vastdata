@@ -181,6 +181,53 @@ func TestRemoveNilValues(t *testing.T) {
 	require.Equal(t, []any{"x"}, cleaned["f"])
 }
 
+func TestRemoveNilValues_NestedObjectStructure(t *testing.T) {
+	input := map[string]any{
+		"config": map[string]any{
+			"bucket_name":        "vastdb-metrics",
+			"bucket_owner":       "metrics-user",
+			"enabled":            true,
+			"max_capacity_mb":    int64(2048),
+			"retention_time_sec": int64(172800),
+		},
+		"user_defined_columns": []any{
+			map[string]any{
+				"field": map[string]any{
+					"column_type": "integer",
+					"key_type":    nil,
+					"value_type":  nil,
+				},
+				"name": "ENV_ACCESS_COUNT",
+			},
+			map[string]any{
+				"field": map[string]any{
+					"column_type": "string",
+					"key_type":    nil,
+					"value_type":  nil,
+				},
+				"name": "ENV_USER_ID",
+			},
+		},
+	}
+
+	cleaned := RemoveNilValues(input).(map[string]any)
+
+	udc := cleaned["user_defined_columns"].([]any)
+	for _, e := range udc {
+		obj := e.(map[string]any)
+		field := obj["field"].(map[string]any)
+		if _, ok := field["key_type"]; ok {
+			t.Fatalf("key_type should have been removed, found: %v", field["key_type"])
+		}
+		if _, ok := field["value_type"]; ok {
+			t.Fatalf("value_type should have been removed, found: %v", field["value_type"])
+		}
+		if _, ok := field["column_type"]; !ok {
+			t.Fatalf("column_type should remain in field")
+		}
+	}
+}
+
 func TestSet_InstantiateFromNil(t *testing.T) {
 	var initial []int = nil
 	s := NewSet(initial)

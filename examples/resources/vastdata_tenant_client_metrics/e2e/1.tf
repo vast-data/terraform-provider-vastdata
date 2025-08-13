@@ -15,15 +15,15 @@ resource "vastdata_tenant_client_metrics" "vastdb_tenant_client_metrics" {
 
   user_defined_columns = [
     {
-      name  = "ENV_USER_ID"
+      name = "ENV_USER_ID"
       field = {
         column_type = "string"
       }
     },
     {
-      name  = "ENV_ACCESS_COUNT"
+      name = "ENV_ACCESS_COUNT"
       field = {
-        column_type = "integer"
+        column_type = "int16"
       }
     }
   ]

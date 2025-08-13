@@ -414,8 +414,6 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			// !NOTE: default implementation works only for resources with 'id' field.
 			// For other resources please implement CreateResource to avoid entering this branch.
 			createParamsDiff := diffMap(createParams, record.(Record))
-			// Clean nils recursively to avoid sending nulls
-			createParamsDiff = is.RemoveNilValues(createParamsDiff).(map[string]any)
 			if len(createParamsDiff) > 0 {
 				id, exists := record.(Record)["id"]
 				if !exists {

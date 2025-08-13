@@ -103,6 +103,9 @@ func ensureTenantClientMetricsUpdatedWith(ctx context.Context, stateTs, fieldsTs
 		"config",
 		"user_defined_columns",
 	); ok {
+		// Strip nils recursively to avoid sending nulls in nested objects
+		raw := map[string]any(params)
+		params = is.RemoveNilValues(raw).(map[string]any)
 		// Use the custom API method to update client metrics
 		return rest.Tenants.UpdateClientMetricsWithContext(ctx, tenantId, params)
 	}
