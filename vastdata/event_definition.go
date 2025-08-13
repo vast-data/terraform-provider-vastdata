@@ -29,6 +29,11 @@ func (m *EventDefinition) NewResourceManager(raw map[string]attr.Value, schema a
 		&is.TFStateHints{
 			SchemaRef: EventDefinitionSchemaRef,
 			AdditionalSchemaAttributes: map[string]any{
+				"id": rschema.Int64Attribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "Unique identifier for the event definition",
+				},
 				"name": rschema.StringAttribute{
 					Required:    true,
 					Description: "Name of the event definition",
