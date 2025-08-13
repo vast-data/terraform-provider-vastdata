@@ -59,6 +59,13 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 							stringplanmodifier.RequiresReplace(),
 						},
 					},
+					"tenant_id": rschema.Int64Attribute{
+						Optional:    true,
+						Description: "The ID of the tenant to which the user or group belongs.",
+						PlanModifiers: []planmodifiers.Int64{
+							int64planmodifier.RequiresReplace(),
+						},
+					},
 				},
 			},
 		},
@@ -111,7 +118,7 @@ func (m *S3PolicyAttachment) CreateResource(ctx context.Context, rest *VMSRest) 
 	}
 
 	searchParams := params{key: val}
-	ts.SetToMapIfAvailable(searchParams, "context")
+	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
@@ -167,7 +174,7 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 	}
 
 	searchParams := params{key: val}
-	ts.SetToMapIfAvailable(searchParams, "context")
+	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
@@ -226,7 +233,7 @@ func (m *S3PolicyAttachment) DeleteResource(ctx context.Context, rest *VMSRest) 
 	}
 
 	searchParams := params{key: val}
-	ts.SetToMapIfAvailable(searchParams, "context")
+	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
 		return fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
