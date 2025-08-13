@@ -69,7 +69,8 @@ func addSchemaEntries(
 			warnWithContext(context.Background(), fmt.Sprintf("Skipping ambiguous object schema for field '%s' with no properties", name))
 			continue
 		}
-		fieldRequired := required || contains(requiredFields, name)
+		// Requiredness is determined strictly by this object's required array
+		fieldRequired := contains(requiredFields, name)
 		fieldOptional := optional
 		fieldComputed := computed
 		fieldWriteOnly := writeOnly
@@ -81,6 +82,11 @@ func addSchemaEntries(
 		desc := schema.Description
 		if desc == "" {
 			desc = schema.Title
+		}
+
+		// Ensure at least one flag is set; default to Optional when none provided
+		if !fieldRequired && !fieldOptional && !fieldComputed {
+			fieldOptional = true
 		}
 
 		entry := &SchemaEntry{
@@ -96,7 +102,20 @@ func addSchemaEntries(
 
 		if isObject(schema) && schema.Properties != nil {
 			entry.Children = make(map[string]*SchemaEntry)
-			addSchemaEntries(schema.Properties, schema.Required, hints, entry.Children, fieldRequired, fieldOptional, fieldComputed, fieldWriteOnly, fieldSensitive, fieldOrdered)
+			// Do NOT propagate parent required to children; children requiredness
+			// must be determined solely by the child object's own required array.
+			addSchemaEntries(
+				schema.Properties,
+				schema.Required,
+				hints,
+				entry.Children,
+				false, // required: do not inherit from parent
+				fieldOptional,
+				fieldComputed,
+				fieldWriteOnly,
+				fieldSensitive,
+				fieldOrdered,
+			)
 		}
 
 		target[name] = entry

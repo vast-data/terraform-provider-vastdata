@@ -447,7 +447,7 @@ func (s *TFState) ToSlice(path string) []any {
 	if !ok {
 		s.convPanic(fmt.Sprintf("ToSlice: expected a slice at %q, got %T", path, l))
 	}
-	return removeNilValues(converted).([]any)
+	return RemoveNilValues(converted).([]any)
 }
 
 func (s *TFState) ToMap(path string) map[string]any {
@@ -459,7 +459,7 @@ func (s *TFState) ToMap(path string) map[string]any {
 	if !ok {
 		s.convPanic(fmt.Sprintf("ToMap: expected map[string]any at %q, got %T", path, v))
 	}
-	return removeNilValues(converted).(map[string]any)
+	return RemoveNilValues(converted).(map[string]any)
 }
 
 // SetToMapIfAvailable sets the value at the given path to the provided map
@@ -655,7 +655,7 @@ func (s *TFState) GetFilteredValues(
 	}
 
 	if !searchEmpty {
-		result = removeNilValues(result).(map[string]any)
+		result = RemoveNilValues(result).(map[string]any)
 	}
 	return result
 }
@@ -725,7 +725,7 @@ func (s *TFState) DiffFields(
 	}
 
 	if !searchEmpty {
-		diff = removeNilValues(diff).(map[string]any)
+		diff = RemoveNilValues(diff).(map[string]any)
 	}
 	return diff
 }

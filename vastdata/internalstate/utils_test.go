@@ -81,19 +81,19 @@ func TestPartsToStrings_EmptyParts(t *testing.T) {
 
 func TestRemoveNilValues_NestedNilSlice(t *testing.T) {
 	s := []any{nil, []any{nil, 1}, 2}
-	cleaned := removeNilValues(s).([]any)
+	cleaned := RemoveNilValues(s).([]any)
 	require.Equal(t, []any{[]any{1}, 2}, cleaned)
 }
 
 func TestRemoveNilValues_NestedNilMap(t *testing.T) {
 	m := map[string]any{"a": map[string]any{"b": nil, "c": 3}, "d": nil}
-	cleaned := removeNilValues(m).(map[string]any)
+	cleaned := RemoveNilValues(m).(map[string]any)
 	require.Equal(t, map[string]any{"a": map[string]any{"c": 3}}, cleaned)
 }
 
 func TestRemoveNilValues_EmptyMapAndSlice(t *testing.T) {
-	require.Equal(t, map[string]any{}, removeNilValues(map[string]any{}))
-	require.Equal(t, []any{}, removeNilValues([]any{}))
+	require.Equal(t, map[string]any{}, RemoveNilValues(map[string]any{}))
+	require.Equal(t, []any{}, RemoveNilValues([]any{}))
 }
 
 func TestGetType(t *testing.T) {
@@ -173,7 +173,7 @@ func TestRemoveNilValues(t *testing.T) {
 		},
 		"f": []any{nil, "x"},
 	}
-	cleaned := removeNilValues(input).(map[string]any)
+	cleaned := RemoveNilValues(input).(map[string]any)
 
 	require.NotContains(t, cleaned, "a")
 	require.Contains(t, cleaned, "b")

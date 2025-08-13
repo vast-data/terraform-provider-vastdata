@@ -88,7 +88,7 @@ Required:
 <a id="nestedatt--user_defined_columns--field"></a>
 ### Nested Schema for `user_defined_columns.field`
 
-Required:
+Optional:
 
 - `column_type` (String)
 - `key_type` (Attributes) Column type for the map key (only when `column_type` is "map") (see [below for nested schema](#nestedatt--user_defined_columns--field--key_type))
@@ -97,7 +97,7 @@ Required:
 <a id="nestedatt--user_defined_columns--field--key_type"></a>
 ### Nested Schema for `user_defined_columns.field.key_type`
 
-Required:
+Optional:
 
 - `column_type` (String) The type of the key (e.g., "string", "bool")
 
@@ -105,6 +105,6 @@ Required:
 <a id="nestedatt--user_defined_columns--field--value_type"></a>
 ### Nested Schema for `user_defined_columns.field.value_type`
 
-Required:
+Optional:
 
 - `column_type` (String) The type of the value (e.g., "string", "bool")

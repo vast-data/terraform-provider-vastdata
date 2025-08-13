@@ -155,7 +155,10 @@ func partsToStrings(parts []any) []string {
 	return out
 }
 
-func removeNilValues(v any) any {
+// RemoveNilValues removes nil values recursively from maps and slices.
+// It is safe to use before sending request bodies to avoid serializing nulls.
+// Note: this is a public wrapper to allow usage from provider code.
+func RemoveNilValues(v any) any {
 	switch val := v.(type) {
 	case map[string]any:
 		cleaned := make(map[string]any)
@@ -163,7 +166,7 @@ func removeNilValues(v any) any {
 			if v2 == nil {
 				continue
 			}
-			cleanedVal := removeNilValues(v2)
+			cleanedVal := RemoveNilValues(v2)
 			if cleanedVal != nil {
 				cleaned[k] = cleanedVal
 			}
@@ -173,7 +176,7 @@ func removeNilValues(v any) any {
 	case []any:
 		var cleaned []any
 		for _, item := range val {
-			cleanedItem := removeNilValues(item)
+			cleanedItem := RemoveNilValues(item)
 			if cleanedItem != nil {
 				cleaned = append(cleaned, cleanedItem)
 			}

@@ -142,17 +142,17 @@ func TestPartsToStrings_ConvertsParts(t *testing.T) {
 
 func TestRemoveNilValues_RemovesNilFromMapAndSlice(t *testing.T) {
 	m := map[string]any{"a": 1, "b": nil, "c": map[string]any{"d": nil, "e": 2}}
-	cleaned := removeNilValues(m).(map[string]any)
+	cleaned := RemoveNilValues(m).(map[string]any)
 	require.Equal(t, map[string]any{"a": 1, "c": map[string]any{"e": 2}}, cleaned)
 
 	s := []any{1, nil, 2}
-	cleanedSlice := removeNilValues(s).([]any)
+	cleanedSlice := RemoveNilValues(s).([]any)
 	require.Equal(t, []any{1, 2}, cleanedSlice)
 }
 
 func TestRemoveNilValues_ReturnsDefaultForOtherTypes(t *testing.T) {
-	require.Equal(t, 5, removeNilValues(5))
-	require.Equal(t, "foo", removeNilValues("foo"))
+	require.Equal(t, 5, RemoveNilValues(5))
+	require.Equal(t, "foo", RemoveNilValues("foo"))
 }
 
 func TestEqual_Primitives(t *testing.T) {
