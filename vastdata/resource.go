@@ -699,7 +699,7 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 	}
 
 	// Copy changes from plan to state.
-	planTfState.CopyNonEmptyFieldsTo(tfState)
+	planTfState.CopyKnownFieldsTo(tfState)
 
 	if err = tfState.SetState(ctx, &resp.State); err != nil {
 		resp.Diagnostics.AddError(

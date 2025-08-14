@@ -599,6 +599,21 @@ func (s *TFState) CopyNonEmptyFieldsTo(other *TFState) {
 	}
 }
 
+// CopyKnownFieldsTo copies only known fields from this TFState
+// to another, along with their associated attribute metadata.
+func (s *TFState) CopyKnownFieldsTo(other *TFState) {
+	s.assertEnabled()
+	other.assertEnabled()
+
+	for k, v := range s.Raw {
+		if v.IsUnknown() {
+			continue // skip null or unknown values
+		}
+		other.Raw[k] = v
+		other.Meta[k] = s.Meta[k]
+	}
+}
+
 // GetFilteredValues returns a map of state values filtered by the provided field filter flags.
 //
 // By default, it returns only non-null and known values (i.e., populated fields).
