@@ -69,6 +69,10 @@ func (m *TenantClientMetrics) ReadDatasource(ctx context.Context, rest *VMSRest)
 	return rest.Tenants.GetClientMetricsWithContext(ctx, tenantId)
 }
 
+func (m *TenantClientMetrics) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	return m.ReadDatasource(ctx, rest)
+}
+
 func (m *TenantClientMetrics) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	ts := m.tfstate
 	return ensureTenantClientMetricsUpdatedWith(ctx, ts, ts, rest)
