@@ -11,17 +11,71 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
+
+// sensitiveDataPatterns defines regex patterns for sensitive data that should be sanitized
+var sensitiveDataPatterns = []struct {
+	name    string
+	pattern *regexp.Regexp
+	replace string
+}{
+	{
+		name:    "PGP Public Key",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN PGP PUBLIC KEY BLOCK-----\s*\n.*?\n\s*-----END PGP PUBLIC KEY BLOCK-----`),
+		replace: "-----BEGIN PGP PUBLIC KEY BLOCK-----\n    .\n    .  <content>\n    .\n-----END PGP PUBLIC KEY BLOCK-----",
+	},
+	{
+		name:    "PGP Private Key",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN PGP PRIVATE KEY BLOCK-----\s*\n.*?\n\s*-----END PGP PRIVATE KEY BLOCK-----`),
+		replace: "-----BEGIN PGP PRIVATE KEY BLOCK-----\n    .\n    .  <content>\n    .\n-----END PGP PRIVATE KEY BLOCK-----",
+	},
+	{
+		name:    "X.509 Certificate",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN CERTIFICATE-----\s*\n.*?\n\s*-----END CERTIFICATE-----`),
+		replace: "-----BEGIN CERTIFICATE-----\n    .\n    .  <content>\n    .\n-----END CERTIFICATE-----",
+	},
+	{
+		name:    "X.509 Private Key",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN PRIVATE KEY-----\s*\n.*?\n\s*-----END PRIVATE KEY-----`),
+		replace: "-----BEGIN PRIVATE KEY-----\n    .\n    .  <content>\n    .\n-----END PRIVATE KEY-----",
+	},
+	{
+		name:    "RSA Private Key",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN RSA PRIVATE KEY-----\s*\n.*?\n\s*-----END RSA PRIVATE KEY-----`),
+		replace: "-----BEGIN RSA PRIVATE KEY-----\n    .\n    .  <content>\n    .\n-----END RSA PRIVATE KEY-----",
+	},
+	{
+		name:    "DSA Private Key",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN DSA PRIVATE KEY-----\s*\n.*?\n\s*-----END DSA PRIVATE KEY-----`),
+		replace: "-----BEGIN DSA PRIVATE KEY-----\n    .\n    .  <content>\n    .\n-----END DSA PRIVATE KEY-----",
+	},
+	{
+		name:    "EC Private Key",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN EC PRIVATE KEY-----\s*\n.*?\n\s*-----END EC PRIVATE KEY-----`),
+		replace: "-----BEGIN EC PRIVATE KEY-----\n    .\n    .  <content>\n    .\n-----END EC PRIVATE KEY-----",
+	},
+	{
+		name:    "OpenSSH Private Key",
+		pattern: regexp.MustCompile(`(?s)-----BEGIN OPENSSH PRIVATE KEY-----\s*\n.*?\n\s*-----END OPENSSH PRIVATE KEY-----`),
+		replace: "-----BEGIN OPENSSH PRIVATE KEY-----\n    .\n    .  <content>\n    .\n-----END OPENSSH PRIVATE KEY-----",
+	},
+	{
+		name:    "SSH2 Private Key",
+		pattern: regexp.MustCompile(`(?s)---- BEGIN SSH2 PRIVATE KEY ----\s*\n.*?\n\s*---- END SSH2 PRIVATE KEY ----`),
+		replace: "---- BEGIN SSH2 PRIVATE KEY ----\n    .\n    .  <content>\n    .\n---- END SSH2 PRIVATE KEY ----",
+	},
+}
 
 func main() {
 	baseDirs := []struct {
 		path   string
 		output string
 	}{
-		{"examples/resources", "resource.tf"},
-		{"examples/data-sources", "data-source.tf"},
+		{"../examples/resources", "resource.tf"},
+		{"../examples/data-sources", "data-source.tf"},
 	}
 
 	for _, base := range baseDirs {
@@ -109,17 +163,42 @@ func appendCleaned(builder *strings.Builder, path string) (bool, error) {
 
 	scanner := bufio.NewScanner(f)
 	var hasContent bool
+	var content strings.Builder
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.Contains(line, "Copyright (c) HashiCorp") {
 			continue
 		}
-		builder.WriteString(line + "\n")
+		content.WriteString(line + "\n")
 		if strings.TrimSpace(line) != "" {
 			hasContent = true
 		}
 	}
-	return hasContent, scanner.Err()
+
+	if err := scanner.Err(); err != nil {
+		return false, err
+	}
+
+	// Sanitize sensitive data
+	sanitizedContent := sanitizeSensitiveData(content.String())
+	builder.WriteString(sanitizedContent)
+
+	return hasContent, nil
+}
+
+// sanitizeSensitiveData replaces sensitive data with placeholder content
+func sanitizeSensitiveData(content string) string {
+	sanitized := content
+
+	for _, pattern := range sensitiveDataPatterns {
+		if pattern.pattern.MatchString(sanitized) {
+			fmt.Printf("Sanitized %s in content\n", pattern.name)
+			sanitized = pattern.pattern.ReplaceAllString(sanitized, pattern.replace)
+		}
+	}
+
+	return sanitized
 }
 
 // hasUncommentedNonEmptyLine returns true if the file contains at least one
