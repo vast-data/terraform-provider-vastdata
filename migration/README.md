@@ -41,7 +41,6 @@ VastData provider **2.0** uses the new Terraform Plugin Framework and includes b
 3. **Updates attribute names**: `type_` → `type`, `permissions_list` → `permissions`
 4. **Converts schema structures**: Block lists to attributes, IP ranges, etc.
 5. **Preserves dynamic blocks** (requires manual review)
-6. **Validates results** with `terraform init` and `terraform apply`
 
 ### Example Transformation
 
