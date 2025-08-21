@@ -23,6 +23,12 @@ The VastData Terraform provider is a provider to manage VastData clusters [resou
         - [Building Into A Differant directory](#building-into-a-differant-directory)
     - [Using Local Copy Using dev_overrides](#using-local-copy-using-dev_overrides)
         - [Edit ~/.terraformrc file](#edit-terraformrc-file)
+    - [Importing Existing Resources](#importing-existing-resources)
+        - [Import Formats](#import-formats)
+        - [Import Field Types](#import-field-types)
+        - [Examples](#examples)
+        - [Troubleshooting Import](#troubleshooting-import)
+        - [Finding Import Fields](#finding-import-fields)
     - [Submitting Bugs/Feature Requests](#submitting-bugsfeature-requests)
 
 <!-- markdown-toc end -->
@@ -136,6 +142,87 @@ skip_ssl_verify = true
 version_validation_mode = "warn"
 }
 ```
+
+## Importing Existing Resources
+
+The VastData provider supports importing existing resources using various ID formats, including composite keys for resources that require multiple identifiers.
+
+### Import Formats
+
+#### 1. Simple ID Import
+For resources that use a single identifier:
+```bash
+terraform import vastdata_example.my_resource "12345"
+```
+
+#### 2. Key-Value Pairs Import
+For resources requiring multiple fields, use key=value format with comma or semicolon separators:
+```bash
+# Using comma separator
+terraform import vastdata_example.my_resource "gid=1001,tenant_id=22,context=ad"
+
+# Using semicolon separator  
+terraform import vastdata_example.my_resource "gid=1001;tenant_id=22;context=ad"
+```
+
+#### 3. Ordered Values Import (Pipe-separated)
+For resources with predefined import field order, use pipe-separated values:
+```bash
+terraform import vastdata_example.my_resource "1001|22|ad"
+```
+
+### Import Field Types
+
+The provider automatically handles type conversion for imported values:
+
+- **String fields**: Values are imported as-is
+- **Integer fields**: Numeric strings are converted to integers
+- **Boolean fields**: Accepts `true`, `false`, `1`, or `0`
+
+### Examples
+
+#### Import a User with Multiple Identifiers
+```bash
+# Key-value format
+terraform import vastdata_user.admin "username=admin,tenant_id=1,domain=local"
+
+# Ordered format (if resource supports it)
+terraform import vastdata_user.admin "admin|1|local"
+```
+
+#### Import a Quota with Composite Key
+```bash
+terraform import vastdata_quota.project_quota "name=project1,path=/data/project1,tenant_id=5"
+```
+
+#### Import a Network Interface
+```bash
+terraform import vastdata_network_interface.eth0 "name=eth0,node_id=1"
+```
+
+### Troubleshooting Import
+
+**Error: "field 'x' is not present in the resource schema"**
+- Ensure the field name matches exactly what's defined in the resource schema
+- Check the resource documentation for correct field names
+
+**Error: "expected X values for fields [...], got Y"**
+- When using pipe-separated format, ensure the number of values matches the expected import fields
+- Use key=value format instead if you need to specify only some fields
+
+**Error: "invalid int64 for field 'x'"**
+- Ensure numeric fields contain valid integer values
+- Check for extra spaces or non-numeric characters
+
+### Finding Import Fields
+
+To determine which fields are required for importing a specific resource:
+
+1. Check the resource documentation
+2. Look at the resource's required attributes
+3. Use `terraform plan` after creating a minimal resource configuration to see required fields
+4. Refer to the VastData API documentation for the underlying resource identifiers
+
 # Submitting Bugs/Feature Requests
 
 While it is common to submit Bugs/Feature Requests using github issues,
