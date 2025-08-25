@@ -34,18 +34,38 @@ VastData provider **2.0** uses the new Terraform Plugin Framework and includes b
 ./run_migration.sh --clean
 ```
 
+After conversion, **you** need to:
+1. Review the converted files
+2. Run `terraform validate` 
+3. Run `terraform plan`
+4. Run `terraform apply` (if you're satisfied with the changes)
+
 ### What It Does
 
-1. **Automatically detects** and sets up Python 3.9+ environment
+This tool **ONLY** converts your Terraform configuration files:
+
+1. **Updates provider version**: `version = "1.7.0"` → `version = "2.0.0"`
 2. **Transforms resource types**: `vastdata_administators_managers` → `vastdata_administrator_manager`
 3. **Updates attribute names**: `type_` → `type`, `permissions_list` → `permissions`
 4. **Converts schema structures**: Block lists to attributes, IP ranges, etc.
-5. **Preserves dynamic blocks** (requires manual review)
+5. **Preserves dynamic blocks** (may need manual review)
+6. **Updates resource references** throughout your files
+
+**This tool handles all the tedious file conversion work for you, so you can focus on reviewing and applying the changes.**
 
 ### Example Transformation
 
 **Before (Provider 1.x):**
 ```hcl
+terraform {
+  required_providers {
+    vastdata = {
+      source = "vast-data/vastdata"
+      version = "1.7.0"
+    }
+  }
+}
+
 resource "vastdata_administators_managers" "admin" {
   username         = "admin1"
   permissions_list = ["create_support", "create_settings"]
@@ -59,6 +79,15 @@ resource "vastdata_administators_managers" "admin" {
 
 **After (Provider 2.0):**
 ```hcl
+terraform {
+  required_providers {
+    vastdata = {
+      source = "vast-data/vastdata"
+      version = "2.0.0"
+    }
+  }
+}
+
 resource "vastdata_administrator_manager" "admin" {
   username    = "admin1"
   permissions = ["create_support", "create_settings"]
@@ -70,12 +99,51 @@ resource "vastdata_administrator_manager" "admin" {
 }
 ```
 
-## Important Notes
+## 🔧 FILE CONVERSION CAPABILITIES
 
-- **Backup** your configurations before migration
-- **Review** converted files carefully
-- **Test** with provider 2.0 before production use
-- **Dynamic blocks** are preserved unchanged and may need manual review
+**Smart Terraform configuration converter for VastData provider v2.0 migration.**
+
+The conversion tool:
+- ✅ **Updates** VastData provider version from 1.x.x to 2.0.0
+- ✅ **Converts** your `.tf` configuration files to the new format
+- ✅ **Saves** converted files with new names (keeps originals safe)  
+- ✅ **Updates** all resource references automatically
+- ✅ **Handles** complex schema transformations intelligently
+- ✅ **Preserves** your file structure and formatting
+
+**You maintain complete control over when and how to apply the converted configurations.**
+
+## Streamlined Conversion Workflow
+
+### 1. Prepare for Migration
+- **💾 Backup** your Terraform files and state
+- **📊 Document** your current infrastructure
+
+### 2. Convert Your Files
+```bash
+./run_migration.sh /path/to/old/configs /path/to/converted/configs
+```
+
+**What happens:**
+- All `.tf` files are automatically converted to v2.0 format
+- Converted files saved with `_converted.tf` suffix  
+- Original files remain untouched
+- Resource references updated throughout your configurations
+
+### 3. Review and Deploy
+- **🔍 Review** converted files (see exactly what changed)
+- **📊 Validate** syntax with `terraform validate`
+- **👀 Preview** changes with `terraform plan`
+- **🧪 Test** in staging environment
+- **🚀 Deploy** with `terraform apply`
+
+## Best Practices
+
+- **🧪 Test first** in staging before production deployment
+- **💾 Keep backups** of your Terraform state and configuration files
+- **🔍 Review changes** to understand what was converted
+- **🚀 Use provider 2.0** for all new configurations after migration
+- **🔧 Check dynamic blocks** - these are preserved as-is and may need adjustment
 
 ## Support
 
@@ -265,13 +333,38 @@ Rename resources in `.tf` files using find-and-replace:
 - `vastdata_kafka_brokers` → `vastdata_kafka_broker`
 
 ## Validation and Testing
-1. Run `terraform validate` to check for syntax errors.
-2. Run `terraform plan` to preview changes and ensure correctness.
-3. Run `terraform apply` to apply the updated configurations.
-4. Monitor for errors and verify resources in your VAST infrastructure.
 
-## Notes
-- *Backup*: Always keep a backup of your original `.tf` files.
-- *Documentation*: Check the VAST plugin v2.0.0 docs for specific attribute formats (e.g., `cnode_ids` string format).
-- *Testing*: Test in a non-production environment if possible.
-- *Support*: Contact VAST support for complex cases or issues.
+### After File Conversion (Your Responsibility)
+After the converter finishes, you must:
+1. **Review converted files** - Check each file for correctness
+2. **Test in staging** - Apply in a non-production environment first
+3. **Run `terraform plan`** - Verify planned changes match expectations
+4. **Manual `terraform apply`** - Only after thorough review and testing
+
+### Common Validation Issues and Solutions
+
+**Error: "Provider configuration not found"**
+- Ensure your `terraform` block includes the new VastData provider v2.0 configuration
+- Update your provider source to the correct version
+
+**Error: "Resource not found" during plan**
+- This may be expected if you're migrating to new resource types
+- Review the resource rename mappings in the migration summary
+
+**Error: "Invalid attribute name"** 
+- Check for dynamic blocks that may need manual adjustment
+- Verify attribute transformations are correct for your use case
+
+**Error: "Type mismatch"**
+- Some attributes change types (e.g., list of numbers → comma-separated string)
+- Review the transformed values to ensure they match expected format
+
+## 🚀 Migration Success Tips
+
+- **💾 Prepare thoroughly**: Backup files, state, and document your current setup
+- **📖 Stay informed**: Review VastData provider v2.0.0 documentation for new features
+- **🧪 Test confidently**: Use staging environments to validate conversions
+- **🔍 Review systematically**: Understand each change before applying
+- **📞 Leverage support**: VastData support team is available for complex scenarios
+- **⏱️ Plan strategically**: Schedule appropriate maintenance windows
+- **📋 Be prepared**: Have rollback procedures ready for peace of mind

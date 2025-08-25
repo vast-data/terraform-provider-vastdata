@@ -4,11 +4,10 @@
 import os
 import sys
 import re
-import subprocess
 from pathlib import Path
 import argparse
 
-VERSION = "1.1.0"
+VERSION = "1.2.1"
 
 # Resource type rename map (old → new)
 resource_type_rename_map = {
@@ -43,7 +42,7 @@ key_groups = {
     "Block List --> List of Maps": ["addresses", "group_quotas", "user_quotas"],
     "List of Number --> Set of Number": ["roles", "s3_policies_ids", "gids", "tenants"],
     "Block List --> List of List of String": ["client_ip_ranges", "ip_ranges"],
-    "List of Number --> String": ["cnode_ids", "active_cnode_ids"],
+    "List of Number --> String": ["active_cnode_ids"],
     "List of String --> Set of String": [
         "object_types", "ldap_groups", "permissions_list", "groups", "users",
         "abac_tags", "hosts", "abe_protocols", "bucket_creators", "bucket_creators_groups",
@@ -53,6 +52,28 @@ key_groups = {
 
 # Reverse lookup for key group by key (attribute-focused)
 key_to_group = {k: g for g, keys in key_groups.items() for k in keys}
+
+# Attributes to remove entirely (no longer supported or read-only in v2.0)
+attributes_to_remove = {
+    # Unsupported arguments
+    "s3_bucket_full_control",
+    
+    # Read-only attributes that should not be set
+    "tenant_name",
+    "smb_directory_mode_padded", 
+    "smb_file_mode_padded",
+    "log_username",
+    "log_hostname",
+    "log_full_path", 
+    "log_deleted",
+    "enable_snapshot_lookup",
+    "enable_listing_of_snapshot_dir",
+    "data_modify",
+    "data_create_delete",
+    "data_read", 
+    "cluster",
+    "count_views",
+}
 
 def get_group_for_key(key):
     # Exact attribute key match
@@ -101,13 +122,16 @@ def transform_resource_block(lines, i):
     ##########
     # Split the first line to get the resource type
     parts = transformed[0].split()
+    current_resource_type = None
     if len(parts) > 1:
         resource_type = parts[1]  # This includes quotes, e.g., "vastdata_resource"
         resource_type_clean = resource_type.strip('"')  # Remove quotes for lookup
+        current_resource_type = resource_type_clean
         # Check if the resource type is in the resource_type_rename_map
         new_resource_type = resource_type_rename_map.get(resource_type_clean)
         if new_resource_type:
             transformed[0] = transformed[0].replace(resource_type_clean, new_resource_type)
+            current_resource_type = new_resource_type
     while j < len(body_lines):
         line = body_lines[j]
         stripped = line.strip()
@@ -217,12 +241,23 @@ def transform_resource_block(lines, i):
             indent, attr_key, value_expr = assign.groups()
             original_attr_key = attr_key
             
+            # Skip attributes that should be removed entirely
+            if attr_key in attributes_to_remove:
+                j += 1
+                continue
+
             # Handle attribute name changes
             if attr_key == "type_":
                 attr_key = "type"
-            elif attr_key == "permissions_list":
+            elif attr_key == "use32bit_fileid":
+                attr_key = "use_32bit_fileid"
+            elif attr_key == "permissions_list" and current_resource_type != "vastdata_administrator_manager":
+                # For most resources: permissions_list -> permissions
                 attr_key = "permissions"
-            
+            elif attr_key == "permissions" and current_resource_type == "vastdata_administrator_manager":
+                # For administrator_manager specifically: permissions -> permissions_list
+                attr_key = "permissions_list"
+
             group = get_group_for_key(attr_key)
             if group == "List of Number --> String":
                 # Handle multi-line list by collecting all content until closing bracket
@@ -326,6 +361,48 @@ def transform_data_block(lines, i):
     
     return "".join(block), j - i
 
+def transform_terraform_block(lines, i):
+    """Transform terraform blocks to update VastData provider version from 1.x.x to 2.0.0."""
+    if not lines[i].strip().startswith("terraform "):
+        return None, 0
+
+    # Collect the entire terraform block
+    block = []
+    brace_level = 0
+    j = i
+    while j < len(lines):
+        block.append(lines[j])
+        brace_level += lines[j].count("{") - lines[j].count("}")
+        j += 1
+        if brace_level == 0:
+            break
+
+    transformed_block = []
+    provider_version_updated = False
+    
+    for line in block:
+        # Look for vastdata provider version lines
+        # Match patterns like: version = "1.7.0" or version = "1.x.x"
+        version_match = re.search(r'(\s*version\s*=\s*")(1\.\d+\.\d+)(")', line)
+        if version_match:
+            # Check if we're within a vastdata provider block by looking at surrounding context
+            block_str = "".join(block)
+            # Look for vastdata provider context
+            if 'vastdata' in block_str and 'vast-data/vastdata' in block_str:
+                # Update version from 1.x.x to 2.0.0
+                updated_line = line.replace(version_match.group(2), "2.0.0")
+                transformed_block.append(updated_line)
+                provider_version_updated = True
+                continue
+        
+        transformed_block.append(line)
+    
+    # Only return transformed content if we actually updated something
+    if provider_version_updated:
+        return "".join(transformed_block), j - i
+    else:
+        return None, 0
+
 def transform_file(input_path: Path, output_path: Path):
     with open(input_path, "r") as f:
         lines = f.readlines()
@@ -346,6 +423,12 @@ def transform_file(input_path: Path, output_path: Path):
                 transformed_lines.append(tr)
                 i += consumed
                 continue
+        elif line.strip().startswith("terraform "):
+            tr, consumed = transform_terraform_block(lines, i)
+            if consumed:
+                transformed_lines.append(tr)
+                i += consumed
+                continue
         transformed_lines.append(line)
         i += 1
 
@@ -358,51 +441,59 @@ def transform_file(input_path: Path, output_path: Path):
     with open(output_path, "w") as f:
         f.write(content)
 
-def terraform_apply(file_path: Path):
-    work_dir = file_path.parent
 
-    print(f"\nRunning 'terraform init' in {work_dir}")
-    result_init = subprocess.run(["terraform", "init", "-input=false"], cwd=work_dir, capture_output=True, text=True)
-    if result_init.returncode != 0:
-        print(f"terraform init failed:\n{result_init.stderr}")
-        return False
-    print(result_init.stdout)
-
-    print(f"Running 'terraform apply' on {file_path.name}")
-    result_apply = subprocess.run(["terraform", "apply", "-auto-approve", file_path.name], cwd=work_dir, capture_output=True, text=True)
-    if result_apply.returncode != 0:
-        print(f"terraform apply failed:\n{result_apply.stderr}")
-        return False
-    print(result_apply.stdout)
-    return True
 
 def main(src_folder, dst_folder):
     src_folder = Path(src_folder)
     dst_folder = Path(dst_folder)
 
     if not src_folder.is_dir():
-        print(f"Source folder '{src_folder}' does not exist or is not a directory")
+        print(f"❌ Source folder '{src_folder}' does not exist or is not a directory")
         sys.exit(1)
 
     dst_folder.mkdir(parents=True, exist_ok=True)
+    
+    print("🚀 VastData Terraform File Converter")
+    print("=" * 50)
+    print(f"📂 Source: {src_folder}")
+    print(f"📁 Output: {dst_folder}")
+    print("=" * 50)
+
+    converted_files = []
 
     for tf_file in src_folder.rglob("*.tf"):
         relative_path = tf_file.relative_to(src_folder)
         output_file = dst_folder / relative_path.with_name(tf_file.stem + "_converted.tf")
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        print(f"\nConverting {tf_file} -> {output_file}")
+        print(f"🔄 Converting {tf_file} -> {output_file}")
         transform_file(tf_file, output_file)
+        converted_files.append(output_file)
 
-        # Run terraform apply to verify
-        success = terraform_apply(output_file)
-        if not success:
-            print(f"Apply failed for {output_file}")
-        else:
-            print(f"Apply succeeded for {output_file}")
+    # Print summary
+    print("\n" + "=" * 60)
+    print("📋 CONVERSION COMPLETE")
+    print("=" * 60)
+    
+    print(f"✅ Files converted: {len(converted_files)}")
+    print(f"📁 Output location: {dst_folder}")
+    
+    print("\n" + "⚠️ " * 20)
+    print("📋 NEXT STEPS - USER ACTION REQUIRED")
+    print("⚠️ " * 20)
+    print("1. 🔍 Review each converted file carefully")
+    print("2. 💾 Backup your terraform state files") 
+    print("3. ✅ Run 'terraform validate' to check syntax")
+    print("4. 📋 Run 'terraform plan' to preview changes")
+    print("5. 🧪 Test in non-production environment first")
+    print("6. 🚀 Run 'terraform apply' only after thorough review")
+    print("⚠️ " * 20)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert and apply Terraform files in a folder.")
+    parser = argparse.ArgumentParser(
+        description="Convert Terraform files for VastData provider v2.0 migration. "
+                   "Performs file conversion only - user must validate and apply manually."
+    )
     parser.add_argument("src_folder", nargs="?", help="Source folder containing .tf files")
     parser.add_argument("dst_folder", nargs="?", help="Destination folder for converted files")
     parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")

@@ -75,7 +75,7 @@ class TestRealCustomerScenarios:
             assert 'permissions_list = [' not in content
     
     def test_vip_pool_cnode_ids_transformation(self, vast_terraform_dir, temp_migration_dirs):
-        """Test that cnode_ids lists are converted to comma-separated strings."""
+        """Test that cnode_ids lists remain as lists (no conversion to strings)."""
         src_dir, dst_dir = temp_migration_dirs
         
         vip_pools_tf = vast_terraform_dir / "vip_pools.tf"
@@ -92,10 +92,11 @@ class TestRealCustomerScenarios:
             
             content = converted_file.read_text()
             
-            # Check cnode_ids transformations from multi-line lists to strings
-            assert 'cnode_ids = "1,2"' in content
-            assert 'cnode_ids = "3,4"' in content  
-            assert 'cnode_ids = "1,2,3,4"' in content
+            # Check cnode_ids remain as lists (not converted to strings)
+            assert 'cnode_ids         = [' in content or 'cnode_ids = [' in content
+            # Verify the lists contain the expected values
+            assert '1,' in content and '2,' in content  # from first pool
+            assert '3,' in content and '4,' in content  # from second pool
             
             # Check IP ranges are still transformed correctly
             assert 'ip_ranges = [' in content
@@ -103,8 +104,8 @@ class TestRealCustomerScenarios:
             assert '["10.66.20.141", "10.66.20.148"]' in content
             assert '["192.168.55.20", "192.168.55.30"]' in content
             
-            # Ensure old multi-line format is not present
-            assert 'cnode_ids         = [' not in content
+            # Note: cnode_ids should remain as lists (multi-line format preserved)
+            # Only active_cnode_ids should be converted to strings if present
     
     def test_view_policy_list_attributes(self, vast_terraform_dir, temp_migration_dirs):
         """Test that view policy list attributes are preserved correctly."""

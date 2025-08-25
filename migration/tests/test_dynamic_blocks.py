@@ -189,8 +189,8 @@ class TestDynamicBlocks:
         assert 'dynamic "client_ip_ranges" {' in result
         assert 'for_each = var.ip_ranges' in result
         
-        # Check static list is transformed
-        assert 'cnode_ids = "1,2,3"' in result
+        # Check static list remains as list (cnode_ids should not be converted to string)
+        assert 'cnode_ids = [1, 2, 3]' in result
     
     def test_dynamic_block_with_comments(self):
         """Test that dynamic blocks with comments are preserved."""
@@ -336,7 +336,7 @@ resource "vastdata_kafka_brokers" "broker1" {
         
         # Check static transformations occurred
         assert 'capacity_limits = {' in result
-        assert 'cnode_ids = "1,2,3"' in result
+        assert 'cnode_ids = [1, 2, 3]' in result  # cnode_ids should remain as list
         
         # Check dynamic blocks were preserved
         assert 'dynamic "client_ip_ranges" {' in result
