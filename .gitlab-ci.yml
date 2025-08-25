@@ -213,14 +213,13 @@ e2e_terraform_sanity:
     TRIGGER: "lb_terraform_sanity [from-upstream]"
 
 
-# TODO: need to add GITLAB_USER_EMAIL, GITLAB_USER_NAME, and GITHUB_TOKEN variables to the CI/CD settings in GitLab.
 release_terraform_plugin:
   image:
     name: alpine/git
     entrypoint: [""]
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: manual
+#  rules:
+#    - if: '$CI_COMMIT_TAG'
+#      when: manual
   stage: release
   before_script:
     - git config --global user.email "$GITLAB_USER_EMAIL"
@@ -244,14 +243,14 @@ release_terraform_plugin:
     
     TARGET_BRANCH=main
     git remote add github https://oauth2:$GITHUB_TOKEN@github.com/vast-data/terraform-provider-vastdata.git || true    
-    git fetch github $TARGET_BRANCH
-    git checkout -B $TARGET_BRANCH FETCH_HEAD
-    git checkout $CI_COMMIT_SHA -- .
-    git commit --allow-empty -am "Terraform Plugin - $TAG
     
-      (from $CI_COMMIT_SHA)"
+    # Fetch complete history from GitLab (in case of shallow clone)
+    git fetch --unshallow origin || true
+    git fetch origin --tags
     
-    git push -f --tags github HEAD:$TARGET_BRANCH
+    # Push the complete main branch and tags to GitHub
+    git push github origin/main:$TARGET_BRANCH --force-with-lease
+    git push github --tags --force
   when: manual
   tags:
     - vast-dev-builder
