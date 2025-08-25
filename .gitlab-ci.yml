@@ -248,8 +248,11 @@ release_terraform_plugin:
     git fetch --unshallow origin || true
     git fetch origin --tags
     
-    # Push the complete main branch and tags to GitHub
-    git push github origin/main:$TARGET_BRANCH --force-with-lease
+    # Fetch current state from GitHub to avoid stale info
+    git fetch github $TARGET_BRANCH || true
+    
+    # Push the complete main branch and tags to GitHub (force push for mirroring)
+    git push github origin/main:$TARGET_BRANCH --force
     git push github --tags --force
   when: manual
   tags:
