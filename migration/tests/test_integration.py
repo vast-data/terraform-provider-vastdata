@@ -23,7 +23,50 @@ class TestIntegration:
     
     def test_migration_script_version(self):
         """Test that the migration script version is correctly defined."""
-        assert VERSION == "1.1.0"
+        assert VERSION == "1.2.1"
+    
+    def test_provider_version_update(self, temp_dir):
+        """Test that VastData provider version is updated from 1.x.x to 2.0.0."""
+        # Create input file with provider version 1.x.x
+        terraform_content = '''terraform {
+  required_providers {
+    vastdata = {
+      source = "vast-data/vastdata"
+      version = "1.7.0"
+    }
+  }
+}
+
+provider "vastdata" {
+  host = "192.168.1.100"
+}
+
+resource "vastdata_administators_managers" "admin" {
+  username = "admin1"
+}
+'''
+        input_file = temp_dir / "main.tf"
+        input_file.write_text(terraform_content)
+        
+        # Run transformation
+        output_file = temp_dir / "main_converted.tf"
+        transform_file(input_file, output_file)
+        
+        # Read and verify output
+        result = output_file.read_text()
+        
+        # Verify provider version was updated
+        assert 'version = "2.0.0"' in result
+        assert 'version = "1.7.0"' not in result
+        
+        # Verify resource was also transformed
+        assert 'resource "vastdata_administrator_manager"' in result
+        assert 'resource "vastdata_administators_managers"' not in result
+        
+        # Verify provider block structure is preserved
+        assert 'source = "vast-data/vastdata"' in result
+        assert 'required_providers' in result
+        assert 'host = "192.168.1.100"' in result
     
     def test_end_to_end_single_file_migration(self, temp_dir):
         """Test complete migration of a single file."""
@@ -143,7 +186,7 @@ resource "vastdata_active_directory2" "ad" {
         # Test schema transformations
         assert 'capacity_limits = {' in result
         assert 'frames = [' in result
-        assert 'cnode_ids = "1,2,3,4"' in result
+        assert 'cnode_ids = [1, 2, 3, 4]' in result  # cnode_ids should remain as list
         assert 'client_ip_ranges = [' in result
         assert '["192.168.1.1", "192.168.1.100"]' in result
         assert '["10.0.0.1", "10.0.0.50"]' in result
@@ -236,7 +279,7 @@ variable "admin_settings" {
         storage_result = (dst_dir / "modules" / "storage" / "main_converted.tf").read_text()
         assert "vastdata_kafka_broker" in storage_result
         assert 'client_ip_ranges = [' in storage_result
-        assert 'cnode_ids = "1,2,3"' in storage_result
+        assert 'cnode_ids = [1, 2, 3]' in storage_result  # cnode_ids should remain as list
     
     def test_migration_preserves_file_structure(self, temp_dir):
         """Test that migration preserves the original file and directory structure."""

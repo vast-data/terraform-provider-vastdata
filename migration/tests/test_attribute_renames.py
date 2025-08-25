@@ -130,12 +130,12 @@ class TestAttributeRenames:
         
         assert result is not None
         # Check that complex expressions are preserved
-        assert 'permissions = concat(' in result
+        assert 'permissions_list = concat(' in result  # administrator_manager uses permissions_list
         assert 'var.additional_permissions' in result
         assert 'type = var.s3_type != null ? var.s3_type : "CUSTOM_S3"' in result
     
-    def test_no_change_for_correct_attribute_names(self):
-        """Test that already correct attribute names are not modified."""
+    def test_administrator_manager_permissions_rename(self):
+        """Test that permissions is converted to permissions_list for vastdata_administrator_manager."""
         terraform_content = '''resource "vastdata_administrator_manager" "manager" {
   username = "test-manager"
   permissions = ["read", "write"]
@@ -147,12 +147,11 @@ class TestAttributeRenames:
         result, consumed = transform_resource_block(lines, 0)
         
         assert result is not None
-        # Check that correct attributes are unchanged
-        assert 'permissions = ["read", "write"]' in result
+        # Check that permissions is converted to permissions_list for administrator_manager
+        assert 'permissions_list = ["read", "write"]' in result
         assert 'type = "STANDARD"' in result
-        # Should not add underscore
-        assert 'permissions_list' not in result
-        assert 'type_' not in result
+        # Should not have the old attribute name
+        assert 'permissions = ["read", "write"]' not in result
     
     def test_attribute_rename_in_nested_blocks(self):
         """Test that attribute renames work within nested blocks."""
@@ -177,11 +176,10 @@ class TestAttributeRenames:
         assert result is not None
         # Check that nested attribute renames work
         assert 'type = "CUSTOM"' in result
-        assert 'permissions = ["admin"]' in result
+        assert 'permissions_list = ["admin"]' in result  # administrator_manager uses permissions_list
         assert 'type = "INCREMENTAL"' in result
         # Originals should be gone
         assert 'type_' not in result
-        assert 'permissions_list' not in result
     
     def test_file_level_attribute_renames(self, temp_dir):
         """Test attribute renames work at the file level with multiple resources."""
@@ -227,12 +225,11 @@ resource "vastdata_administators_managers" "manager1" {
         assert "vastdata_administrator_manager" in result
         
         # Check attribute renames
-        assert 'permissions = ["create_support", "create_settings"]' in result
+        assert 'permissions = ["create_support", "create_settings"]' in result  # administrator_role uses permissions
         assert 'type = "AWS_S3"' in result
-        assert 'permissions = ["create_monitoring"]' in result
+        assert 'permissions_list = ["create_monitoring"]' in result  # administrator_manager uses permissions_list
         
         # Check originals are gone
-        assert 'permissions_list' not in result
         assert 'type_' not in result
         
         # Check that unchanged resources remain unchanged
