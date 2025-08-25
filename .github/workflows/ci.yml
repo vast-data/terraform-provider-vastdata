@@ -7,7 +7,7 @@ on:
     branches: [ main, terraform_plugin_framework_based_provider ]
 
 env:
-  GO_VERSION: '1.22'
+  GO_VERSION: '1.24'
 
 jobs:
   test:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go-version: ['1.21', '1.22']
+        go-version: ['1.23', '1.24']
     
     steps:
     - name: Check out code

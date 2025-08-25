@@ -819,7 +819,7 @@ func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.
 			val := strings.TrimSpace(kvPair[1])
 			kv[key] = val
 		}
-	} else {
+	} else if strings.Contains(s, "|") {
 		// Handle ordered pipe-separated values
 		values := strings.Split(s, "|")
 		if len(values) != len(fields) {
@@ -827,6 +827,13 @@ func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.
 		}
 		for i, f := range fields {
 			kv[f] = strings.TrimSpace(values[i])
+		}
+	} else {
+		// Handle single token - treat as "id" field
+		if tfState.HasAttribute("id") {
+			kv["id"] = s
+		} else {
+			return fmt.Errorf("single token provided but no 'id' field available in schema")
 		}
 	}
 
