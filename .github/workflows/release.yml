@@ -58,6 +58,10 @@ jobs:
         mkdir -p dist
         PLATFORMS="linux/amd64 darwin/amd64 darwin/arm64 windows/amd64"
         
+        # Extract version without 'v' prefix
+        VERSION="${{ github.ref_name }}"
+        VERSION_NO_V="${VERSION#v}"
+        
         for PLATFORM in $PLATFORMS; do
           OS=$(echo $PLATFORM | cut -d/ -f1)
           ARCH=$(echo $PLATFORM | cut -d/ -f2)
@@ -67,7 +71,7 @@ jobs:
           fi
         
           OUT_DIR="dist/${OS}_${ARCH}"
-          BIN_NAME="terraform-provider-vastdata_${{ github.ref_name }}_${OS}_${ARCH}${EXT}"
+          BIN_NAME="terraform-provider-vastdata_${{ github.ref_name }}${EXT}"
         
           mkdir -p "$OUT_DIR"
           echo "Building for $OS/$ARCH"
@@ -78,13 +82,17 @@ jobs:
           # Create provider package structure for Terraform Registry
           (
             cd "$OUT_DIR"
-            zip "../terraform-provider-vastdata_${{ github.ref_name }}_${OS}_${ARCH}.zip" "$BIN_NAME"
+            zip "../terraform-provider-vastdata_${VERSION_NO_V}_${OS}_${ARCH}.zip" "$BIN_NAME"
           )
         done
 
     - name: Generate provider manifest
       run: |
-        cat > dist/terraform-provider-vastdata_${{ github.ref_name }}_manifest.json << 'EOF'
+        # Extract version without 'v' prefix
+        VERSION="${{ github.ref_name }}"
+        VERSION_NO_V="${VERSION#v}"
+        
+        cat > dist/terraform-provider-vastdata_${VERSION_NO_V}_manifest.json << 'EOF'
         {
           "version": 1,
           "metadata": {
@@ -96,13 +104,23 @@ jobs:
     - name: Generate checksums
       run: |
         cd dist
-        sha256sum *.zip > terraform-provider-vastdata_${{ github.ref_name }}_SHA256SUMS
-        cat terraform-provider-vastdata_${{ github.ref_name }}_SHA256SUMS
+        # Extract version without 'v' prefix
+        VERSION="${{ github.ref_name }}"
+        VERSION_NO_V="${VERSION#v}"
+        
+        # Generate checksums for zip files and manifest
+        sha256sum *.zip *.json > terraform-provider-vastdata_${VERSION_NO_V}_SHA256SUMS
+        cat terraform-provider-vastdata_${VERSION_NO_V}_SHA256SUMS
 
     - name: Sign checksums
       run: |
         cd dist
-        gpg --detach-sign --armor terraform-provider-vastdata_${{ github.ref_name }}_SHA256SUMS
+        # Extract version without 'v' prefix
+        VERSION="${{ github.ref_name }}"
+        VERSION_NO_V="${VERSION#v}"
+        
+        # Generate binary (not ASCII armored) signature as required by HashiCorp Registry
+        gpg --detach-sign terraform-provider-vastdata_${VERSION_NO_V}_SHA256SUMS
 
     - name: Get Latest Tag
       run: echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
