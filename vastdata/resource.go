@@ -790,6 +790,7 @@ func (r *Resource) validateConfigImpl(ctx context.Context, req resource.Validate
 // parseAndApplyCompositeImport parses a composite import string into values for the given fields
 // and invokes set(key, value) with properly typed Terraform attr values.
 // Accepted formats:
+//   - key=value pairs separated by ',' (e.g., "gid=1001,tenant_id=22,context=ad")
 //   - ordered values separated by '|' matching fields order
 func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.TFState, set func(string, attr.Value)) error {
 	kv := make(map[string]string)
@@ -798,13 +799,35 @@ func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.
 		return fmt.Errorf("empty import id")
 	}
 
-	// Ordered values: caller must ensure '|' is present
-	values := strings.Split(s, "|")
-	if len(values) != len(fields) {
-		return fmt.Errorf("expected %d values for fields %v, got %d", len(fields), fields, len(values))
-	}
-	for i, f := range fields {
-		kv[f] = strings.TrimSpace(values[i])
+	if strings.Contains(s, "=") {
+		// Handle key=value comma-separated format
+		sep := ","
+		if strings.Contains(s, ";") {
+			sep = ";"
+		}
+		parts := strings.Split(s, sep)
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			kvPair := strings.SplitN(p, "=", 2)
+			if len(kvPair) != 2 {
+				return fmt.Errorf("segment %q is not in key=value form", p)
+			}
+			key := strings.TrimSpace(kvPair[0])
+			val := strings.TrimSpace(kvPair[1])
+			kv[key] = val
+		}
+	} else {
+		// Handle ordered pipe-separated values
+		values := strings.Split(s, "|")
+		if len(values) != len(fields) {
+			return fmt.Errorf("expected %d values for fields %v, got %d", len(fields), fields, len(values))
+		}
+		for i, f := range fields {
+			kv[f] = strings.TrimSpace(values[i])
+		}
 	}
 
 	// Set parsed fields with type coercion and schema validation

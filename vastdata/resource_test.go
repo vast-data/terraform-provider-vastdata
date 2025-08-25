@@ -272,7 +272,30 @@ func (t *testManager) NewDatasourceManager(raw map[string]attr.Value, schema any
 func (t *testManager) TfState() *is.TFState                      { return t.tf }
 func (t *testManager) API(_ *VMSRest) VastResourceAPIWithContext { return nil }
 func (t *testManager) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
-	return nil, nil
+	// Return a record based on current state for testing
+	record := make(Record)
+
+	// Add id if present in state
+	if t.tf.HasAttribute("id") && !t.tf.IsNull("id") {
+		if t.tf.Type("id").Equal(types.Int64Type) {
+			record["id"] = t.tf.Int64("id")
+		} else if t.tf.Type("id").Equal(types.StringType) {
+			record["id"] = t.tf.String("id")
+		}
+	}
+
+	// Add other common test attributes
+	for _, attr := range []string{"name", "gid", "tenant_id", "context"} {
+		if t.tf.HasAttribute(attr) && !t.tf.IsNull(attr) {
+			if t.tf.Type(attr).Equal(types.Int64Type) {
+				record[attr] = t.tf.Int64(attr)
+			} else if t.tf.Type(attr).Equal(types.StringType) {
+				record[attr] = t.tf.String(attr)
+			}
+		}
+	}
+
+	return record, nil
 }
 
 // build a Resource whose ManagerWithSchemaOnly uses custom schema (no OpenAPI)
