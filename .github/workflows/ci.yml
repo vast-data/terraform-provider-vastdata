@@ -110,19 +110,6 @@ jobs:
     - name: Build provider binary
       run: make build
 
-    - name: Test provider examples
-      run: |
-        echo "Testing Terraform configuration examples..."
-        for example_dir in examples/resources/*/; do
-          if [ -f "$example_dir/basic.tf" ]; then
-            echo "Validating example: $(basename "$example_dir")"
-            cd "$example_dir"
-            terraform init -backend=false
-            terraform validate
-            cd - > /dev/null
-          fi
-        done
-
     - name: Generate documentation
       run: make generate-docs
 

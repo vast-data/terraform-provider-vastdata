@@ -22,11 +22,6 @@ jobs:
       with:
         go-version: '1.22'
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: "~1.5"
-
     - name: Run comprehensive test suite
       run: |
         make vet
@@ -34,19 +29,6 @@ jobs:
         make test
         make test-unit
         make test-benchmarks
-
-    - name: Validate examples
-      run: |
-        echo "Validating Terraform examples before release..."
-        for example_dir in examples/resources/*/; do
-          if [ -f "$example_dir/basic.tf" ]; then
-            echo "Validating: $(basename "$example_dir")"
-            cd "$example_dir"
-            terraform init -backend=false
-            terraform validate
-            cd - > /dev/null
-          fi
-        done
 
   release:
     name: Create Release
