@@ -49,6 +49,10 @@ data "vastdata_vms" "vastdb_vms_by_name" {
 - `login_banner` (String) The login banner for the VMS Web UI and CLI, if customized.
 - `max_api_tokens_per_user` (Number) Max active API tokens allowed per VMS user
 - `mgmt_cnode` (String) The name of the CNode currently running VMS
+- `mgmt_data_interface` (String) Management Data Interface name for L3 networks
+- `mgmt_data_netmask` (String) Management Data Interface Netmask for L3 networks
+- `mgmt_data_vip` (String) Management Data Interface VIP for L3 networks
+- `mgmt_data_vip_vlan` (String) Management Data Interface VLAN for L3 networks
 - `mgmt_inner_vip` (String) A virtual IP on the internal network used for mounting the VMS database.
 - `mgmt_inner_vip_cnode` (String) The CNode currently hosting virtual IP on the internal network used for mounting the VMS database (mgmt_inner_vip).
 - `mgmt_ip` (String) The external management IP of the management CNode, the CNode currently hosting VMS

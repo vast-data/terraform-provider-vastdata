@@ -1,9 +1,16 @@
+## 2.1.0
+
+ENHANCEMENTS:
+
+* **vastdata_vip_pool**: Added client monitoring support for VIP pool connectivity monitoring
+* **vastdata_volume**: Added volume monitoring capabilities
+* **vastdata_vms**: Added management data interface configuration for L3 networks
+
 ## 2.0.1
 
 BUG FIXES:
 
-* **vastdata_nonlocal_user**: Fixed `uid` and `vid` attributes being incorrectly marked as non computed for nonlocal_user resource
-
+* **vastdata_nonlocal_user**: Fixed `uid` and `vid` attributes being incorrectly marked as non computed for nonlocal_user resour
 ## 2.0.0
 
 NOTES:

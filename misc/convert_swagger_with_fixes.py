@@ -25,6 +25,7 @@ import tempfile
 import subprocess
 from pathlib import Path
 from ruamel.yaml import YAML
+from ruamel.yaml.timestamp import TimeStamp
 
 class SwaggerConverter:
     def __init__(self, input_file, output_dir="/tmp/apiconv", debug=False, auto_fix=True):
@@ -55,8 +56,19 @@ class SwaggerConverter:
         }
         print(f"{icons.get(level, '')} {message}")
 
+    def convert_timestamps(self, obj):
+        """Recursively convert TimeStamp objects to strings for JSON serialization"""
+        if isinstance(obj, TimeStamp):
+            return str(obj)
+        elif isinstance(obj, dict):
+            return {k: self.convert_timestamps(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self.convert_timestamps(item) for item in obj]
+        else:
+            return obj
+
     def yaml_to_json(self):
-        """Convert YAML to JSON with duplicate key handling"""
+        """Convert YAML to JSON with duplicate key handling and TimeStamp fix"""
         try:
             self.log(f"Converting YAML to JSON: {self.input_file}")
             
@@ -65,6 +77,10 @@ class SwaggerConverter:
             
             with open(self.input_file, "r") as f:
                 data = yaml.load(f)
+            
+            # Convert TimeStamp objects to strings to avoid JSON serialization errors
+            data = self.convert_timestamps(data)
+            self.log("Converted TimeStamp objects to strings for JSON compatibility", "fix")
             
             with open(self.swagger_json, "w") as f:
                 json.dump(data, f, indent=2)

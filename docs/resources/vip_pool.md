@@ -123,6 +123,7 @@ resource "vastdata_vip_pool" "vastdata_vip_pool_ipv6" {
 - `active_interfaces` (Number) Number of active interfaces
 - `bgp_config_guid` (String) BGP Configuration GUID
 - `bgp_config_name` (String) BGP Configuration Name
+- `client_monitoring_ips` (Set of Set of String) External client monitoring IP ranges for VIP pool connectivity monitoring
 - `cluster` (String) Parent cluster
 - `cnodes` (Set of String) Names of cnodes comprising cnode group
 - `guid` (String) Global unique ID

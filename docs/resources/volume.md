@@ -62,6 +62,7 @@ resource "vastdata_volume" "vastdb_volume" {
 
 - `capacity` (Number) The amount of data written to the volume.
 - `id` (Number) Volume ID
+- `is_monitored` (Boolean) Is this volume live monitored (default - False).
 - `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
 - `mapped_block_hosts_preview` (String) Mapped block hosts preview.
 - `namespace_id` (Number) Available for mapped volumes, the namespace ID as used by hosts to search the volume within the subsystem. Each namespace ID is unique within the subsystem. If a volume snapshot is mapped to any host(s), a snapshot volume is created with its own namespace ID.

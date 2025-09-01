@@ -29,6 +29,7 @@ data "vastdata_volume" "vastdb_volume_by_name" {
 
 - `capacity` (Number) The amount of data written to the volume.
 - `id` (Number) Volume ID
+- `is_monitored` (Boolean) Is this volume live monitored (default - False).
 - `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
 - `mapped_block_hosts_preview` (String) Mapped block hosts preview.
 - `name` (String) The path to the volume relative to the view path.
