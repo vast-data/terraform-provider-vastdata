@@ -106,11 +106,16 @@ func safeDeepEqual(expected, actual any) (diff []string, panicked bool) {
 // Returns an error if more than one field is set.
 func validateOneOf(tf *is.TFState, fields ...string) error {
 	var setFields []string
+	var fieldDeclared bool
 
 	for _, field := range fields {
 		if tf.IsKnownAndNotNull(field) {
+			fieldDeclared = true
 			setFields = append(setFields, field)
 		}
+	}
+	if !fieldDeclared {
+		return fmt.Errorf("one of %q must be set", fields)
 	}
 
 	if len(setFields) > 1 {
