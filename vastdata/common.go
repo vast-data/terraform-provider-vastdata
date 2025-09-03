@@ -16,17 +16,24 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/go-test/deep"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
-	"net/http"
-	"strings"
 )
 
 var notImportable = false
+
+// ProviderData contains the client and configuration passed from the provider
+type ProviderData struct {
+	Client             *VMSRest
+	SkipRefreshAPICall bool
+}
 
 // Rest Client
 type (

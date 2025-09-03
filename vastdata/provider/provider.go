@@ -4,6 +4,8 @@ package provider
 
 import (
 	"context"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
@@ -12,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	vsd "github.com/vast-data/terraform-provider-vastdata/vastdata"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
-	"time"
 )
 
 var _ provider.Provider = &VastProvider{}
@@ -29,6 +30,7 @@ type VastProviderModel struct {
 	Password              types.String `tfsdk:"password"`
 	ApiToken              types.String `tfsdk:"api_token"`
 	VersionValidationMode types.String `tfsdk:"version_validation_mode"`
+	SkipRefreshAPICall    types.Bool   `tfsdk:"skip_refresh_api_call"`
 }
 
 func New(
@@ -80,6 +82,13 @@ func (p *VastProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp 
 				Optional:            true,
 				MarkdownDescription: "Version validation mode: 'strict' or 'warn'.",
 			},
+			"skip_refresh_api_call": schema.BoolAttribute{
+				Optional: true,
+				MarkdownDescription: "Skip API calls during refresh and use current tfstate instead." +
+					" Useful for offline or performance-critical scenarios. Default is false. " +
+					"**Warning:** When enabled, it is assumed the user will manage the entire resource lifecycle via Terraform only." +
+					" Manual changes made through browser UI or other software will not be detected, as the provider will not refresh state from the backend.",
+			},
 		},
 	}
 }
@@ -112,6 +121,7 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	if validationMode == "" {
 		validationMode = "warn"
 	}
+	skipRefreshAPICall := boolOr(config.SkipRefreshAPICall, "VASTDATA_SKIP_REFRESH_API_CALL", false)
 
 	// Generic timeout. Should be enough for all API operations.
 	restTimeout := time.Minute * 4
@@ -126,8 +136,12 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
-	resp.ResourceData = vmsRest
-	resp.DataSourceData = vmsRest
+	providerData := &vsd.ProviderData{
+		Client:             vmsRest,
+		SkipRefreshAPICall: skipRefreshAPICall,
+	}
+	resp.ResourceData = providerData
+	resp.DataSourceData = providerData
 }
 
 func (p *VastProvider) Resources(_ context.Context) []func() resource.Resource {

@@ -391,7 +391,7 @@ type TransformResponseRecord interface {
 
 The updated OpenAPI schema must be saved as api.tar.gz and placed in the following path:
 
-- `vastdata/client/api/5.3.0/api.tar.gz`
+- `vastdata/client/api/api.tar.gz`
 
 Assuming you have Orion cloned locally, run:
 
@@ -408,7 +408,7 @@ After running this command, you should see the following two files in your curre
 - api.tar.gz
 
 We only need api.tar.gz.
-Move it to: `vastdata/client/api/5.3.0/api.tar.gz`
+Move it to: `vastdata/client/api/api.tar.gz`
 
 ##### Make sure newly generated shema can be parsed properly
 

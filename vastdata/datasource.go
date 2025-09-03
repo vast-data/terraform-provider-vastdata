@@ -18,9 +18,9 @@ import (
 )
 
 type Datasource struct {
-	newManager  DatasourceFactoryFn
-	client      *VMSRest
-	managerName string
+	newManager   DatasourceFactoryFn
+	providerData *ProviderData
+	managerName  string
 }
 
 func (d *Datasource) EmptyManager() DataSourceManager {
@@ -104,17 +104,29 @@ func (d *Datasource) schemaImpl(ctx context.Context, _ datasource.SchemaRequest,
 	resp.Schema = manager.TfState().Schema.(dschema.Schema)
 }
 
-func (d *Datasource) configureImpl(_ context.Context, req datasource.ConfigureRequest, _ *datasource.ConfigureResponse) {
+func (d *Datasource) configureImpl(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Check if the provider data is provided
 	if req.ProviderData == nil {
 		return
 	}
-	d.client = req.ProviderData.(*VMSRest)
+
+	// Extract the provider data
+	providerData, ok := req.ProviderData.(*ProviderData)
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Datasource Configure Type",
+			fmt.Sprintf("Expected *ProviderData, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+		return
+	}
+
+	d.providerData = providerData
 }
 
 func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var (
 		manager     = d.NewManager(req.Config)
-		rest        = d.client
+		rest        = d.providerData.Client
 		managerName = d.managerName
 		tfState     = manager.TfState()
 		record      DisplayableRecord
@@ -202,7 +214,7 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 
 func (d *Datasource) getRecordBySearchParams(ctx context.Context, manager DataSourceManager, op string) (DisplayableRecord, error) {
 	var (
-		rest        = d.client
+		rest        = d.providerData.Client
 		managerName = d.managerName
 		tfState     = manager.TfState()
 		api         = manager.API(rest)

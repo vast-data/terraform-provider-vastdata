@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	//go:embed api/**/*
+	//go:embed api/*
 	FS             embed.FS
 	openApiDocOnce sync.Once
 	openApiDoc     *openapi3.T
@@ -36,7 +36,7 @@ var (
 //   - Errors encountered during the initial load are also cached and returned on subsequent calls.
 func loadOpenAPIDocOnce() (*openapi3.T, error) {
 	openApiDocOnce.Do(func() {
-		data, err := FS.ReadFile("api/5.3.0/api.tar.gz")
+		data, err := FS.ReadFile("api/api.tar.gz")
 		if err != nil {
 			openApiDocErr = fmt.Errorf("read embedded tar.gz: %w", err)
 			return

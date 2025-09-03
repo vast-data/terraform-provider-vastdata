@@ -23,9 +23,9 @@ import (
 )
 
 type Resource struct {
-	newManager  ResourceFactoryFn
-	client      *VMSRest
-	managerName string
+	newManager   ResourceFactoryFn
+	providerData *ProviderData
+	managerName  string
 }
 
 func (r *Resource) EmptyManager() ResourceManager {
@@ -157,16 +157,28 @@ func (r *Resource) schemaImpl(ctx context.Context, _ resource.SchemaRequest, res
 	resp.Schema = manager.TfState().Schema.(rschema.Schema)
 }
 
-func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureRequest, _ *resource.ConfigureResponse) {
+func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Check if the provider data is provided
 	if req.ProviderData == nil {
 		return
 	}
-	r.client = req.ProviderData.(*VMSRest)
+
+	// Extract the provider data
+	providerData, ok := req.ProviderData.(*ProviderData)
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *ProviderData, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+		return
+	}
+
+	r.providerData = providerData
 }
 
 func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	var (
-		rest        = r.client
+		rest        = r.providerData.Client
 		manager, _  = r.ManagerWithSchemaOnly(ctx)
 		managerName = r.managerName
 		tfState     = manager.TfState()
@@ -325,7 +337,7 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 
 func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var (
-		rest              = r.client
+		rest              = r.providerData.Client
 		manager           = r.NewManager(req.Plan)
 		api               = manager.API(rest)
 		managerName       = r.managerName
@@ -500,7 +512,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 
 func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var (
-		rest        = r.client
+		rest        = r.providerData.Client
 		manager     = r.NewManager(req.State)
 		managerName = r.managerName
 		tfState     = manager.TfState()
@@ -532,9 +544,16 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 		tflog.Debug(ctx, fmt.Sprintf("ReadResource[%s]: do.", managerName))
 		record, err = imp.ReadResource(ctx, rest)
 	} else {
-		// Delegate to the default read implementation
-		tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
-		record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
+		// Check if we should skip API calls and use current tfstate
+		if r.providerData.SkipRefreshAPICall {
+			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: skip API call, using current tfstate as record.", managerName))
+			// Convert current tfstate to map[string]any and use as record
+			record = Record(tfState.GetAllValues())
+		} else {
+			// Delegate to the default read implementation
+			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
+			record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
+		}
 	}
 
 	if err != nil {
@@ -597,7 +616,7 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 
 func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var (
-		rest        = r.client
+		rest        = r.providerData.Client
 		stateManger = r.NewManager(req.State)
 		planManager = r.NewManager(req.Plan) // Planned changes to the resource (only diff fields)
 		tfState     = stateManger.TfState()
@@ -712,7 +731,7 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 
 func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var (
-		rest        = r.client
+		rest        = r.providerData.Client
 		manager     = r.NewManager(req.State)
 		tfState     = manager.TfState()
 		managerName = r.managerName
@@ -865,7 +884,7 @@ func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.
 
 func (r *Resource) getRecordBySearchParams(ctx context.Context, manager, planManager ResourceManager, op string) (DisplayableRecord, error) {
 	var (
-		rest                    = r.client
+		rest                    = r.providerData.Client
 		managerName             = r.managerName
 		tfState                 = manager.TfState()
 		planTfState *is.TFState = nil
@@ -881,7 +900,7 @@ func (r *Resource) getRecordBySearchParams(ctx context.Context, manager, planMan
 
 func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager ResourceManager, op string) error {
 	var (
-		rest        = r.client
+		rest        = r.providerData.Client
 		managerName = r.managerName
 		tfState     = manager.TfState()
 		api         = manager.API(rest)
