@@ -155,7 +155,7 @@ For resources that use a single identifier:
 terraform import vastdata_example.my_resource "12345"
 ```
 
-#### 2. Key-Value Pairs Import
+#### 2. Key-Value Pairs Import (Recommended)
 For resources requiring multiple fields, use key=value format with comma or semicolon separators:
 ```bash
 # Using comma separator
@@ -165,11 +165,7 @@ terraform import vastdata_example.my_resource "gid=1001,tenant_id=22,context=ad"
 terraform import vastdata_example.my_resource "gid=1001;tenant_id=22;context=ad"
 ```
 
-#### 3. Ordered Values Import (Pipe-separated)
-For resources with predefined import field order, use pipe-separated values:
-```bash
-terraform import vastdata_example.my_resource "1001|22|ad"
-```
+**This is the recommended import format** as it is explicit, order-independent, and allows you to specify only the required fields without needing to know a specific field order.
 
 ### Import Field Types
 
@@ -179,15 +175,36 @@ The provider automatically handles type conversion for imported values:
 - **Integer fields**: Numeric strings are converted to integers
 - **Boolean fields**: Accepts `true`, `false`, `1`, or `0`
 
+### Legacy Import Format (Pipe-separated)
+
+**This section is for backward compatibility with provider version 1.7 only.**
+
+A limited set of resources still support the legacy pipe-separated import format for backward compatibility. This format requires all values to be provided in a specific order and is **not recommended** for new configurations.
+
+#### Supported Resources with Legacy Format
+
+Only the following resources support pipe-separated imports:
+
+- **`vastdata_nonlocal_user`**: `username|context|tenant_id`
+- **`vastdata_nonlocal_group`**: `groupname|context|tenant_id`  
+- **`vastdata_view_policy`**: `name|tenant_name`
+- **`vastdata_view`**: `path|tenant_name`
+
+#### Legacy Format Usage
+
+```bash
+# Example: Import a nonlocal user (not recommended - use key=value instead)
+terraform import vastdata_nonlocal_user.example "admin|ldap|1"
+
+# Example: Import a view (not recommended - use key=value instead)  
+terraform import vastdata_view.example "/data/project|tenant1"
+```
+
 ### Examples
 
 #### Import a User with Multiple Identifiers
 ```bash
-# Key-value format
 terraform import vastdata_user.admin "username=admin,tenant_id=1,domain=local"
-
-# Ordered format (if resource supports it)
-terraform import vastdata_user.admin "admin|1|local"
 ```
 
 #### Import a Quota with Composite Key

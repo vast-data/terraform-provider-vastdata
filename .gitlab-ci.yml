@@ -218,42 +218,48 @@ release_terraform_plugin:
     name: alpine/git
     entrypoint: [""]
   rules:
-    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_TAG'   # run only on tag pipelines
       when: manual
   stage: release
   before_script:
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
   script: |
-    set -x
-    
-    # Ensure this tag was created from the main branch
-    echo "Checking if tag was created from main branch..."
-    git fetch origin main:main
-    TAG=$(git describe --tags --abbrev=0)
-    
-    # Check if the tag points to a commit that exists in main branch
-    if ! git merge-base --is-ancestor $CI_COMMIT_SHA main; then
-      echo "❌ Error: Tag $TAG was not created from the main branch"
-      echo "Tags for release must be created from the main branch only"
-      exit 1
+    set -euxo pipefail
+
+    # Ensure we have full history & all refs
+    git fetch --all --tags --prune || true
+    git fetch --unshallow || true
+
+    TAG="${CI_COMMIT_TAG}"
+    COMMIT_SHA="${CI_COMMIT_SHA}"
+
+    echo "Tag: $TAG"
+    echo "Commit: $COMMIT_SHA"
+
+    # Detect a branch on origin that contains this commit (pick the first; fallback to default)
+    TARGET_BRANCH="$(git branch -r --contains "$COMMIT_SHA" | sed -n 's|  origin/||p' | grep -v '^HEAD$' | head -n1 || true)"
+    if [ -z "${TARGET_BRANCH:-}" ]; then
+      TARGET_BRANCH="${CI_DEFAULT_BRANCH}"
+      echo "No unique branch contains commit, falling back to default branch: $TARGET_BRANCH"
+    else
+      echo "Detected target branch containing the commit: $TARGET_BRANCH"
     fi
-    
-    echo "✅ Tag $TAG was created from main branch, proceeding with release..."
-    
-    TARGET_BRANCH=main
-    git remote add github https://oauth2:$GITHUB_TOKEN@github.com/vast-data/terraform-provider-vastdata.git || true    
-    
-    # Fetch complete history from GitLab (in case of shallow clone)
-    git fetch --unshallow origin || true
+
+    # Add GitHub remote
+    git remote add github "https://oauth2:${GITHUB_TOKEN}@github.com/vast-data/terraform-provider-vastdata.git" || true
+
+    # Refresh remote state to avoid staleness
     git fetch origin --tags
-    
-    # Fetch current state from GitHub to avoid stale info
-    git fetch github $TARGET_BRANCH || true
-    
-    # Push the complete main branch and tags to GitHub (force push for mirroring)
-    git push github origin/main:$TARGET_BRANCH --force
+    git fetch origin "$TARGET_BRANCH" || true
+    git fetch github "$TARGET_BRANCH" || true
+
+    # Mirror the detected branch and tags to GitHub
+    git push github "origin/${TARGET_BRANCH}:${TARGET_BRANCH}" --force
     git push github --tags --force
+
+    echo "✅ Pushed branch '${TARGET_BRANCH}' and all tags to GitHub."
   when: manual
   tags:
     - vast-dev-builder
+
