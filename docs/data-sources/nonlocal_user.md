@@ -58,7 +58,7 @@ data "vastdata_nonlocal_user" "vastdb_nonlocal_user_by_sid" {
 - `s3_vid` (Number)
 - `sid` (String)
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
-- `uid` (String) NFS UID
+- `uid` (Number)
 - `username` (String) username
 - `vid` (String) Vast user ID
 

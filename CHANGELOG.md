@@ -1,3 +1,10 @@
+## 2.0.1
+
+BUG FIXES:
+
+* **vastdata_nonlocal_user**: Fixed `uid` field type from String to Number in data source to match API specification
+* **vastdata_nonlocal_group**: Added missing `provider_type` field to data source documentation
+
 ## 2.0.0
 
 NOTES:

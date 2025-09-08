@@ -36,6 +36,7 @@ data "vastdata_nonlocal_group" "nonlocal_group_by_sid" {
 - `context` (String) The provider to query
 - `gid` (Number) The gid of the non-local group.
 - `groupname` (String) Groupname
+- `provider_type` (String)
 - `sid` (String) The sid of the non-local group.
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 - `vaid` (String) Group VAID (a VAST identifier for groups)
