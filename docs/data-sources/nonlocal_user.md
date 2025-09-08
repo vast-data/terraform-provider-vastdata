@@ -60,7 +60,7 @@ data "vastdata_nonlocal_user" "vastdb_nonlocal_user_by_sid" {
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 - `uid` (Number)
 - `username` (String) username
-- `vid` (String) Vast user ID
+- `vid` (Number)
 
 ### Read-Only
 
