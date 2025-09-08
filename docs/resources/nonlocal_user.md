@@ -99,7 +99,7 @@ resource "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
 - `tenant_id` (Number) Tenant ID
 - `uid` (Number) User UID
 - `username` (String) User name
-- `vid` (String) Vast user ID
+- `vid` (Number) Vast user ID
 
 ### Read-Only
 

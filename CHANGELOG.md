@@ -2,8 +2,7 @@
 
 BUG FIXES:
 
-* **vastdata_nonlocal_user**: Fixed `uid` field type from String to Number in data source to match API specification
-* **vastdata_nonlocal_group**: Added missing `provider_type` field to data source documentation
+* **vastdata_nonlocal_user**: Fixed `uid` and `vid` attributes being incorrectly marked as non computed for nonlocal_user resource
 
 ## 2.0.0
 
