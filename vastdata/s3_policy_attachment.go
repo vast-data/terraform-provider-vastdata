@@ -116,7 +116,10 @@ func (m *S3PolicyAttachment) ensurePolicyIDAndGUID(ctx context.Context, rest *VM
 	return 0, fmt.Errorf("either s3_policy_id or s3_policy_guid must be provided")
 }
 
-func (m *S3PolicyAttachment) ValidateResourceConfig(context.Context) error {
+// validateS3PolicyAttachmentConfig validates that exactly one of gid/uid is set and
+// exactly one of s3_policy_id/s3_policy_guid is set. This validation is performed
+// at runtime when resource references can be resolved.
+func (m *S3PolicyAttachment) validateS3PolicyAttachmentConfig() error {
 	if err := validateOneOf(m.tfstate, "gid", "uid"); err != nil {
 		return err
 	}
@@ -124,7 +127,6 @@ func (m *S3PolicyAttachment) ValidateResourceConfig(context.Context) error {
 		return err
 	}
 	return nil
-
 }
 
 func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -201,6 +203,11 @@ func (m *S3PolicyAttachment) CreateResource(ctx context.Context, rest *VMSRest) 
 		s3PolicyId int64
 		err        error
 	)
+
+	// Validate configuration now that resource references are resolved
+	if err := m.validateS3PolicyAttachmentConfig(); err != nil {
+		return nil, err
+	}
 
 	// Ensure both s3_policy_id and s3_policy_guid are set
 	s3PolicyId, err = m.ensurePolicyIDAndGUID(ctx, rest, ts)

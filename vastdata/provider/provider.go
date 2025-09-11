@@ -30,7 +30,6 @@ type VastProviderModel struct {
 	Password              types.String `tfsdk:"password"`
 	ApiToken              types.String `tfsdk:"api_token"`
 	VersionValidationMode types.String `tfsdk:"version_validation_mode"`
-	SkipRefreshAPICall    types.Bool   `tfsdk:"skip_refresh_api_call"`
 }
 
 func New(
@@ -82,13 +81,6 @@ func (p *VastProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp 
 				Optional:            true,
 				MarkdownDescription: "Version validation mode: 'strict' or 'warn'.",
 			},
-			"skip_refresh_api_call": schema.BoolAttribute{
-				Optional: true,
-				MarkdownDescription: "Skip API calls during refresh and use current tfstate instead." +
-					" Useful for offline or performance-critical scenarios. Default is false. " +
-					"**Warning:** When enabled, it is assumed the user will manage the entire resource lifecycle via Terraform only." +
-					" Manual changes made through browser UI or other software will not be detected, as the provider will not refresh state from the backend.",
-			},
 		},
 	}
 }
@@ -121,7 +113,6 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	if validationMode == "" {
 		validationMode = "warn"
 	}
-	skipRefreshAPICall := boolOr(config.SkipRefreshAPICall, "VASTDATA_SKIP_REFRESH_API_CALL", false)
 
 	// Generic timeout. Should be enough for all API operations.
 	restTimeout := time.Minute * 4
@@ -137,8 +128,7 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	}
 
 	providerData := &vsd.ProviderData{
-		Client:             vmsRest,
-		SkipRefreshAPICall: skipRefreshAPICall,
+		Client: vmsRest,
 	}
 	resp.ResourceData = providerData
 	resp.DataSourceData = providerData

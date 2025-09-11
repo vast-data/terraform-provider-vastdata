@@ -544,16 +544,9 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 		tflog.Debug(ctx, fmt.Sprintf("ReadResource[%s]: do.", managerName))
 		record, err = imp.ReadResource(ctx, rest)
 	} else {
-		// Check if we should skip API calls and use current tfstate
-		if r.providerData.SkipRefreshAPICall {
-			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: skip API call, using current tfstate as record.", managerName))
-			// Convert current tfstate to map[string]any and use as record
-			record = Record(tfState.GetAllValues())
-		} else {
-			// Delegate to the default read implementation
-			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
-			record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
-		}
+		// Delegate to the default read implementation
+		tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
+		record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
 	}
 
 	if err != nil {

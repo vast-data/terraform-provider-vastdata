@@ -31,8 +31,7 @@ var notImportable = false
 
 // ProviderData contains the client and configuration passed from the provider
 type ProviderData struct {
-	Client             *VMSRest
-	SkipRefreshAPICall bool
+	Client *VMSRest
 }
 
 // Rest Client

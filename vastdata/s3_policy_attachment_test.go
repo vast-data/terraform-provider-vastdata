@@ -3,7 +3,6 @@
 package provider
 
 import (
-	"context"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -52,7 +51,7 @@ func createTestS3PolicyAttachment(rawValues map[string]attr.Value) *S3PolicyAtta
 	}
 }
 
-func TestS3PolicyAttachment_ValidateResourceConfig(t *testing.T) {
+func TestS3PolicyAttachment_validateS3PolicyAttachmentConfig(t *testing.T) {
 	tests := []struct {
 		name      string
 		rawValues map[string]attr.Value
@@ -116,7 +115,7 @@ func TestS3PolicyAttachment_ValidateResourceConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			attachment := createTestS3PolicyAttachment(tt.rawValues)
-			err := attachment.ValidateResourceConfig(context.Background())
+			err := attachment.validateS3PolicyAttachmentConfig()
 
 			if tt.expectErr {
 				require.Error(t, err)

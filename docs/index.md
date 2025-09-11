@@ -59,7 +59,6 @@ provider "vastdata" {
 - `api_token` (String, Sensitive) VastData Cluster API token (conflicts with username/password).
 - `password` (String, Sensitive) VastData Cluster password (conflicts with api_token).
 - `port` (Number) The server API port (Default is 443) ,if environment variable VASTDATA_PORT exists it will be used
-- `skip_refresh_api_call` (Boolean) Skip API calls during refresh and use current tfstate instead. Useful for offline or performance-critical scenarios. Default is false. **Warning:** When enabled, it is assumed the user will manage the entire resource lifecycle via Terraform only. Manual changes made through browser UI or other software will not be detected, as the provider will not refresh state from the backend.
 - `skip_ssl_verify` (Boolean) Whether to skip SSL certificate verification.
 - `username` (String, Sensitive) VastData Cluster username (conflicts with api_token).
 - `version_validation_mode` (String) Version validation mode: 'strict' or 'warn'.
