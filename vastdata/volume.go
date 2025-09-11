@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var VolumeSchemaRef = is.NewSchemaReference(
@@ -23,8 +24,10 @@ func (m *Volume) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:      VolumeSchemaRef,
-			ReadOnlyFields: []string{"tenant_id"},
+			SchemaRef:            VolumeSchemaRef,
+			OptionalSchemaFields: []string{"is_monitored"},
+			EditOnlyFields:       []string{"is_monitored"},
+			ReadOnlyFields:       []string{"tenant_id"},
 		},
 	)}
 }

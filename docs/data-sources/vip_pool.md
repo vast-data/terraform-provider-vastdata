@@ -68,7 +68,7 @@ data "vastdata_vip_pool" "vastdb_vip_pool_by_guid" {
 ### Read-Only
 
 - `active_cnode_ids` (Set of Number) IDs of active CNodes
-- `client_monitoring_ips` (Set of Set of String) External client monitoring IP ranges for VIP pool connectivity monitoring
+- `client_monitoring_ips` (List of List of String) External client monitoring IP ranges for VIP pool connectivity monitoring
 - `cnode_ids` (Set of Number) If a group of CNodes is dedicated to the VIP Pool, these are the IDs of the CNodes comprising the group
 - `cnodes` (Set of String) Names of cnodes comprising cnode group
 - `ip_ranges` (List of List of String) The IP ranges that comprise the vippool

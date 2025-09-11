@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var VipPoolSchemaRef = is.NewSchemaReference(
@@ -26,7 +27,7 @@ func (m *VipPool) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 			SchemaRef:               VipPoolSchemaRef,
 			NotRequiredSchemaFields: []string{"subnet_cidr"},
 			ReadOnlyFields:          []string{"serves_tenant"},
-			PreserveOrderFields:     []string{"ip_ranges"},
+			PreserveOrderFields:     []string{"ip_ranges", "client_monitoring_ips"},
 		},
 	)}
 }
@@ -37,7 +38,7 @@ func (m *VipPool) NewDatasourceManager(raw map[string]attr.Value, schema any) Da
 		schema,
 		&is.TFStateHints{
 			SchemaRef:           VipPoolSchemaRef,
-			PreserveOrderFields: []string{"ip_ranges"},
+			PreserveOrderFields: []string{"ip_ranges", "client_monitoring_ips"},
 		}),
 	}
 }
