@@ -238,7 +238,7 @@ release_terraform_plugin:
     echo "Commit: $COMMIT_SHA"
 
     # Detect a branch on origin that contains this commit (pick the first; fallback to default)
-    TARGET_BRANCH="$(git branch -r --contains "$COMMIT_SHA" | sed -n 's|  origin/||p' | grep -v '^HEAD$' | head -n1 || true)"
+    TARGET_BRANCH="$(git branch -r --contains "$COMMIT_SHA" | sed -n 's|.*origin/||p' | grep -v '^HEAD$' | head -n1 || true)"
     if [ -z "${TARGET_BRANCH:-}" ]; then
       TARGET_BRANCH="${CI_DEFAULT_BRANCH}"
       echo "No unique branch contains commit, falling back to default branch: $TARGET_BRANCH"
