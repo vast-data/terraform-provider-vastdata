@@ -154,7 +154,7 @@ type PrepareDeleteResource interface {
 }
 
 type ImportResourceState interface {
-	ImportResourceState(context.Context, *VMSRest) error
+	ImportResourceState(resource.ImportStateRequest, context.Context, *VMSRest) error
 }
 
 type CreateResource interface {
