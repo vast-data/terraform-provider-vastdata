@@ -5,7 +5,7 @@ ENHANCEMENTS:
 * **vastdata_vip_pool**: Added client monitoring support for VIP pool connectivity monitoring
 * **vastdata_volume**: Added volume monitoring capabilities
 * **vastdata_vms**: Added management data interface configuration for L3 networks
-* **vastdata_s3_policy_attachment**: get s3_policy_attachment by `s3_policy_guid`
+* **vastdata_s3_policy_attachment**: get s3_policy_attachment by `s3_policy_guid`; added import support
 
 ## 2.0.1
 

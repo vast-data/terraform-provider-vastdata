@@ -17,9 +17,12 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/go-test/deep"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
@@ -60,6 +63,12 @@ type ForceCleanState struct{}
 
 func (ForceCleanState) Error() string {
 	return "force-clean-state"
+}
+
+type CustomImportOnly struct{}
+
+func (CustomImportOnly) Error() string {
+	return "custom-import-only"
 }
 
 // Helpers
@@ -435,4 +444,81 @@ func underscoreToDash(s string) string {
 // Example: "start-at" → "start_at"
 func dashToUnderscore(s string) string {
 	return strings.ReplaceAll(s, "-", "_")
+}
+
+// parseImportId parses the import ID into the TFState attributes.
+func parseImportId(importID string, tfState *is.TFState) error {
+	// Use default import implementation
+	hints := tfState.Hints
+
+	if strings.Contains(importID, "=") {
+		// Parse key=value pairs regardless of hints
+		sep := ","
+		if strings.Contains(importID, ";") {
+			sep = ";"
+		}
+		parts := strings.Split(importID, sep)
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			kv := strings.SplitN(p, "=", 2)
+
+			if len(kv) != 2 {
+				return fmt.Errorf("segment %q is not in key=value form", p)
+			}
+			key := strings.TrimSpace(kv[0])
+			val := strings.TrimSpace(kv[1])
+			if !tfState.HasAttribute(key) {
+				return fmt.Errorf("field %q is not present in the resource schema", key)
+			}
+			t := tfState.Type(key)
+			switch {
+			case t.Equal(types.Int64Type):
+				n, convErr := strconv.ParseInt(val, 10, 64)
+				if convErr != nil {
+					return fmt.Errorf("field %q contains invalid value %q: %w", key, val, convErr)
+				}
+				tfState.SetOrAdd(key, types.Int64Value(n))
+			case t.Equal(types.BoolType):
+				bv := strings.EqualFold(val, "true") || val == "1"
+				tfState.SetOrAdd(key, types.BoolValue(bv))
+			case t.Equal(types.StringType):
+				tfState.SetOrAdd(key, types.StringValue(val))
+			default:
+				// store as string for unsupported types
+				tfState.SetOrAdd(key, types.StringValue(val))
+			}
+		}
+	} else if hints != nil && len(hints.ImportFields) > 0 && strings.Contains(importID, "|") {
+		// Ordered values mode via hints
+		if err := parseAndApplyCompositeImport(importID, hints.ImportFields, tfState, func(k string, v attr.Value) {
+			tfState.SetOrAdd(k, v)
+		}); err != nil {
+			return err
+		}
+	} else {
+		// Treat as single ID token
+		idField := "id"
+		if !tfState.HasAttribute(idField) {
+			return fmt.Errorf("field %q is not present in the resource schema", idField)
+		}
+		idType := tfState.Type(idField)
+		if idType.Equal(types.Int64Type) {
+			idInt64, convErr := strconv.ParseInt(importID, 10, 64)
+			if convErr != nil {
+				return fmt.Errorf("field %q contains invalid value %q: %w", idField, importID, convErr)
+			}
+			tfState.SetOrAdd(idField, types.Int64Value(idInt64))
+		} else if idType.Equal(types.StringType) {
+			tfState.SetOrAdd(idField, types.StringValue(importID))
+		} else if idType.Equal(types.BoolType) {
+			bv := strings.EqualFold(importID, "true") || importID == "1"
+			tfState.SetOrAdd(idField, types.BoolValue(bv))
+		} else {
+			return fmt.Errorf("field %q is not present in the resource schema", idField)
+		}
+	}
+	return nil
 }

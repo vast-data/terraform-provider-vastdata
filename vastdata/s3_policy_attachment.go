@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -25,7 +26,6 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 		raw,
 		schema,
 		&is.TFStateHints{
-			Importable: &notImportable,
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
 				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid') or a user (identified by 'uid').",
 				SchemaAttributes: map[string]any{
@@ -127,6 +127,54 @@ func (m *S3PolicyAttachment) validateS3PolicyAttachmentConfig() error {
 		return err
 	}
 	return nil
+}
+
+func (m *S3PolicyAttachment) ImportResourceState(req resource.ImportStateRequest, ctx context.Context, rest *VMSRest) error {
+	var (
+		ts       = m.tfstate
+		importID = req.ID
+		key      string
+		val      int64
+		getFn    RestFn
+	)
+
+	if err := parseImportId(importID, ts); err != nil {
+		return err
+	}
+
+	if err := m.validateS3PolicyAttachmentConfig(); err != nil {
+		return err
+	}
+
+	// Ensure both s3_policy_id and s3_policy_guid are set
+	if _, err := m.ensurePolicyIDAndGUID(ctx, rest, ts); err != nil {
+		return err
+	}
+
+	switch {
+	case ts.IsKnownAndNotNull("gid"):
+		key = "gid"
+		val = ts.Int64("gid")
+		getFn = rest.NonLocalGroups.GetWithContext
+		defer rest.NonLocalGroups.Lock(key, val)()
+
+	case ts.IsKnownAndNotNull("uid"):
+		key = "uid"
+		val = ts.Int64("uid")
+		getFn = rest.NonLocalUsers.GetWithContext
+		defer rest.NonLocalUsers.Lock(key, val)()
+
+	default:
+		return errors.New("either 'gid' or 'uid' must be specified")
+	}
+
+	searchParams := params{key: val}
+	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
+	if _, err := getFn(ctx, searchParams); err != nil {
+		return fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
+	}
+
+	return CustomImportOnly{}
 }
 
 func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
