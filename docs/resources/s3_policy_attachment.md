@@ -3,12 +3,12 @@
 page_title: "vastdata_s3_policy_attachment Resource - vastdata"
 subcategory: ""
 description: |-
-  One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid') or a user (identified by 'uid').
+  One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid' or 'username').
 ---
 
 # vastdata_s3_policy_attachment (Resource)
 
-One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid') or a user (identified by 'uid').
+One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid' or 'username').
 
 ## Example Usage
 
@@ -97,9 +97,11 @@ resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
 ### Optional
 
 - `context` (String) Specify the context for the user/group query.
-- `gid` (Number) The GID of the non-local group to attach the policy to.
+- `gid` (Number) The GID of the non-local group to attach the policy to. Either 'gid' or 'groupname' must be provided for group attachments.
+- `groupname` (String) The name of the non-local group to attach the policy to. Either 'gid' or 'groupname' must be provided for group attachments.
 - `ignore_present` (Boolean) If set to true, the resource will not return an error if the specified S3 policy is already attached to the user or group. This is useful for gracefully handling pre-existing attachments.
 - `s3_policy_guid` (String) The GUID of the S3 policy to attach. Either 's3_policy_id' or 's3_policy_guid' must be provided.
 - `s3_policy_id` (Number) The ID of the S3 policy to attach. Either 's3_policy_id' or 's3_policy_guid' must be provided.
 - `tenant_id` (Number) The ID of the tenant to which the user or group belongs.
-- `uid` (Number) The UID of the non-local user to attach the policy to.
+- `uid` (Number) The UID of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.
+- `username` (String) The name of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.

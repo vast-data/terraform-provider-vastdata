@@ -1,3 +1,9 @@
+## 2.1.1
+
+ENHANCEMENTS:
+
+* **vastdata_s3_policy_attachment**: Added support for `username` and `groupname` attributes as alternatives to `uid` and `gid` for identifying users and groups
+
 ## 2.1.0
 
 ENHANCEMENTS:
@@ -11,7 +17,8 @@ ENHANCEMENTS:
 
 BUG FIXES:
 
-* **vastdata_nonlocal_user**: Fixed `uid` and `vid` attributes being incorrectly marked as non computed for nonlocal_user resour
+* **vastdata_nonlocal_user**: Fixed `uid` and `vid` attributes being incorrectly marked as non computed for nonlocal_user resource
+* 
 ## 2.0.0
 
 NOTES:
