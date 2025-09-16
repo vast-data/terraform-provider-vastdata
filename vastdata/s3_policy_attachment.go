@@ -27,20 +27,34 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 		schema,
 		&is.TFStateHints{
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
-				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid') or a user (identified by 'uid').",
+				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid' or 'username').",
 				SchemaAttributes: map[string]any{
 					"gid": rschema.Int64Attribute{
 						Optional:    true,
-						Description: "The GID of the non-local group to attach the policy to.",
+						Description: "The GID of the non-local group to attach the policy to. Either 'gid' or 'groupname' must be provided for group attachments.",
 						PlanModifiers: []planmodifiers.Int64{
 							int64planmodifier.RequiresReplace(),
 						},
 					},
+					"groupname": rschema.StringAttribute{
+						Optional:    true,
+						Description: "The name of the non-local group to attach the policy to. Either 'gid' or 'groupname' must be provided for group attachments.",
+						PlanModifiers: []planmodifiers.String{
+							stringplanmodifier.RequiresReplace(),
+						},
+					},
 					"uid": rschema.Int64Attribute{
 						Optional:    true,
-						Description: "The UID of the non-local user to attach the policy to.",
+						Description: "The UID of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.",
 						PlanModifiers: []planmodifiers.Int64{
 							int64planmodifier.RequiresReplace(),
+						},
+					},
+					"username": rschema.StringAttribute{
+						Optional:    true,
+						Description: "The name of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.",
+						PlanModifiers: []planmodifiers.String{
+							stringplanmodifier.RequiresReplace(),
 						},
 					},
 					"s3_policy_id": rschema.Int64Attribute{
@@ -116,25 +130,59 @@ func (m *S3PolicyAttachment) ensurePolicyIDAndGUID(ctx context.Context, rest *VM
 	return 0, fmt.Errorf("either s3_policy_id or s3_policy_guid must be provided")
 }
 
-// validateS3PolicyAttachmentConfig validates that exactly one of gid/uid is set and
-// exactly one of s3_policy_id/s3_policy_guid is set. This validation is performed
-// at runtime when resource references can be resolved.
+// validateS3PolicyAttachmentConfig validates that exactly one user/group identifier is set
+// (gid, groupname, uid, or username) and exactly one of s3_policy_id/s3_policy_guid is set.
+// This validation is performed at runtime when resource references can be resolved.
 func (m *S3PolicyAttachment) validateS3PolicyAttachmentConfig() error {
-	if err := validateOneOf(m.tfstate, "gid", "uid"); err != nil {
+	// Validate that exactly one user/group identifier is provided
+	if err := validateOneOf(m.tfstate, "gid", "groupname", "uid", "username"); err != nil {
 		return err
 	}
+
+	// Validate that exactly one policy identifier is provided
 	if err := validateOneOf(m.tfstate, "s3_policy_id", "s3_policy_guid"); err != nil {
 		return err
 	}
+
 	return nil
+}
+
+func (m *S3PolicyAttachment) getSearchParamsFromState(tfState *is.TFState) (params, string) {
+	var (
+		key           string
+		val           any
+		attachContext string
+	)
+
+	switch {
+	case tfState.IsKnownAndNotNull("gid"):
+		key = "gid"
+		val = tfState.Int64("gid")
+		attachContext = "group"
+	case tfState.IsKnownAndNotNull("groupname"):
+		key = "groupname"
+		val = tfState.String("groupname")
+		attachContext = "group"
+	case tfState.IsKnownAndNotNull("uid"):
+		key = "uid"
+		val = tfState.Int64("uid")
+		attachContext = "user"
+	case tfState.IsKnownAndNotNull("username"):
+		key = "username"
+		val = tfState.String("username")
+		attachContext = "user"
+	}
+
+	searchParams := params{key: val}
+	tfState.SetToMapIfAvailable(searchParams, "context", "tenant_id")
+
+	return searchParams, attachContext
 }
 
 func (m *S3PolicyAttachment) ImportResourceState(req resource.ImportStateRequest, ctx context.Context, rest *VMSRest) error {
 	var (
 		ts       = m.tfstate
 		importID = req.ID
-		key      string
-		val      int64
 		getFn    RestFn
 	)
 
@@ -151,27 +199,19 @@ func (m *S3PolicyAttachment) ImportResourceState(req resource.ImportStateRequest
 		return err
 	}
 
-	switch {
-	case ts.IsKnownAndNotNull("gid"):
-		key = "gid"
-		val = ts.Int64("gid")
-		getFn = rest.NonLocalGroups.GetWithContext
-		defer rest.NonLocalGroups.Lock(key, val)()
-
-	case ts.IsKnownAndNotNull("uid"):
-		key = "uid"
-		val = ts.Int64("uid")
+	searchParams, attachContext := m.getSearchParamsFromState(ts)
+	if attachContext == "user" {
 		getFn = rest.NonLocalUsers.GetWithContext
-		defer rest.NonLocalUsers.Lock(key, val)()
-
-	default:
-		return errors.New("either 'gid' or 'uid' must be specified")
+		defer rest.NonLocalUsers.Lock()()
+	} else if attachContext == "group" {
+		getFn = rest.NonLocalGroups.GetWithContext
+		defer rest.NonLocalGroups.Lock()()
+	} else {
+		return errors.New("either user or group identifier must be specified")
 	}
 
-	searchParams := params{key: val}
-	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 	if _, err := getFn(ctx, searchParams); err != nil {
-		return fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
+		return fmt.Errorf("failed to fetch record: %w", err)
 	}
 
 	return CustomImportOnly{}
@@ -180,8 +220,6 @@ func (m *S3PolicyAttachment) ImportResourceState(req resource.ImportStateRequest
 func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	var (
 		ts               = m.tfstate
-		key              string
-		val              int64
 		getFn            RestFn
 		updateFn         RestFn
 		s3PolicyId       int64
@@ -200,31 +238,24 @@ func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (D
 	}
 
 	if s3PolicyId != actualS3PolicyId {
-		// ID has changed out from under us. We need to detach the old ID and atach the new one.
-		switch {
-		case ts.IsKnownAndNotNull("gid"):
-			key = "gid"
-			val = ts.Int64("gid")
-			getFn = rest.NonLocalGroups.GetWithContext
-			updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-			defer rest.NonLocalGroups.Lock(key, val)()
+		// ID has changed out from under us. We need to detach the old ID and attach the new one.
+		searchParams, attachContext := m.getSearchParamsFromState(ts)
 
-		case ts.IsKnownAndNotNull("uid"):
-			key = "uid"
-			val = ts.Int64("uid")
+		if attachContext == "user" {
 			getFn = rest.NonLocalUsers.GetWithContext
 			updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-			defer rest.NonLocalUsers.Lock(key, val)()
-
-		default:
-			return nil, errors.New("either 'gid' or 'uid' must be specified")
+			defer rest.NonLocalUsers.Lock()()
+		} else if attachContext == "group" {
+			getFn = rest.NonLocalGroups.GetWithContext
+			updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
+			defer rest.NonLocalGroups.Lock()()
+		} else {
+			return nil, errors.New("either user or group identifier must be specified")
 		}
 
-		searchParams := params{key: val}
-		ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 		record, err := getFn(ctx, searchParams)
 		if err != nil {
-			return nil, fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
+			return nil, fmt.Errorf("failed to fetch record: %w", err)
 		}
 
 		set := is.Must(is.NewSetFromAny[int64](record["s3_policies_ids"]))
@@ -237,14 +268,11 @@ func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (D
 		}
 	}
 	return nil, nil
-
 }
 
 func (m *S3PolicyAttachment) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	var (
 		ts         = m.tfstate
-		key        string
-		val        int64
 		getFn      RestFn
 		updateFn   RestFn
 		record     Record
@@ -263,30 +291,23 @@ func (m *S3PolicyAttachment) CreateResource(ctx context.Context, rest *VMSRest) 
 		return nil, err
 	}
 
-	switch {
-	case ts.IsKnownAndNotNull("gid"):
-		key = "gid"
-		val = ts.Int64("gid")
-		getFn = rest.NonLocalGroups.GetWithContext
-		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-		defer rest.NonLocalGroups.Lock(key, val)()
+	searchParams, attachContext := m.getSearchParamsFromState(ts)
 
-	case ts.IsKnownAndNotNull("uid"):
-		key = "uid"
-		val = ts.Int64("uid")
+	if attachContext == "user" {
 		getFn = rest.NonLocalUsers.GetWithContext
 		updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-		defer rest.NonLocalUsers.Lock(key, val)()
-
-	default:
-		return nil, errors.New("either 'gid' or 'uid' must be specified")
+		defer rest.NonLocalUsers.Lock()()
+	} else if attachContext == "group" {
+		getFn = rest.NonLocalGroups.GetWithContext
+		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
+		defer rest.NonLocalGroups.Lock()()
+	} else {
+		return nil, errors.New("either user or group identifier must be specified")
 	}
 
-	searchParams := params{key: val}
-	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 	record, err = getFn(ctx, searchParams)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
+		return nil, fmt.Errorf("failed to fetch record: %w", err)
 	}
 
 	set := is.Must(is.NewSetFromAny[int64](record["s3_policies_ids"]))
@@ -295,10 +316,9 @@ func (m *S3PolicyAttachment) CreateResource(ctx context.Context, rest *VMSRest) 
 		searchParams["s3_policies_ids"] = set.ToSlice()
 		return updateFn(ctx, searchParams)
 	} else if ts.IsKnownAndNotNull("ignore_present") && !ts.Bool("ignore_present") {
-		return nil, fmt.Errorf("s3 policy ID %d is already attached to %s=%d", s3PolicyId, key, val)
+		return nil, fmt.Errorf("s3 policy ID %d is already attached", s3PolicyId)
 	}
 	return nil, nil
-
 }
 
 func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
@@ -308,8 +328,6 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 		planManager       = plan.(*S3PolicyAttachment)
 		planTs            = planManager.tfstate
 		newPolicyId       int64
-		key               string
-		val               int64
 		getFn             RestFn
 		updateFn          RestFn
 		record            Record
@@ -328,23 +346,18 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 		return nil, err
 	}
 
-	switch {
-	case ts.IsKnownAndNotNull("gid"):
-		key = "gid"
-		val = ts.Int64("gid")
-		getFn = rest.NonLocalGroups.GetWithContext
-		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-		defer rest.NonLocalGroups.Lock(key, val)()
+	searchParams, attachContext := m.getSearchParamsFromState(ts)
 
-	case ts.IsKnownAndNotNull("uid"):
-		key = "uid"
-		val = ts.Int64("uid")
+	if attachContext == "user" {
 		getFn = rest.NonLocalUsers.GetWithContext
 		updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-		defer rest.NonLocalUsers.Lock(key, val)()
-
-	default:
-		return nil, errors.New("either 'gid' or 'uid' must be specified")
+		defer rest.NonLocalUsers.Lock()()
+	} else if attachContext == "group" {
+		getFn = rest.NonLocalGroups.GetWithContext
+		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
+		defer rest.NonLocalGroups.Lock()()
+	} else {
+		return nil, errors.New("either user or group identifier must be specified")
 	}
 
 	// No-op if the policy ID hasn't changed
@@ -352,11 +365,9 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 		return nil, nil
 	}
 
-	searchParams := params{key: val}
-	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 	record, err = getFn(ctx, searchParams)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
+		return nil, fmt.Errorf("failed to fetch record: %w", err)
 	}
 
 	set := is.Must(is.NewSetFromAny[int64](record["s3_policies_ids"]))
@@ -376,7 +387,7 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 
 	// policy already attached and unchanged
 	if !added && ts.IsKnownAndNotNull("ignore_present") && !ts.Bool("ignore_present") {
-		return nil, fmt.Errorf("s3 policy ID %d is already attached to %s=%d", newPolicyId, key, val)
+		return nil, fmt.Errorf("s3 policy ID %d is already attached", newPolicyId)
 	}
 
 	if removed || added {
@@ -391,8 +402,6 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 func (m *S3PolicyAttachment) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	var (
 		ts             = m.tfstate
-		key            string
-		val            int64
 		getFn          RestFn
 		updateFn       RestFn
 		actualPolicyId int64
@@ -405,30 +414,23 @@ func (m *S3PolicyAttachment) DeleteResource(ctx context.Context, rest *VMSRest) 
 		return err
 	}
 
-	switch {
-	case ts.IsKnownAndNotNull("gid"):
-		key = "gid"
-		val = ts.Int64("gid")
-		getFn = rest.NonLocalGroups.GetWithContext
-		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-		defer rest.NonLocalGroups.Lock(key, val)()
+	searchParams, attachContext := m.getSearchParamsFromState(ts)
 
-	case ts.IsKnownAndNotNull("uid"):
-		key = "uid"
-		val = ts.Int64("uid")
+	if attachContext == "user" {
 		getFn = rest.NonLocalUsers.GetWithContext
 		updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-		defer rest.NonLocalUsers.Lock(key, val)()
-
-	default:
-		return fmt.Errorf("either 'gid' or 'uid' must be specified")
+		defer rest.NonLocalUsers.Lock()()
+	} else if attachContext == "group" {
+		getFn = rest.NonLocalGroups.GetWithContext
+		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
+		defer rest.NonLocalGroups.Lock()()
+	} else {
+		return fmt.Errorf("either user or group identifier must be specified")
 	}
 
-	searchParams := params{key: val}
-	ts.SetToMapIfAvailable(searchParams, "context", "tenant_id")
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
-		return fmt.Errorf("failed to fetch record by %s=%d: %w", key, val, err)
+		return fmt.Errorf("failed to fetch record: %w", err)
 	}
 
 	set := is.Must(is.NewSetFromAny[int64](record["s3_policies_ids"]))
