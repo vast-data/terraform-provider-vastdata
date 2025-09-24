@@ -58,6 +58,7 @@ resource "vastdata_snapshot" "vastdb_snapshot" {
 - `indestructible` (Boolean) Set to true to protect the snapshot from accidental or malicious deletion with the indestructibility feature. If this setting is enabled, authorized unlocking of the cluster's indestructibility mechanism is required to do any of the following: deleting the snapshot, shortening its expiration time or disabling this setting.
 - `locked` (Boolean) Not in use.
 - `tenant_id` (Number) Tenant ID
+- `volume_id` (Number) Mapped volume id to filter by.
 
 ### Read-Only
 

@@ -45,4 +45,4 @@ data "vastdata_s3_policy" "vastdb_s3_policy_by_name" {
 ### Read-Only
 
 - `groups` (Set of String) The groups to which the S3 identity policy is attached.
-- `users` (Set of String) The users to which the S3 identity policy is attached.
+- `users` (Set of String)

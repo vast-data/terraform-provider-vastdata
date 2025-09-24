@@ -120,6 +120,7 @@ resource "vastdata_user_tenant_data" "vastdb_user_tenant_data" {
 
 ### Required
 
+- `tenant_id` (Number) Tenant ID
 - `user_id` (Number) The ID of the user to manage tenant data for.
 
 ### Optional
@@ -128,4 +129,3 @@ resource "vastdata_user_tenant_data" "vastdb_user_tenant_data" {
 - `allow_delete_bucket` (Boolean) Grants the user permission to delete S3 buckets. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `s3_policies_ids` (Set of Number) IDs of S3 policies to attach to the user.
 - `s3_superuser` (Boolean) Grants the user S3 super user permission, which enables the user to override S3 ACLs. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
-- `tenant_id` (Number) Tenant ID

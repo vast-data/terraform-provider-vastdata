@@ -85,7 +85,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `s3_object_write` (String) Hosts with full permissions
 - `s3_object_write_acp` (String) Hosts with full permissions
 - `s3_special_chars_support` (Boolean) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols
-- `serves_tenant` (String) Filter by served tenants. Accepts tenant ID or "all" for all served tenants.
+- `serves_tenant` (String) Filter by served tenants. Accepts Tenant ID or "all".
 - `smb_directory_mode` (Number) Default unix type permissions on new folder
 - `smb_directory_mode_padded` (String) Default unix type permissions on new folder
 - `smb_file_mode` (Number) Default unix type permissions on new file
@@ -132,6 +132,8 @@ Read-Only:
 - `log_deleted_files_dirs` (Boolean) Log deleted files and directories
 - `log_full_path` (Boolean) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
 - `log_username` (Boolean) Log username of requesting user. Disabled by default
+- `modify_data` (Boolean)
 - `modify_data_md` (Boolean) Audit operations that modify data (including operations that change the file size) and metadata
 - `read_data` (Boolean) Audit operations that read data and metadata
+- `read_data_md` (Boolean)
 - `session_create_close` (Boolean) Audit session creation and closing operations for sessions that use Kerberos 5 authentication (krb5, krb5i, or krb5p)

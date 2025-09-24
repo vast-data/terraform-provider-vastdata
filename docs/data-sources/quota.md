@@ -134,6 +134,7 @@ Read-Only:
 - `identifier` (String)
 - `identifier_type` (String)
 - `is_group` (Boolean) True for a group quota. False for a user quota.
+- `is_iam_role` (Boolean)
 - `name` (String) A user or group name
 - `vast_id` (Number) VAST ID of the user or group with the listed user/group quota
 
@@ -168,5 +169,6 @@ Read-Only:
 - `identifier` (String)
 - `identifier_type` (String)
 - `is_group` (Boolean) True for a group quota. False for a user quota.
+- `is_iam_role` (Boolean)
 - `name` (String) A user or group name
 - `vast_id` (Number) VAST ID of the user or group with the listed user/group quota

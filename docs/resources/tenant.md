@@ -59,54 +59,64 @@ resource "vastdata_tenant" "vastdb_tenant" {
 
 ### Required
 
-- `name` (String) A name for the tenant
+- `name` (String) Tenant name
 
 ### Optional
 
-- `access_ip_ranges` (Set of String) Restricts tenant login access to specified source IP ranges. Enter as single IPs (1.1.1.1), ranges (1.2.3.4 - 1.2.3.6), or CIDR (1.1.1.0/24).
-- `ad_provider_id` (Number) The ID of an Active Directory provider configured on the cluster. Enables the specified provider for the tenant.
-- `allow_disabled_users` (Boolean) Allow IO from users whose Active Directory accounts are explicitly disabled.
-- `allow_locked_users` (Boolean) Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.
+- `access_ip_ranges` (Set of String)
+- `ad_provider_id` (Number) Active Directory provider ID
+- `allow_disabled_users` (Boolean) Allow explicitly disabled users
+- `allow_locked_users` (Boolean) Allow temporarily locked out users
+- `allowed_delegations` (String) Defines the possible types of NFSv4 delegations
+- `application_users_group_name` (String) The name of the group that will be used for application users
 - `capacity_rules` (Attributes) (see [below for nested schema](#nestedatt--capacity_rules))
-- `client_ip_ranges` (List of List of String) Array of ranges of client IPs to be served by the tenant. For client requests made to a VIP that belongs to a VIP Pool that is not associated to a specific tenant, the client's source IP is checked against the Client IPs that are defined within each tenant. That check determines access. The client IPs that you associate with each tenant must be unique per tenant.
+- `client_ip_ranges` (List of List of String) Array of source IP ranges to allow for the tenant.
 - `default_others_share_level_perm` (String) Default Share-level permissions for Others
-- `domain_name` (String) Domain name to incorporate into the VMS tenant login page URL.
+- `domain_name` (String)
 - `encryption_crn` (String) Tenant's encryption group unique identifier (deprecated)
 - `encryption_group` (String) Tenant's encryption group unique identifier
 - `force_delete` (Boolean) If set to true, forces deletion of the tenant even if it has empty subdirectories or other removable remnants. Use with caution, as this will bypass standard cleanup checks.
-- `identity_provider_name` (String) The ID of a SAML provider configured on the cluster. Connects the specified provider to the tenant.
+- `grant_unrequested_delegations_by_default` (Boolean) When enabled, the server may grant delegations based on share access even if not explicitly requested by the client
+- `identity_provider_name` (String)
 - `is_nfsv42_supported` (Boolean) Enable NFSv4.2
-- `ldap_provider_id` (Number) The ID of an LDAP provider configured on the cluster. Enables the specified provider for the tenant.
-- `local_provider_id` (Number) The ID of a local provider configured on the cluster. Connects the specified provider to the tenant.
+- `krb_provider_id` (Number) Kerberos provider ID
+- `ldap_provider_id` (Number) Open-LDAP provider ID specified separately by the user
+- `local_provider_id` (Number) Local provider ID
 - `login_name_primary_provider` (String) Login name primary provider type
-- `nis_provider_id` (Number) The ID of a NIS provider configured on the cluster. Enables the specified provider for the tenant.
-- `posix_primary_provider` (String) Specifies which provider takes precedence over other providers in case of any conflicts between attribute values when user information is retrieved from the providers. Relevant only if more than one provider is enabled for the tenant.
+- `max_views` (Number) Max views we can create on this tenant (0:unlimted as default)
+- `nis_provider_id` (Number) NIS provider ID
+- `oidc_provider_id` (Number) OIDC provider ID
+- `posix_primary_provider` (String) POSIX primary provider type
 - `preferred_owning_group` (String) Set to prefer GID of the user as the owning group of the file
 - `qos` (Attributes) (see [below for nested schema](#nestedatt--qos))
 - `require_smb_signing` (Boolean) Require SMB signing
-- `smb_administrators_group_name` (String) Optional custom name to specify a non default privileged group. If not set, privileged group is the Backup Operators domain group.
-- `smb_privileged_group_full_access` (Boolean) True=The SMB privileged user group has read and write control access. Members of the group can perform backup and restore operations on all files and directories, without requiring read or write access to the specific files and directories. False=the privileged group has read only access.
+- `smb_administrators_group_name` (String) Optional custom name to specify a non default privileged group. If not set, privileged group is the BUILTIN\Administrators group.
+- `smb_encryption_state` (String) Defines the encryption level for SMB
+- `smb_privileged_group_full_access` (Boolean) If true, the privileged group has full access. Otherwise, read only
 - `smb_privileged_group_sid` (String) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.
 - `smb_privileged_user_name` (String) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'
-- `tenant_admins_group_name` (String) Specifies a group on an AD or LDAP provider. Enables users in the group to log into the tenant VMS as Tenant Admin users. In order to be granted permissions to do any configuration, the same users need to belong to groups on the provider that are associated with VMS manager user roles for tenant admin type users on the tenant.
-- `trash_gid` (Number) GID of group of NFSv3 users to which to grant permission to move files into the trash folder. If not set, the operation of moving files into the trash folder is supported for the root user only.
+- `tenant_admins_group_name` (String)
+- `trash_gid` (Number) GID with permissions to the trash folder
 - `use_smb_native` (Boolean) Use native SMB authentication
-- `use_smb_privileged_group` (Boolean) Enables SMB privileged user group
-- `use_smb_privileged_user` (Boolean) Enables SMB privileged user
+- `use_smb_privileged_group` (Boolean) If true, the privileged group is enabled
+- `use_smb_privileged_user` (Boolean) If true, the privileged user is enabled
 
 ### Read-Only
 
 - `ad_title` (String)
 - `client_ip_ranges_summary` (String)
+- `data_engine_enabled` (Boolean) True if DataEngine is enabled on this tenant
 - `dir` (String)
 - `encryption_group_id` (Number) Encryption Group ID
 - `encryption_group_state` (String) Tenant's encryption group state
 - `guid` (String) Tenant guid
 - `id` (Number) The ID of this resource.
+- `krb_provider_title` (String) Kerberos provider title
 - `ldap_title` (String)
 - `local_provider` (Attributes) (see [below for nested schema](#nestedatt--local_provider))
-- `local_provider_title` (String) The local provider associated with the tenant
+- `local_provider_title` (String) Local provider title
 - `nis_title` (String)
+- `oidc_provider_title` (String)
 - `smb_allowed` (Boolean)
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
@@ -162,7 +172,7 @@ Optional:
 Read-Only:
 
 - `id` (Number) ID of the local provider
-- `name` (String) Name of the local provider
+- `name` (String)
 
 
 <a id="nestedatt--vippools"></a>

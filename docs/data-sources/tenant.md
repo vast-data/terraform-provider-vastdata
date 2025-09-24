@@ -31,7 +31,10 @@ data "vastdata_tenant" "vastdb_tenant_by_guid" {
 - `ad_title` (String)
 - `allow_disabled_users` (Boolean) Allow IO from users whose Active Directory accounts are explicitly disabled.
 - `allow_locked_users` (Boolean) Allow IO from users whose Active Directory accounts are locked out by lockout policies due to unsuccessful login attempts.
+- `allowed_delegations` (String) Defines the possible types of NFSv4 delegations
+- `application_users_group_name` (String) The name of the group that will be used for application users
 - `client_ip_ranges_summary` (String)
+- `data_engine_enabled` (Boolean) True if DataEngine is enabled on this tenant
 - `default_others_share_level_perm` (String) Default Share-level permissions for 'Everyone' Group
 - `dir` (String)
 - `domain_name` (String) Domain name to incorporate into the VMS tenant login page URL.
@@ -39,23 +42,30 @@ data "vastdata_tenant" "vastdb_tenant_by_guid" {
 - `encryption_group` (String) Tenant's encryption group unique identifier
 - `encryption_group_id` (Number) Encryption Group ID
 - `encryption_group_state` (String) Tenant's encryption group state
+- `grant_unrequested_delegations_by_default` (Boolean) When enabled, the server may grant delegations based on share access even if not explicitly requested by the client
 - `guid` (String) Tenant guid
 - `identity_provider_name` (String) Sets a configured SAML login provider to enable for the tenant.  When set, users defined on the specified SAML provider with relevant roles and user types can login to the tenant VMS.
 - `is_nfsv42_supported` (Boolean) Enable NFSv4.2
+- `krb_provider_id` (Number) Kerberos provider ID
+- `krb_provider_title` (String) Kerberos provider title
 - `ldap_provider_id` (Number) Open-LDAP provider ID
 - `ldap_title` (String)
 - `local_provider_id` (Number) Local provider ID
-- `local_provider_title` (String) The local provider associated with the tenant
+- `local_provider_title` (String) Local provider title
 - `login_name_primary_provider` (String) Primary provider for the user's login name
+- `max_views` (Number) Max views we can create on this tenant (0:unlimted as default)
 - `name` (String)
 - `name__icontains` (String) Name to filter by
 - `nis_provider_id` (Number) NIS provider ID
 - `nis_title` (String)
+- `oidc_provider_id` (Number) OIDC provider ID
+- `oidc_provider_title` (String)
 - `posix_primary_provider` (String) The primary provider that takes precedence for POSIX user attributes in case of conflict between two providers that both have POSIX user attributes
 - `preferred_owning_group` (String) Set to prefer GID of the user as the owning group of the file
 - `require_smb_signing` (Boolean) Require SMB clients to perform SMB message signing. SMB messages with invalid or missing signatures will be blocked.
 - `smb_administrators_group_name` (String) Optional custom name to specify a non default privileged group. If not set, privileged group is the BUILTIN\Administrators group.
 - `smb_allowed` (Boolean)
+- `smb_encryption_state` (String) Defines the encryption level for SMB
 - `smb_privileged_group_full_access` (Boolean) If true, the privileged group has full access. Otherwise, read only
 - `smb_privileged_group_sid` (String) Optional custom SID to specify a non default SMB privileged group. If not set, SMB privileged group is the Backup Operators domain group.
 - `smb_privileged_user_name` (String) Optional custom username for the SMB privileged user. If not set, the SMB privileged user name is 'vastadmin'
@@ -100,7 +110,7 @@ Read-Only:
 Read-Only:
 
 - `id` (Number) ID of the local provider
-- `name` (String) Name of the local provider
+- `name` (String)
 
 
 <a id="nestedatt--qos"></a>

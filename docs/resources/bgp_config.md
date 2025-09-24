@@ -45,19 +45,32 @@ resource "vastdata_bgp_config" "vastdb_bgp_config" {
 
 ### Required
 
-- `external_asn` (Number) The ASN expected to be presented to CNodes by upstream routers.
-- `name` (String) The name of the BGP layer 3 connectivity configuration.
-- `self_asn` (Number) The Autonomous System number(s) presented by CNodes to the upstream/customer routers.
+- `external_asn` (Number)
+- `name` (String)
+- `self_asn` (Number)
 
 ### Optional
 
-- `any_external_asn` (Boolean) If true, allow CNodes to peer with any ASN. Supercedes specified external_asn.
+- `any_external_asn` (Boolean)
 - `bfd_enabled` (Boolean)
 - `guid` (String)
-- `id` (Number) The ID of the BGP layer 3 connectivity configuration.
-- `md5_password` (String) A password used for BGP and BFD authentication.
+- `ips_represent` (String) IP address representation (odd/even)
+- `md5_password` (String)
 - `method` (String)
+- `racks` (Attributes Set) (see [below for nested schema](#nestedatt--racks))
 - `status` (String)
-- `subnet_bits` (Number) The number of bits in the subnet. For IPv4, this should be 32, for IPv6, 128 (i.e., a single address in the subnet)
-- `vip_migration_grace_period_sec` (Number) The period of time after a BGP session is dropped before the virtual IPs advertised in the session link are moved to another CNode, in seconds
+- `subnet_bits` (Number)
+- `vip_migration_grace_period_sec` (Number)
 - `vlan` (Number)
+
+### Read-Only
+
+- `id` (Number) The ID of this resource.
+
+<a id="nestedatt--racks"></a>
+### Nested Schema for `racks`
+
+Optional:
+
+- `ip_ranges` (Set of String)
+- `rack_id` (Number)

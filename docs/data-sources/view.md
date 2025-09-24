@@ -34,11 +34,12 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `auto_commit` (String) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
 - `bucket` (String) S3 Bucket name
 - `bucket_owner` (String) S3 Bucket owner
+- `bucket_owner_type` (String)
 - `bulk_permission_update_progress` (Number) Progress
 - `bulk_permission_update_state` (String) State
 - `cluster` (String) Parent Cluster
-- `cluster__id` (String) Limit response by cluster ID
-- `cluster__name` (String) Filter response by cluster name.
+- `cluster__id` (String)
+- `cluster__name` (String)
 - `cluster_id` (Number) Parent Cluster ID
 - `create_dir` (String) Creates the directory specified by the path
 - `created` (String)
@@ -53,20 +54,26 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `internal` (Boolean)
 - `is_default_subsystem` (Boolean) True if the view is the default subsystem for block storage. There can be up to one default subsystem per tenant. The default subsystem is the default view selected when creating a block volume if no view is specified.
 - `is_indestructible_object_enabled` (Boolean) True if indestructible object mode is enabled.
+- `is_kafka_encrypted_conn_allowed` (Boolean) True if encrypted connection is allowed for Kafka
+- `is_kafka_unencrypted_conn_allowed` (Boolean) True if unencrypted connection is allowed for Kafka
 - `is_remote` (Boolean)
 - `is_seamless` (Boolean) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
+- `kafka_encrypted_auth_mechanism` (String) Authentication mechanism for encrypted connection
 - `kafka_first_join_group_timeout_sec` (Number) Kafka first join group timeout in seconds
+- `kafka_is_authorization_required` (Boolean) True if authorization is required for Kafka
 - `kafka_rejoin_group_timeout_sec` (Number) Kafka rejoin group timeout in seconds
+- `kafka_unencrypted_auth_mechanism` (String) Authentication mechanism for unencrypted connection
 - `locking` (Boolean) Write Once Read Many (WORM) locking enabled
 - `logical_capacity` (Number) Logical Capacity consumed by view
 - `max_retention_period` (String) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
 - `min_retention_period` (String) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
 - `name` (String)
 - `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.
-- `nqn` (String) Applicable to subsystem (block protocol enabled) views. The subsystem's NVMe Qualified Name. A unique identifier used to identify the subsystem in NVMe operations.
+- `nqn` (String) NVMe Qualified Name, applicable to Subsystem (block protocol enabled).
 - `path` (String) The Element Store path exposed by the view. Begin with a forward slash. Do not include a trailing slash
 - `physical_capacity` (Number) Physical Capacity consumed by view
 - `policy` (String) The name of the associated view policy
+- `policy__id` (String) Filter by view policy ID
 - `policy__name` (String) Filter by view policy name
 - `policy_id` (Number) The ID of the associated view policy
 - `qos_policy` (String) QoS Policy
@@ -77,6 +84,7 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `s3_versioning` (Boolean) S3 Versioning enabled on S3 bucket.
 - `select_for_live_monitoring` (Boolean) True when the view has live monitoring enabled.  Views that have live monitoring enabled are polled for metrics every ten seconds. Otherwise, views are polled every five minutes.
 - `share` (String) Name of the SMB share. Must not include certain special characters.
+- `smb_encryption_state` (String) Defines the encryption level for SMB
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
 - `tenant_id` (Number) Tenant ID
@@ -89,8 +97,8 @@ data "vastdata_view" "vastdb_view_by_guid" {
 
 - `abac_tags` (Set of String) Comma separated tags.
 - `abe_protocols` (Set of String) The protocols for which Access-Based Enumeration (ABE) is enabled
-- `bucket_creators` (Set of String) For S3 endpoint buckets, this is a list of users whose bucket create requests use this view.
-- `bucket_creators_groups` (Set of String) For S3 endpoint buckets, this is a list of groups whose bucket create requests use this view.
+- `bucket_creators` (Set of String) List of bucket creators users
+- `bucket_creators_groups` (Set of String) List of bucket creators groups
 - `bucket_logging` (Attributes) S3 bucket logging configuration. S3 bucket logging records S3 operations on a source bucket, with logs written to a different bucket configured as the destination. When the source bucket has S3 bucket logging enabled, VAST Cluster creates a log entry in AWS log format for each request made to the source bucket, and periodically uploads the log objects to a destination bucket. The format of log object keys can be configured to allow for date-based partitioning of log objects. (see [below for nested schema](#nestedatt--bucket_logging))
 - `event_notifications` (Attributes Set) (see [below for nested schema](#nestedatt--event_notifications))
 - `id` (Number) The ID of this resource.

@@ -114,41 +114,27 @@ resource "vastdata_qos_policy" "vastdb_qos_policy" {
 
 ### Optional
 
-- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy. (see [below for nested schema](#nestedatt--attached_users))
+- `attached_iam_roles` (Set of Number) List of IAM Roles IDs which should be attached to that QOS Policy
 - `capacity_limits` (Attributes) Performance limits per unit of either used logical capacity or provisioned capacity, depending on the mode. Units are stated per limit. Valid values: 0-4294967296. 0 means unlimited. (see [below for nested schema](#nestedatt--capacity_limits))
 - `capacity_total_limits` (Attributes) (see [below for nested schema](#nestedatt--capacity_total_limits))
 - `is_default` (Boolean) Is default User QOS Policy
-- `is_gold` (Boolean) Grants priority QoS over views that do not have this setting enabled.
-- `limit_by` (String) Specifies which performance parameter(s) are limited by the policy. BW_IOPS=The policy limits service according to bandwidth (BW) and IO per second (IOPS). BW=The policy limits service according to BW only. IOPS=The policy limits service according to IOPS only.
+- `is_gold` (Boolean) Grants priority QoS over views that do not have this setting enabled
+- `limit_by` (String) Parameter to limit by
 - `mode` (String) QoS provisioning mode
-- `policy_type` (String) QOS Policy type
+- `policy_type` (String) QOS Policy type - VIEW or USER
 - `s3_connections_limit` (Number) Maximum number of allowed S3 connections, 0 means unlimited
 - `static_limits` (Attributes) (see [below for nested schema](#nestedatt--static_limits))
 - `static_total_limits` (Attributes) (see [below for nested schema](#nestedatt--static_total_limits))
 - `tenant_id` (Number) Tenant ID
-- `use_total_limits` (Boolean) If true - total limits are used instead of separate read/write limits.
+- `use_total_limits` (Boolean) If true - total limits are used instead of separate read/write limits
 
 ### Read-Only
 
+- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy (see [below for nested schema](#nestedatt--attached_users))
 - `guid` (String) QoS Policy guid
 - `id` (Number) The ID of this resource.
 - `io_size_bytes` (Number) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
 - `tenant_name` (String) Tenant Name
-
-<a id="nestedatt--attached_users"></a>
-### Nested Schema for `attached_users`
-
-Required:
-
-- `fqdn` (String) The Fully Qualified Domain Name (FQDN) of the user's domain.
-- `identifier_type` (String) The attribute used to identify the user.
-- `identifier_value` (String) The value of the identifying attribute for the user. Must be of the attribute specified as identifier_type.
-- `name` (String) User's name
-
-Optional:
-
-- `label` (String) A label for the user
-
 
 <a id="nestedatt--capacity_limits"></a>
 ### Nested Schema for `capacity_limits`
@@ -206,3 +192,18 @@ Optional:
 - `max_iops` (Number) Maximal IOPS
 - `min_bw_mbps` (Number) Minimal BW Mb/s
 - `min_iops` (Number) Minimal IOPS
+
+
+<a id="nestedatt--attached_users"></a>
+### Nested Schema for `attached_users`
+
+Required:
+
+- `fqdn` (String) The Fully Qualified Domain Name (FQDN) of the user's domain.
+- `identifier_type` (String) The attribute used to identify the user.
+- `identifier_value` (String) The value of the identifying attribute for the user. Must be of the attribute specified as identifier_type.
+- `name` (String) User's name
+
+Read-Only:
+
+- `label` (String) A label for the user

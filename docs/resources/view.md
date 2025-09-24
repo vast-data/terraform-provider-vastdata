@@ -159,59 +159,65 @@ resource "vastdata_view" "vastdb_view" {
 
 ### Required
 
-- `path` (String) The full Element Store path to from the top level of the storage system on the cluster to the location that you want to expose. Begin with '/'. Do not include a trailing slash.
-- `policy_id` (Number) Every view must be attached to one view policy, which specifies further configurations. Specify by view policy ID which view policy should be used for the view.
+- `path` (String) The Element Store path to exposed through the view
+- `policy_id` (Number) Specify (by ID) which view policy should be applied to the view
 
 ### Optional
 
 - `abac_tags` (Set of String) list of ABAC tags
-- `abe_max_depth` (Number) Restricts ABE to a specified path depth. For example, if max depth is 3, ABE does not affect paths deeper than three levels. If not specified, ABE affects all path depths.
-- `abe_protocols` (Set of String) The protocols for which Access-Based Enumeration (ABE) is enabled
-- `alias` (String) Relevant if NFS is included in the protocols array. An alias for the mount path of an NFSv3 export. The alias must begin with a forward slash ('/') and must consist of only ASCII characters. If specified, the alias that can be used by NFSv3 clients to mount the view.
-- `allow_anonymous_access` (Boolean) not in use
-- `allow_s3_anonymous_access` (Boolean) Allow S3 anonymous access to S3 bucket. If true, anonymous requests are granted provided that the object ACL grants access to the All Users group (in S3 Native security flavor) or the permission mode bits on the requested file and directory path grant access permission to 'others' (in NFS security flavor).
-- `auto_commit` (String) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
-- `bucket` (String) A name for the S3 bucket name. Must be specified if S3 bucket is specified in protocols.
-- `bucket_creators` (Set of String) For S3 endpoint views, specify a list of users, by user name, whose bucket create requests use this view. Any request to create an S3 bucket that is sent by S3 API by a specified user will use this S3 Endpoint view. Users should not be specified as bucket creators in more than one S3 Endpoint view. Naming a user as a bucket creator in two S3 Endpoint views will fail the creation of the view with an error.
-- `bucket_creators_groups` (Set of String) For S3 endpoint views, specify a list of groups, by group name, whose bucket create requests use this view. Any request to create an S3 bucket that is sent by S3 API by a user who belongs to a group listed here will use this S3 Endpoint view. Take extra care not to duplicate bucket creators through groups: If you specify a group as a bucket creator group in one view and you also specify a user who belongs to that group as a bucket creator user in another view, view creation will not fail. Yet, there is a conflict between the two configurations and the selection of a view for configuring the user's buckets is not predictable.
+- `abe_max_depth` (Number) The maximum depth of folders under the view on which the ABE feature is enabled
+- `abe_protocols` (Set of String) Protocols for which ABE is enabled
+- `alias` (String) For NFS-enabled views, an alias that can be used by NFSv3 clients
+- `allow_anonymous_access` (Boolean) Allow S3 anonymous access
+- `allow_s3_anonymous_access` (Boolean) Allow S3 anonymous access
+- `auto_commit` (String) Specifies the amount of time since the last file modification after which the file will be committed to WORM mode.
+- `bucket` (String)
+- `bucket_creators` (Set of String)
+- `bucket_creators_groups` (Set of String)
 - `bucket_logging` (Attributes) (see [below for nested schema](#nestedatt--bucket_logging))
-- `bucket_owner` (String) Specifies a user to be the bucket owner. Specify as user name. Must be specified if S3 Bucket is included in protocols.
+- `bucket_owner` (String) S3 Bucket owner
+- `bucket_owner_type` (String)
 - `cluster_id` (Number) Cluster ID
-- `create_dir` (Boolean) Create a directory at the specified path. Set to true if the specified path does not exist.
-- `create_dir_acl` (Attributes Set) Define ACL for the newly created dir (see [below for nested schema](#nestedatt--create_dir_acl))
+- `create_dir` (Boolean) Create a directory at the specified path
+- `create_dir_acl` (Attributes Set) ACL for the newly created dir (see [below for nested schema](#nestedatt--create_dir_acl))
 - `create_dir_mode` (Number) Unix permissions mode for the new dir
-- `default_retention_period` (String) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
+- `default_retention_period` (String) The amount of time in which the file/object is protected. This is mandatory if an S3 retention mode is set.
 - `delete_dir` (Boolean) If set to true during view deletion, the underlying directory will also be deleted. This behavior is only effective during delete operations. For it to work properly, the Trash API must be enabled on the VAST cluster.
-- `files_retention_mode` (String) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object.
-- `indestructible_object_duration` (Number) Retention period for objects, in days. Each object in the bucket is protected from deletion, overwriting, renaming and metadata changes for the specified number of days after its creation date.
+- `files_retention_mode` (String) The retention mode for new files that are created via NFS or SMB.
+- `indestructible_object_duration` (Number) Duration of indestructible object in days
 - `inherit_acl` (Boolean) Indicates whether the directory should inherit ACLs from its parent directory
-- `is_default_subsystem` (Boolean) Set to true to set view to be the default subsystem for block storage. There can be up to one default subsystem per tenant. The default subsystem is the default view selected when creating a block volume if no view is specified.
-- `is_indestructible_object_enabled` (Boolean) Set to true to enable indestructible object mode on the view. This is supported only if S3 is the only specified protocol. Other limitations also apply.
-- `is_seamless` (Boolean) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
-- `kafka_first_join_group_timeout_sec` (Number) Kafka first join group timeout, in seconds
-- `kafka_rejoin_group_timeout_sec` (Number) Kafka rejoin group timeout, in seconds
-- `kafka_vip_pools` (Set of Number) For Kafka-enabled views, an array of IDs of Virtual IP pools used to access event topics exposed by the view. The specified virtual IP pool must belong to the same tenant as the Kafka-enabled view. Must also not be a virtual IP pool that is excluded by the view policy's virtual IP pool association.
-- `locking` (Boolean) Set to true to enable object locking on a view. Object locking cannot be disabled after the view is created. Must be true if s3_versioning is true.
-- `max_retention_period` (String) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
-- `min_retention_period` (String) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
+- `is_default_subsystem` (Boolean) is the current view a default subsystem (there could be only one default subsystem per tenant).
+- `is_indestructible_object_enabled` (Boolean) True if the view has enabled indestructible object
+- `is_kafka_encrypted_conn_allowed` (Boolean) True if encrypted connection is allowed for Kafka
+- `is_kafka_unencrypted_conn_allowed` (Boolean) True if unencrypted connection is allowed for Kafka
+- `is_seamless` (Boolean) supports seamless connection between peers
+- `kafka_encrypted_auth_mechanism` (String) Authentication mechanism for encrypted connection
+- `kafka_first_join_group_timeout_sec` (Number) Kafka first join group timeout in seconds
+- `kafka_is_authorization_required` (Boolean) True if authorization is required for Kafka
+- `kafka_rejoin_group_timeout_sec` (Number) Kafka rejoin group timeout in seconds
+- `kafka_unencrypted_auth_mechanism` (String) Authentication mechanism for unencrypted connection
+- `kafka_vip_pools` (Set of Number) Specify VIP Pool IDs in a comma separated list.
+- `locking` (Boolean) Object Locking
+- `max_retention_period` (String) Prevents setting a retention period for a file/object on the view to a value that is higher than the maximum retention period.
+- `min_retention_period` (String) Prevents setting a retention period for a file/object on the view to a value that is lower than the minimum retention period.
 - `name` (String) A name for the view
 - `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.
-- `owner` (String) The owner of the folder. Specify the owner using the attribute type set by owner_type. You can specify a group as the owner, as supported by SMB. To enable setting a group as the owner, set owner_is_group=true. In all cases, set owning_group also.
-- `owner_is_group` (Boolean) Set to true if passing a group as the owner of the folder. This feature is used to enable setting a group as the owner, as supported by SMB.
-- `owner_type` (String) The type of attribute used to specify owner.
-- `owning_group` (String) The owning group of the folder.
-- `owning_group_type` (String) The type of attribute to use to specify the owning group of the folder.
-- `protocols` (Set of String) Protocols enabled for access to the view. 'NFS' enables access from NFS version 3, 'NFS4' enables access from NFS version 4.1 and 4.2, S3' creates an S3 bucket on the view, 'ENDPOINT' creates an S3 endpoint, used as template for views created via S3 RPCs, DATABASE exposes the view as a VAST database. KAFKA enables events related to elements on the view path to be published to the VAST Event Broker. BLOCK exposes the view as a block storage subsystem.
+- `owner` (String) The owner of the folder. You can specify a group as the owner, as supported by SMB. In this case, set owner_is_group=true.
+- `owner_is_group` (Boolean) Set to true if passing a group as the user parameter (the owner of the folder). This feature is used to enable setting a group as the owner, as supported by SMB.
+- `owner_type` (String) posix | sid | login_name | vast_id
+- `owning_group` (String) The owning group of the folder
+- `owning_group_type` (String) posix | sid | login_name | vast_id
+- `protocols` (Set of String) Enabled client access protocols
 - `qos_policy` (String) QoS Policy
-- `qos_policy_id` (Number) Associates a QoS policy with the view.
+- `qos_policy_id` (Number) QoS Policy ID
 - `s3_locks_retention_mode` (String) The retention mode for new object versions stored in this bucket. You can override this if you upload a new object version with an explicit retention mode and period.
 - `s3_object_ownership_rule` (String)
 - `s3_unverified_lookup` (Boolean) S3 Unverified Lookup
-- `s3_versioning` (Boolean) Enable S3 Versioning if S3 bucket. Versioning cannot be disabled after the view is created.
-- `select_for_live_monitoring` (Boolean) Enables live monitoring on the view. Live monitoring can be enabled for up to ten views at one time. Analytics data for views is polled every 5 minutes by default and every 10 seconds with live monitoring.
-- `share` (String) SMB share name. Must be specified if SMB is specified in protocols.
-- `share_acl` (Attributes) Share-level ACL details (see [below for nested schema](#nestedatt--share_acl))
-- `tenant_id` (Number) Associates the specified tenant with the view.
+- `s3_versioning` (Boolean) S3 Versioning
+- `select_for_live_monitoring` (Boolean)
+- `share` (String) SMB share name
+- `smb_encryption_state` (String) Defines the encryption level for SMB
+- `tenant_id` (Number) Tenant ID
 - `user_impersonation` (Attributes) (see [below for nested schema](#nestedatt--user_impersonation))
 
 ### Read-Only
@@ -230,9 +236,10 @@ resource "vastdata_view" "vastdb_view" {
 - `internal` (Boolean)
 - `is_remote` (Boolean)
 - `logical_capacity` (Number) Logical Capacity consumed by view
-- `nqn` (String) Applicable to subsystem (block protocol enabled) views. The subsystem's NVMe Qualified Name. A unique identifier used to identify the subsystem in NVMe operations.
+- `nqn` (String) NVMe Qualified Name, applicable to Subsystem (block protocol enabled).
 - `physical_capacity` (Number) Physical Capacity consumed by view
 - `policy` (String) The name of the associated view policy
+- `share_acl` (Attributes) Share-level ACL details (see [below for nested schema](#nestedatt--share_acl))
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
 - `tenant_name` (String) Tenant Name
@@ -244,12 +251,12 @@ resource "vastdata_view" "vastdb_view" {
 
 Required:
 
-- `destination_id` (Number) Specifies a view ID as the destination bucket for S3 bucket logging. The specified view must have the S3 bucket protocol enabled, must be on the same tenant as the view itself (the source view), must have the same bucket owner, and cannot be the same view as the source view. It also must not have S3 object locking enabled.  In bucket logging, a log entry is created in AWS log format for each request made to the source bucket. The log entries are periodically uploaded to the destination bucket. Configuring destination_id enables S3 bucket logging for the view.
+- `destination_id` (Number) Bucket logging destination id
 
 Optional:
 
-- `key_format` (String) The format for the S3 bucket logging object keys. SIMPLE_PREFIX=[DestinationPrefix][YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString], PARTITIONED_PREFIX_EVENT_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the logged events occurred, PARTITIONED_PREFIX_DELIVERY_TIME=[DestinationPrefix][SourceUsername]/[SourceBucket]/[YYYY]/[MM]/[DD]/[YYYY]-[MM]-[DD]-[hh]-[mm]-[ss]-[UniqueString] where the partitioning is done based on the time when the log object has been delivered to the destination bucket. Default: SIMPLE_PREFIX
-- `prefix` (String) Specifies a prefix to be prepended to each key of a log object uploaded to the destination bucket. This prefix can be used to categorize log objects; for example, if you use the same destination bucket for multiple source buckets. The prefix can be up to 128 characters and must follow S3 object naming rules.
+- `key_format` (String) Bucket logging destination key format
+- `prefix` (String) Bucket logging destination prefix key
 
 
 <a id="nestedatt--create_dir_acl"></a>
@@ -266,28 +273,6 @@ Optional:
 - `sid_str` (String) SID attribute of grantee. Specify this attribute or another for the grantee.
 - `uid_or_gid` (String) UID of user type grantee or GID of group type grantee. Specify this attribute or another attribute for the grantee.
 - `vid_or_vaid` (String) VID of user type grantee or VAID of group type grantee. This is a VAST user or group attribute. Specify this attribute or another attribute for the guarantee.
-
-
-<a id="nestedatt--share_acl"></a>
-### Nested Schema for `share_acl`
-
-Optional:
-
-- `acl` (Attributes Set) Share-level ACL (see [below for nested schema](#nestedatt--share_acl--acl))
-- `enabled` (Boolean) True if Share ACL is enabled on the view, otherwise False
-
-<a id="nestedatt--share_acl--acl"></a>
-### Nested Schema for `share_acl.acl`
-
-Optional:
-
-- `fqdn` (String) FQDN of the grantee
-- `grantee` (String) Type of grantee
-- `name` (String) Name of the grantee
-- `perm` (String) Permission to grant to the grantee
-- `sid_str` (String) Grantee`s SID
-- `uid_or_gid` (Number) Grantee`s uid (if user) or gid (if group)
-
 
 
 <a id="nestedatt--user_impersonation"></a>
@@ -313,3 +298,24 @@ Read-Only:
 - `suffix_filter` (String) Event suffix filter
 - `topic` (String) Event topic
 - `triggers` (Set of String) Event triggers
+
+
+<a id="nestedatt--share_acl"></a>
+### Nested Schema for `share_acl`
+
+Read-Only:
+
+- `acl` (Attributes Set) Share-level ACL (see [below for nested schema](#nestedatt--share_acl--acl))
+- `enabled` (Boolean) True if Share ACL is enabled on the view, otherwise False
+
+<a id="nestedatt--share_acl--acl"></a>
+### Nested Schema for `share_acl.acl`
+
+Read-Only:
+
+- `fqdn` (String) FQDN of the chosen grantee
+- `grantee` (String) grantee type
+- `name` (String) name of the chosen grantee
+- `perm` (String) Grantee`s permissions
+- `sid_str` (String) grantee`s SID
+- `uid_or_gid` (Number) grantee`s uid (if user) or gid (if group)

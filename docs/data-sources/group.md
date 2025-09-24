@@ -51,7 +51,7 @@ data "vastdata_group" "vastdb_group_by_name" {
 Read-Only:
 
 - `id` (Number) ID of the local provider
-- `name` (String) Name of the local provider
+- `name` (String)
 
 
 <a id="nestedatt--s3_policies"></a>

@@ -50,22 +50,44 @@ resource "vastdata_volume" "vastdb_volume" {
 
 ### Required
 
-- `name` (String) The path to the volume relative to the subsystem directory. The path should not begin with a slash (/). You can include slashes inside the path to indicate a hierarchy of directories. The path will be created under the subsystem path for the volume. Any directory hierarchy indicated by slashes will be created accordingly. For example, if you specify b/c/d the directories <subsystem_path>/b and <subsystem_path>b/c will be created if they do not yet exist, as well as the new directory <subsystem_path>/b/c/d.
-- `size` (Number) The volume size, in bytes.
-- `view_id` (Number) The ID of the subsystem view on which to create the volume.
+- `name` (String) Volume path (relative so subsystem)
+- `size` (Number) Volume size (in Bytes)
+- `view_id` (Number) view (subsystem) ID
 
 ### Optional
 
 - `is_monitored` (Boolean) Is this volume live monitored (default - False).
+- `qos_policy_id` (Number) QOS Policy ID
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 
 ### Read-Only
 
-- `capacity` (Number) The amount of data written to the volume.
+- `capacity` (Number) Written data
+- `created` (String)
 - `id` (Number) Volume ID
-- `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
+- `mapped_block_host_count` (Number) How many Blockhost are mapped to this volume.
 - `mapped_block_hosts_preview` (String) Mapped block hosts preview.
 - `namespace_id` (Number) Available for mapped volumes, the namespace ID as used by hosts to search the volume within the subsystem. Each namespace ID is unique within the subsystem. If a volume snapshot is mapped to any host(s), a snapshot volume is created with its own namespace ID.
 - `nguid` (String) The NGUID used by block hosts to access the volume.
+- `qos_policy` (Attributes) (see [below for nested schema](#nestedatt--qos_policy))
+- `snapshot_data` (Attributes) (see [below for nested schema](#nestedatt--snapshot_data))
 - `tenant_name` (String) The name of the tenant to which the volume belongs.
 - `uuid` (String) The UUID, used by hosts to search the volume in the subsystem.
+
+<a id="nestedatt--qos_policy"></a>
+### Nested Schema for `qos_policy`
+
+Read-Only:
+
+- `id` (Number) ID
+- `name` (String) Name
+
+
+<a id="nestedatt--snapshot_data"></a>
+### Nested Schema for `snapshot_data`
+
+Read-Only:
+
+- `created` (String) snapshot's creation time
+- `id` (Number) snapshot's ID
+- `name` (String) snapshot's name
