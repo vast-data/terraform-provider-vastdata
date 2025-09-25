@@ -91,6 +91,13 @@ func GetOpenApiResource(resourcePath string) (*openapi3.PathItem, error) {
 
 	resource := doc.Paths.Map()[resourcePath]
 	if resource == nil {
+		// Fallback: try without trailing slash
+		fallbackPath := strings.TrimSuffix(resourcePath, "/")
+		resource = doc.Paths.Map()[fallbackPath]
+		if resource != nil {
+			return resource, nil
+		}
+
 		// Collect all available paths
 		var available []string
 		for path := range doc.Paths.Map() {

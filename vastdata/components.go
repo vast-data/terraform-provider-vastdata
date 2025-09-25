@@ -64,6 +64,8 @@ var allTFComponents = []TFManager{
 	&SamlConfig{},
 	&VmsConfiguredIdps{},
 	&BlockHost{},
+	&Kerberos{},
+	&KerberosKeytab{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
