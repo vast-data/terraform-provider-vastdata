@@ -22,6 +22,19 @@ import (
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
+// Operation constants for resource operations
+const (
+	OpMetadata       = "Metadata"
+	OpSchema         = "Schema"
+	OpConfigure      = "Configure"
+	OpImportState    = "ImportState"
+	OpCreate         = "Create"
+	OpRead           = "Read"
+	OpUpdate         = "Update"
+	OpDelete         = "Delete"
+	OpValidateConfig = "ValidateConfig"
+)
+
 type Resource struct {
 	newManager   ResourceFactoryFn
 	providerData *ProviderData
@@ -84,58 +97,57 @@ func (r *Resource) NewManager(state any) ResourceManager {
 // ----------------------------------------
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	withContext(ctx, "Metadata", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpMetadata, r.managerName, func(ctx context.Context) {
 		r.metadataImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-	withContext(ctx, "Schema", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpSchema, r.managerName, func(ctx context.Context) {
 		r.schemaImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	withContext(ctx, "Configure", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpConfigure, r.managerName, func(ctx context.Context) {
 		r.configureImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	withContext(ctx, "ImportState", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpImportState, r.managerName, func(ctx context.Context) {
 		r.importStateImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	withContext(ctx, "Create", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpCreate, r.managerName, func(ctx context.Context) {
 		r.createImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	withContext(ctx, "Read", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpRead, r.managerName, func(ctx context.Context) {
 		r.readImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	withContext(ctx, "Update", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpUpdate, r.managerName, func(ctx context.Context) {
 		r.updateImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	withContext(ctx, "Delete", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpDelete, r.managerName, func(ctx context.Context) {
 		r.deleteImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
-	withContext(ctx, "ValidateConfig", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpValidateConfig, r.managerName, func(ctx context.Context) {
 		r.validateConfigImpl(ctx, req, resp)
 	})
-
 }
 
 // ----------------------------------------
@@ -464,32 +476,40 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		return
 	}
 
-	if imp, ok := manager.(AfterCreateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterCreateResource[%s]: do.", managerName))
-		if err = imp.AfterCreateResource(ctx, rest, record.(Record)); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterCreateResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
-	} else if len(tfState.Hints.EditOnlyFields) > 0 {
-		// Update fields on resource that cannot be set on creation. For instance "enabled" field for some resources.
-		updateParams := tfState.GetReadEditOnlyParams()
-		if len(updateParams) > 0 {
-			tflog.Debug(ctx, fmt.Sprintf("Create[%s]: Update 'EditOnly' fields.", managerName))
-			id, exists := record.(Record)["id"]
-			if !exists {
-				panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
-			}
-			_, err = api.UpdateWithContext(ctx, id, updateParams)
-			for k, v := range updateParams {
-				record.(Record)[k] = v // Update record with new values.
-			}
-		}
+	// Ensure record is of type Record, otherwise set to nil.
+	// NOTE: it can be of type EmptyRecord.
+	if _, ok := record.(Record); !ok {
+		record = nil
 	}
 
 	if record != nil {
+		// Handle AfterCreateResource hook
+		if imp, ok := manager.(AfterCreateResource); ok {
+			tflog.Debug(ctx, fmt.Sprintf("AfterCreateResource[%s]: do.", managerName))
+			if err = imp.AfterCreateResource(ctx, rest, record.(Record)); err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("AfterCreateResource[%q]", managerName),
+					err.Error(),
+				)
+				return
+			}
+		} else if len(tfState.Hints.EditOnlyFields) > 0 {
+			// Update fields on resource that cannot be set on creation. For instance "enabled" field for some resources.
+			updateParams := tfState.GetReadEditOnlyParams()
+			if len(updateParams) > 0 {
+				tflog.Debug(ctx, fmt.Sprintf("Create[%s]: Update 'EditOnly' fields.", managerName))
+				id, exists := record.(Record)["id"]
+				if !exists {
+					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
+				}
+				_, err = api.UpdateWithContext(ctx, id, updateParams)
+				for k, v := range updateParams {
+					record.(Record)[k] = v // Update record with new values.
+				}
+			}
+		}
+
+		// Handle response transformation
 		if transformer, ok := manager.(TransformResponseRecord); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
@@ -675,7 +695,7 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		if !exists {
 			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field.", managerName))
 		}
-		updateParams := planTfState.DiffFields(tfState, is.FilterOr, nil, is.SearchOptional, is.SearchRequired)
+		updateParams := planTfState.GetChangedParams(tfState)
 		if transformer, ok := stateManger.(TransformRequestBody); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformRequestBody[%s]: do.", managerName))
 			updateParams = transformer.TransformRequestBody(updateParams)
@@ -695,6 +715,12 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
+	// Ensure record is of type Record, otherwise set to nil.
+	// NOTE: it can be of type EmptyRecord.
+	if _, ok := record.(Record); !ok {
+		record = nil
+	}
+
 	if record != nil {
 		if transformer, ok := stateManger.(TransformResponseRecord); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
@@ -710,19 +736,20 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 			)
 			return
 		}
+
+		if imp, ok := stateManger.(AfterUpdateResource); ok {
+			tflog.Debug(ctx, fmt.Sprintf("AfterUpdateResource[%s]: do.", managerName))
+			if err = imp.AfterUpdateResource(ctx, planManager.(AfterUpdateResource), rest, record.(Record)); err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("AfterUpdateResource[%q]", managerName),
+					err.Error(),
+				)
+				return
+			}
+		}
+
 	} else {
 		tflog.Debug(ctx, fmt.Sprintf("Update[%s]: no record returned, skipping internalstate update.", managerName))
-	}
-
-	if imp, ok := stateManger.(AfterUpdateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterUpdateResource[%s]: do.", managerName))
-		if err = imp.AfterUpdateResource(ctx, planManager.(AfterUpdateResource), rest, record.(Record)); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterUpdateResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
 	}
 
 	// Copy changes from plan to state.

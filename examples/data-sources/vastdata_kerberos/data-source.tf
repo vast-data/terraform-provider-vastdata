@@ -5,3 +5,4 @@ data "vastdata_kerberos" "vastdb_kerberos_by_id" {
 data "vastdata_kerberos" "vastdb_kerberos_by_realm" {
   realm = "EXAMPLE.COM"
 }
+

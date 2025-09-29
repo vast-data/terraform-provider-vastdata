@@ -34,3 +34,4 @@ resource "vastdata_kerberos" "ip_based_kerberos" {
   kadmin_servers     = ["10.27.14.107"]
   enabled            = true
 }
+

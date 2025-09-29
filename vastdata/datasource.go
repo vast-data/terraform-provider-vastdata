@@ -62,25 +62,25 @@ func (d *Datasource) NewManager(config tfsdk.Config) DataSourceManager {
 // ----------------------------------------
 
 func (d *Datasource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	withContext(ctx, "Metadata", d.managerName, func(ctx context.Context) {
+	withContext(ctx, OpMetadata, d.managerName, func(ctx context.Context) {
 		d.metadataImpl(ctx, req, resp)
 	})
 }
 
 func (d *Datasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-	withContext(ctx, "Schema", d.managerName, func(ctx context.Context) {
+	withContext(ctx, OpSchema, d.managerName, func(ctx context.Context) {
 		d.schemaImpl(ctx, req, resp)
 	})
 }
 
 func (d *Datasource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	withContext(ctx, "Configure", d.managerName, func(ctx context.Context) {
+	withContext(ctx, OpConfigure, d.managerName, func(ctx context.Context) {
 		d.configureImpl(ctx, req, resp)
 	})
 }
 
 func (d *Datasource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	withContext(ctx, "Read", d.managerName, func(ctx context.Context) {
+	withContext(ctx, OpRead, d.managerName, func(ctx context.Context) {
 		d.readImpl(ctx, req, resp)
 	})
 }

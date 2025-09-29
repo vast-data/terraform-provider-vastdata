@@ -68,6 +68,10 @@ var allTFComponents = []TFManager{
 	&KerberosKeytab{},
 	&Cluster{},
 	&ClusterEkm{},
+	&Cnode{},
+	&CnodeBgpConfig{},
+	&Rack{},
+	&RackBgpConfig{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate

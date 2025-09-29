@@ -834,6 +834,14 @@ func (s *TFState) GetReadEditOnlyParams() vast_client.Params {
 	return searchParams
 }
 
+// GetChangedParams returns a map of parameters that differ between this TFState (plan)
+// and another TFState (current state), returning only the changed fields.
+// This is commonly used in UpdateResource methods to send only modified fields to the API.
+func (s *TFState) GetChangedParams(otherState *TFState) vast_client.Params {
+	diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional, SearchRequired)
+	return diffParams
+}
+
 // GetDeleteOnlyBodyParams returns a map of parameters used exclusively for delete operations (delete-only).
 // These fields are not used during normal lifecycle operations, but may be required for safe deletion.
 func (s *TFState) GetDeleteOnlyBodyParams() vast_client.Params {

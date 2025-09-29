@@ -3,3 +3,4 @@ resource "vastdata_kerberos_keytab" "generate_keytab" {
   admin_username = "admin@EXAMPLE.COM"
   admin_password = "admin_password"
 }
+

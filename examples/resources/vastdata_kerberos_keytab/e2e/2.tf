@@ -19,3 +19,4 @@ resource "vastdata_kerberos_keytab" "vastdb_keytab_with_upload" {
   keytab_file = base64decode("BQIAAABUAAIAC0VYQU1QTEUuQ09NAAR2YXN0ABB0ZXN0LmV4YW1wbGUuY29tAAAAAWHPmYABABIAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
   filename    = "vast-test.keytab"
 }
+

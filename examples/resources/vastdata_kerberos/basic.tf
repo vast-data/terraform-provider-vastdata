@@ -6,3 +6,4 @@ resource "vastdata_kerberos" "basic_kerberos" {
   kadmin_servers     = ["kadmin.example.com"]
   enabled            = true
 }
+

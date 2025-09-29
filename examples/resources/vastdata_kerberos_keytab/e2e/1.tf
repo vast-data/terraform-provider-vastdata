@@ -12,3 +12,4 @@ resource "vastdata_kerberos_keytab" "vastdb_keytab" {
   admin_username = "admin@VASTDB.LOCAL"
   admin_password = "vastdata123"
 }
+
