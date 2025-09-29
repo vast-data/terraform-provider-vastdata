@@ -66,6 +66,8 @@ var allTFComponents = []TFManager{
 	&BlockHost{},
 	&Kerberos{},
 	&KerberosKeytab{},
+	&Cluster{},
+	&ClusterEkm{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate

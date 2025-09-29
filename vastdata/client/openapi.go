@@ -198,8 +198,9 @@ func GetSchema_PATCH_RequestBody(resourcePath string) (*openapi3.SchemaRef, erro
 }
 
 // GetSchema_POST_StatusOk extracts the schema from a POST operation's response,
-// checking status codes 200, 201, 202 (in that order of preference).
+// checking status codes 200, 201, 202, 204 (in that order of preference).
 // It returns the schema if available under "application/json" content type.
+// For 204 (No Content) responses, it returns an empty schema.
 func GetSchema_POST_StatusOk(resourcePath string) (*openapi3.SchemaRef, error) {
 	resource, err := GetOpenApiResource(resourcePath)
 	if err != nil {
@@ -210,6 +211,7 @@ func GetSchema_POST_StatusOk(resourcePath string) (*openapi3.SchemaRef, error) {
 		return &openapi3.SchemaRef{Value: &openapi3.Schema{}}, nil
 	}
 
+	// Check for responses with content (200, 201, 202)
 	for _, code := range []int{200, 201, 202} {
 		resp := resource.Post.Responses.Status(code)
 		schemaRef := extractSchemaFromResponse(resp)
@@ -219,8 +221,15 @@ func GetSchema_POST_StatusOk(resourcePath string) (*openapi3.SchemaRef, error) {
 		}
 	}
 
+	// Check for 204 No Content response
+	resp204 := resource.Post.Responses.Status(204)
+	if resp204 != nil && resp204.Value != nil {
+		// 204 responses have no content, return empty schema
+		return &openapi3.SchemaRef{Value: &openapi3.Schema{}}, nil
+	}
+
 	return nil, fmt.Errorf(
-		"no valid schema found in POST response (200/201/202) for resource %s", resourcePath,
+		"no valid schema found in POST response (200/201/202/204) for resource %s", resourcePath,
 	)
 }
 
