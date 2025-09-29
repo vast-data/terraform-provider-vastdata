@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
 var ClusterEkmSchemaRef = is.NewSchemaReference(
@@ -36,18 +35,6 @@ func (m *ClusterEkm) NewResourceManager(raw map[string]attr.Value, schema any) R
 					Description: "Cluster ID to which the EKM should be added",
 				},
 			},
-			CommonModifiersMapping: map[string]string{
-				"cluster_id":            schema_generation.ModifierForceNew,
-				"ekm_auth_domain":       schema_generation.ModifierForceNew,
-				"ekm_bypass_validation": schema_generation.ModifierForceNew,
-				"ekm_ca_certificate":    schema_generation.ModifierForceNew,
-				"ekm_certificate":       schema_generation.ModifierForceNew,
-				"ekm_domain":            schema_generation.ModifierForceNew,
-				"ekm_private_key":       schema_generation.ModifierForceNew,
-				"ekm_proxy_address":     schema_generation.ModifierForceNew,
-				"ekm_servers":           schema_generation.ModifierForceNew,
-				"encryption_type":       schema_generation.ModifierForceNew,
-			},
 		},
 	)}
 }
@@ -65,22 +52,34 @@ func (m *ClusterEkm) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRec
 }
 
 func (m *ClusterEkm) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	ts := m.tfstate
-	clusterId := ts.Int64("cluster_id")
-	createParams := ts.GetCreateParams()
-	createParams.Without("cluster_id") // Remove cluster_id from the body since it's in the URL path
-	_, err := rest.Clusters.AddEkmWithContext(ctx, clusterId, createParams)
-	return nil, err
+	clusterId := m.tfstate.Int64("cluster_id")
+	params := m.tfstate.GetCreateParams()
+	params.Without("cluster_id") // Remove cluster_id from params, as it's part of the URL
+
+	return addClusterEkm(ctx, clusterId, params, rest)
 }
 
-func (m *ClusterEkm) UpdateResource(_ context.Context, _ UpdateResource, _ *VMSRest) (DisplayableRecord, error) {
-	// With force_new modifiers, Terraform will handle replacements automatically
-	// This method should not be called for updates since all fields have RequiresReplace()
-	// But we'll keep it as a safety net in case it's called
-	return nil, fmt.Errorf("cluster EKM operations should be replaced, not updated")
+func (m *ClusterEkm) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
+	clusterId := m.tfstate.Int64("cluster_id")
+	planTs := plan.(*ClusterEkm).TfState()
+	params := planTs.GetChangedParams(m.tfstate)
+	params.Without("cluster_id") // Remove cluster_id from params, as it's part of the URL
+
+	return addClusterEkm(ctx, clusterId, params, rest)
 }
 
 func (m *ClusterEkm) DeleteResource(_ context.Context, _ *VMSRest) error {
-	// No-op: KerberosKeytab cannot be deleted - it's a one-time operation
+	// No-op: ClusterEkm cannot be deleted - it's a one-time operation
 	return nil
+}
+
+// addClusterEkm adds EKM configuration to a specific cluster with the given parameters.
+// This is used by both CreateResource and UpdateResource for ClusterEkm.
+func addClusterEkm(ctx context.Context, clusterId int64, params map[string]any, rest *VMSRest) (DisplayableRecord, error) {
+	if clusterId == 0 {
+		return nil, fmt.Errorf("failed to get cluster ID: cluster ID is empty")
+	}
+
+	_, err := rest.Clusters.AddEkmWithContext(ctx, clusterId, params)
+	return nil, err
 }

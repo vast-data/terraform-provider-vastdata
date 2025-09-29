@@ -72,6 +72,9 @@ var allTFComponents = []TFManager{
 	&CnodeBgpConfig{},
 	&Rack{},
 	&RackBgpConfig{},
+	&NicPortRelatedPorts{},
+	&ManagerAuthorizedStatus{},
+	&ManagerPassword{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate

@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
 var KerberosKeytabSchemaRef = is.NewSchemaReference(
@@ -44,13 +43,6 @@ func (m *KerberosKeytab) NewResourceManager(raw map[string]attr.Value, schema an
 					Description: "Custom filename for the keytab file",
 				},
 			},
-			CommonModifiersMapping: map[string]string{
-				"kerberos_id":    schema_generation.ModifierForceNew,
-				"admin_username": schema_generation.ModifierForceNew,
-				"admin_password": schema_generation.ModifierForceNew,
-				"keytab_file":    schema_generation.ModifierForceNew,
-				"filename":       schema_generation.ModifierForceNew,
-			},
 		},
 	)}
 }
@@ -68,32 +60,76 @@ func (m *KerberosKeytab) ReadResource(_ context.Context, _ *VMSRest) (Displayabl
 }
 
 func (m *KerberosKeytab) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	ts := m.tfstate
+	kerberosId := m.tfstate.Int64("kerberos_id")
+	// For create, all params are considered "changed"
+	allParams := m.tfstate.GetCreateParams()
 
-	kerberosId := ts.Int64("kerberos_id")
-	adminUsername := ts.String("admin_username")
-	adminPassword := ts.String("admin_password")
+	return processKerberosKeytab(ctx, kerberosId, m.tfstate, allParams, rest)
+}
 
-	// Prepare parameters for keytab generation
-	params := params{
-		"admin_username": adminUsername,
-		"admin_password": adminPassword,
+func (m *KerberosKeytab) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
+	kerberosId := m.tfstate.Int64("kerberos_id")
+	planTs := plan.(*KerberosKeytab).TfState()
+	changedParams := planTs.GetChangedParams(m.tfstate)
+
+	return processKerberosKeytab(ctx, kerberosId, planTs, changedParams, rest)
+}
+
+func (m *KerberosKeytab) DeleteResource(ctx context.Context, rest *VMSRest) error {
+	// No-op: KerberosKeytab cannot be deleted - it's a one-time operation
+	return nil
+}
+
+// processKerberosKeytab handles the complex keytab generation and optional upload logic.
+// This is used by both CreateResource and UpdateResource for KerberosKeytab.
+func processKerberosKeytab(ctx context.Context, kerberosId int64, tfstate *is.TFState, changedParams map[string]any, rest *VMSRest) (DisplayableRecord, error) {
+	if kerberosId == 0 {
+		return nil, fmt.Errorf("failed to get kerberos ID: kerberos ID is empty")
 	}
 
-	// Generate the keytab
-	_, err := rest.Kerberos.GenerateKeytabWithContext(ctx, kerberosId, params)
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate keytab: %w", err)
+	// Check if we need to generate keytab (admin credentials changed or this is a create operation)
+	needsGeneration := false
+	if _, hasUsername := changedParams["admin_username"]; hasUsername {
+		needsGeneration = true
+	}
+	if _, hasPassword := changedParams["admin_password"]; hasPassword {
+		needsGeneration = true
+	}
+	// For create operations, changedParams will contain all params, so we always generate
+	if len(changedParams) > 0 && (changedParams["admin_username"] != nil || changedParams["admin_password"] != nil) {
+		needsGeneration = true
+	}
+
+	if needsGeneration {
+		// Get both admin credentials from the current tfstate
+		adminUsername := tfstate.String("admin_username")
+		adminPassword := tfstate.String("admin_password")
+
+		if adminUsername == "" || adminPassword == "" {
+			return nil, fmt.Errorf("admin_username and admin_password are required for keytab generation")
+		}
+
+		// Prepare parameters for keytab generation (only admin credentials)
+		generateParams := map[string]any{
+			"admin_username": adminUsername,
+			"admin_password": adminPassword,
+		}
+
+		// Generate the keytab
+		_, err := rest.Kerberos.GenerateKeytabWithContext(ctx, kerberosId, generateParams)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate keytab: %w", err)
+		}
 	}
 
 	// Check if keytab_file is provided for upload
-	if ts.IsKnownAndNotNull("keytab_file") {
-		keytabFileData := ts.String("keytab_file")
+	if tfstate.IsKnownAndNotNull("keytab_file") {
+		keytabFileData := tfstate.String("keytab_file")
 		filename := "keytab"
 
 		// Use custom filename if provided
-		if ts.IsKnownAndNotNull("filename") {
-			filename = ts.String("filename")
+		if tfstate.IsKnownAndNotNull("filename") {
+			filename = tfstate.String("filename")
 		}
 
 		// Upload the keytab file
@@ -102,23 +138,12 @@ func (m *KerberosKeytab) CreateResource(ctx context.Context, rest *VMSRest) (Dis
 			return nil, fmt.Errorf("failed to upload keytab: %w", err)
 		}
 
-		// Return the upload record if available, otherwise the generation record
+		// Return the upload record if available
 		if uploadRecord != nil {
 			return uploadRecord, nil
 		}
 	}
 
+	// Return nil for successful generation without upload
 	return nil, nil
-}
-
-func (m *KerberosKeytab) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
-	// With force_new modifiers, Terraform will handle replacements automatically
-	// This method should not be called for updates since all fields have RequiresReplace()
-	// But we'll keep it as a safety net in case it's called
-	return nil, fmt.Errorf("kerberos keytab operations should be replaced, not updated")
-}
-
-func (m *KerberosKeytab) DeleteResource(ctx context.Context, rest *VMSRest) error {
-	// No-op: KerberosKeytab cannot be deleted - it's a one-time operation
-	return nil
 }
