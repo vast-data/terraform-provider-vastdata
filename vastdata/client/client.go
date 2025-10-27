@@ -3,8 +3,9 @@
 package client
 
 import (
-	vast_client "github.com/vast-data/go-vast-client"
 	"time"
+
+	vast_client "github.com/vast-data/go-vast-client"
 )
 
 func NewRest(
@@ -16,14 +17,16 @@ func NewRest(
 	timeout time.Duration,
 ) (*vast_client.VMSRest, error) {
 	vmsConfig := &vast_client.VMSConfig{
-		Host:      host,
-		Port:      uint64(port),
-		Username:  username,
-		Password:  password,
-		ApiToken:  apiToken,
-		SslVerify: sslVerify,
-		UserAgent: getUserAgent(pluginVer),
-		Timeout:   &timeout,
+		ApiVersion:   "latest",
+		Host:         host,
+		Port:         uint64(port),
+		Username:     username,
+		Password:     password,
+		ApiToken:     apiToken,
+		SslVerify:    sslVerify,
+		UserAgent:    getUserAgent(pluginVer),
+		Timeout:      &timeout,
+		UseBasicAuth: true,
 
 		BeforeRequestFn: BeforeRequestFnCallback,
 		AfterRequestFn:  AfterRequestFnCallback,

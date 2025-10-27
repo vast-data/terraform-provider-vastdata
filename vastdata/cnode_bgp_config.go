@@ -63,9 +63,9 @@ func (m *CnodeBgpConfig) API(_ *VMSRest) VastResourceAPIWithContext {
 	return nil
 }
 
-func (m *CnodeBgpConfig) ReadDatasource(_ context.Context, rest *VMSRest) (DisplayableRecord, error) {
+func (m *CnodeBgpConfig) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	cnodeId := m.tfstate.Int64("cnode_id")
-	return rest.Cnodes.GetBgpConfig(cnodeId)
+	return rest.Cnodes.CnodeBgpconfigWithContext_GET(ctx, cnodeId, params{})
 }
 
 func (m *CnodeBgpConfig) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -105,5 +105,10 @@ func updateCnodeBgpConfig(ctx context.Context, cnodeId int64, params map[string]
 		return nil, fmt.Errorf("failed to get cnode ID: cnode ID is empty")
 	}
 
-	return rest.Cnodes.UpdateBgpConfigWithContext(ctx, cnodeId, params)
+	err := rest.Cnodes.CnodeBgpconfigWithContext_PATCH(ctx, cnodeId, params)
+	if err != nil {
+		return nil, err
+	}
+	// Return the updated config
+	return rest.Cnodes.CnodeBgpconfigWithContext_GET(ctx, cnodeId, make(map[string]any))
 }

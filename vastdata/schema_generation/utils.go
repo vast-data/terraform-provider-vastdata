@@ -19,14 +19,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
+	"github.com/vast-data/go-vast-client/openapi_schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
 type TFStateHints = is.TFStateHints
 
-var resolveComposedSchema = client.ResolveComposedSchema
-var resolveAllRefs = client.ResolveAllRefs
+// Aliases to shared OpenAPI schema utilities from go-vast-client/openapi_schema
+var (
+	resolveComposedSchema = openapi_schema.ResolveComposedSchema
+	resolveAllRefs        = openapi_schema.ResolveAllRefs
+	isObject              = openapi_schema.IsObject
+	isAmbiguousObject     = openapi_schema.IsAmbiguousObject
+	isPrimitive           = openapi_schema.IsPrimitive
+	isStringOrInteger     = openapi_schema.IsStringOrInteger
+	IsEmptySchema         = openapi_schema.IsEmptySchema
+	compareSchemaValues   = openapi_schema.CompareSchemaValues
+	getSchemaType         = openapi_schema.GetSchemaType
+)
 
 type SchemaEntry struct {
 	Prop        *openapi3.Schema
@@ -186,63 +196,8 @@ func flagsFromHintsForResource(name string, hints *TFStateHints, required, optio
 	return required, optional, computed, writeOnly, sensitive, ordered
 }
 
-func isObject(prop *openapi3.Schema) bool {
-	return prop.Type != nil && len(*prop.Type) > 0 && (*prop.Type)[0] == openapi3.TypeObject
-}
-
-func isAmbiguousObject(prop *openapi3.Schema) bool {
-	return isObject(prop) && len(prop.Properties) == 0
-}
-
 func isExcluded(name string, hints *TFStateHints) bool {
 	return hints != nil && hints.ExcludedSchemaFields != nil && contains(hints.ExcludedSchemaFields, name)
-}
-
-// isPrimitive returns true if the given OpenAPI schema represents a primitive type
-// supported by Terraform input parameters (string, integer, number, or boolean).
-//
-// In data source schema generation, this is used to restrict search (input) parameters
-// to primitive types, while non-primitives are only allowed if they are computed.
-func isPrimitive(prop *openapi3.Schema) bool {
-	if prop == nil || prop.Type == nil || len(*prop.Type) == 0 {
-		return false
-	}
-	switch (*prop.Type)[0] {
-	case openapi3.TypeString,
-		openapi3.TypeInteger,
-		openapi3.TypeNumber,
-		openapi3.TypeBoolean:
-		return true
-	default:
-		return false
-	}
-}
-
-// isStringOrInteger returns true if the given OpenAPI schema represents string or integer
-func isStringOrInteger(prop *openapi3.Schema) bool {
-	if prop == nil || prop.Type == nil || len(*prop.Type) == 0 {
-		return false
-	}
-	switch (*prop.Type)[0] {
-	case openapi3.TypeString, openapi3.TypeInteger:
-		return true
-	default:
-		return false
-	}
-}
-
-func IsEmptySchema(ref *openapi3.SchemaRef) bool {
-	if ref == nil || ref.Value == nil {
-		return true
-	}
-	schema := ref.Value
-	return (schema.Type == nil || len(*schema.Type) == 0) &&
-		len(schema.Properties) == 0 &&
-		schema.Items == nil &&
-		len(schema.AllOf) == 0 &&
-		len(schema.OneOf) == 0 &&
-		len(schema.AnyOf) == 0 &&
-		len(schema.Required) == 0
 }
 
 func contains[T comparable](list []T, key T) bool {
@@ -304,63 +259,6 @@ func infoWithContext(ctx context.Context, message string) {
 	} else {
 		fmt.Printf("#===> 🟢  %s\n", message)
 	}
-}
-
-func compareSchemaValues(a, b *openapi3.Schema) (string, bool) {
-	if a == nil || b == nil {
-		if a == b {
-			return "", true
-		}
-		return "One schema is nil while the other is not", false
-	}
-
-	typeA := getSchemaType(a)
-	typeB := getSchemaType(b)
-	if typeA != typeB {
-		return fmt.Sprintf("Type mismatch: %q vs %q", typeA, typeB), false
-	}
-
-	// Compare array items
-	if typeA == "array" {
-		if a.Items == nil || b.Items == nil {
-			if a.Items == b.Items {
-				return "", true
-			}
-			return "Array item schema is nil in one but not the other", false
-		}
-		msg, ok := compareSchemaValues(a.Items.Value, b.Items.Value)
-		if !ok {
-			return fmt.Sprintf("Array item mismatch: %s", msg), false
-		}
-		return "", true
-	}
-
-	// Compare object properties
-	if typeA == "object" {
-		if len(a.Properties) != len(b.Properties) {
-			return fmt.Sprintf("Object property count mismatch: %d vs %d", len(a.Properties), len(b.Properties)), false
-		}
-		for key, valA := range a.Properties {
-			valB, ok := b.Properties[key]
-			if !ok {
-				return fmt.Sprintf("Property %q missing in one schema", key), false
-			}
-			msg, ok := compareSchemaValues(valA.Value, valB.Value)
-			if !ok {
-				return fmt.Sprintf("Property %q mismatch: %s", key, msg), false
-			}
-		}
-	}
-
-	// Optionally: compare format, enum, etc.
-	return "", true
-}
-
-func getSchemaType(s *openapi3.Schema) string {
-	if s == nil || s.Type == nil || len(*s.Type) == 0 {
-		return ""
-	}
-	return (*s.Type)[0]
 }
 
 // injectModifiers applies plan modifiers from hints and automatically adds UseStateForUnknown()

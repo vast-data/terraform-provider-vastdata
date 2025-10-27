@@ -51,7 +51,7 @@ data "vastdata_tenant" "vastdb_tenant_by_guid" {
 - `ldap_provider_id` (Number) Open-LDAP provider ID
 - `ldap_title` (String)
 - `local_provider_id` (Number) Local provider ID
-- `local_provider_title` (String) Local provider title
+- `local_provider_title` (String) The local provider associated with the tenant
 - `login_name_primary_provider` (String) Primary provider for the user's login name
 - `max_views` (Number) Max views we can create on this tenant (0:unlimted as default)
 - `name` (String)
@@ -110,7 +110,7 @@ Read-Only:
 Read-Only:
 
 - `id` (Number) ID of the local provider
-- `name` (String)
+- `name` (String) Name of the local provider
 
 
 <a id="nestedatt--qos"></a>

@@ -18,7 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
+	"github.com/vast-data/go-vast-client/openapi_schema"
 )
 
 func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schema, error) {
@@ -53,15 +53,15 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	// Resolve createSchemaRef
 	switch resourceMethod {
 	case http.MethodPost:
-		if createSchemaRef, err = client.GetSchema_POST_RequestBody(resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPost, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get POST schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodGet:
-		if createSchemaRef, err = client.GetSchema_GET_StatusOk(resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get GET schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
-		if createSchemaRef, err = client.GetSchema_PATCH_RequestBody(resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get PATCH schema for resource %q: %w", resourcePath, err)
 		}
 	default:
@@ -73,11 +73,11 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	// Resolve modelSchemaRef
 	switch resourceMethod {
 	case http.MethodPost:
-		if modelSchemaRef, err = client.GetSchema_POST_StatusOk(resourcePath); err != nil {
+		if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPost, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
-		if modelSchemaRef, err = client.GetSchema_PATCH_RequestBody(resourcePath); err != nil {
+		if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get patch model schema for resource %q: %w", resourcePath, err)
 		}
 
@@ -201,7 +201,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	}
 
 	// Will be optional only fields (Query parameters).
-	params, err := client.QueryParametersGET(resourcePath)
+	params, err := openapi_schema.QueryParametersGET(resourcePath)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		infoWithContext(ctx, fmt.Sprintf("ReadOnly fields: %v", hints.ReadOnlyFields))
 	}
 
-	if searchableQueryParams, err := client.SearchableQueryParams(resourcePath); err == nil {
+	if searchableQueryParams, err := openapi_schema.SearchableQueryParams(resourcePath); err == nil {
 		var filteredSearchableParams []string
 		for _, name := range searchableQueryParams {
 			if _, ok := allProps[name]; ok {

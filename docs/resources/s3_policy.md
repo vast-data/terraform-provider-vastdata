@@ -115,4 +115,4 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
 - `tenant_name` (String)
 - `title` (String)
 - `url` (String)
-- `users` (Set of String)
+- `users` (Set of String) The principals to which the S3 identity policy is attached.

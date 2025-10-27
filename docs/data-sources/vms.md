@@ -47,7 +47,7 @@ data "vastdata_vms" "vastdb_vms_by_name" {
 - `ip2` (String) The IP of the management CNode on the second of the cluster's internal data networks.
 - `ipv6_support` (Boolean) Parameter that controls visibility of ipv6 fields for VIP Pools
 - `login_banner` (String) The login banner for the VMS Web UI and CLI, if customized.
-- `max_api_tokens_per_user` (Number) Max api tokens a User can create
+- `max_api_tokens_per_user` (Number) Max active API tokens allowed per VMS user
 - `mgmt_cnode` (String) The name of the CNode currently running VMS
 - `mgmt_data_interface` (String) Management Data Interface name for L3 networks
 - `mgmt_data_netmask` (String) Management Data Interface Netmask for L3 networks

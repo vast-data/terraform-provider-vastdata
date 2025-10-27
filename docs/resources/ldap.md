@@ -95,7 +95,8 @@ resource "vastdata_ldap" "vastdb_ldap" {
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
 - `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
 - `domain_name` (String) FQDN of Active Directory domain. Must be resolvable in DNS.
-- `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes in case posix_attributes_source is set to SPECIFIC_DOMAINS.
+- `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes
+in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `gid_number` (String) The attribute of a group entry on the LDAP server that contains the GID number of a group, if different from 'gidNumber'. When binding VAST Cluster to AD, you may need to set this to 'gidnumber' (case sensitive).
 - `group_login_name` (String) Specifies the attribute used to query Active Directory for the group login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
@@ -112,7 +113,7 @@ resource "vastdata_ldap" "vastdb_ldap" {
 - `query_posix_attributes_from_gc` (Boolean) When set to True - users/groups from non-joined domain POSIX attributes are supported, when set to False - Posix attributes of users/groups from non-joined domain are not supported. As a condition Global catalog needs to be configured to support Posix attributes. (deprecated since 4.6)
 - `reverse_lookup` (Boolean) Resolve LDAP netgroups into hostnames
 - `super_admin_groups` (Set of String) List of groups on the LDAP provider. Members of these groups can log into VMS as cluster admin users.
-- `tls_certificate` (String) TLS certificate to use for verifying the remote LDAP server''s TLS certificate.
+- `tls_certificate` (String) TLS certificate to use for verifying the remote LDAP server's TLS certificate.
 - `uid` (String) The attribute of a user entry on the LDAP server that contains the user name, if different from 'uid'  When binding VAST Cluster to AD, you may need to set this to 'sAMAccountname'.
 - `uid_member` (String) The attribute of a group entry on the LDAP server that contains names of group members, if different from 'memberUid'. When binding VAST Cluster to AD, you may need to set this to 'memberUID'.
 - `uid_member_value_property_name` (String) Specifies the attribute which represents the value of the LDAP group's member property.

@@ -54,7 +54,11 @@ func (m *RackBgpConfig) CreateResource(ctx context.Context, rest *VMSRest) (Disp
 	rackId := ts.Int64("rack_id")
 	params := ts.GetCreateParams()
 	params.Without("rack_id") // Remove rack_id from params, as it's part of the URL
-	return rest.Racks.UpdateBgpConfigWithContext(ctx, rackId, params)
+	err := rest.Racks.RackBgpconfigWithContext_POST(ctx, rackId, params)
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 func (m *RackBgpConfig) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
@@ -65,7 +69,11 @@ func (m *RackBgpConfig) UpdateResource(ctx context.Context, plan UpdateResource,
 	// Merge plan changes into params
 	params.Update(planTs.GetCreateParams(), true)
 	params.Without("rack_id") // Remove rack_id from params, as it's part of the URL
-	return rest.Racks.UpdateBgpConfigWithContext(ctx, rackId, params)
+	err := rest.Racks.RackBgpconfigWithContext_POST(ctx, rackId, params)
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 func (m *RackBgpConfig) DeleteResource(_ context.Context, _ *VMSRest) error {

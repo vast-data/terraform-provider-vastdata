@@ -136,22 +136,22 @@ resource "vastdata_protected_path" "protected_path_view" {
 ### Required
 
 - `name` (String)
-- `source_dir` (String) path to replicate
-- `target_exported_dir` (String) where to replicate on the remote
-- `tenant_id` (String) local tenant ID
+- `source_dir` (String) A path on the local cluster to protect. A snapshot of the specified path will be taken periodically on the schedule configured in the specified protection policy.
+- `target_exported_dir` (String) A path on a remote peer to which to replicate.
+- `tenant_id` (String) Tenant ID of the tenant on the local cluster to which the source_dir belongs.
 
 ### Optional
 
-- `capabilities` (String) Stream capabilities
-- `enabled` (Boolean) enable/pause protected path
-- `lease_expiry_time` (Number) replication group lease expiry time (sec)
-- `policy_id` (String) replication policy id
-- `protection_policy_id` (String) protection policy id
-- `remote_target_id` (Number) Remote target ID for streams with GN or SYNC capability.
-- `remote_tenant_guid` (String) remote tenant guid
+- `capabilities` (String) Indicates if the protected path supports global access streams ("STARED_GLOBAL_NAMESPACE") or async replication streams ("ASYNC_REPLICATION") or a single stream for synchronous replication ("SYNC_REPLICATION") or both global access and async replication ("REPLICATION_AND_GN").
+- `enabled` (Boolean) Enables/pauses the protected path
+- `lease_expiry_time` (Number) The lease expiry time, in seconds, for a global access protected path. This is the duration for which data that was already requested at the destination path can be read locally from cache without the destination peer requesting it from the source peer. When the lease expires, the cache is invalidated and the next read request for the data is requested again from the source peer.
+- `policy_id` (String) Protection policy ID
+- `protection_policy_id` (String) Specifies whcih protection policy to use
+- `remote_target_id` (Number) Remote target ID for streams with global namespace or synchronous replication capability.
+- `remote_tenant_guid` (String) Tenant GUID of the remote peer tenant to which to replicate
 - `source_member_capabilities` (String) Stream capabilities for the source member
-- `sync_disconnect_time` (Number) replication group sync replication disconnect time (sec)
-- `sync_interval` (Number) replication group sync interval
+- `sync_disconnect_time` (Number) A period of time, in seconds, without communication between sync replication peers, after which the peers are disconnected.
+- `sync_interval` (Number) Replication group sync interval
 
 ### Read-Only
 
@@ -178,6 +178,7 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `last_uploading_restore_point_progress` (Number)
 - `last_uploading_restore_point_state` (String)
 - `logical_size` (Number)
+- `members_info` (Attributes Map) Members info per Replication Peer (see [below for nested schema](#nestedatt--members_info))
 - `peer_cluster_name` (String)
 - `peer_connection_state` (String)
 - `physical_size` (Number)
@@ -193,3 +194,12 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `state` (String) state
 - `state_description` (String)
 - `tenant_name` (String) Local Tenant name
+
+<a id="nestedatt--members_info"></a>
+### Nested Schema for `members_info`
+
+Read-Only:
+
+- `capabilities` (String)
+- `role` (String)
+- `state` (String)

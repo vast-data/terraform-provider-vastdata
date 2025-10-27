@@ -41,7 +41,7 @@ data "vastdata_vip_pool" "vastdb_vip_pool_by_guid" {
 - `enabled` (Boolean) True if the VIP pool is enabled
 - `end_ip` (String) Not currently in use. Use ip_ranges instead.
 - `guid` (String) Global unique ID
-- `gw_ip` (String) The IP address of a local gateway device if client traffic is routed through one
+- `gw_ip` (String) The IP address of a local gateway device if client traffic is routed through one.
 - `gw_ipv6` (String) GW IPv6 Address
 - `id` (Number) VIP Pool ID
 - `name` (String) VIP pool name
@@ -49,7 +49,7 @@ data "vastdata_vip_pool" "vastdb_vip_pool_by_guid" {
 - `port_membership` (String) Allocation of left, right or all CNode ports to the VIP pool. Allocating the left port and the right port in different VIP pools enables the CNodes to be connected to multiple networks simultaneously. Default: all
 - `ranges_summary` (String) IP ranges
 - `role` (String) 'PROTOCOLS' dedicates the VIP pool to client traffic from all of the supported access protocols (NFSv3, NFSv4.1, NFSv4.2, SMBv2, S3, Database, Block, Kafka). At least one VIP pool must be created to enable client access. 'REPLICATION' dedicates the VIP pool for connectivity with an async replication peer cluster. This is needed for async  replication. 'BIG_CATALOG' dedicates the VIP pool to VAST Catalog query access from the client network.
-- `serves_tenant` (String) Filter by served tenants. Accepts Tenant ID or "all".
+- `serves_tenant` (String) Filter by served tenants. Accepts tenant ID or "all" for all served tenants.
 - `start_ip` (String) Not currently in use. Use ip_ranges instead.
 - `state` (String) The state of the VIP pool
 - `subnet_cidr` (Number) The subnet expressed as a CIDR index (number of bits in each IPv4 address that belong to the subnet)
@@ -63,7 +63,7 @@ data "vastdata_vip_pool" "vastdb_vip_pool_by_guid" {
 - `url` (String) The VIP Pool's endpoint URL for API operations
 - `vast_asn` (Number) The cluster's ASN. Applicable only if enable_l3 is true.
 - `vlan` (Number) VIPPool VLAN, if the VIP pool is tagged with a specific VLAN. The VIP pool is exposed only to the specified VLAN on the client data network
-- `vms_preferred` (Boolean) If true, CNodes participating in the vip pool are preferred in VMS host election
+- `vms_preferred` (Boolean) If true, CNodes participating in the vip pool are preferred in VMS host election.
 
 ### Read-Only
 

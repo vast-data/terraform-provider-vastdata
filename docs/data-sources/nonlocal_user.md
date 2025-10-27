@@ -73,7 +73,7 @@ data "vastdata_nonlocal_user" "vastdb_nonlocal_user_by_sid" {
 - `s3_policies_ids` (Set of Number)
 - `s3_remote_policies` (Set of String)
 - `user_qos_policies` (Attributes Set) (see [below for nested schema](#nestedatt--user_qos_policies))
-- `vids` (Set of Number)
+- `vids` (Set of Number) VAST IDs
 
 <a id="nestedatt--access_keys"></a>
 ### Nested Schema for `access_keys`

@@ -4,6 +4,9 @@ package provider
 import (
 	"context"
 	"errors"
+	"net/http"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -67,19 +70,81 @@ func (m *BlockHostMapping) ReadResource(ctx context.Context, rest *VMSRest) (Dis
 func (m *BlockHostMapping) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	volumeId := m.tfstate.Int64("volume_id")
 	hostId := m.tfstate.Int64("host_id")
-	return rest.BlockHostMappings.EnsureMapWithContext(ctx, hostId, volumeId)
+
+	// Check if mapping already exists
+	result, err := rest.BlockHostMappings.GetWithContext(ctx, params{"volume__id": volumeId, "block_host__id": hostId})
+	if err == nil {
+		// Mapping already exists, return it
+		return result, nil
+	}
+
+	// If not found, create the mapping using bulk API
+	if isNotFoundErr(err) {
+		body := params{
+			"map": []map[string]any{
+				{
+					"block_host_id": hostId,
+					"volume_id":     volumeId,
+				},
+			},
+		}
+		_, err := rest.BlockHostMappings.BlockHostMappingBulk_PATCH(body, 3*time.Minute)
+		if err != nil {
+			return nil, err
+		}
+		// Retrieve the created mapping
+		return rest.BlockHostMappings.GetWithContext(ctx, params{"volume__id": volumeId, "block_host__id": hostId})
+	}
+
+	return nil, err
 }
 
 func (m *BlockHostMapping) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
 	planTfstate := plan.(*BlockHostMapping).tfstate
 	volumeId := planTfstate.Int64("volume_id")
 	hostId := planTfstate.Int64("host_id")
-	return rest.BlockHostMappings.EnsureMapWithContext(ctx, hostId, volumeId)
+
+	// Check if mapping already exists
+	result, err := rest.BlockHostMappings.GetWithContext(ctx, params{"volume__id": volumeId, "block_host__id": hostId})
+	if err == nil {
+		// Mapping already exists, return it
+		return result, nil
+	}
+
+	// If not found, create the mapping using bulk API
+	if isNotFoundErr(err) {
+		body := params{
+			"map": []map[string]any{
+				{
+					"block_host_id": hostId,
+					"volume_id":     volumeId,
+				},
+			},
+		}
+		_, err := rest.BlockHostMappings.BlockHostMappingBulk_PATCH(body, 3*time.Minute)
+		if err != nil {
+			return nil, err
+		}
+		// Retrieve the created mapping
+		return rest.BlockHostMappings.GetWithContext(ctx, params{"volume__id": volumeId, "block_host__id": hostId})
+	}
+
+	return nil, err
 }
 
 func (m *BlockHostMapping) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	volumeId := m.tfstate.Int64("volume_id")
 	hostId := m.tfstate.Int64("host_id")
-	_, err := rest.BlockHostMappings.UnMapWithContext(ctx, hostId, volumeId)
-	return err
+
+	// Use bulk API to unmap (with "unmap" operation)
+	body := params{
+		"unmap": []map[string]any{
+			{
+				"block_host_id": hostId,
+				"volume_id":     volumeId,
+			},
+		},
+	}
+	_, err := rest.BlockHostMappings.BlockHostMappingBulk_PATCH(body, 3*time.Minute)
+	return ignoreStatusCodes(err, http.StatusNotFound)
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
+	"github.com/vast-data/go-vast-client/openapi_schema"
 )
 
 var excludeSearchParams = []string{"page", "page_size", "sync", "created", "sync_time"}
@@ -49,7 +49,7 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 
 	switch resourceMethod {
 	case http.MethodGet:
-		if readSchemaRef, err = client.GetSchema_GET_StatusOk(resourcePath); err != nil {
+		if readSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get schema for GET %q: %w", resourcePath, err)
 		}
 	default:
@@ -59,7 +59,7 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 	}
 
 	// Will be write-only fields (Query parameters) unless present in Response schema
-	params, err := client.QueryParametersGET(resourcePath)
+	params, err := openapi_schema.QueryParametersGET(resourcePath)
 	if err != nil {
 		return nil, err
 	}

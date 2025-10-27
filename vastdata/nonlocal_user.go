@@ -3,12 +3,13 @@ package provider
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var NonlocalUserSchemaRef = is.NewSchemaReference(
@@ -85,7 +86,9 @@ func (m *NonlocalUser) TfState() *is.TFState {
 }
 
 func (m *NonlocalUser) API(rest *VMSRest) VastResourceAPIWithContext {
-	return rest.NonLocalUsers
+	// NonLocalUsers resource has been removed in go-vast-client v0.100.0+
+	// Non-local user operations are now part of the Users resource via UserQuery_* methods
+	return rest.Users
 }
 
 func (m *NonlocalUser) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -110,7 +113,7 @@ func (m *NonlocalUser) DeleteResource(ctx context.Context, rest *VMSRest) error 
 // This is used in both CreateResource and UpdateResource for NonLocalUser.
 func ensureNonlocalUserUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := getSearchParams(ctx, stateTs, fieldsTs)
-	record, err := rest.NonLocalUsers.GetWithContext(ctx, searchParams)
+	record, err := rest.Users.UserQueryWithContext_GET(ctx, searchParams)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +128,7 @@ func ensureNonlocalUserUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TF
 		"username",
 		"s3_superuser",
 	); ok {
-		if _, err = rest.NonLocalUsers.UpdateNonLocalUserWithContext(ctx, searchParams); err != nil {
+		if _, err = rest.Users.UserQueryWithContext_PATCH(ctx, searchParams); err != nil {
 			return nil, err
 		}
 	}

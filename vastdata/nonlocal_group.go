@@ -3,12 +3,13 @@ package provider
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var NonlocalGroupSchemaRef = is.NewSchemaReference(
@@ -92,7 +93,7 @@ func (m *NonlocalGroup) TfState() *is.TFState {
 }
 
 func (m *NonlocalGroup) API(rest *VMSRest) VastResourceAPIWithContext {
-	return rest.NonLocalGroups
+	return nil
 }
 
 func (m *NonlocalGroup) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -117,13 +118,13 @@ func (m *NonlocalGroup) DeleteResource(ctx context.Context, rest *VMSRest) error
 // This is used in both CreateResource and UpdateResource for NonLocalGroup.
 func ensureNonlocalGroupUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := getSearchParams(ctx, stateTs, fieldsTs)
-	record, err := rest.NonLocalGroups.GetWithContext(ctx, searchParams)
+	record, err := rest.Groups.GroupQueryWithContext_GET(ctx, searchParams)
 	if err != nil {
 		return nil, err
 	}
 	searchParams.Without("context")
 	if ok := fieldsTs.SetToMapIfAvailable(searchParams, "tenant_id", "s3_policies_ids"); ok {
-		if _, err = rest.NonLocalGroups.UpdateNonLocalGroupWithContext(ctx, searchParams); err != nil {
+		if _, err = rest.Groups.GroupQueryWithContext_PATCH(ctx, searchParams); err != nil {
 			return nil, err
 		}
 	}

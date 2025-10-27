@@ -4,8 +4,9 @@ package provider
 import (
 	"context"
 	"fmt"
-	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"net/http"
+
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -72,7 +73,7 @@ func (m *UserTenantData) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *UserTenantData) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	userID := m.tfstate.Int64("user_id")
-	return rest.Users.GetTenantDataWithContext(ctx, userID)
+	return rest.Users.UserTenantDataWithContext_GET(ctx, userID, nil)
 }
 
 func (m *UserTenantData) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -116,8 +117,7 @@ func ensureUserTenantDataUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.
 		"s3_superuser",
 		"s3_policies_ids",
 	); ok {
-		// Use the custom API method to update tenant data
-		record, err := rest.Users.UpdateTenantDataWithContext(ctx, userID, params)
+		record, err := rest.Users.UserTenantDataWithContext_PATCH(ctx, userID, params)
 		if err != nil {
 			return nil, fmt.Errorf("failed to update tenant data: %w", err)
 		}
@@ -125,7 +125,7 @@ func ensureUserTenantDataUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.
 	}
 
 	// If no fields to update, just get the current tenant data
-	record, err := rest.Users.GetTenantDataWithContext(ctx, userID)
+	record, err := rest.Users.UserTenantDataWithContext_GET(ctx, userID, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tenant data: %w", err)
 	}

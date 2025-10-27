@@ -99,7 +99,7 @@ func (m *Vms) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRec
 	}
 	if ts.IsKnownAndNotNull("max_api_tokens_per_user") {
 		maxTokens := ts.Int64("max_api_tokens_per_user")
-		if _, err = rest.Vms.SetMaxApiTokensPerUser(vmsId, maxTokens); err != nil {
+		if _, err = rest.Vms.VmsSetMaxApiTokensPerUserWithContext_PATCH(ctx, vmsId, maxTokens); err != nil {
 			return nil, fmt.Errorf("failed to set max_api_tokens_per_user: %w", err)
 		}
 		record["max_api_tokens_per_user"] = maxTokens
@@ -118,7 +118,7 @@ func (m *Vms) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMS
 
 	if planTs.IsKnownAndNotNull("max_api_tokens_per_user") {
 		maxTokens := planTs.Int64("max_api_tokens_per_user")
-		if _, err = rest.Vms.SetMaxApiTokensPerUser(vmsId, maxTokens); err != nil {
+		if _, err = rest.Vms.VmsSetMaxApiTokensPerUserWithContext_PATCH(ctx, vmsId, maxTokens); err != nil {
 			return nil, fmt.Errorf("failed to set max_api_tokens_per_user: %w", err)
 		}
 		ts.Set("max_api_tokens_per_user", maxTokens)

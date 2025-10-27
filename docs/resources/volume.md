@@ -50,22 +50,23 @@ resource "vastdata_volume" "vastdb_volume" {
 
 ### Required
 
-- `name` (String) Volume path (relative so subsystem)
-- `size` (Number) Volume size (in Bytes)
-- `view_id` (Number) view (subsystem) ID
+- `name` (String) The path to the volume relative to the subsystem directory. The path should not begin with a slash (/). You can include slashes inside the path to indicate a hierarchy of directories. The path will be created under the subsystem path for the volume. Any directory hierarchy indicated by slashes will be created accordingly. For example, if you specify b/c/d the directories <subsystem_path>/b and <subsystem_path>b/c will be created if they do not yet exist, as well as the new directory <subsystem_path>/b/c/d.
+- `size` (Number) The volume size, in bytes.
+- `view_id` (Number) The ID of the subsystem view on which to create the volume.
 
 ### Optional
 
 - `is_monitored` (Boolean) Is this volume live monitored (default - False).
 - `qos_policy_id` (Number) QOS Policy ID
+- `tags` (Map of String)
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 
 ### Read-Only
 
-- `capacity` (Number) Written data
+- `capacity` (Number) The amount of data written to the volume (deprecated as of 5.4).
 - `created` (String)
 - `id` (Number) Volume ID
-- `mapped_block_host_count` (Number) How many Blockhost are mapped to this volume.
+- `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
 - `mapped_block_hosts_preview` (String) Mapped block hosts preview.
 - `namespace_id` (Number) Available for mapped volumes, the namespace ID as used by hosts to search the volume within the subsystem. Each namespace ID is unique within the subsystem. If a volume snapshot is mapped to any host(s), a snapshot volume is created with its own namespace ID.
 - `nguid` (String) The NGUID used by block hosts to access the volume.

@@ -31,7 +31,7 @@ data "vastdata_active_directory" "vastdb_active_directory1" {
 
 ### Optional
 
-- `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory. This parameter is required unless ldap_id is provided.
+- `domain_name` (String) FQDN of the domain. This parameter is required unless ldap_id is provided
 - `enabled` (Boolean) enabled/disabled
 - `guid` (String) GUID
 - `ldap_id` (Number) ID of the LDAP configuration for binding to the LDAP domain of the Active Directory server. This parameter is required unless domain_name is provided.

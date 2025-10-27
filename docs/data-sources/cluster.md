@@ -47,10 +47,10 @@ description: |-
 - `drive_size` (Number) Drive size for mocked devices
 - `drr` (Number) Data reduction ratio (logical_space_in_use / physical_space_in_use)
 - `drr_text` (String) DRR presented as 1:5.6
-- `ekm_address` (String) EKM address
+- `ekm_address` (String) IP address or DNS name of External Key Manager
 - `ekm_auth_domain` (String) EKM auth domain (Thales)
 - `ekm_domain` (String) EKM domain (Thales)
-- `ekm_port` (Number) EKM port
+- `ekm_port` (Number) Port number for connections to an external key manager. Valid range: 1024 - 65535. Default: 5696
 - `ekm_proxy_address` (String) Thales EKM proxy address: https://proxy-address:port
 - `ekm_servers` (String) List of additional EKM servers: 10.0.0.1:5696,11.0.0.1:5697
 - `enable_bucket_db_replication` (Boolean) True if bucket DB replication is enabled
@@ -65,7 +65,7 @@ description: |-
 - `enable_turbo_boost` (Boolean) Enable Turbo Boost
 - `enable_vast_db_audit` (Boolean) If enabled, audit logs are saved in a VAST DataBase table. Can be enabled in addition to enable_json_audit.
 - `enabled` (Boolean) cluster enabled
-- `encryption_type` (String) Encryption type
+- `encryption_type` (String) Encryption type. INTERNAL = keys are managed internally. CIPHER_TRUST_KMIP=Keys are stored and managed on Thales Group CipherTrust Data Security Platform, FORTANIX_KMIP=Keys are stored and managed on Fortanix DSM, HASHICORP_KMIP?=Keys are stored and managed on HashiCorp Vault Enterprise.
 - `estore_capacity_in_use_bytes` (Number) Logical Space In Use
 - `estore_capacity_in_use_tb` (Number) Logical Space In Use (TB)
 - `expansion_phase` (Number)
@@ -194,7 +194,7 @@ description: |-
 - `s3_enable_v2_authentication` (Boolean) If true, version 2 authentication is blocked for S3 client API requests. Disabled by default.
 - `s3_private_key` (String) Private file content of the SSL certificate used to enable client connection to the S3 service over HTTPS.
 - `secondary_ekm_address` (String) Secondary EKM address
-- `secondary_ekm_port` (Number) Secondary EKM port
+- `secondary_ekm_port` (Number) Secondary EKM port. Valid range: 1024 - 65535.
 - `shards` (Number) Number of shards
 - `showmount_hide_slash` (Boolean) Suppress Linux showmount command output including "/"
 - `showmount_suppressed` (Boolean) Suppress Linux showmount command output on for NFSv3 users
@@ -242,6 +242,7 @@ description: |-
 - `access_ip_ranges` (Set of String)
 - `available_upgrade_version` (Attributes) Details of an upgrade package that has been uploaded and is available. Empty if there is no upgrade package uploaded. (see [below for nested schema](#nestedatt--available_upgrade_version))
 - `max_performance` (Attributes) (see [below for nested schema](#nestedatt--max_performance))
+- `max_performance_metrics` (Map of Number)
 - `protocols` (Set of String) Array of globally audited protocols.
 - `protocols_audit` (Attributes) Global audit options that apply to all views. Settings that are disabled here can be enabled in the view policy. (see [below for nested schema](#nestedatt--protocols_audit))
 - `qos` (Attributes) (see [below for nested schema](#nestedatt--qos))

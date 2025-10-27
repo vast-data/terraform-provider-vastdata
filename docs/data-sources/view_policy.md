@@ -53,7 +53,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `gid_inheritance` (String) Specifies how files receive their owning group when they are created. 'LINUX' (default): Each new file inherits its owning group from the group ID of the user who creates the file. 'BSD': Each new file inherits its owning group from the group ID of the parent directory.
 - `guid` (String) Globally unique identifier
 - `id` (Number) ID
-- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting posix settings from the parent directory versus configured values
+- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting POSIX settings from the parent directory versus configured values.
 - `internal` (Boolean)
 - `is_s3_default_policy` (Boolean) Specifies whether to make this View Policy default for S3
 - `log_deleted` (Boolean) Log deleted files/dirs from trash dir
@@ -85,7 +85,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `s3_object_write` (String) Hosts with full permissions
 - `s3_object_write_acp` (String) Hosts with full permissions
 - `s3_special_chars_support` (Boolean) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols
-- `serves_tenant` (String) Filter by served tenants. Accepts Tenant ID or "all".
+- `serves_tenant` (String) Filter by served tenants. Accepts tenant ID or "all" for all served tenants.
 - `smb_directory_mode` (Number) Default unix type permissions on new folder
 - `smb_directory_mode_padded` (String) Default unix type permissions on new folder
 - `smb_file_mode` (Number) Default unix type permissions on new file
@@ -109,6 +109,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `nfs_no_squash` (Set of String) Hosts with no squash policy
 - `nfs_read_write` (Set of String) Hosts with NFS read/write permissions
 - `nfs_root_squash` (Set of String) Hosts with root squash policy
+- `permission_per_vip_pool` (Map of String)
 - `protocols` (Set of String) Array of protocols to audit
 - `protocols_audit` (Attributes) Audit settings. Any settings enabled here apply to attached views, in addition to any audit settings enabled on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read` (Set of String) Hosts with read permissions
@@ -121,7 +122,6 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `smb_read_only` (Set of String) Hosts with SMB read only permissions
 - `smb_read_write` (Set of String) Hosts with SMB read/write permissions
 - `trash_access` (Set of String) Hosts with trash access permission
-- `vip_pools` (Set of Number) Comma separated vip pool ids. Restricts view access to specified VIP pools.
 
 <a id="nestedatt--protocols_audit"></a>
 ### Nested Schema for `protocols_audit`

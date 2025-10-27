@@ -80,3 +80,13 @@ data "vastdata_protected_path" "vastdb_protected_path_by_guid" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
+- `members_info` (Attributes Map) Members info per Replication Peer (see [below for nested schema](#nestedatt--members_info))
+
+<a id="nestedatt--members_info"></a>
+### Nested Schema for `members_info`
+
+Read-Only:
+
+- `capabilities` (String)
+- `role` (String)
+- `state` (String)

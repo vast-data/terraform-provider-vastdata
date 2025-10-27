@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var ViewPolicySchemaRef = is.NewSchemaReference(
@@ -45,5 +46,5 @@ func (m *ViewPolicy) TfState() *is.TFState {
 }
 
 func (m *ViewPolicy) API(rest *VMSRest) VastResourceAPIWithContext {
-	return rest.ViewPolies
+	return rest.ViewPolicies
 }

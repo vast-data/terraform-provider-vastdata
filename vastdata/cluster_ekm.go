@@ -80,6 +80,6 @@ func addClusterEkm(ctx context.Context, clusterId int64, params map[string]any, 
 		return nil, fmt.Errorf("failed to get cluster ID: cluster ID is empty")
 	}
 
-	_, err := rest.Clusters.AddEkmWithContext(ctx, clusterId, params)
+	err := rest.Clusters.ClusterAddEkmWithContext_POST(ctx, clusterId, params)
 	return nil, err
 }

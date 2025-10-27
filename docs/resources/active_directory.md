@@ -60,14 +60,16 @@ resource "vastdata_active_directory" "ad1" {
 
 ### Optional
 
-- `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check.
-- `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check.
+- `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check
+- `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
 - `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
-- `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory. This parameter is required unless ldap_id is provided.
-- `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes in case posix_attributes_source is set to SPECIFIC_DOMAINS.
+- `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory domain to join. This parameter is required unless ldap_id is provided.
+- `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes
+in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `gid_number` (String) Override 'gidNumber' as the attribute of a group entry that contains the group's GID number. When binding VAST Cluster to AD, you may need to set this to 'gidnumber' (case sensitive).
-- `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
+- `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping.
+Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `ldap_id` (String) ID of the LDAP configuration for binding to the LDAP domain of the Active Directory server. This parameter is required unless domain_name is provided.
@@ -96,7 +98,8 @@ resource "vastdata_active_directory" "ad1" {
 - `uid` (String) Override 'uid' as the attribute of a user entry on the LDAP server that contains the user name. When binding VAST Cluster to AD, you may need to set this to 'sAMAccountname'.
 - `uid_member` (String) Override 'memberUid' as the attribute of a group entry on the LDAP server that contains names of group members. When binding VAST Cluster to AD, you may need to set this to 'memberUID'
 - `uid_member_value_property_name` (String)
-- `uid_number` (String) Override 'uidNumber' as the attribute of a user entry on the LDAP server that contains the UID number. Often when binding VAST Cluster to Active Directory this does not need to be set.
+- `uid_number` (String) Override 'uidNumber' as the attribute of a user entry on the LDAP server that contains the UID number.
+Often when binding VAST Cluster to Active Directory this does not need to be set.
 - `url` (String) LDAP server URI in the format <scheme>://<address>. <address> can be either a DNS name or an IP address. Example: ldap://ldap.company.com
 - `urls` (Set of String) Comma separated list of URIs of LDAP servers in the format <scheme>://<address>. The order of listing defines the priority order. The URI with highest priority that has a good health status is used.
 - `use_auto_discovery` (Boolean) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
@@ -104,7 +107,8 @@ resource "vastdata_active_directory" "ad1" {
 - `use_multi_forest` (Boolean) Allow access for users from trusted domains on other forests.
 - `use_posix` (Boolean) POSIX support
 - `use_tls` (Boolean) Set to true to enable use of TLS to secure communication between VAST Cluster and the LDAP server.
-- `user_login_name` (String) The attribute used to query Active Directory for the user login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
+- `user_login_name` (String) The attribute used to query Active Directory for the user login name in NFS ID mapping.
+Applicable only with Active Directory and NFSv4.
 - `username_property_name` (String) The attribute to use for querying users in VMS user-initated user queries. Default is 'name'. Sometimes set to 'cn'
 
 ### Read-Only

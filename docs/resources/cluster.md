@@ -21,7 +21,7 @@ description: |-
 
 ### Optional
 
-- `audit_dir_name` (String) Name of the audit directory, which is located under the root directory.
+- `audit_dir_name` (String) Audit directory name, located under root directory. Protocol audit logs are saved to this directory.
 - `auto_drive_fw_upgrade` (Boolean) Enable/disable auto drives FW upgrade
 - `bmc_upgrade` (Boolean) BMC upgrade
 - `build` (String) The build to be installed on the cluster
@@ -34,12 +34,12 @@ description: |-
 - `deep_stripe` (Boolean) Is deep stripe system
 - `default_others_share_level_perm` (String) Default Share level permissions for Others. (deprecated since 4.6)
 - `defrag_threshold` (Number) Defrag Threshold
-- `delete_snap_blocks_threshold` (Number) Delete snap blocks threshold
+- `delete_snap_blocks_threshold` (Number) Threshold limiting the number of content blocks handled in a single execution of a delete-snap fiber
 - `deny_cnode_system_access` (Boolean) Flag for disabling cnode access to the system, default: False
 - `disable_dboxes_slots` (Set of String) List of dboxes slots to disable, optional
 - `disable_default_micro_shards` (Boolean) Set the micro shards values to equal the mega shards values
 - `disable_dirsnap` (Boolean) Disable directory snapshots
-- `disable_metrics` (Boolean) Disable dev metrics collection
+- `disable_metrics` (Boolean) Disable internal metrics collection
 - `disable_mgmt_ha` (Boolean) Disable management HA
 - `disable_restrict_user` (Boolean) Ignore user restriction on raider clusters
 - `dmsetup` (Boolean) Mock NVMeoF devices with dmsetup devices
@@ -50,22 +50,22 @@ description: |-
 - `dr_shards` (Number) Number of DR shards
 - `dr_wb_shards` (Number) Number of DR write buffer shards
 - `drive_size` (Number) Drive size for mocked devices
-- `ekm_address` (String) EKM address
+- `ekm_address` (String) IP address or DNS name of External Key Manager. Applicable if encryption is enabled and encryption type is one of the external key management types.
 - `ekm_auth_domain` (String) EKM auth domain (Thales)
-- `ekm_bypass_validation` (Boolean) Bypass key and cert validation
-- `ekm_ca_certificate` (String) EKM CA certificate
-- `ekm_certificate` (String) EKM certificate
+- `ekm_bypass_validation` (Boolean) Bypass key and certificate validation
+- `ekm_ca_certificate` (String) The CA certificate for the connection to the EKM servers
+- `ekm_certificate` (String) The SSL certificate for the connection to the EKM servers
 - `ekm_domain` (String) EKM domain (Thales)
-- `ekm_port` (Number) EKM port
-- `ekm_private_key` (String) EKM private key
+- `ekm_port` (Number) Port number for connections to an External Key Manager. Applicable if encryption is enabled and encryption type is one of the external key management types. Valid range: 1024 - 65535. Default: 5696
+- `ekm_private_key` (String) The private key of the SSL certificate for the connection to the EKM servers.
 - `ekm_proxy_address` (String) Thales EKM proxy address: https://proxy-address:port
-- `ekm_servers` (String) List of additional EKM servers: 10.0.0.1:5696,11.0.0.1:5697
+- `ekm_servers` (String) List of EKM server IPs, additional to ekm_address. Up to five servers may be specified in total. For example: 10.0.0.1:5696,11.0.0.1:5697
 - `enable_dr` (Boolean) Enable data reduction
 - `enable_encryption` (Boolean) Enable data encryption
 - `enable_rack_level_resiliency` (Boolean) Enable rack level resiliency
 - `enable_similarity` (Boolean) Enable similarity
 - `enable_smb` (Boolean) Enable support for SMB
-- `encryption_type` (String) Encryption type
+- `encryption_type` (String) Encryption type. INTERNAL = keys are managed internally. CIPHER_TRUST_KMIP=Keys are stored and managed on Thales Group CipherTrust Data Security Platform, FORTANIX_KMIP=Keys are stored and managed on Fortanix DSM, HASHICORP_KMIP=Keys are stored and managed on HashiCorp Vault Enterprise.
 - `failing_components_cnodes_failure_to_fail_percentage` (Number) Percentage of all CNodes that are allowed to fail
 - `failing_components_enabled` (Boolean) Enable failing components feature
 - `failure_domains_support` (Boolean) Failure domains support
@@ -82,8 +82,8 @@ description: |-
 - `max_file_size` (Number) Maximum audit file size for each CNode core
 - `max_nvram_capacity_percent` (Number) Max NVRAM capacity percent
 - `max_nvram_replication_factor` (Number) Max NVRAM replication factor
-- `max_retention_period` (Number) Max retention period for audit files
-- `max_retention_timeunit` (String) Max retention period timeunit for audit files
+- `max_retention_period` (Number) Max retention period for audit files. Units of measurement set by max_renention_timeunit.
+- `max_retention_timeunit` (String) Unit of measurement for the period specified as max_retention_period
 - `max_ssd_capacity_percent` (Number) Max SSD capacity percent
 - `mega_dr_shards` (Number) Number of DR shards
 - `mega_dr_wb_shards` (Number) Number of DR write buffer shards
@@ -100,14 +100,15 @@ description: |-
 - `nvram_section_layout` (String) NVRAM Section Layout
 - `nvram_size` (Number) NVRAM size for mocked devices
 - `prefill_devices` (Boolean) prefill the mocked devices with zeroes at install
-- `protocols` (Set of String) Protocols to audit
+- `protocols` (Set of String) Protocols to audit for all views.
 - `psnt` (String) Cluster PSNT
+- `rack_pools` (Attributes Map) (see [below for nested schema](#nestedatt--rack_pools))
 - `read_access_users` (Set of String) Enter users here to grant them read access to all files in the audit directory. To make the audit directory accessible to clients, create a view on the directory.
 - `read_access_users_groups` (Set of String) Enter groups here to grant them read access to all files in the audit directory. To make the audit directory accessible to clients, create a view on the directory.
 - `restrict_user` (Boolean) Flag for restrict vastdata user, default is False
 - `s3_block_v2_authentication` (Boolean) Manage s3 blocks v2 authentication
 - `secondary_ekm_address` (String) EKM address
-- `secondary_ekm_port` (Number) EKM port
+- `secondary_ekm_port` (Number) EKM port. Valid range: 1024 - 65535.
 - `shards` (Number) Number of shards
 - `stripe_groups` (Number) Number of stripe groups
 - `sw_defined` (Boolean) Enable sw_defined (only for SDS setup)
@@ -115,6 +116,7 @@ description: |-
 - `use_spdk` (Boolean) Should install spdk
 - `virtual` (Boolean) virtual hardware deployment (default is False)
 - `voc` (Boolean) vast on cloud installation flag (default is False)
+- `vsettings` (Map of String)
 - `wb_raid_layout` (String) WB Raid layout
 
 ### Read-Only
@@ -185,6 +187,7 @@ description: |-
 - `max_cluster_write_bw_mb` (Number) Maximum cluster write bandwidth in MB/s
 - `max_handles_count` (Number) Maximum supported number of handles
 - `max_performance` (Attributes) (see [below for nested schema](#nestedatt--max_performance))
+- `max_performance_metrics` (Map of Number)
 - `md_iops` (Number) Meta-data IOPS
 - `md_usage_health` (String)
 - `memory_raid_rebuild_progress` (Number)
@@ -289,6 +292,17 @@ description: |-
 - `wr_latency` (Number) Write Latency
 - `wr_latency_ms` (Number) Write Latency
 - `wr_md_iops` (Number) Write Meta-data IOPS
+
+<a id="nestedatt--rack_pools"></a>
+### Nested Schema for `rack_pools`
+
+Optional:
+
+- `cnode_ip_pool` (Set of String)
+- `cnode_ipmi_pool` (Set of String)
+- `dnode_ip_pool` (Set of String)
+- `dnode_ipmi_pool` (Set of String)
+
 
 <a id="nestedatt--available_upgrade_version"></a>
 ### Nested Schema for `available_upgrade_version`

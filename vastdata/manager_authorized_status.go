@@ -40,6 +40,6 @@ func (m *ManagerAuthorizedStatus) API(rest *VMSRest) VastResourceAPIWithContext 
 
 func (m *ManagerAuthorizedStatus) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	params := getSearchParams(ctx, m.tfstate, nil)
-	return rest.Managers.GetAuthorizedStatusWithContext(ctx, params)
+	return rest.Managers.ManagerAuthorizedStatusWithContext_GET(ctx, params)
 
 }

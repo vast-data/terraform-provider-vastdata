@@ -31,7 +31,7 @@ data "vastdata_dns" "vastdb_dns_by_name" {
 
 ### Optional
 
-- `bgp_config_id` (Number) BGP configuration ID
+- `bgp_config_id` (Number) The ID of the BGP configuration used for L3 connectivity
 - `domain_suffix` (String) Specifies a suffix to append to domain names of each VIP pool. The suffix should complete each domain name to form a valid FQDN for DNS requests to target.
 - `enable_l3` (Boolean) Enable L3 connectivity
 - `enabled` (Boolean)

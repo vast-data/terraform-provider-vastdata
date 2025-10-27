@@ -5,12 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var UserKeySchemaRef = is.NewSchemaReference(
@@ -67,7 +68,9 @@ func (m *UserKey) TfState() *is.TFState {
 }
 
 func (m *UserKey) API(rest *VMSRest) VastResourceAPIWithContext {
-	return rest.UserKeys
+	// UserKeys resource has been removed in go-vast-client v0.100.0+
+	// User access key operations are now extra methods on the Users resource
+	return rest.Users
 }
 
 func (m *UserKey) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -100,7 +103,14 @@ func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 		return nil, err
 	}
 	userId := ts.Int64("user_id")
-	record, err := rest.UserKeys.CreateKeyWithContext(ctx, userId)
+	// Get tenant_id from the user record
+	userRecord, err := rest.Users.GetByIdWithContext(ctx, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user details for tenant_id: %w", err)
+	}
+	tenantId := userRecord.RecordTenantID()
+
+	record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, tenantId)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +129,7 @@ func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 		record["encrypted_secret_key"] = types.StringNull()
 	}
 	if ts.IsKnownAndNotNull("enabled") && !ts.Bool("enabled") {
-		if _, err = rest.UserKeys.DisableKeyWithContext(ctx, userId, record["access_key"].(string)); err != nil {
+		if err = rest.Users.UserAccessKeysWithContext_PATCH(ctx, userId, record["access_key"].(string), false); err != nil {
 			return nil, err
 		}
 	}
@@ -138,11 +148,7 @@ func (m *UserKey) UpdateResource(ctx context.Context, plan UpdateResource, rest 
 	// Handle enabled/disabled status toggle
 	if planTs.IsKnownAndNotNull("enabled") {
 		accessKey := ts.String("access_key")
-		if planTs.Bool("enabled") {
-			_, err = rest.UserKeys.EnableKeyWithContext(ctx, userId, accessKey)
-		} else {
-			_, err = rest.UserKeys.DisableKeyWithContext(ctx, userId, accessKey)
-		}
+		err = rest.Users.UserAccessKeysWithContext_PATCH(ctx, userId, accessKey, planTs.Bool("enabled"))
 		if err != nil {
 			return nil, err
 		}
@@ -177,7 +183,7 @@ func (m *UserKey) DeleteResource(ctx context.Context, rest *VMSRest) error {
 		return err
 	}
 	userId := ts.Int64("user_id")
-	_, err := rest.UserKeys.DeleteKeyWithContext(ctx, userId, accessKey)
+	err := rest.Users.UserAccessKeysWithContext_DELETE(ctx, userId, accessKey)
 	if ignoreStatusCodes(err, http.StatusNotFound) != nil {
 		return err
 	}

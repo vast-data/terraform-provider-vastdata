@@ -56,8 +56,8 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 
 - `access_flavor` (String) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)
 - `allowed_characters` (String) Specifies the policy for which characters are allowed in file names.
-- `apple_sid` (Boolean) apple sid
-- `atime_frequency` (String) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Specify as time in seconds. If not filled would use 3600s as default value.
+- `apple_sid` (Boolean) For use when connecting from Mac clients to SMB shares, this option enables Security IDs (SIDs) to be returned in Apple compatible representation.
+- `atime_frequency` (String) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. For example: 300 or 00:00:30 seconds is supported. Zero value is not supported. Default: 3600
 - `auth_source` (String) Specifies which source is trusted for the user's group memberships, when users' access to the view is authorized.
 - `cluster_id` (Number)
 - `disable_handle_lease` (Boolean)
@@ -68,13 +68,13 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `expose_id_in_fsid` (Boolean)
 - `flavor` (String) Specifies the security flavor, which determines how file and directory permissions are applied in multiprotocol views.
 - `gid_inheritance` (String) Specifies how files receive their owning group when they are created.
-- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting posix settings from the parent directory versus configured values
-- `is_s3_default_policy` (Boolean) Specifies whether to make this View Policy default for S3
+- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting POSIX settings from the parent directory versus configured values.
+- `is_s3_default_policy` (Boolean) Specifies whether to make the view policy the default policy used for S3 endpoint views.
 - `nfs_all_squash` (Set of String) Specify which NFS client hosts have all squash. With all squash, all client users are mapped to nobody for all file and folder management operations on the export. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
-- `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv4.1
-- `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4.1 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
+- `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
+- `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
 - `nfs_enforce_tls_relaxed` (Boolean) Whether to relax TLS enforcement by not requiring TLS for auxiliary NFSv3 sub-protocols | (MOUNT, NLM, NSM, RQUOTA, NFSACL)
-- `nfs_minimal_protection_level` (String)
+- `nfs_minimal_protection_level` (String) For a policy intended for use with NFSv4-enabled views, sets the Minimal Protection Level for NFSv4 client mounts: 'KRB_AUTH_ONLY' allows client mounts with Kerberos authentication only (using the RPCSEC_GSS authentication service), 'SYSTEM' allows client mounts using either the AUTH_SYS RCP security flavor (the traditional default NFS authentication scheme) or with Kerberos authentication, 'NONE' (default) allows client mounts with the AUTH_NONE (anonymous access), or AUTH_SYS RCP security flavors, or with Kerberos authentication.
 - `nfs_no_squash` (Set of String) Specify which NFS client hosts have no squash. With no squash, all operations are supported. Use this option if you trust the root user not to perform operations that will corrupt data. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `nfs_posix_acl` (Boolean) Enables full support of extended POSIX Access Control Lists (ACL).
 - `nfs_read_only` (Set of String) Specify which NFS client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
@@ -82,27 +82,27 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `nfs_return_open_permissions` (Boolean) If enabled for NFS-exposed views, the NFS server unilaterally returns open (777) permission for all files and directories when responding to client side access checks.
 - `nfs_root_squash` (Set of String) Specify which NFS client hosts have root squash. With root squash, the root user is mapped to nobody for all file and folder management operations on the export. This enables you to prevent the strongest super user from corrupting all user data on the VAST Cluster. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `path_length` (String) Specifies the policy for limiting file path component name length.
-- `protocols` (Set of String) Protocols to audit
+- `permission_per_vip_pool` (Map of String)
+- `protocols` (Set of String) Array of protocols to audit
 - `read_only` (Set of String) Specify which NFS client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `read_write` (Set of String) Specify which NFS client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `s3_flavor_allow_free_listing` (Boolean) Allow NFS clients freely list bucket views and their subdirectories, regardless of individual object permissions.
 - `s3_flavor_detect_full_pathname` (Boolean) When this flag is enabled in S3 flavor, NFS access to objects is determined based on the full resource names specified in the identity policies. When disabled, only the bucket name is compared to the identity policy.
-- `s3_read_only` (Set of String) Specify which S3 client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
-- `s3_read_write` (Set of String) Specify which S3 client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
+- `s3_read_only` (Set of String) Specify which S3 client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
+- `s3_read_write` (Set of String) Specify which S3 client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `s3_special_chars_support` (Boolean) This will enable object names that contain “//“ or “/../“ and are incompatible with other protocols
-- `s3_visibility` (Set of String)
-- `s3_visibility_groups` (Set of String)
-- `serves_tenant` (String) Filter by served tenants. Accepts Tenant ID or "all".
+- `s3_visibility` (Set of String) Users with permission to list buckets that are created using this policy even if they do not have permission to access those buckets.
+- `s3_visibility_groups` (Set of String) Users with permission to list buckets that are created using this policy even if they do not have permission to access those buckets.
+- `serves_tenant` (String) Filter by served tenants. Accepts tenant ID or "all" for all served tenants.
 - `smb_directory_mode` (Number) For multiprotocol views, if the security flavor is NFS, this parameter sets default unix permission bits for directories created by SMB clients. Use three digit numeric notation, each digit representing the user, group and others compontents of the permissions, in that order. Each digit is the sum of the read bit, write bit and execute bit. If reading is permitted, the read bit adds 4 to the component. If writing is permitted, the write bit adds 2 to the component. If execution is permitted, the execute bit adds 1 to the component.
 - `smb_file_mode` (Number) For multiprotocol views, if the security flavor is NFS, this parameter sets default unix permission bits for files created by SMB clients. Use three digit numeric notation, each digit representing the user, group and others compontents of the permissions, in that order. Each digit is the sum of the read bit, write bit and execute bit. If reading is permitted, the read bit adds 4 to the component. If writing is permitted, the write bit adds 2 to the component. If execution is permitted, the execute bit adds 1 to the component.
-- `smb_is_ca` (Boolean)
-- `smb_read_only` (Set of String) Specify which SMB client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
+- `smb_is_ca` (Boolean) When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.
+- `smb_read_only` (Set of String) Specify which SMB client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `smb_read_write` (Set of String) Specify which SMB client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `tenant_id` (Number) Tenant ID
-- `trash_access` (Set of String) Specify which NFS client hosts can access the trash folder. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. Trash folder access must also be enabled for the cluster.
+- `trash_access` (Set of String) Specify which NFS client hosts can access the trash folder. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. Trash folder access must also be enabled for the cluster.
 - `use_32bit_fileid` (Boolean) Sets the VAST Cluster's NFS server to use 32bit file IDs. This setting supports legacy 32-bit applications running over NFS.
 - `use_auth_provider` (Boolean) Not in use
-- `vip_pools` (Set of Number) Dedicate VIP Pools to the view policy. Specify VIP Pool IDs in a comma separated list.
 
 ### Read-Only
 

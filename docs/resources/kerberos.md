@@ -59,7 +59,7 @@ resource "vastdata_kerberos" "ip_based_kerberos" {
 - `kadmin_servers` (Set of String)
 - `kdc` (Set of String)
 - `realm` (String)
-- `service_principals` (Set of String)
+- `service_principals` (Set of String) Kerberos Provider Service Principals
 
 ### Optional
 

@@ -5,9 +5,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	vast_client "github.com/vast-data/go-vast-client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -61,29 +61,31 @@ func (m *UserCopy) CreateResource(ctx context.Context, rest *VMSRest) (Displayab
 	}
 
 	// Prepare the copy parameters
-	params := vast_client.UsersCopyParams{
-		DestinationProviderID: ts.Int64("destination_provider_id"),
-	}
+	copyParams := make(params)
+	copyParams["destination_provider_id"] = ts.Int64("destination_provider_id")
 
 	if hasTenantID {
-		params.TenantID = ts.Int64("tenant_id")
+		copyParams["tenant_id"] = ts.Int64("tenant_id")
 	}
 
 	if hasUserIDs {
 		userIDs := ts.ToSlice("user_ids")
-		params.UserIDs = make([]int64, len(userIDs))
+		userIDsInt := make([]int64, len(userIDs))
 		for i, userID := range userIDs {
 			if id, ok := userID.(int64); ok {
-				params.UserIDs[i] = id
+				userIDsInt[i] = id
 			} else {
 				return nil, fmt.Errorf("invalid user_id type: expected int64, got %T", userID)
 			}
 		}
+		copyParams["user_ids"] = userIDsInt
 	}
 
-	// Execute the copy operation using the CopyWithContext method
-	err := rest.Users.CopyWithContext(ctx, params)
-	return nil, err
+	_, err := rest.Users.UserCopyWithContext_POST(ctx, copyParams, 3*time.Minute)
+	if err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
 
 func (m *UserCopy) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {

@@ -109,14 +109,7 @@ func processKerberosKeytab(ctx context.Context, kerberosId int64, tfstate *is.TF
 			return nil, fmt.Errorf("admin_username and admin_password are required for keytab generation")
 		}
 
-		// Prepare parameters for keytab generation (only admin credentials)
-		generateParams := map[string]any{
-			"admin_username": adminUsername,
-			"admin_password": adminPassword,
-		}
-
-		// Generate the keytab
-		_, err := rest.Kerberos.GenerateKeytabWithContext(ctx, kerberosId, generateParams)
+		_, err := rest.Kerberos.KerberosKeytabWithContext_POST(ctx, kerberosId, adminPassword, adminUsername)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate keytab: %w", err)
 		}
@@ -133,7 +126,7 @@ func processKerberosKeytab(ctx context.Context, kerberosId int64, tfstate *is.TF
 		}
 
 		// Upload the keytab file
-		uploadRecord, err := rest.Kerberos.UploadKeytabWithContext(ctx, kerberosId, []byte(keytabFileData), filename)
+		uploadRecord, err := rest.Kerberos.KerberosKeytabWithContext_PUT(ctx, kerberosId, []byte(keytabFileData), filename)
 		if err != nil {
 			return nil, fmt.Errorf("failed to upload keytab: %w", err)
 		}

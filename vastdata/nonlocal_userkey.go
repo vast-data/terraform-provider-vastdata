@@ -5,12 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var NonlocalUserKeySchemaRef = is.NewSchemaReference(
@@ -59,7 +60,7 @@ func (m *NonlocalUserKey) TfState() *is.TFState {
 }
 
 func (m *NonlocalUserKey) API(rest *VMSRest) VastResourceAPIWithContext {
-	return rest.NonLocalUserKeys
+	return rest.Users
 }
 
 func (m *NonlocalUserKey) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -94,7 +95,7 @@ func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (Di
 	uid := ts.Int64("uid")
 	createParams := params{"uid": uid}
 	ts.SetToMapIfAvailable(createParams, "tenant_id", "enabled")
-	record, err := rest.NonLocalUserKeys.CreateWithContext(ctx, createParams)
+	record, err := rest.Users.UserNonLocalKeysWithContext_POST(ctx, createParams)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +130,7 @@ func (m *NonlocalUserKey) UpdateResource(ctx context.Context, plan UpdateResourc
 			"access_key": ts.String("access_key"),
 			"enabled":    planTs.Bool("enabled"),
 		}
-		if _, err := rest.NonLocalUserKeys.UpdateNonIdWithContext(ctx, updateParams); err != nil {
+		if err := rest.Users.UserNonLocalKeysWithContext_PATCH(ctx, updateParams); err != nil {
 			return nil, err
 		}
 	}
@@ -163,7 +164,7 @@ func (m *NonlocalUserKey) DeleteResource(ctx context.Context, rest *VMSRest) err
 		return err
 	}
 	deleteParams := params{"access_key": accessKey, "uid": ts.Int64("uid")}
-	_, err := rest.NonLocalUserKeys.DeleteNonIdWithContext(ctx, nil, deleteParams)
+	err := rest.Users.UserNonLocalKeysWithContext_DELETE(ctx, deleteParams)
 	if ignoreStatusCodes(err, http.StatusNotFound) != nil {
 		return err
 	}

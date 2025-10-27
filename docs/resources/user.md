@@ -125,15 +125,15 @@ resource "vastdata_user" "vastdb_user" {
 
 ### Optional
 
-- `allow_create_bucket` (Boolean) Set to true to give the user permission to create S3 buckets
-- `allow_delete_bucket` (Boolean) Set to true to give the user permission to delete S3 buckets
-- `gids` (Set of Number) list of GIDs
+- `allow_create_bucket` (Boolean) Set to true to give the user permission to create S3 buckets. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
+- `allow_delete_bucket` (Boolean) Set to true to give the user permission to delete S3 buckets. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
+- `gids` (Set of Number) List of group GIDs of all groups to which the user should belong.
 - `leading_gid` (Number) Leading GID
-- `local` (Boolean)
-- `local_provider_id` (Number) Local provider ID
+- `local` (Boolean) Not in use
+- `local_provider_id` (Number) The ID of the local provider to which to add the user
 - `password` (String, Sensitive) Password
 - `s3_policies_ids` (Set of Number) S3 policies IDs, denoting which S3 identity policies are associated with the user. The user is granted and denied S3 permissions according to the associated S3 identity policies.
-- `s3_superuser` (Boolean) Set to true to give the user S3 superuser permission
+- `s3_superuser` (Boolean) Set to true to give the user S3 superuser permission. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `uid` (Number) NFS UID
 
 ### Read-Only
@@ -161,7 +161,7 @@ resource "vastdata_user" "vastdb_user" {
 Read-Only:
 
 - `id` (Number) ID of the local provider
-- `name` (String)
+- `name` (String) Name of the local provider
 
 
 <a id="nestedatt--s3_policies"></a>

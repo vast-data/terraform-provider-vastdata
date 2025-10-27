@@ -34,7 +34,7 @@ data "vastdata_qos_policy" "vastdb_qos_policy_by_name" {
 - `guid` (String) QoS Policy guid
 - `io_size_bytes` (Number) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
 - `is_default` (Boolean) Is default User QOS Policy
-- `is_gold` (Boolean) Grants priority QoS over views that do not have this setting enabled
+- `is_gold` (Boolean) Grants priority QoS over views that do not have this setting enabled.
 - `limit_by` (String) Specifies which performance parameter(s) are limited by the policy. BW_IOPS=The policy limits service according to bandwidth (BW) and IO per second (IOPS). BW=The policy limits service according to BW only. IOPS=The policy limits service according to IOPS only.
 - `mode` (String) The mode of provisioning quality of service per view. STATIC=read and/or write BW and/or IOPS may be limited to a set maximum limit. USED_CAPACITY=BW and IOPS may be limited set per unit of used logical capacity. Static limits are also configurable and define boundaries of performance allowance. PROVISIONED_CAPACITY=BW and IOPS may be limited per unit of logical capacity, as provisioned by the soft limit of a quota on the view path. Static limits are also configurable and define boundaries of performance allowance.
 - `name` (String)

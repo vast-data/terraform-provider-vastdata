@@ -3,9 +3,10 @@ package provider
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var ApiTokenSchemaRef = is.NewSchemaReference(
@@ -50,6 +51,6 @@ func (m *ApiToken) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *ApiToken) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	ts := m.tfstate
-	_, err := rest.ApiTokens.RevokeWithContext(ctx, ts.String("id"))
+	_, err := rest.ApiTokens.ApiTokenRevokeWithContext_PATCH(ctx, ts.String("id"), nil)
 	return ignoreStatusCodes(err, http.StatusNotFound)
 }

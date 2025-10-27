@@ -52,7 +52,7 @@ func (m *NicPortRelatedPorts) ReadDatasource(ctx context.Context, rest *VMSRest)
 		return nil, fmt.Errorf("nic_port_id is required")
 	}
 
-	relatedIds, err := rest.NicPorts.GetRelatedNicPortsWithContext(ctx, nicPortId)
+	relatedIds, err := rest.NicPorts.NicPortRelatedNicportsWithContext_GET(ctx, nicPortId, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get related NIC ports: %w", err)
 	}

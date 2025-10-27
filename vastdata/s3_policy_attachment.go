@@ -201,11 +201,15 @@ func (m *S3PolicyAttachment) ImportResourceState(req resource.ImportStateRequest
 
 	searchParams, attachContext := m.getSearchParamsFromState(ts)
 	if attachContext == "user" {
-		getFn = rest.NonLocalUsers.GetWithContext
-		defer rest.NonLocalUsers.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Users.UserQueryWithContext_GET(ctx, params)
+		}
+		defer rest.Users.Lock()()
 	} else if attachContext == "group" {
-		getFn = rest.NonLocalGroups.GetWithContext
-		defer rest.NonLocalGroups.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Groups.GroupQueryWithContext_GET(ctx, params)
+		}
+		defer rest.Groups.Lock()()
 	} else {
 		return errors.New("either user or group identifier must be specified")
 	}
@@ -242,13 +246,21 @@ func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (D
 		searchParams, attachContext := m.getSearchParamsFromState(ts)
 
 		if attachContext == "user" {
-			getFn = rest.NonLocalUsers.GetWithContext
-			updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-			defer rest.NonLocalUsers.Lock()()
+			getFn = func(ctx context.Context, params params) (Record, error) {
+				return rest.Users.UserQueryWithContext_GET(ctx, params)
+			}
+			updateFn = func(ctx context.Context, params params) (Record, error) {
+				return rest.Users.UserQuery_PATCH(params)
+			}
+			defer rest.Users.Lock()()
 		} else if attachContext == "group" {
-			getFn = rest.NonLocalGroups.GetWithContext
-			updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-			defer rest.NonLocalGroups.Lock()()
+			getFn = func(ctx context.Context, params params) (Record, error) {
+				return rest.Groups.GroupQueryWithContext_GET(ctx, params)
+			}
+			updateFn = func(ctx context.Context, params params) (Record, error) {
+				return rest.Groups.GroupQueryWithContext_PATCH(ctx, params)
+			}
+			defer rest.Groups.Lock()()
 		} else {
 			return nil, errors.New("either user or group identifier must be specified")
 		}
@@ -294,13 +306,21 @@ func (m *S3PolicyAttachment) CreateResource(ctx context.Context, rest *VMSRest) 
 	searchParams, attachContext := m.getSearchParamsFromState(ts)
 
 	if attachContext == "user" {
-		getFn = rest.NonLocalUsers.GetWithContext
-		updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-		defer rest.NonLocalUsers.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Users.UserQueryWithContext_GET(ctx, params)
+		}
+		updateFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Users.UserQueryWithContext_PATCH(ctx, params)
+		}
+		defer rest.Users.Lock()()
 	} else if attachContext == "group" {
-		getFn = rest.NonLocalGroups.GetWithContext
-		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-		defer rest.NonLocalGroups.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Groups.GroupQueryWithContext_GET(ctx, params)
+		}
+		updateFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Groups.GroupQueryWithContext_PATCH(ctx, params)
+		}
+		defer rest.Groups.Lock()()
 	} else {
 		return nil, errors.New("either user or group identifier must be specified")
 	}
@@ -349,13 +369,21 @@ func (m *S3PolicyAttachment) UpdateResource(ctx context.Context, plan UpdateReso
 	searchParams, attachContext := m.getSearchParamsFromState(ts)
 
 	if attachContext == "user" {
-		getFn = rest.NonLocalUsers.GetWithContext
-		updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-		defer rest.NonLocalUsers.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Users.UserQueryWithContext_GET(ctx, params)
+		}
+		updateFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Users.UserQueryWithContext_PATCH(ctx, params)
+		}
+		defer rest.Users.Lock()()
 	} else if attachContext == "group" {
-		getFn = rest.NonLocalGroups.GetWithContext
-		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-		defer rest.NonLocalGroups.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Groups.GroupQueryWithContext_GET(ctx, params)
+		}
+		updateFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Groups.GroupQueryWithContext_PATCH(ctx, params)
+		}
+		defer rest.Groups.Lock()()
 	} else {
 		return nil, errors.New("either user or group identifier must be specified")
 	}
@@ -417,13 +445,21 @@ func (m *S3PolicyAttachment) DeleteResource(ctx context.Context, rest *VMSRest) 
 	searchParams, attachContext := m.getSearchParamsFromState(ts)
 
 	if attachContext == "user" {
-		getFn = rest.NonLocalUsers.GetWithContext
-		updateFn = rest.NonLocalUsers.UpdateNonLocalUserWithContext
-		defer rest.NonLocalUsers.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Users.UserQueryWithContext_GET(ctx, params)
+		}
+		updateFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Users.UserQueryWithContext_PATCH(ctx, params)
+		}
+		defer rest.Users.Lock()()
 	} else if attachContext == "group" {
-		getFn = rest.NonLocalGroups.GetWithContext
-		updateFn = rest.NonLocalGroups.UpdateNonLocalGroupWithContext
-		defer rest.NonLocalGroups.Lock()()
+		getFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Groups.GroupQueryWithContext_GET(ctx, params)
+		}
+		updateFn = func(ctx context.Context, params params) (Record, error) {
+			return rest.Groups.GroupQueryWithContext_PATCH(ctx, params)
+		}
+		defer rest.Groups.Lock()()
 	} else {
 		return fmt.Errorf("either user or group identifier must be specified")
 	}

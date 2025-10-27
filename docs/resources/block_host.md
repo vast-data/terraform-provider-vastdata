@@ -70,6 +70,10 @@ resource "vastdata_block_host_mapping" "vastdb_block_host_mapping" {
 - `nqn` (String) The host's NVMe Qualified Name (NQN), a unique identifier used to identify the host in NVMe operations. Retrieve the NQN from the host.
 - `tenant_id` (Number) The ID of the tenant to which to add the block host. Add the host separately as needed to each tenant.
 
+### Optional
+
+- `tags` (Map of String)
+
 ### Read-Only
 
 - `id` (Number) The ID of this resource.

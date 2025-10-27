@@ -3,11 +3,12 @@ package provider
 
 import (
 	"context"
+	"net/http"
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
-	"strings"
 )
 
 var ViewSchemaRef = is.NewSchemaReference(
@@ -72,8 +73,9 @@ func (m *View) PrepareDeleteResource(ctx context.Context, rest *VMSRest) error {
 	var err error
 	if tfstate.IsKnownAndNotNull("delete_dir") && tfstate.Bool("delete_dir") {
 		// If delete_dir is true, we delete the directory.
-		deleteParams, _ := tfstate.SetIfAvailable("path", "tenant_id")
-		if _, err = rest.Folders.DeleteFolderWithContext(ctx, deleteParams); isApiError(err) {
+		path := tfstate.String("path")
+		tenantId := tfstate.Int64("tenant_id")
+		if _, err = rest.Folders.FolderDeleteFolderWithContext_DELETE(ctx, path, tenantId); isApiError(err) {
 			body := err.(*ApiError).Body
 			if strings.Contains(body, "no such directory") {
 				return nil

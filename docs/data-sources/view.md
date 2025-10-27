@@ -38,8 +38,8 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `bulk_permission_update_progress` (Number) Progress
 - `bulk_permission_update_state` (String) State
 - `cluster` (String) Parent Cluster
-- `cluster__id` (String)
-- `cluster__name` (String)
+- `cluster__id` (String) Limit response by cluster ID
+- `cluster__name` (String) Filter response by cluster name.
 - `cluster_id` (Number) Parent Cluster ID
 - `create_dir` (String) Creates the directory specified by the path
 - `created` (String)
@@ -69,7 +69,7 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `min_retention_period` (String) Applicable if locking is enabled. Sets a minimum retention period for files that are locked in the view. Files cannot be locked for less than this period, whether locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (h - hours, d - days, m - months, y - years). Example: 1d (1 day).
 - `name` (String)
 - `nfs_interop_flags` (String) Indicates whether the view should support simultaneous access to NFS3/NFS4/SMB protocols.
-- `nqn` (String) NVMe Qualified Name, applicable to Subsystem (block protocol enabled).
+- `nqn` (String) Applicable to subsystem (block protocol enabled) views. The subsystem's NVMe Qualified Name. A unique identifier used to identify the subsystem in NVMe operations.
 - `path` (String) The Element Store path exposed by the view. Begin with a forward slash. Do not include a trailing slash
 - `physical_capacity` (Number) Physical Capacity consumed by view
 - `policy` (String) The name of the associated view policy
@@ -97,8 +97,8 @@ data "vastdata_view" "vastdb_view_by_guid" {
 
 - `abac_tags` (Set of String) Comma separated tags.
 - `abe_protocols` (Set of String) The protocols for which Access-Based Enumeration (ABE) is enabled
-- `bucket_creators` (Set of String) List of bucket creators users
-- `bucket_creators_groups` (Set of String) List of bucket creators groups
+- `bucket_creators` (Set of String) For S3 endpoint buckets, this is a list of users whose bucket create requests use this view.
+- `bucket_creators_groups` (Set of String) For S3 endpoint buckets, this is a list of groups whose bucket create requests use this view.
 - `bucket_logging` (Attributes) S3 bucket logging configuration. S3 bucket logging records S3 operations on a source bucket, with logs written to a different bucket configured as the destination. When the source bucket has S3 bucket logging enabled, VAST Cluster creates a log entry in AWS log format for each request made to the source bucket, and periodically uploads the log objects to a destination bucket. The format of log object keys can be configured to allow for date-based partitioning of log objects. (see [below for nested schema](#nestedatt--bucket_logging))
 - `event_notifications` (Attributes Set) (see [below for nested schema](#nestedatt--event_notifications))
 - `id` (Number) The ID of this resource.
@@ -146,9 +146,9 @@ Read-Only:
 - `fqdn` (String) FQDN of the chosen grantee
 - `grantee` (String) grantee type
 - `name` (String) name of the chosen grantee
-- `perm` (String) Grantee`s permissions
-- `sid_str` (String) grantee`s SID
-- `uid_or_gid` (Number) grantee`s uid (if user) or gid (if group)
+- `perm` (String) Grantee’s permissions
+- `sid_str` (String) grantee’s SID
+- `uid_or_gid` (Number) grantee’s uid (if user) or gid (if group)
 
 
 
