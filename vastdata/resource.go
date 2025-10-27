@@ -456,7 +456,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			if len(createParamsDiff) > 0 {
 				id, exists := record.(Record)["id"]
 				if !exists {
-					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
+					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
 				}
 				// Send only difference between current record from vast and createParams.
 				if record, err = api.UpdateWithContext(ctx, id, createParamsDiff); err == nil {
@@ -500,7 +500,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				tflog.Debug(ctx, fmt.Sprintf("Create[%s]: Update 'EditOnly' fields.", managerName))
 				id, exists := record.(Record)["id"]
 				if !exists {
-					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
+					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
 				}
 				_, err = api.UpdateWithContext(ctx, id, updateParams)
 				for k, v := range updateParams {
@@ -693,7 +693,7 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		// For other resources please implement CreateResource to avoid entering this branch.
 		id, exists := record.(Record)["id"]
 		if !exists {
-			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field.", managerName))
+			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
 		}
 		updateParams := planTfState.GetChangedParams(tfState)
 		if transformer, ok := stateManger.(TransformRequestBody); ok {

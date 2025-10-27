@@ -97,5 +97,6 @@ func (m *Topic) DeleteResource(ctx context.Context, rest *VMSRest) error {
 		return err
 	}
 	deleteParams, _ := m.tfstate.SetIfAvailable("database_name", "name")
-	return rest.Topics.TopicDeleteWithContext_DELETE(ctx, deleteParams)
+	err := rest.Topics.TopicDeleteWithContext_DELETE(ctx, deleteParams)
+	return ignoreStatusCodes(err, http.StatusNotFound)
 }

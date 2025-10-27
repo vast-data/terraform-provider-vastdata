@@ -81,10 +81,10 @@ func (m *BlockHostMapping) CreateResource(ctx context.Context, rest *VMSRest) (D
 	// If not found, create the mapping using bulk API
 	if isNotFoundErr(err) {
 		body := params{
-			"map": []map[string]any{
+			"pairs_to_add": []map[string]any{
 				{
-					"block_host_id": hostId,
-					"volume_id":     volumeId,
+					"host_id":   hostId,
+					"volume_id": volumeId,
 				},
 			},
 		}
@@ -114,10 +114,10 @@ func (m *BlockHostMapping) UpdateResource(ctx context.Context, plan UpdateResour
 	// If not found, create the mapping using bulk API
 	if isNotFoundErr(err) {
 		body := params{
-			"map": []map[string]any{
+			"pairs_to_add": []map[string]any{
 				{
-					"block_host_id": hostId,
-					"volume_id":     volumeId,
+					"host_id":   hostId,
+					"volume_id": volumeId,
 				},
 			},
 		}
@@ -136,12 +136,12 @@ func (m *BlockHostMapping) DeleteResource(ctx context.Context, rest *VMSRest) er
 	volumeId := m.tfstate.Int64("volume_id")
 	hostId := m.tfstate.Int64("host_id")
 
-	// Use bulk API to unmap (with "unmap" operation)
+	// Use bulk API to unmap (with "pairs_to_remove" operation)
 	body := params{
-		"unmap": []map[string]any{
+		"pairs_to_remove": []map[string]any{
 			{
-				"block_host_id": hostId,
-				"volume_id":     volumeId,
+				"host_id":   hostId,
+				"volume_id": volumeId,
 			},
 		},
 	}
