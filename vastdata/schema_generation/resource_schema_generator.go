@@ -94,38 +94,6 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		return nil, fmt.Errorf("model schema reference is nil for resource path %q", resourcePath)
 	}
 
-	//createSchemaRef, err := client.GetSchema_POST_RequestBody(resourcePath)
-	//if err != nil {
-	//	return nil, fmt.Errorf("failed to get POST request schema for resource %q: %w", resourcePath, err)
-	//}
-	//
-	//if IsEmptySchema(createSchemaRef) {
-	//	if createSchemaRef, err = client.GetSchema_GET_StatusOk(resourcePath); err != nil {
-	//		return nil, fmt.Errorf("failed to get GET status schema for resource %q: %w", resourcePath, err)
-	//	}
-	//	infoWithContext(
-	//		ctx,
-	//		fmt.Sprintf("POST schema is not present for resource %q, using GET status schema instead", resourcePath),
-	//	)
-	//}
-
-	//modelSchemaRef, err := client.GetSchema_POST_StatusOk(resourcePath)
-	//if err != nil {
-	//	return nil, fmt.Errorf("failed to get POST status schema: %w", err)
-	//}
-	//if modelSchemaRef == nil {
-	//	return nil, fmt.Errorf("model schema reference is nil for resource path %q", resourcePath)
-	//}
-	//if IsEmptySchema(modelSchemaRef) {
-	//	if modelSchemaRef, err = client.GetSchema_PATCH_RequestBody(resourcePath); err != nil {
-	//		return nil, fmt.Errorf("failed to get PATCH request schema for resource %q: %w", resourcePath, err)
-	//	}
-	//	infoWithContext(
-	//		ctx,
-	//		fmt.Sprintf("Model schema is not present for resource %q, using PATCH request schema instead", resourcePath),
-	//	)
-	//}
-
 	var description, title string
 	if modelSchemaRef.Value != nil {
 		title = modelSchemaRef.Value.Title

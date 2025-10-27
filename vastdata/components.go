@@ -75,6 +75,7 @@ var allTFComponents = []TFManager{
 	&NicPortRelatedPorts{},
 	&ManagerAuthorizedStatus{},
 	&ManagerPassword{},
+	&Topic{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
