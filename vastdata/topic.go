@@ -11,8 +11,8 @@ import (
 )
 
 var TopicSchemaRef = is.NewSchemaReference(
-	http.MethodGet,
-	"topics/show",
+	http.MethodPost,
+	"topics",
 	http.MethodGet,
 	"topics/show",
 )

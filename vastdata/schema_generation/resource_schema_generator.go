@@ -73,8 +73,28 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	// Resolve modelSchemaRef
 	switch resourceMethod {
 	case http.MethodPost:
-		if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPost, resourcePath); err != nil {
+		// Try to get model schema from POST response
+		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPost, resourcePath)
+
+		// If POST doesn't have a response schema, try to use the Read endpoint as fallback
+		if err != nil && hints.SchemaRef.Read != nil {
+			readPath := hints.SchemaRef.Read.Path
+			readMethod := hints.SchemaRef.Read.Method
+			if readMethod == http.MethodGet && readPath != "" {
+				warnWithContext(ctx, fmt.Sprintf("POST response schema not found for %q, using GET %q for model schema", resourcePath, readPath))
+				if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, readPath); err != nil {
+					return nil, fmt.Errorf("failed to get model schema from POST response or GET %q: %w", readPath, err)
+				}
+			} else {
+				return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
+			}
+		} else if err != nil {
 			return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
+		}
+	case http.MethodGet:
+		// Use GET response schema for both create and model schemas (typically for read-only or schema-only resources)
+		if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
+			return nil, fmt.Errorf("failed to get GET model schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
 		if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
