@@ -41,7 +41,7 @@ func (d *Datasource) ManagerWithSchemaOnly(ctx context.Context) (DataSourceManag
 	switch sch := any(*schema).(type) {
 	case dschema.Schema:
 		for k, a := range sch.Attributes {
-			zeroRaw[k], _ = is.BuildAttrValueFromAny(a.GetType(), nil)
+			zeroRaw[k], _, _ = is.BuildAttrValueFromAny(a.GetType(), nil)
 		}
 	default:
 		// Fallback to passing nil Raw if schema kind unexpected

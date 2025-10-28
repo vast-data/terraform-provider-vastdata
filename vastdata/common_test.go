@@ -4,8 +4,9 @@ package provider
 
 import (
 	"fmt"
-	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"testing"
+
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -211,7 +212,7 @@ func mustTFState(raw map[string]attr.Value) *internalstate.TFState {
 }
 
 func mustBuildAttr(t attr.Type, val any) attr.Value {
-	v, err := internalstate.BuildAttrValueFromAny(t, val)
+	v, _, err := internalstate.BuildAttrValueFromAny(t, val)
 	if err != nil {
 		panic(fmt.Sprintf("build attr failed: %v", err))
 	}

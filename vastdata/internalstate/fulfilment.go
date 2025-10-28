@@ -80,8 +80,8 @@ func FillFrameworkValues(val tftypes.Value, schema any) (map[string]attr.Value, 
 		if !ok {
 			continue
 		}
-		av, err := BuildAttrValueFromAny(attrType, v)
-		if err != nil {
+		av, _, err := BuildAttrValueFromAny(attrType, v)
+		if err != nil && av == nil {
 			return nil, fmt.Errorf("BuildAttrValueFromAny failed for %q: %w\nInspected object: %v", k, err, obj)
 		}
 		result[k] = av
@@ -90,135 +90,145 @@ func FillFrameworkValues(val tftypes.Value, schema any) (map[string]attr.Value, 
 	return result, nil
 }
 
-func BuildAttrValueFromAny(t attr.Type, val any) (attr.Value, error) {
+// BuildAttrValueFromAny converts any value to a Terraform attr.Value.
+// Returns (attr.Value, bool, error) where:
+// - attr.Value: the converted value (may be a default value even on parse failure)
+// - bool: indicates if parsing was fully successful
+// - error: describes what went wrong (if anything)
+//
+// For cases like empty string to int64, returns (Int64Value(0), false, error) to allow
+// callers to use the default value while being aware of the parsing issue.
+func BuildAttrValueFromAny(t attr.Type, val any) (attr.Value, bool, error) {
 	if tfVal, ok := val.(attr.Value); ok {
-		return tfVal, nil
+		return tfVal, true, nil
 	}
 	if _, ok := val.(tftypes.Value); ok {
-		return tfTypeToAttrType(t, val.(tftypes.Value))
+		attrVal, err := tfTypeToAttrType(t, val.(tftypes.Value))
+		return attrVal, true, err
 	}
 
 	if IsNil(val) {
 		switch t.String() {
 		case types.StringType.String():
-			return types.StringNull(), nil
+			return types.StringNull(), true, nil
 		case types.Int64Type.String():
-			return types.Int64Null(), nil
+			return types.Int64Null(), true, nil
 		case types.Float64Type.String():
-			return types.Float64Null(), nil
+			return types.Float64Null(), true, nil
 		case types.BoolType.String():
-			return types.BoolNull(), nil
+			return types.BoolNull(), true, nil
 		default:
 			switch tt := t.(type) {
 			case types.ListType:
-				return types.ListNull(tt.ElemType), nil
+				return types.ListNull(tt.ElemType), true, nil
 			case types.SetType:
-				return types.SetNull(tt.ElemType), nil
+				return types.SetNull(tt.ElemType), true, nil
 			case types.MapType:
-				return types.MapNull(tt.ElemType), nil
+				return types.MapNull(tt.ElemType), true, nil
 			case types.ObjectType:
-				return types.ObjectNull(tt.AttributeTypes()), nil
+				return types.ObjectNull(tt.AttributeTypes()), true, nil
 			default:
-				return nil, fmt.Errorf("unsupported null type: %T", t)
+				return nil, true, fmt.Errorf("unsupported null type: %T", t)
 			}
 		}
 	}
 
 	switch t.String() {
 	case types.StringType.String():
-		return types.StringValue(fmt.Sprintf("%v", val)), nil
+		return types.StringValue(fmt.Sprintf("%v", val)), true, nil
 	case types.Int64Type.String():
 		n, err := ToInt(val)
 		if err != nil {
-			return nil, err
+			// Cannot parse - return default value 0 with success=false
+			return types.Int64Value(0), false, err
 		}
-		return types.Int64Value(n), nil
+		return types.Int64Value(n), true, nil
 	case types.Float64Type.String():
 		f, err := ToFloat(val)
 		if err != nil {
-			return nil, err
+			return nil, true, err
 		}
-		return types.Float64Value(f), nil
+		return types.Float64Value(f), true, nil
 	case types.BoolType.String():
 		b, ok := val.(bool)
 		if !ok {
-			return nil, fmt.Errorf("expected bool, got %T", val)
+			return nil, true, fmt.Errorf("expected bool, got %T", val)
 		}
-		return types.BoolValue(b), nil
+		return types.BoolValue(b), true, nil
 	}
 
 	switch tt := t.(type) {
 	case types.ListType:
 		rawList, ok := val.([]any)
 		if !ok {
-			return nil, fmt.Errorf("expected []any for list, got %T, value = %v", val, val)
+			return nil, true, fmt.Errorf("expected []any for list, got %T, value = %v", val, val)
 		}
 		var elems []attr.Value
 		for i, item := range rawList {
-			elem, err := BuildAttrValueFromAny(tt.ElemType, item)
-			if err != nil {
-				return nil, fmt.Errorf("list[%d]: %w", i, err)
+			elem, _, err := BuildAttrValueFromAny(tt.ElemType, item)
+			if elem == nil {
+				return nil, true, fmt.Errorf("list[%d]: %w", i, err)
 			}
 			elems = append(elems, elem)
 		}
-		return types.ListValueMust(tt.ElemType, elems), nil
+		return types.ListValueMust(tt.ElemType, elems), true, nil
 
 	case types.SetType:
 		rawList, ok := val.([]any)
 		if !ok {
-			return nil, fmt.Errorf("expected []any for set, got %T. value = %v", val, val)
+			return nil, true, fmt.Errorf("expected []any for set, got %T. value = %v", val, val)
 		}
 		var elems []attr.Value
 		for i, item := range rawList {
-			elem, err := BuildAttrValueFromAny(tt.ElemType, item)
-			if err != nil {
-				return nil, fmt.Errorf("set[%d]: %w", i, err)
+			elem, _, err := BuildAttrValueFromAny(tt.ElemType, item)
+			if elem == nil {
+				return nil, true, fmt.Errorf("set[%d]: %w", i, err)
 			}
 			elems = append(elems, elem)
 		}
-		return types.SetValueMust(tt.ElemType, elems), nil
+		return types.SetValueMust(tt.ElemType, elems), true, nil
 
 	case types.MapType:
 		rawMap, ok := val.(map[string]any)
 		if !ok {
-			return nil, fmt.Errorf("expected map[string]any for map, got %T", val)
+			return nil, true, fmt.Errorf("expected map[string]any for map, got %T", val)
 		}
 		converted := make(map[string]attr.Value)
 		for k, v := range rawMap {
-			elem, err := BuildAttrValueFromAny(tt.ElemType, v)
-			if err != nil {
-				return nil, fmt.Errorf("map[%q]: %w", k, err)
+			elem, _, err := BuildAttrValueFromAny(tt.ElemType, v)
+			if elem == nil {
+				return nil, true, fmt.Errorf("map[%q]: %w", k, err)
 			}
 			converted[k] = elem
 		}
-		return types.MapValueMust(tt.ElemType, converted), nil
+		return types.MapValueMust(tt.ElemType, converted), true, nil
 
 	case types.ObjectType:
 		rawObj, ok := val.(map[string]any)
 		if !ok {
-			return nil, fmt.Errorf("expected map[string]any for object, got %T", val)
+			return nil, true, fmt.Errorf("expected map[string]any for object, got %T", val)
 		}
 		converted := make(map[string]attr.Value)
 		for k, fieldType := range tt.AttributeTypes() {
 			fieldVal, exists := rawObj[k]
 			if !exists {
-				converted[k], _ = BuildAttrValueFromAny(fieldType, nil)
+				converted[k], _, _ = BuildAttrValueFromAny(fieldType, nil)
 				continue
 			}
-			elem, err := BuildAttrValueFromAny(fieldType, fieldVal)
-			if err != nil {
-				return nil, fmt.Errorf("object[%q]: %w", k, err)
+			elem, _, err := BuildAttrValueFromAny(fieldType, fieldVal)
+			if elem == nil {
+				return nil, true, fmt.Errorf("object[%q]: %w", k, err)
 			}
 			converted[k] = elem
 		}
 		obj, diags := types.ObjectValue(tt.AttributeTypes(), converted)
 		if diags.HasError() {
-			return nil, fmt.Errorf("objectValue: %s", diags)
+			return nil, true, fmt.Errorf("objectValue: %s", diags)
 		}
-		return obj, nil
+		return obj, true, nil
 	}
 
-	return nil, fmt.Errorf("unsupported type: %T", t)
+	return nil, true, fmt.Errorf("unsupported type: %T", t)
 }
 
 func tfTypeToAttrType(t attr.Type, val tftypes.Value) (attr.Value, error) {

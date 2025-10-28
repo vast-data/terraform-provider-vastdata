@@ -417,7 +417,8 @@ func (s *TFState) Set(key string, value any) {
 	}
 	destType := s.Type(key)
 
-	val := Must(BuildAttrValueFromAny(destType, value))
+	attrVal, _, err := BuildAttrValueFromAny(destType, value)
+	val := Must(attrVal, err)
 	s.Raw[key] = val
 }
 
@@ -430,7 +431,8 @@ func (s *TFState) SetOrAdd(key string, value any) {
 	destType := s.Type(key)
 
 	// Convert the value to the appropriate type
-	val := Must(BuildAttrValueFromAny(destType, value))
+	attrVal, _, err := BuildAttrValueFromAny(destType, value)
+	val := Must(attrVal, err)
 
 	// Set the value in Raw (this will add the key if it doesn't exist)
 	s.Raw[key] = val
@@ -556,8 +558,13 @@ func (s *TFState) FillFromRecordIncludingRequired(record Record, includeRequired
 				continue
 			}
 		}
-		val, err := BuildAttrValueFromAny(typ, rawVal)
-		if err != nil {
+		val, success, err := BuildAttrValueFromAny(typ, rawVal)
+		if !success {
+			// Soft error - parsing failed (e.g., empty string for int64)
+			continue
+		}
+		if err != nil && val == nil {
+			// Hard error - no value could be produced
 			return fmt.Errorf(
 				"FillFromRecord for %q failed: %w\nInspected object:\n%v",
 				key, err, record.PrettyJson("     "),

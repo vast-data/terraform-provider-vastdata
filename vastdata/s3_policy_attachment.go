@@ -27,7 +27,7 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 		schema,
 		&is.TFStateHints{
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
-				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid' or 'username').",
+				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid', 'sid', or 'username').",
 				SchemaAttributes: map[string]any{
 					"gid": rschema.Int64Attribute{
 						Optional:    true,
@@ -45,14 +45,21 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 					},
 					"uid": rschema.Int64Attribute{
 						Optional:    true,
-						Description: "The UID of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.",
+						Description: "The UID of the non-local user to attach the policy to. Either 'uid', 'sid', or 'username' must be provided for user attachments.",
 						PlanModifiers: []planmodifiers.Int64{
 							int64planmodifier.RequiresReplace(),
 						},
 					},
+					"sid": rschema.StringAttribute{
+						Optional:    true,
+						Description: "The SID of the non-local user to attach the policy to. Either 'uid', 'sid', or 'username' must be provided for user attachments.",
+						PlanModifiers: []planmodifiers.String{
+							stringplanmodifier.RequiresReplace(),
+						},
+					},
 					"username": rschema.StringAttribute{
 						Optional:    true,
-						Description: "The name of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.",
+						Description: "The name of the non-local user to attach the policy to. Either 'uid', 'sid', or 'username' must be provided for user attachments.",
 						PlanModifiers: []planmodifiers.String{
 							stringplanmodifier.RequiresReplace(),
 						},
@@ -131,11 +138,11 @@ func (m *S3PolicyAttachment) ensurePolicyIDAndGUID(ctx context.Context, rest *VM
 }
 
 // validateS3PolicyAttachmentConfig validates that exactly one user/group identifier is set
-// (gid, groupname, uid, or username) and exactly one of s3_policy_id/s3_policy_guid is set.
+// (gid, groupname, uid, sid, or username) and exactly one of s3_policy_id/s3_policy_guid is set.
 // This validation is performed at runtime when resource references can be resolved.
 func (m *S3PolicyAttachment) validateS3PolicyAttachmentConfig() error {
 	// Validate that exactly one user/group identifier is provided
-	if err := validateOneOf(m.tfstate, "gid", "groupname", "uid", "username"); err != nil {
+	if err := validateOneOf(m.tfstate, "gid", "groupname", "uid", "sid", "username"); err != nil {
 		return err
 	}
 
@@ -166,6 +173,10 @@ func (m *S3PolicyAttachment) getSearchParamsFromState(tfState *is.TFState) (para
 	case tfState.IsKnownAndNotNull("uid"):
 		key = "uid"
 		val = tfState.Int64("uid")
+		attachContext = "user"
+	case tfState.IsKnownAndNotNull("sid"):
+		key = "sid"
+		val = tfState.String("sid")
 		attachContext = "user"
 	case tfState.IsKnownAndNotNull("username"):
 		key = "username"

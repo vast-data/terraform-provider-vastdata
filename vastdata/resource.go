@@ -59,7 +59,7 @@ func (r *Resource) ManagerWithSchemaOnly(ctx context.Context) (ResourceManager, 
 	switch sch := any(*schema).(type) {
 	case rschema.Schema:
 		for k, a := range sch.Attributes {
-			zeroRaw[k], _ = is.BuildAttrValueFromAny(a.GetType(), nil)
+			zeroRaw[k], _, _ = is.BuildAttrValueFromAny(a.GetType(), nil)
 		}
 	default:
 		// Fallback to passing nil Raw if schema kind unexpected

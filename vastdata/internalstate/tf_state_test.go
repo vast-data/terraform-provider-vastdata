@@ -62,7 +62,7 @@ func TestExtractMetaFromSchema(t *testing.T) {
 		require.True(t, ok, "unexpected attribute: %s", key)
 		attrType := attrDef.GetType()
 
-		converted, err := BuildAttrValueFromAny(attrType, val)
+		converted, _, err := BuildAttrValueFromAny(attrType, val)
 		require.NoError(t, err, "failed to build attr.Value for %q", key)
 
 		raw[key] = converted
@@ -686,7 +686,7 @@ func TestBuildAttrMapFromRecord_Complex(t *testing.T) {
 
 	attrMap := make(map[string]attr.Value)
 	for k, typ := range schema {
-		val, err := BuildAttrValueFromAny(typ, record[k])
+		val, _, err := BuildAttrValueFromAny(typ, record[k])
 		require.NoError(t, err, "failed at key: %s", k)
 		require.NotNil(t, val, "value should not be nil: %s", k)
 		attrMap[k] = val
@@ -734,7 +734,7 @@ func TestBuildAttrValueFromAny_ListOfListOfList(t *testing.T) {
 	}
 
 	// Call the builder
-	val, err := BuildAttrValueFromAny(tripleListType, record["triple_nested"])
+	val, _, err := BuildAttrValueFromAny(tripleListType, record["triple_nested"])
 	require.NoError(t, err)
 	require.False(t, val.IsNull())
 	require.False(t, val.IsUnknown())

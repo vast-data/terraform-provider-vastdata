@@ -92,8 +92,18 @@ func (m *NonlocalGroup) TfState() *is.TFState {
 	return m.tfstate
 }
 
-func (m *NonlocalGroup) API(rest *VMSRest) VastResourceAPIWithContext {
+func (m *NonlocalGroup) API(_ *VMSRest) VastResourceAPIWithContext {
 	return nil
+}
+
+func (m *NonlocalGroup) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	ts := m.tfstate
+	searchParams := getSearchParams(ctx, ts, nil)
+	return rest.Groups.GroupQueryWithContext_GET(ctx, searchParams)
+}
+
+func (m *NonlocalGroup) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	return m.ReadDatasource(ctx, rest)
 }
 
 func (m *NonlocalGroup) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

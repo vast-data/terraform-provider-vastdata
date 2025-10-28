@@ -85,10 +85,18 @@ func (m *NonlocalUser) TfState() *is.TFState {
 	return m.tfstate
 }
 
-func (m *NonlocalUser) API(rest *VMSRest) VastResourceAPIWithContext {
-	// NonLocalUsers resource has been removed in go-vast-client v0.100.0+
-	// Non-local user operations are now part of the Users resource via UserQuery_* methods
-	return rest.Users
+func (m *NonlocalUser) API(_ *VMSRest) VastResourceAPIWithContext {
+	return nil
+}
+
+func (m *NonlocalUser) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	ts := m.tfstate
+	searchParams := getSearchParams(ctx, ts, nil)
+	return rest.Users.UserQueryWithContext_GET(ctx, searchParams)
+}
+
+func (m *NonlocalUser) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	return m.ReadDatasource(ctx, rest)
 }
 
 func (m *NonlocalUser) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
