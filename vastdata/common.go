@@ -351,11 +351,12 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 //
 // Returns:
 //   - error: any error that occurred during deletion, excluding 404s (they are ignored)
-func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState *is.TFState, managerName, op string) error {
+func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState *is.TFState, managerName, op string) (vast_client.Record, error) {
 	var err error
+	var result vast_client.Record
 	searchParams := getSearchParams(ctx, tfState, nil)
 	if len(searchParams) == 0 {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"%s[%s]: no search parameters provided for %q resource."+
 				" Verify presence of required fields or add searchable hints to resource",
 			op,
@@ -376,12 +377,12 @@ func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithCont
 	if id, ok := searchParams["id"]; ok {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
 		// If the ID is set, we assume it's a direct call by ID
-		_, err = api.DeleteByIdWithContext(ctx, id, deleteQueryParams, deleteBodyParams)
+		result, err = api.DeleteByIdWithContext(ctx, id, deleteQueryParams, deleteBodyParams)
 	} else {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: no ID found, using search params.", op, managerName))
-		_, err = api.DeleteWithContext(ctx, searchParams, deleteQueryParams, deleteBodyParams)
+		result, err = api.DeleteWithContext(ctx, searchParams, deleteQueryParams, deleteBodyParams)
 	}
-	return ignoreStatusCodes(err, http.StatusNotFound)
+	return result, ignoreStatusCodes(err, http.StatusNotFound)
 
 }
 

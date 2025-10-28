@@ -88,7 +88,7 @@ func (m *BlockHostMapping) CreateResource(ctx context.Context, rest *VMSRest) (D
 				},
 			},
 		}
-		_, err := rest.BlockHostMappings.BlockHostMappingBulk_PATCH(body, 3*time.Minute)
+		_, err := rest.BlockHostMappings.BlockHostMappingBulkWithContext_PATCH(ctx, body, 3*time.Minute)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +121,7 @@ func (m *BlockHostMapping) UpdateResource(ctx context.Context, plan UpdateResour
 				},
 			},
 		}
-		_, err := rest.BlockHostMappings.BlockHostMappingBulk_PATCH(body, 3*time.Minute)
+		_, err := rest.BlockHostMappings.BlockHostMappingBulkWithContext_PATCH(ctx, body, 3*time.Minute)
 		if err != nil {
 			return nil, err
 		}
@@ -145,6 +145,6 @@ func (m *BlockHostMapping) DeleteResource(ctx context.Context, rest *VMSRest) er
 			},
 		},
 	}
-	_, err := rest.BlockHostMappings.BlockHostMappingBulk_PATCH(body, 3*time.Minute)
+	_, err := rest.BlockHostMappings.BlockHostMappingBulkWithContext_PATCH(ctx, body, 3*time.Minute)
 	return ignoreStatusCodes(err, http.StatusNotFound)
 }

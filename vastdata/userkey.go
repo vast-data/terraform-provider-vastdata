@@ -68,8 +68,6 @@ func (m *UserKey) TfState() *is.TFState {
 }
 
 func (m *UserKey) API(rest *VMSRest) VastResourceAPIWithContext {
-	// UserKeys resource has been removed in go-vast-client v0.100.0+
-	// User access key operations are now extra methods on the Users resource
 	return rest.Users
 }
 

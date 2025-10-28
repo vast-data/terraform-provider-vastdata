@@ -1,8 +1,9 @@
 
 
 resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
-  uid  = 30109
+  name              = "vastdb_user"
+  uid               = 30109
+  local_provider_id = 1
 }
 
 resource "vastdata_user_key" "vastdb_user_key" {

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -18,6 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/vast-data/go-vast-client/resources/untyped"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
@@ -377,7 +379,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				if imp, ok := manager.(DeleteResource); ok {
 					imp.DeleteResource(ctx, rest)
 				} else {
-					if err = r.deleteRecordBySearchParams(ctx, manager, "TransactionDelete"); err != nil {
+					if _, err = r.deleteRecordBySearchParams(ctx, manager, "TransactionDelete"); err != nil {
 						tflog.Warn(
 							ctx,
 							fmt.Sprintf("TransactionDelete[%s]:"+
@@ -476,13 +478,21 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		return
 	}
 
-	// Ensure record is of type Record, otherwise set to nil.
-	// NOTE: it can be of type EmptyRecord.
-	if _, ok := record.(Record); !ok {
+	// Ensure record is not empty, otherwise set to nil.
+	if record, ok := record.(Record); ok && record.Empty() {
 		record = nil
 	}
 
 	if record != nil {
+		// In case record is AsyncTask
+		if err := r.handleMaybeAsyncTask(ctx, record.(Record)); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("AsyncTask - create[%s].", managerName),
+				err.Error(),
+			)
+			return
+		}
+
 		// Handle AfterCreateResource hook
 		if imp, ok := manager.(AfterCreateResource); ok {
 			tflog.Debug(ctx, fmt.Sprintf("AfterCreateResource[%s]: do.", managerName))
@@ -702,8 +712,14 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		}
 
 		delete(updateParams, "id") // Remove ID from update parameters, as it should not be updated.
-		if record, err = api.UpdateWithContext(ctx, id, updateParams); err == nil {
-			r.checkIntegrity(ctx, record.(Record), updateParams)
+		if len(updateParams) == 0 {
+			tflog.Debug(
+				ctx, fmt.Sprintf("Update[%s]: no update request parameters. Skipping update...", managerName),
+			)
+		} else {
+			if record, err = api.UpdateWithContext(ctx, id, updateParams); err == nil {
+				r.checkIntegrity(ctx, record.(Record), updateParams)
+			}
 		}
 	}
 
@@ -715,13 +731,21 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
-	// Ensure record is of type Record, otherwise set to nil.
-	// NOTE: it can be of type EmptyRecord.
-	if _, ok := record.(Record); !ok {
+	// Ensure record is not empty, otherwise set to nil.
+	if record, ok := record.(Record); ok && record.Empty() {
 		record = nil
 	}
 
 	if record != nil {
+		// In case record is AsyncTask
+		if err := r.handleMaybeAsyncTask(ctx, record.(Record)); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("AsyncTask - update[%s].", managerName),
+				err.Error(),
+			)
+			return
+		}
+
 		if transformer, ok := stateManger.(TransformResponseRecord); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
@@ -799,7 +823,17 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 	} else {
 		// Delegate to the default delete implementation
 		tflog.Debug(ctx, fmt.Sprintf("Delete[%s]: use default implementation.", managerName))
-		err = r.deleteRecordBySearchParams(ctx, manager, "Delete")
+		record, err := r.deleteRecordBySearchParams(ctx, manager, "Delete")
+		if err == nil && record != nil {
+			// In case record is AsyncTask
+			if err := r.handleMaybeAsyncTask(ctx, record); err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("AsyncTask - delete[%s].", managerName),
+					err.Error(),
+				)
+				return
+			}
+		}
 	}
 
 	if err != nil {
@@ -933,7 +967,7 @@ func (r *Resource) getRecordBySearchParams(ctx context.Context, manager, planMan
 
 }
 
-func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager ResourceManager, op string) error {
+func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager ResourceManager, op string) (Record, error) {
 	var (
 		rest        = r.providerData.Client
 		managerName = r.managerName
@@ -941,6 +975,18 @@ func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager Resou
 		api         = manager.API(rest)
 	)
 	return deleteRecordBySearchParams(ctx, api, tfState, managerName, op)
+}
+
+func (r *Resource) handleMaybeAsyncTask(ctx context.Context, record Record) error {
+	rest := r.providerData.Client
+	asyncResult, taskResponse, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, 10*time.Minute)
+	if err != nil {
+		return err
+	}
+	if asyncResult != nil && asyncResult.IsFailed() {
+		return fmt.Errorf("async task failed: %s", taskResponse.PrettyJson("  "))
+	}
+	return nil
 }
 
 func (r *Resource) checkNonEmptyFields(ctx context.Context, manager ResourceManager, dg *diag.Diagnostics) bool {

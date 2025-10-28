@@ -74,7 +74,10 @@ func (m *View) PrepareDeleteResource(ctx context.Context, rest *VMSRest) error {
 	if tfstate.IsKnownAndNotNull("delete_dir") && tfstate.Bool("delete_dir") {
 		// If delete_dir is true, we delete the directory.
 		path := tfstate.String("path")
-		tenantId := tfstate.Int64("tenant_id")
+		var tenantId int64
+		if tfstate.IsKnownAndNotNull("tenant_id") {
+			tenantId = tfstate.Int64("tenant_id")
+		}
 		if _, err = rest.Folders.FolderDeleteFolderWithContext_DELETE(ctx, path, tenantId); isApiError(err) {
 			body := err.(*ApiError).Body
 			if strings.Contains(body, "no such directory") {

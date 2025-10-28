@@ -261,7 +261,7 @@ func (m *S3PolicyAttachment) ReadResource(ctx context.Context, rest *VMSRest) (D
 				return rest.Users.UserQueryWithContext_GET(ctx, params)
 			}
 			updateFn = func(ctx context.Context, params params) (Record, error) {
-				return rest.Users.UserQuery_PATCH(params)
+				return rest.Users.UserQueryWithContext_PATCH(ctx, params)
 			}
 			defer rest.Users.Lock()()
 		} else if attachContext == "group" {

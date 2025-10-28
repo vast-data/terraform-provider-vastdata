@@ -68,8 +68,6 @@ func (m *SamlConfig) TfState() *is.TFState {
 }
 
 func (m *SamlConfig) API(rest *VMSRest) VastResourceAPIWithContext {
-	// SamlConfigs resource has been removed in go-vast-client v0.100.0+
-	// SAML config operations are now extra methods on the Vms resource
 	return rest.Vms
 }
 

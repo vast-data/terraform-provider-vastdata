@@ -27,8 +27,9 @@ data "vastdata_tenant" "vastdb_tenant" {
 }
 
 resource "vastdata_group" "vastdb_group" {
-  name = "vastdb_group"
-  gid  = 1001
+  name              = "vastdb_group"
+  gid               = 1001
+  local_provider_id = 1
 }
 
 resource "vastdata_s3_policy" "vastdb_s3policy1" {

@@ -76,6 +76,11 @@ var allTFComponents = []TFManager{
 	&ManagerAuthorizedStatus{},
 	&ManagerPassword{},
 	&Topic{},
+	&IamRole{},
+	&IamRoleCredentials{},
+	&Oidc{},
+	&VastDbVips{},
+	&TenantNfs4Delegation{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
