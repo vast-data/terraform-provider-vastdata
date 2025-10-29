@@ -19,12 +19,14 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-test/deep"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
+	"github.com/vast-data/go-vast-client/resources/untyped"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
@@ -520,6 +522,21 @@ func parseImportId(importID string, tfState *is.TFState) error {
 		} else {
 			return fmt.Errorf("field %q is not present in the resource schema", idField)
 		}
+	}
+	return nil
+}
+
+// ----------------------------------
+// Async tasks
+// ----------------------------------
+
+func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout time.Duration) error {
+	asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, timeout)
+	if err != nil {
+		return err
+	}
+	if asyncResult != nil {
+		return asyncResult.Err
 	}
 	return nil
 }

@@ -1638,3 +1638,423 @@ func TestTFState_SetOrAdd_OverwriteExistingValue(t *testing.T) {
 }
 
 // NOTE: SetState is simplified in the implementation; skipping write-only persistence behavior tests.
+
+// ==========================================
+// Tests for GetUpdateParams
+// ==========================================
+
+func TestGetUpdateParams_ExcludesEditOnlyFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":            rschema.Int64Attribute{Optional: true},
+			"name":          rschema.StringAttribute{Optional: true},
+			"enabled":       rschema.BoolAttribute{Optional: true},   // edit-only
+			"description":   rschema.StringAttribute{Optional: true}, // regular field
+			"delete_option": rschema.StringAttribute{Optional: true}, // delete-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+		DeleteOnlyBodyFields: map[string]string{
+			"delete_option": "",
+		},
+	}
+
+	// Current state (old)
+	stateRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("old-name"),
+		"enabled":       types.BoolValue(false),
+		"description":   types.StringValue("old-desc"),
+		"delete_option": types.StringValue("old-opt"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state (new)
+	planRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("new-name"), // CHANGED
+		"enabled":       types.BoolValue(true),         // CHANGED (edit-only)
+		"description":   types.StringValue("new-desc"), // CHANGED
+		"delete_option": types.StringValue("new-opt"),  // CHANGED (delete-only)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get update params
+	updateParams := planState.GetUpdateParams(currentState)
+
+	// Should include regular changed fields
+	assert.Contains(t, updateParams, "name")
+	assert.Equal(t, "new-name", updateParams["name"])
+	assert.Contains(t, updateParams, "description")
+	assert.Equal(t, "new-desc", updateParams["description"])
+
+	// Should NOT include edit-only fields
+	assert.NotContains(t, updateParams, "enabled", "edit-only field should be excluded")
+
+	// Should NOT include delete-only fields
+	assert.NotContains(t, updateParams, "delete_option", "delete-only field should be excluded")
+
+	// Should NOT include id
+	assert.NotContains(t, updateParams, "id", "id should not be in update params")
+}
+
+func TestGetUpdateParams_NoHints(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":   rschema.Int64Attribute{Optional: true},
+			"name": rschema.StringAttribute{Optional: true},
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("old-name"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, nil) // No hints
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("new-name"),
+	}
+	planState := NewTFStateMust(planRaw, schema, nil)
+
+	// Get update params - should work like GetChangedParams when no hints
+	updateParams := planState.GetUpdateParams(currentState)
+
+	assert.Contains(t, updateParams, "name")
+	assert.Equal(t, "new-name", updateParams["name"])
+}
+
+func TestGetUpdateParams_OnlyEditOnlyFieldsChanged(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":      rschema.Int64Attribute{Optional: true},
+			"name":    rschema.StringAttribute{Optional: true},
+			"enabled": rschema.BoolAttribute{Optional: true}, // edit-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"name":    types.StringValue("same-name"),
+		"enabled": types.BoolValue(false),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - only edit-only field changed
+	planRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"name":    types.StringValue("same-name"), // NOT changed
+		"enabled": types.BoolValue(true),          // CHANGED (edit-only)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get update params - should be empty
+	updateParams := planState.GetUpdateParams(currentState)
+
+	assert.Empty(t, updateParams, "Should be empty when only edit-only fields changed")
+}
+
+// ==========================================
+// Tests for GetChangedEditOnlyParams
+// ==========================================
+
+func TestGetChangedEditOnlyParams_ReturnsOnlyChangedEditOnlyFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":          rschema.Int64Attribute{Optional: true},
+			"name":        rschema.StringAttribute{Optional: true},
+			"enabled":     rschema.BoolAttribute{Optional: true},   // edit-only
+			"auto_start":  rschema.BoolAttribute{Optional: true},   // edit-only
+			"description": rschema.StringAttribute{Optional: true}, // regular field
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled", "auto_start"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("old-name"),
+		"enabled":     types.BoolValue(false),
+		"auto_start":  types.BoolValue(false),
+		"description": types.StringValue("old-desc"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("new-name"), // CHANGED (regular)
+		"enabled":     types.BoolValue(true),         // CHANGED (edit-only)
+		"auto_start":  types.BoolValue(false),        // NOT changed (edit-only)
+		"description": types.StringValue("new-desc"), // CHANGED (regular)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get changed edit-only params
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	// Should include only CHANGED edit-only field
+	assert.Contains(t, editOnlyParams, "enabled")
+	assert.Equal(t, true, editOnlyParams["enabled"])
+
+	// Should NOT include unchanged edit-only field
+	assert.NotContains(t, editOnlyParams, "auto_start", "unchanged edit-only field should be excluded")
+
+	// Should NOT include regular fields
+	assert.NotContains(t, editOnlyParams, "name", "regular field should be excluded")
+	assert.NotContains(t, editOnlyParams, "description", "regular field should be excluded")
+}
+
+func TestGetChangedEditOnlyParams_NoHints(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":   rschema.Int64Attribute{Optional: true},
+			"name": rschema.StringAttribute{Optional: true},
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("old-name"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, nil) // No hints
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("new-name"),
+	}
+	planState := NewTFStateMust(planRaw, schema, nil)
+
+	// Get changed edit-only params - should be empty
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	assert.Empty(t, editOnlyParams, "Should be empty when no hints provided")
+}
+
+func TestGetChangedEditOnlyParams_NoChanges(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":      rschema.Int64Attribute{Optional: true},
+			"enabled": rschema.BoolAttribute{Optional: true}, // edit-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"enabled": types.BoolValue(true),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - no changes
+	planRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"enabled": types.BoolValue(true), // NOT changed
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get changed edit-only params - should be empty
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	assert.Empty(t, editOnlyParams, "Should be empty when no edit-only fields changed")
+}
+
+// ==========================================
+// Tests for GetUpdateParams + GetChangedEditOnlyParams
+// Combined (Disjoint Sets)
+// ==========================================
+
+func TestGetUpdateParams_And_GetChangedEditOnlyParams_AreDisjoint(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":            rschema.Int64Attribute{Optional: true},
+			"name":          rschema.StringAttribute{Optional: true},
+			"enabled":       rschema.BoolAttribute{Optional: true},   // edit-only
+			"auto_start":    rschema.BoolAttribute{Optional: true},   // edit-only
+			"description":   rschema.StringAttribute{Optional: true}, // regular field
+			"delete_option": rschema.StringAttribute{Optional: true}, // delete-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled", "auto_start"},
+		DeleteOnlyBodyFields: map[string]string{
+			"delete_option": "",
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("old-name"),
+		"enabled":       types.BoolValue(false),
+		"auto_start":    types.BoolValue(false),
+		"description":   types.StringValue("old-desc"),
+		"delete_option": types.StringValue("old-opt"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - all fields changed
+	planRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("new-name"),
+		"enabled":       types.BoolValue(true),
+		"auto_start":    types.BoolValue(true),
+		"description":   types.StringValue("new-desc"),
+		"delete_option": types.StringValue("new-opt"),
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get both sets
+	updateParams := planState.GetUpdateParams(currentState)
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	// Verify updateParams contains regular fields only
+	assert.Contains(t, updateParams, "name")
+	assert.Contains(t, updateParams, "description")
+	assert.Len(t, updateParams, 2, "Should have exactly 2 regular changed fields")
+
+	// Verify editOnlyParams contains edit-only fields only
+	assert.Contains(t, editOnlyParams, "enabled")
+	assert.Contains(t, editOnlyParams, "auto_start")
+	assert.Len(t, editOnlyParams, 2, "Should have exactly 2 edit-only changed fields")
+
+	// Verify NO overlap between the two sets
+	for key := range updateParams {
+		assert.NotContains(t, editOnlyParams, key, "Field %q should not be in both sets", key)
+	}
+	for key := range editOnlyParams {
+		assert.NotContains(t, updateParams, key, "Field %q should not be in both sets", key)
+	}
+
+	// Verify delete-only fields are in neither set
+	assert.NotContains(t, updateParams, "delete_option")
+	assert.NotContains(t, editOnlyParams, "delete_option")
+
+	// Verify id is in neither set
+	assert.NotContains(t, updateParams, "id")
+	assert.NotContains(t, editOnlyParams, "id")
+}
+
+func TestGetUpdateParams_And_GetChangedEditOnlyParams_CompletePartitioning(t *testing.T) {
+	// This test verifies that GetUpdateParams + GetChangedEditOnlyParams together
+	// capture ALL changed optional/required fields (excluding delete-only and id)
+
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":          rschema.Int64Attribute{Optional: true},
+			"name":        rschema.StringAttribute{Optional: true},
+			"enabled":     rschema.BoolAttribute{Optional: true}, // edit-only
+			"description": rschema.StringAttribute{Optional: true},
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("old-name"),
+		"enabled":     types.BoolValue(false),
+		"description": types.StringValue("old-desc"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - all fields changed
+	planRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("new-name"),
+		"enabled":     types.BoolValue(true),
+		"description": types.StringValue("new-desc"),
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get all changed params using old method
+	allChangedParams := planState.GetChangedParams(currentState)
+
+	// Get partitioned sets
+	updateParams := planState.GetUpdateParams(currentState)
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	// Combine the two partitioned sets
+	combinedParams := make(vast_client.Params)
+	for k, v := range updateParams {
+		combinedParams[k] = v
+	}
+	for k, v := range editOnlyParams {
+		combinedParams[k] = v
+	}
+
+	// The combined params should equal all changed params (minus id)
+	delete(allChangedParams, "id")
+
+	assert.Equal(t, len(allChangedParams), len(combinedParams),
+		"Combined params should have same length as all changed params (minus id)")
+
+	for key, val := range allChangedParams {
+		assert.Contains(t, combinedParams, key, "Key %q missing from combined params", key)
+		assert.Equal(t, val, combinedParams[key], "Value mismatch for key %q", key)
+	}
+}
+
+func TestGetUpdateParams_WithDeleteOnlyParamFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":           rschema.Int64Attribute{Optional: true},
+			"name":         rschema.StringAttribute{Optional: true},
+			"delete_param": rschema.StringAttribute{Optional: true}, // delete-only param
+		},
+	}
+
+	hints := &TFStateHints{
+		DeleteOnlyParamFields: map[string]string{
+			"delete_param": "force",
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":           types.Int64Value(1),
+		"name":         types.StringValue("old-name"),
+		"delete_param": types.StringValue("old-param"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":           types.Int64Value(1),
+		"name":         types.StringValue("new-name"),
+		"delete_param": types.StringValue("new-param"), // CHANGED (delete-only param)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get update params
+	updateParams := planState.GetUpdateParams(currentState)
+
+	// Should include regular fields
+	assert.Contains(t, updateParams, "name")
+
+	// Should NOT include delete-only param fields
+	assert.NotContains(t, updateParams, "delete_param", "delete-only param field should be excluded")
+}

@@ -373,6 +373,54 @@ func (s *TFState) IsKnownAndNotNull(path string) bool {
 	return !s.IsNull(path) && !s.IsUnknown(path)
 }
 
+// StringWithFallback gets a string value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) StringWithFallback(fallback *TFState, path string) (string, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.String(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.String(path), true
+	}
+	return "", false
+}
+
+// BoolWithFallback gets a bool value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) BoolWithFallback(fallback *TFState, path string) (bool, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.Bool(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.Bool(path), true
+	}
+	return false, false
+}
+
+// Int64WithFallback gets an int64 value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) Int64WithFallback(fallback *TFState, path string) (int64, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.Int64(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.Int64(path), true
+	}
+	return 0, false
+}
+
+// Float64WithFallback gets a float64 value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) Float64WithFallback(fallback *TFState, path string) (float64, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.Float64(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.Float64(path), true
+	}
+	return 0.0, false
+}
+
 func (s *TFState) Get(path string) attr.Value {
 	s.assertEnabled()
 	parts := parsePath(path)
@@ -841,11 +889,64 @@ func (s *TFState) GetReadEditOnlyParams() vast_client.Params {
 	return searchParams
 }
 
+// GetChangedEditOnlyParams returns edit-only fields that have changed between this TFState (plan)
+// and another TFState (current state).
+//
+// This is used in UpdateResource to handle edit-only fields separately from the main update.
+// Edit-only fields are those that cannot be set during creation but can be modified via update operations.
+func (s *TFState) GetChangedEditOnlyParams(otherState *TFState) vast_client.Params {
+	searchParams := make(vast_client.Params)
+	if s.Hints != nil && len(s.Hints.EditOnlyFields) > 0 {
+		// Get all changed fields
+		diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional)
+
+		// Keep only edit-only fields
+		for key := range diffParams {
+			if !slices.Contains(s.Hints.EditOnlyFields, key) {
+				delete(diffParams, key)
+			}
+		}
+
+		searchParams.Update(diffParams, true)
+	}
+	return searchParams
+}
+
 // GetChangedParams returns a map of parameters that differ between this TFState (plan)
 // and another TFState (current state), returning only the changed fields.
 // This is commonly used in UpdateResource methods to send only modified fields to the API.
 func (s *TFState) GetChangedParams(otherState *TFState) vast_client.Params {
 	diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional, SearchRequired)
+	return diffParams
+}
+
+// GetUpdateParams returns a map of changed parameters suitable for update operations,
+// excluding edit-only fields and delete-only fields.
+//
+// This method:
+//  1. Gets all changed fields between plan and current state (like GetChangedParams)
+//  2. Excludes EditOnlyFields - fields that should only be set via separate edit operations
+//  3. Excludes DeleteOnlyBodyFields - fields only used during delete operations
+//  4. Excludes DeleteOnlyParamFields - query params only used during delete operations
+//
+// EditOnlyFields should be handled separately after the main update operation.
+func (s *TFState) GetUpdateParams(otherState *TFState) vast_client.Params {
+	// Build exclusion list
+	var exclude []string
+	if s.Hints != nil {
+		exclude = append(exclude, s.Hints.EditOnlyFields...)                                   // Edit only fields should be updated separately
+		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyBodyFields))...)  // Delete only fields should not be in update
+		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyParamFields))...) // Delete only fields should not be in update
+	}
+
+	// Get all changed params
+	diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional, SearchRequired)
+
+	// Remove excluded fields from the diff
+	for _, excludeField := range exclude {
+		delete(diffParams, excludeField)
+	}
+
 	return diffParams
 }
 

@@ -62,11 +62,14 @@ resource "vastdata_active_directory" "ad1" {
 
 - `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check
 - `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check
+- `admin_passwd` (String, Sensitive) The password for the specified Active Directory admin user.
+- `admin_username` (String) An Active Directory admin user with permission to join the Active Directory server.
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
 - `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
 - `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory domain to join. This parameter is required unless ldap_id is provided.
 - `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes
 in case posix_attributes_source is set to SPECIFIC_DOMAINS.
+- `enabled` (Boolean) Set to true to join Active Directory. Set to false to leave Active Directory.
 - `gid_number` (String) Override 'gidNumber' as the attribute of a group entry that contains the group's GID number. When binding VAST Cluster to AD, you may need to set this to 'gidnumber' (case sensitive).
 - `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping.
 Applicable only with Active Directory and NFSv4.
@@ -113,7 +116,6 @@ Applicable only with Active Directory and NFSv4.
 
 ### Read-Only
 
-- `enabled` (Boolean) enabled/disabled
 - `guid` (String) GUID
 - `id` (Number) The ID of this resource.
 - `last_ma_pwd_renewal_status` (Attributes) Last Active Directory machine account password renewal status (see [below for nested schema](#nestedatt--last_ma_pwd_renewal_status))

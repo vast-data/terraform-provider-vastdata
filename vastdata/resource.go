@@ -19,7 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/vast-data/go-vast-client/resources/untyped"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
@@ -485,7 +484,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 
 	if record != nil {
 		// In case record is AsyncTask
-		if err := r.handleMaybeAsyncTask(ctx, record.(Record)); err != nil {
+		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), 10*time.Minute); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("AsyncTask - create[%s].", managerName),
 				err.Error(),
@@ -705,7 +704,9 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		if !exists {
 			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
 		}
-		updateParams := planTfState.GetChangedParams(tfState)
+
+		// Get update params excluding edit-only and delete-only fields
+		updateParams := planTfState.GetUpdateParams(tfState)
 		if transformer, ok := stateManger.(TransformRequestBody); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformRequestBody[%s]: do.", managerName))
 			updateParams = transformer.TransformRequestBody(updateParams)
@@ -738,7 +739,7 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 
 	if record != nil {
 		// In case record is AsyncTask
-		if err := r.handleMaybeAsyncTask(ctx, record.(Record)); err != nil {
+		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), 10*time.Minute); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("AsyncTask - update[%s].", managerName),
 				err.Error(),
@@ -769,6 +770,39 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 					err.Error(),
 				)
 				return
+			}
+		} else if len(tfState.Hints.EditOnlyFields) > 0 {
+			// Only handle edit-only fields automatically if AfterUpdateResource is not implemented
+			// If AfterUpdateResource is implemented, it's assumed to handle edit-only fields itself
+			editOnlyParams := planTfState.GetChangedEditOnlyParams(tfState)
+			if len(editOnlyParams) > 0 {
+				tflog.Debug(ctx, fmt.Sprintf("Update[%s]: Updating 'EditOnly' fields.", managerName))
+				id, exists := record.(Record)["id"]
+				if !exists {
+					resp.Diagnostics.AddError(
+						fmt.Sprintf("Update[%s]: cannot update edit-only fields.", managerName),
+						"Record does not have 'id' field",
+					)
+					return
+				}
+				var editRecord DisplayableRecord
+				if editRecord, err = api.UpdateWithContext(ctx, id, editOnlyParams); err != nil {
+					resp.Diagnostics.AddError(
+						fmt.Sprintf("Update[%s]: error updating edit-only fields.", managerName),
+						err.Error(),
+					)
+					return
+				}
+				// Update the record with edit-only values
+				if editRecord != nil && !editRecord.(Record).Empty() {
+					for k, v := range editRecord.(Record) {
+						record.(Record)[k] = v
+					}
+				} else {
+					for k, v := range editOnlyParams {
+						record.(Record)[k] = v
+					}
+				}
 			}
 		}
 
@@ -826,7 +860,7 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 		record, err := r.deleteRecordBySearchParams(ctx, manager, "Delete")
 		if err == nil && record != nil {
 			// In case record is AsyncTask
-			if err := r.handleMaybeAsyncTask(ctx, record); err != nil {
+			if err := handleMaybeAsyncTask(ctx, rest, record, 10*time.Minute); err != nil {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("AsyncTask - delete[%s].", managerName),
 					err.Error(),
@@ -975,18 +1009,6 @@ func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager Resou
 		api         = manager.API(rest)
 	)
 	return deleteRecordBySearchParams(ctx, api, tfState, managerName, op)
-}
-
-func (r *Resource) handleMaybeAsyncTask(ctx context.Context, record Record) error {
-	rest := r.providerData.Client
-	asyncResult, taskResponse, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, 10*time.Minute)
-	if err != nil {
-		return err
-	}
-	if asyncResult != nil && asyncResult.IsFailed() {
-		return fmt.Errorf("async task failed: %s", taskResponse.PrettyJson("  "))
-	}
-	return nil
 }
 
 func (r *Resource) checkNonEmptyFields(ctx context.Context, manager ResourceManager, dg *diag.Diagnostics) bool {
