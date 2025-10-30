@@ -28,7 +28,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 ### Optional
 
 - `access_flavor` (String) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)
-- `allowed_characters` (String) How to determine which characters are allowed in file names. 'LCD' (default): Allows only characters allowed by all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. With this (default) option, the limitation on the length of a single component of the path is 255 characters. 'YOYO': Imposes no limitation beyond that of the client protocol.
+- `allowed_characters` (String) How to determine which characters are allowed in file names. 'LCD' (default): Allows only characters allowed by all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. With this (default) option, the limitation on the length of a single component of the path is 255 characters. 'NPL': Imposes no limitation beyond that of the client protocol.
 - `apple_sid` (Boolean) For use when connecting from Mac clients to SMB shares, this option enables Security IDs (SIDs) to be returned in Apple compatible representation.
 - `atime_frequency` (String) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Default: 3600
 - `auth_source` (String) Specifies which source is trusted for the user's group memberships, when users' access to the view is authorized.
@@ -68,7 +68,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `nfs_posix_acl` (Boolean) True if support is enabled for extended POSIX Access Control Lists (ACL) for NFSv3 clients.
 - `nfs_read_only` (String) Hosts with NFS read only permissions
 - `nfs_return_open_permissions` (Boolean) when using smb use open permissions for files
-- `path_length` (String) How to determine the maximum allowed path component name length. 'LCD' (default): Imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. 'YOYO': Imposes no limitation beyond that of the client protocol.
+- `path_length` (String) How to determine the maximum allowed path component name length. 'LCD' (default): Imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. 'NPL': Imposes no limitation beyond that of the client protocol.
 - `pretty_atime_frequency` (String)
 - `pretty_auth_source` (String)
 - `s3_bucket_full_control` (String) Hosts with full permissions
