@@ -591,6 +591,22 @@ func (s *TFState) FillFromRecord(record Record) error {
 // - If includeRequired is true, also sets attributes marked Required (even if not Computed).
 // - Optional non-computed attributes are not set.
 func (s *TFState) FillFromRecordIncludingRequired(record Record, includeRequired bool) error {
+	return s.fillFromRecordInternal(record, includeRequired, false)
+}
+
+// FillFromRecordForImport populates TF state from backend record during import operations.
+// It fills computed and required fields, but NOT optional fields.
+// This prevents drift after import by ensuring optional fields remain null in both plan and state
+// (since they're not specified in config).
+func (s *TFState) FillFromRecordForImport(record Record) error {
+	return s.fillFromRecordInternal(record, true, false)
+}
+
+// fillFromRecordInternal is the internal implementation for filling state from records.
+// Parameters:
+// - includeRequired: if true, sets required fields (even if not computed)
+// - includeOptional: if true, sets optional fields (even if not computed or required)
+func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, includeOptional bool) error {
 	if record == nil {
 		return errors.New("record is nil")
 	}
@@ -601,8 +617,15 @@ func (s *TFState) FillFromRecordIncludingRequired(record Record, includeRequired
 		}
 		// Decide whether to set this field
 		if !s.IsComputed(key) {
-			// Not computed: only set if required and includeRequired
-			if !(includeRequired && s.IsRequired(key)) {
+			// Not computed: check if we should include it
+			shouldInclude := false
+			if includeRequired && s.IsRequired(key) {
+				shouldInclude = true
+			}
+			if includeOptional && s.IsOptional(key) {
+				shouldInclude = true
+			}
+			if !shouldInclude {
 				continue
 			}
 		}
@@ -656,14 +679,24 @@ func (s *TFState) CopyNonEmptyFieldsTo(other *TFState) {
 
 // CopyKnownFieldsTo copies only known fields from this TFState
 // to another, along with their associated attribute metadata.
+// It skips unknown values and null values for computed fields (which should come from API responses).
 func (s *TFState) CopyKnownFieldsTo(other *TFState) {
 	s.assertEnabled()
 	other.assertEnabled()
 
 	for k, v := range s.Raw {
 		if v.IsUnknown() {
-			continue // skip null or unknown values
+			continue // skip unknown values
 		}
+
+		// Skip null values for computed fields to avoid overwriting values from API responses
+		// Example: During update, id=5 is set by FillFromRecord from API, but plan has id=null
+		// We should NOT overwrite the API value with null from the plan
+		meta, ok := s.Meta[k]
+		if ok && meta.Computed && v.IsNull() {
+			continue
+		}
+
 		other.Raw[k] = v
 		other.Meta[k] = s.Meta[k]
 	}

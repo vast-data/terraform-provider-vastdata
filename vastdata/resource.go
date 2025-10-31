@@ -319,8 +319,8 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
-		// On import, populate computed and required fields
-		if err = tfState.FillFromRecordIncludingRequired(record.(Record), true); err != nil {
+		// On import, populate computed and required fields (but NOT optional fields)
+		if err = tfState.FillFromRecordForImport(record.(Record)); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: error filling state.", managerName),
 				err.Error(),
@@ -588,9 +588,16 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 		tflog.Debug(ctx, fmt.Sprintf("ReadResource[%s]: do.", managerName))
 		record, err = imp.ReadResource(ctx, rest)
 	} else {
-		// Delegate to the default read implementation
-		tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
-		record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
+		// Check if we should skip API calls and use current tfstate
+		if tfState.Hints.SkipRefreshAPICall {
+			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: skip API call, using current tfstate as record.", managerName))
+			// Convert current tfstate to map[string]any and use as record
+			record = Record(tfState.GetAllValues())
+		} else {
+			// Delegate to the default read implementation
+			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
+			record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
+		}
 	}
 
 	if err != nil {
