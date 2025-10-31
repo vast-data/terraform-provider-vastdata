@@ -13,15 +13,14 @@ data "vastdata_tenant" "vastdb_tenant" {
 }
 
 
-resource "vastdata_user" "vastdb_user" {
-  name              = "vastdb_user"
-  uid               = 30109
-  local_provider_id = 1
+data "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
+  uid       = 30109
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 }
 
 
 resource "vastdata_nonlocal_user_key" "vastdb_nonlocal_user_key" {
-  uid       = vastdata_user.vastdb_user.uid
+  uid       = data.vastdata_nonlocal_user.vastdb_nonlocal_user.uid
   tenant_id = data.vastdata_tenant.vastdb_tenant.id
   enabled   = false
 }
@@ -34,14 +33,14 @@ data "vastdata_tenant" "vastdb_tenant" {
 }
 
 
-resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
-  uid  = 30109
+data "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
+  uid       = 30109
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 }
 
 
 resource "vastdata_nonlocal_user_key" "vastdb_nonlocal_user_key" {
-  username = vastdata_user.vastdb_user.name
+  uid = data.vastdata_nonlocal_user.vastdb_nonlocal_user.uid
 
   pgp_public_key = <<-EOT
     -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -61,15 +60,14 @@ data "vastdata_tenant" "vastdb_tenant" {
 }
 
 
-resource "vastdata_user" "vastdb_user" {
-  name              = "vastdb_user"
-  uid               = 30109
-  local_provider_id = 1
+data "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
+  uid       = 30109
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 }
 
 
 resource "vastdata_nonlocal_user_key" "vastdb_nonlocal_user_key" {
-  username = vastdata_user.vastdb_user.name
+  uid = data.vastdata_nonlocal_user.vastdb_nonlocal_user.uid
 }
 
 # --------------------

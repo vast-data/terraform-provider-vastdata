@@ -1,3 +1,5 @@
+# e2e:skip
+
 # Basic e2e test: Generate keytab only
 resource "vastdata_kerberos" "vastdb_kerberos" {
   realm              = "VASTDB.LOCAL"

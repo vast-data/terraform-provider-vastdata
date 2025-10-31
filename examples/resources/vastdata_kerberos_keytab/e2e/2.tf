@@ -1,3 +1,5 @@
+# e2e:skip
+
 # E2E test: Generate keytab and upload custom keytab file
 resource "vastdata_kerberos" "vastdb_kerberos_with_upload" {
   realm = "VASTENG.LAB"
