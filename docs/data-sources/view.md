@@ -41,7 +41,7 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `cluster__id` (String) Limit response by cluster ID
 - `cluster__name` (String) Filter response by cluster name.
 - `cluster_id` (Number) Parent Cluster ID
-- `create_dir` (String) Creates the directory specified by the path
+- `create_dir` (Boolean) Creates the directory specified by the path
 - `created` (String)
 - `default_retention_period` (String) Default retention period for objects in the bucket. Required if s3_locks_retention_mode is set to governance or compliance. Object versions that are placed in the bucket are automatically protected with the specified retention for the specified amount of time. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
 - `directory` (Boolean) Create the directory if it does not exist

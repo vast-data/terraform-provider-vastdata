@@ -60,10 +60,6 @@ resource "vastdata_supported_drivers" "example" {
 - `signature` (String) Signature, base64-encoded
 - `version` (String) Version
 
-### Read-Only
-
-- `created` (Number)
-
 <a id="nestedatt--drives"></a>
 ### Nested Schema for `drives`
 

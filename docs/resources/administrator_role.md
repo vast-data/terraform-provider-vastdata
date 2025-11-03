@@ -74,7 +74,7 @@ resource "vastdata_administrator_role" "vastdb_role" {
 - `ldap_groups` (Set of String) Optionally specify LDAP group(s) to associate with the role. A group can be any user group on an LDAP-based provider, including Active Directory. The provider must be connected to the cluster. If the role is for tenant admins, the provider must be connected to the specific tenant. Members of the specified groups can access VMS and are granted whichever permissions are included in the role. A group can be associated with multiple roles.
 - `object_id` (Number) Object ID. Used to specify a particular object to limit the role to.
 - `object_type` (String) Object type. Used to specify a particular object to limit the role to.
-- `permissions` (String) Permission type. Used to assign all the permissions of given type to a role.
+- `permissions` (Set of String) Permission type. Used to assign all the permissions of given type to a role.
 Can be used together with `realm` to narrow resulting permissions list (logical AND).
 Ignored if provided along with `permissions_list`.
 Note, that this is a legacy name, which does not correspond to the output schema's `permissions`.

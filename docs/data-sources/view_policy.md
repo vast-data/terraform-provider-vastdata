@@ -66,12 +66,10 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `nfs_enforce_tls_relaxed` (Boolean) Whether to relax TLS enforcement by not requiring TLS for auxiliary NFSv3 sub-protocols | (MOUNT, NLM, NSM, RQUOTA, NFSACL)
 - `nfs_minimal_protection_level` (String) Minimal Protection Level for NFSv4 client mounts: 'KRB_AUTH_ONLY' allows client mounts with Kerberos authentication only (using the RPCSEC_GSS authentication service), 'SYSTEM' allows client mounts using either the AUTH_SYS RCP security flavor (the traditional default NFS authentication scheme) or with Kerberos authentication, 'NONE' (default) allows client mounts with the AUTH_NONE (anonymous access), or AUTH_SYS RCP security flavors, or with Kerberos authentication.
 - `nfs_posix_acl` (Boolean) True if support is enabled for extended POSIX Access Control Lists (ACL) for NFSv3 clients.
-- `nfs_read_only` (String) Hosts with NFS read only permissions
 - `nfs_return_open_permissions` (Boolean) when using smb use open permissions for files
 - `path_length` (String) How to determine the maximum allowed path component name length. 'LCD' (default): Imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. 'NPL': Imposes no limitation beyond that of the client protocol.
 - `pretty_atime_frequency` (String)
 - `pretty_auth_source` (String)
-- `s3_bucket_full_control` (String) Hosts with full permissions
 - `s3_bucket_listing` (String) Hosts with full permissions
 - `s3_bucket_read` (String) Hosts with full permissions
 - `s3_bucket_read_acp` (String) Hosts with full permissions
@@ -107,6 +105,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `full` (Set of String)
 - `nfs_all_squash` (Set of String) Hosts with all squash policy
 - `nfs_no_squash` (Set of String) Hosts with no squash policy
+- `nfs_read_only` (Set of String) Hosts with NFS read only permissions
 - `nfs_read_write` (Set of String) Hosts with NFS read/write permissions
 - `nfs_root_squash` (Set of String) Hosts with root squash policy
 - `permission_per_vip_pool` (Map of String)

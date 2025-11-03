@@ -138,7 +138,7 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `name` (String)
 - `source_dir` (String) A path on the local cluster to protect. A snapshot of the specified path will be taken periodically on the schedule configured in the specified protection policy.
 - `target_exported_dir` (String) A path on a remote peer to which to replicate.
-- `tenant_id` (String) Tenant ID of the tenant on the local cluster to which the source_dir belongs.
+- `tenant_id` (Number) Tenant ID of the tenant on the local cluster to which the source_dir belongs.
 
 ### Optional
 

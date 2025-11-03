@@ -42,7 +42,6 @@ data "vastdata_s3_replication_peer" "vastdb_s3_replication_peer_by_name" {
 - `guid` (String) unique identifier
 - `http_protocol` (String) http/https
 - `name` (String)
-- `proxies` (String) A list of canonical urls separated by a comma.
 - `state` (String)
 - `state_description` (String)
 - `type` (String)
@@ -51,3 +50,4 @@ data "vastdata_s3_replication_peer" "vastdb_s3_replication_peer_by_name" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
+- `proxies` (Set of String) A list of canonical urls separated by a comma.
