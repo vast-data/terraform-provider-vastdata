@@ -189,7 +189,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	}
 
 	// Will be optional only fields (Query parameters).
-	params, err := openapi_schema.QueryParametersGET(resourcePath)
+	params, err := openapi_schema.GetQueryParameters(http.MethodGet, resourcePath)
 	if err != nil {
 		return nil, err
 	}

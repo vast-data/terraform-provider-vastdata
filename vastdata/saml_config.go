@@ -124,8 +124,7 @@ func ensureSamlConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFSt
 	if data, ok := fieldsTs.SetIfAvailable(
 		"saml_settings",
 	); ok {
-		data["idp_name"] = idpName
-		if _, err := rest.Vms.VmsSamlConfigWithContext_PATCH(ctx, vmsId, data); err != nil {
+		if _, err := rest.Vms.VmsSamlConfigWithContext_POST(ctx, vmsId, params{"idp_name": idpName}, data); err != nil {
 			return nil, err
 		}
 		return nil, nil

@@ -40,5 +40,5 @@ func (m *TenantConfiguredIdp) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *TenantConfiguredIdp) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantName := m.tfstate.String("name")
-	return rest.Tenants.TenantConfiguredIdpWithContext_GET(ctx, params{"tenant_name": tenantName})
+	return rest.Tenants.TenantConfiguredIdpWithContext_GET(ctx, params{"name": tenantName})
 }

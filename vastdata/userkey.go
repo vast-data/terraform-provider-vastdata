@@ -108,7 +108,7 @@ func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 	}
 	tenantId := userRecord.RecordTenantID()
 
-	record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, tenantId)
+	record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, params{"tenant_id": tenantId})
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 		record["encrypted_secret_key"] = types.StringNull()
 	}
 	if ts.IsKnownAndNotNull("enabled") && !ts.Bool("enabled") {
-		if err = rest.Users.UserAccessKeysWithContext_PATCH(ctx, userId, record["access_key"].(string), false); err != nil {
+		if err = rest.Users.UserAccessKeysWithContext_PATCH(ctx, userId, params{"access_key": record["access_key"].(string), "enabled": false}); err != nil {
 			return nil, err
 		}
 	}
@@ -146,7 +146,7 @@ func (m *UserKey) UpdateResource(ctx context.Context, plan UpdateResource, rest 
 	// Handle enabled/disabled status toggle
 	if planTs.IsKnownAndNotNull("enabled") {
 		accessKey := ts.String("access_key")
-		err = rest.Users.UserAccessKeysWithContext_PATCH(ctx, userId, accessKey, planTs.Bool("enabled"))
+		err = rest.Users.UserAccessKeysWithContext_PATCH(ctx, userId, params{"access_key": accessKey, "enabled": planTs.Bool("enabled")})
 		if err != nil {
 			return nil, err
 		}
@@ -181,7 +181,7 @@ func (m *UserKey) DeleteResource(ctx context.Context, rest *VMSRest) error {
 		return err
 	}
 	userId := ts.Int64("user_id")
-	err := rest.Users.UserAccessKeysWithContext_DELETE(ctx, userId, accessKey)
+	err := rest.Users.UserAccessKeysWithContext_DELETE(ctx, userId, params{"access_key": accessKey})
 	if ignoreStatusCodes(err, http.StatusNotFound) != nil {
 		return err
 	}

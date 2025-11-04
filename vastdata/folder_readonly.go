@@ -85,25 +85,19 @@ func (m *FolderReadOnly) ReadResource(ctx context.Context, rest *VMSRest) (Displ
 }
 
 func (m *FolderReadOnly) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	ts := m.tfstate
-	path := ts.String("path")
-	tenantId := ts.Int64("tenant_id")
-	record, err := rest.Folders.FolderReadOnlyWithContext_POST(ctx, path, tenantId)
+	searchParams := getSearchParams(ctx, m.tfstate, nil)
+	record, err := rest.Folders.FolderReadOnlyWithContext_POST(ctx, searchParams)
 	return record, err
 }
 
 func (m *FolderReadOnly) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
-	ts := m.tfstate
-	path := ts.String("path")
-	tenantId := ts.Int64("tenant_id")
-	record, err := rest.Folders.FolderReadOnlyWithContext_POST(ctx, path, tenantId)
+	searchParams := getSearchParams(ctx, m.tfstate, nil)
+	record, err := rest.Folders.FolderReadOnlyWithContext_POST(ctx, searchParams)
 	return record, err
 }
 
 func (m *FolderReadOnly) DeleteResource(ctx context.Context, rest *VMSRest) error {
-	ts := m.tfstate
-	path := ts.String("path")
-	tenantId := ts.Int64("tenant_id")
-	err := rest.Folders.FolderReadOnlyWithContext_DELETE(ctx, path, tenantId)
+	searchParams := getSearchParams(ctx, m.tfstate, nil)
+	err := rest.Folders.FolderReadOnlyWithContext_DELETE(ctx, searchParams)
 	return err
 }

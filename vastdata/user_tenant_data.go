@@ -73,7 +73,14 @@ func (m *UserTenantData) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *UserTenantData) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	userID := m.tfstate.Int64("user_id")
-	return rest.Users.UserTenantDataWithContext_GET(ctx, userID, nil)
+	reqParams := params{}
+	if m.tfstate.IsKnownAndNotNull("tenant_id") {
+		tenantID := m.tfstate.Int64("tenant_id")
+		if tenantID != 0 {
+			reqParams["tenant_id"] = tenantID
+		}
+	}
+	return rest.Users.UserTenantDataWithContext_GET(ctx, userID, reqParams)
 }
 
 func (m *UserTenantData) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

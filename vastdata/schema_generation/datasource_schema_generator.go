@@ -59,7 +59,7 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 	}
 
 	// Will be write-only fields (Query parameters) unless present in Response schema
-	params, err := openapi_schema.QueryParametersGET(resourcePath)
+	params, err := openapi_schema.GetQueryParameters(http.MethodGet, resourcePath)
 	if err != nil {
 		return nil, err
 	}

@@ -49,7 +49,7 @@ func (m *ManagerPassword) ReadResource(_ context.Context, _ *VMSRest) (Displayab
 
 func (m *ManagerPassword) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	password := m.tfstate.String("password")
-	err := rest.Managers.ManagerPasswordWithContext_PATCH(ctx, password)
+	err := rest.Managers.ManagerPasswordWithContext_PATCH(ctx, params{"password": password})
 	return nil, err
 }
 

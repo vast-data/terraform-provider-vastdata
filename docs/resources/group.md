@@ -26,11 +26,11 @@ resource "vastdata_group" "vastdb_group" {
 ### Required
 
 - `gid` (Number) group GID
+- `local_provider_id` (Number) Local provider ID
 - `name` (String) group name
 
 ### Optional
 
-- `local_provider_id` (Number) Local provider ID
 - `s3_policies_ids` (Set of Number) list of s3 policy ids
 - `sid` (String) group SID
 

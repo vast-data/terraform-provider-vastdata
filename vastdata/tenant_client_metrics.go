@@ -66,7 +66,7 @@ func (m *TenantClientMetrics) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *TenantClientMetrics) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantId := m.tfstate.Int64("tenant_id")
-	return rest.Tenants.TenantClientMetricsWithContext_GET(ctx, tenantId, nil)
+	return rest.Tenants.TenantClientMetricsWithContext_GET(ctx, tenantId)
 }
 
 func (m *TenantClientMetrics) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -114,5 +114,5 @@ func ensureTenantClientMetricsUpdatedWith(ctx context.Context, stateTs, fieldsTs
 	}
 
 	// If no fields to update, just get the current client metrics
-	return rest.Tenants.TenantClientMetricsWithContext_GET(ctx, tenantId, nil)
+	return rest.Tenants.TenantClientMetricsWithContext_GET(ctx, tenantId)
 }

@@ -109,7 +109,10 @@ func processKerberosKeytab(ctx context.Context, kerberosId int64, tfstate *is.TF
 			return nil, fmt.Errorf("admin_username and admin_password are required for keytab generation")
 		}
 
-		_, err := rest.Kerberos.KerberosKeytabWithContext_POST(ctx, kerberosId, adminPassword, adminUsername)
+		_, err := rest.Kerberos.KerberosKeytabWithContext_POST(ctx, kerberosId, params{
+			"admin_password": adminPassword,
+			"admin_username": adminUsername,
+		})
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate keytab: %w", err)
 		}

@@ -27,9 +27,10 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:            ViewSchemaRef,
-			DeleteOnlyBodyFields: map[string]string{"delete_dir": ""},
-			ImportFields:         []string{"path", "tenant_name"},
+			SchemaRef:             ViewSchemaRef,
+			DeleteOnlyBodyFields:  map[string]string{"delete_dir": ""},
+			DeleteOnlyParamFields: map[string]string{"force": "force"},
+			ImportFields:          []string{"path", "tenant_name"},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
 				"alias":                    ValidatorPathStartsWithSlash,
@@ -44,6 +45,10 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 					Description: "If set to true during view deletion, the underlying directory will also be deleted. " +
 						"This behavior is only effective during delete operations. " +
 						"For it to work properly, the Trash API must be enabled on the VAST cluster.",
+				},
+				"force": rschema.BoolAttribute{
+					Optional:    true,
+					Description: "Force View removal.",
 				},
 			},
 		},
@@ -78,7 +83,7 @@ func (m *View) PrepareDeleteResource(ctx context.Context, rest *VMSRest) error {
 		if tfstate.IsKnownAndNotNull("tenant_id") {
 			tenantId = tfstate.Int64("tenant_id")
 		}
-		if _, err = rest.Folders.FolderDeleteFolderWithContext_DELETE(ctx, path, tenantId); isApiError(err) {
+		if _, err = rest.Folders.FolderDeleteFolderWithContext_DELETE(ctx, params{"path": path, "tenant_id": tenantId}); isApiError(err) {
 			body := err.(*ApiError).Body
 			if strings.Contains(body, "no such directory") {
 				return nil

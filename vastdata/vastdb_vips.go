@@ -61,7 +61,7 @@ func (m *VastDbVips) API(_ *VMSRest) VastResourceAPIWithContext {
 
 func (m *VastDbVips) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantId := m.tfstate.Int64("tenant_id")
-	recordSet, err := rest.Vips.VipVipsWithContext_GET(ctx, params{"tenant_id": tenantId})
+	recordSet, err := rest.VastDb.VastDbVipsWithContext_GET(ctx, params{"tenant_id": tenantId})
 	if err != nil {
 		return nil, err
 	}
