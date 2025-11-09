@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var GlobalSnapshotSchemaRef = is.NewSchemaReference(
@@ -24,6 +25,9 @@ func (m *GlobalSnapshot) NewResourceManager(raw map[string]attr.Value, schema an
 		schema,
 		&is.TFStateHints{
 			SchemaRef: GlobalSnapshotSchemaRef,
+			CommonValidatorsMapping: map[string]string{
+				"loanee_root_path": ValidatorPathStartsEndsWithSlash,
+			},
 		},
 	)}
 }
