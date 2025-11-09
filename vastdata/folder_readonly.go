@@ -4,12 +4,15 @@ package provider
 import (
 	"context"
 	"net/http"
+	"regexp"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -38,6 +41,12 @@ func (m *FolderReadOnly) NewResourceManager(raw map[string]attr.Value, schema an
 						Description: "Path of the folder to be read-only.",
 						PlanModifiers: []planmodifiers.String{
 							stringplanmodifier.RequiresReplace(),
+						},
+						Validators: []validator.String{
+							stringvalidator.RegexMatches(
+								regexp.MustCompile(`^/([^/].*/)?$`),
+								"must start and end with '/'",
+							),
 						},
 					},
 					"tenant_id": rschema.Int64Attribute{
