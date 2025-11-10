@@ -101,14 +101,22 @@ func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 		return nil, err
 	}
 	userId := ts.Int64("user_id")
-	// Get tenant_id from the user record
-	userRecord, err := rest.Users.GetByIdWithContext(ctx, userId)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user details for tenant_id: %w", err)
-	}
-	tenantId := userRecord.RecordTenantID()
+	createParams := params{}
 
-	record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, params{"tenant_id": tenantId})
+	// Get tenant_id from tfstate if provided, otherwise try to get it from user record
+	if ts.IsKnownAndNotNull("tenant_id") {
+		createParams["tenant_id"] = ts.Int64("tenant_id")
+	} else {
+		userRecord, err := rest.Users.GetByIdWithContext(ctx, userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get user details for tenant_id: %w", err)
+		}
+		if tenantId, ok := userRecord["tenant_id"].(int64); ok {
+			createParams["tenant_id"] = tenantId
+		}
+	}
+
+	record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, createParams)
 	if err != nil {
 		return nil, err
 	}
