@@ -218,6 +218,7 @@ resource "vastdata_view" "vastdb_view" {
 - `s3_versioning` (Boolean) Enable S3 Versioning if S3 bucket. Versioning cannot be disabled after the view is created.
 - `select_for_live_monitoring` (Boolean) Enables live monitoring on the view. Live monitoring can be enabled for up to ten views at one time. Analytics data for views is polled every 5 minutes by default and every 10 seconds with live monitoring.
 - `share` (String) SMB share name. Must be specified if SMB is specified in protocols.
+- `share_acl` (Attributes) Share-level ACL details (see [below for nested schema](#nestedatt--share_acl))
 - `smb_encryption_state` (String) Defines the encryption level for SMB
 - `tenant_id` (Number) Associates the specified tenant with the view.
 - `user_impersonation` (Attributes) (see [below for nested schema](#nestedatt--user_impersonation))
@@ -240,7 +241,6 @@ resource "vastdata_view" "vastdb_view" {
 - `nqn` (String) Applicable to subsystem (block protocol enabled) views. The subsystem's NVMe Qualified Name. A unique identifier used to identify the subsystem in NVMe operations.
 - `physical_capacity` (Number) Physical Capacity consumed by view
 - `policy` (String) The name of the associated view policy
-- `share_acl` (Attributes) Share-level ACL details (see [below for nested schema](#nestedatt--share_acl))
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
 - `tenant_name` (String) Tenant Name
@@ -289,6 +289,28 @@ Optional:
 - `triggers` (Set of String) Event triggers
 
 
+<a id="nestedatt--share_acl"></a>
+### Nested Schema for `share_acl`
+
+Optional:
+
+- `acl` (Attributes Set) Share-level ACL (see [below for nested schema](#nestedatt--share_acl--acl))
+- `enabled` (Boolean) True if Share ACL is enabled on the view, otherwise False
+
+<a id="nestedatt--share_acl--acl"></a>
+### Nested Schema for `share_acl.acl`
+
+Optional:
+
+- `fqdn` (String) FQDN of the chosen grantee
+- `grantee` (String) grantee type
+- `name` (String) name of the chosen grantee
+- `perm` (String) Grantee’s permissions
+- `sid_str` (String) grantee’s SID
+- `uid_or_gid` (Number) grantee’s uid (if user) or gid (if group)
+
+
+
 <a id="nestedatt--user_impersonation"></a>
 ### Nested Schema for `user_impersonation`
 
@@ -299,24 +321,3 @@ Optional:
 - `identifier_type` (String) The identifier type of the specified identifier.
 - `login_name` (String) Full username of user to impersonate, including domain name
 - `username` (String) The username of the user to impersonate
-
-
-<a id="nestedatt--share_acl"></a>
-### Nested Schema for `share_acl`
-
-Read-Only:
-
-- `acl` (Attributes Set) Share-level ACL (see [below for nested schema](#nestedatt--share_acl--acl))
-- `enabled` (Boolean) True if Share ACL is enabled on the view, otherwise False
-
-<a id="nestedatt--share_acl--acl"></a>
-### Nested Schema for `share_acl.acl`
-
-Read-Only:
-
-- `fqdn` (String) FQDN of the chosen grantee
-- `grantee` (String) grantee type
-- `name` (String) name of the chosen grantee
-- `perm` (String) Grantee’s permissions
-- `sid_str` (String) grantee’s SID
-- `uid_or_gid` (Number) grantee’s uid (if user) or gid (if group)

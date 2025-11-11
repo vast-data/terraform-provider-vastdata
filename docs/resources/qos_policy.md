@@ -115,6 +115,7 @@ resource "vastdata_qos_policy" "vastdb_qos_policy" {
 ### Optional
 
 - `attached_iam_roles` (Set of Number) List of IAM Roles IDs which should be attached to that QOS Policy
+- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy (see [below for nested schema](#nestedatt--attached_users))
 - `capacity_limits` (Attributes) Performance limits per unit of either used logical capacity or provisioned capacity, depending on the mode. Units are stated per limit. Valid values: 0-4294967296. 0 means unlimited. (see [below for nested schema](#nestedatt--capacity_limits))
 - `capacity_total_limits` (Attributes) (see [below for nested schema](#nestedatt--capacity_total_limits))
 - `is_default` (Boolean) Is default User QOS Policy
@@ -130,11 +131,25 @@ resource "vastdata_qos_policy" "vastdb_qos_policy" {
 
 ### Read-Only
 
-- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy (see [below for nested schema](#nestedatt--attached_users))
 - `guid` (String) QoS Policy guid
 - `id` (Number) The ID of this resource.
 - `io_size_bytes` (Number) Sets the size of IO for static and capacity limit definitions. The number of IOs per request is obtained by dividing request size by IO size. Default: 64K, Recommended range: 4K - 1M
 - `tenant_name` (String) Tenant Name
+
+<a id="nestedatt--attached_users"></a>
+### Nested Schema for `attached_users`
+
+Required:
+
+- `fqdn` (String) The Fully Qualified Domain Name (FQDN) of the user's domain.
+- `identifier_type` (String) The attribute used to identify the user.
+- `identifier_value` (String) The value of the identifying attribute for the user. Must be of the attribute specified as identifier_type.
+- `name` (String) User's name
+
+Optional:
+
+- `label` (String) A label for the user
+
 
 <a id="nestedatt--capacity_limits"></a>
 ### Nested Schema for `capacity_limits`
@@ -192,18 +207,3 @@ Optional:
 - `max_iops` (Number) Maximal IOPS
 - `min_bw_mbps` (Number) Minimal BW Mb/s
 - `min_iops` (Number) Minimal IOPS
-
-
-<a id="nestedatt--attached_users"></a>
-### Nested Schema for `attached_users`
-
-Required:
-
-- `fqdn` (String) The Fully Qualified Domain Name (FQDN) of the user's domain.
-- `identifier_type` (String) The attribute used to identify the user.
-- `identifier_value` (String) The value of the identifying attribute for the user. Must be of the attribute specified as identifier_type.
-- `name` (String) User's name
-
-Read-Only:
-
-- `label` (String) A label for the user
