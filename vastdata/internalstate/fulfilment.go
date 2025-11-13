@@ -150,9 +150,9 @@ func BuildAttrValueFromAny(t attr.Type, val any) (attr.Value, bool, error) {
 		}
 		return types.Float64Value(f), true, nil
 	case types.BoolType.String():
-		b, ok := val.(bool)
-		if !ok {
-			return nil, true, fmt.Errorf("expected bool, got %T", val)
+		b, err := ToBool(val)
+		if err != nil {
+			return nil, true, err
 		}
 		return types.BoolValue(b), true, nil
 	}
