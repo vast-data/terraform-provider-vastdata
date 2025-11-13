@@ -14,38 +14,38 @@ import (
 
 func TestBuildAttrValueFromAny_ArbitraryToString(t *testing.T) {
 	v := struct{ A string }{A: "val"}
-	val, err := BuildAttrValueFromAny(types.StringType, v)
+	val, _, err := BuildAttrValueFromAny(types.StringType, v)
 	require.NoError(t, err)
 	require.Equal(t, "{val}", val.(types.String).ValueString())
 }
 
 func TestBuildAttrValueFromAny_NullValues(t *testing.T) {
-	val, err := BuildAttrValueFromAny(types.StringType, nil)
+	val, _, err := BuildAttrValueFromAny(types.StringType, nil)
 	require.NoError(t, err)
 	require.True(t, val.IsNull())
 
-	val, err = BuildAttrValueFromAny(types.Int64Type, nil)
+	val, _, err = BuildAttrValueFromAny(types.Int64Type, nil)
 	require.NoError(t, err)
 	require.True(t, val.IsNull())
 
-	val, err = BuildAttrValueFromAny(types.ListType{ElemType: types.StringType}, nil)
+	val, _, err = BuildAttrValueFromAny(types.ListType{ElemType: types.StringType}, nil)
 	require.NoError(t, err)
 	require.True(t, val.IsNull())
 }
 
 func TestBuildAttrValueFromAny_ListAndSet(t *testing.T) {
-	listVal, err := BuildAttrValueFromAny(types.ListType{ElemType: types.StringType}, []any{"a", "b"})
+	listVal, _, err := BuildAttrValueFromAny(types.ListType{ElemType: types.StringType}, []any{"a", "b"})
 	require.NoError(t, err)
 	require.Equal(t, types.ListValueMust(types.StringType, []attr.Value{types.StringValue("a"), types.StringValue("b")}), listVal)
 
-	setVal, err := BuildAttrValueFromAny(types.SetType{ElemType: types.Int64Type}, []any{int64(1), int64(2)})
+	setVal, _, err := BuildAttrValueFromAny(types.SetType{ElemType: types.Int64Type}, []any{int64(1), int64(2)})
 	require.NoError(t, err)
 	require.Equal(t, types.SetValueMust(types.Int64Type, []attr.Value{types.Int64Value(1), types.Int64Value(2)}), setVal)
 }
 
 func TestBuildAttrValueFromAny_ObjectMissingField(t *testing.T) {
 	objType := types.ObjectType{AttrTypes: map[string]attr.Type{"foo": types.StringType, "bar": types.Int64Type}}
-	val, err := BuildAttrValueFromAny(objType, map[string]any{"foo": "baz"})
+	val, _, err := BuildAttrValueFromAny(objType, map[string]any{"foo": "baz"})
 	require.NoError(t, err)
 	require.True(t, val.(types.Object).Attributes()["bar"].IsNull())
 }
@@ -98,7 +98,7 @@ func TestBuildAttrValueFromAny_Primitives(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := BuildAttrValueFromAny(tc.typ, tc.val)
+			got, _, err := BuildAttrValueFromAny(tc.typ, tc.val)
 			require.NoError(t, err)
 			require.Equal(t, tc.want, got)
 		})
@@ -106,7 +106,7 @@ func TestBuildAttrValueFromAny_Primitives(t *testing.T) {
 }
 
 func TestBuildAttrValueFromAny_Null(t *testing.T) {
-	val, err := BuildAttrValueFromAny(types.StringType, nil)
+	val, _, err := BuildAttrValueFromAny(types.StringType, nil)
 	require.NoError(t, err)
 	require.True(t, val.IsNull())
 }
@@ -114,7 +114,7 @@ func TestBuildAttrValueFromAny_Null(t *testing.T) {
 func TestBuildAttrValueFromAny_List(t *testing.T) {
 	listType := types.ListType{ElemType: types.StringType}
 	input := []any{"a", "b"}
-	val, err := BuildAttrValueFromAny(listType, input)
+	val, _, err := BuildAttrValueFromAny(listType, input)
 	require.NoError(t, err)
 
 	list := val.(types.List)
@@ -416,6 +416,82 @@ func TestConvertAttrValueToRaw_UserQuotasExample(t *testing.T) {
 	require.Nil(t, objMap["is_group"])
 	require.Nil(t, objMap["name"])
 	require.Nil(t, objMap["path"])
+}
+
+func TestBuildAttrValueFromAny_EmptyString(t *testing.T) {
+	// Test the new functionality for handling empty strings
+	// Empty string for Int64 should return 0, false (not successful), and error
+	val, success, err := BuildAttrValueFromAny(types.Int64Type, "")
+	require.NotNil(t, val)
+	require.False(t, success, "empty string should not be considered successful parse")
+	require.Error(t, err, "empty string should produce an error")
+	require.Equal(t, int64(0), val.(types.Int64).ValueInt64(), "empty string should default to 0")
+
+	// Test with valid string
+	val, success, err = BuildAttrValueFromAny(types.Int64Type, "42")
+	require.NotNil(t, val)
+	require.True(t, success, "valid number string should be successful")
+	require.NoError(t, err)
+	require.Equal(t, int64(42), val.(types.Int64).ValueInt64())
+
+	// Test with valid int64
+	val, success, err = BuildAttrValueFromAny(types.Int64Type, int64(100))
+	require.NotNil(t, val)
+	require.True(t, success)
+	require.NoError(t, err)
+	require.Equal(t, int64(100), val.(types.Int64).ValueInt64())
+
+	// Test with invalid string
+	val, success, err = BuildAttrValueFromAny(types.Int64Type, "not-a-number")
+	require.NotNil(t, val)
+	require.False(t, success)
+	require.Error(t, err)
+	require.Equal(t, int64(0), val.(types.Int64).ValueInt64())
+}
+
+func TestBuildAttrValueFromAny_OtherTypes(t *testing.T) {
+	// Test that other types still work with success indicator
+
+	// String type - always successful
+	val, success, err := BuildAttrValueFromAny(types.StringType, "hello")
+	require.NoError(t, err)
+	require.True(t, success)
+	require.Equal(t, "hello", val.(types.String).ValueString())
+
+	// Bool type - successful
+	val, success, err = BuildAttrValueFromAny(types.BoolType, true)
+	require.NoError(t, err)
+	require.True(t, success)
+	require.Equal(t, true, val.(types.Bool).ValueBool())
+
+	// Float type - successful
+	val, success, err = BuildAttrValueFromAny(types.Float64Type, 3.14)
+	require.NoError(t, err)
+	require.True(t, success)
+	require.Equal(t, 3.14, val.(types.Float64).ValueFloat64())
+
+	// Null value - successful
+	val, success, err = BuildAttrValueFromAny(types.Int64Type, nil)
+	require.NoError(t, err)
+	require.True(t, success)
+	require.True(t, val.IsNull())
+}
+
+func TestBuildAttrValueFromAny_NestedStructures(t *testing.T) {
+	// Test list with empty string in Int64 element
+	// The list itself should return true (successful), but the Int64 element inside will have returned false
+	listType := types.ListType{ElemType: types.Int64Type}
+	val, success, err := BuildAttrValueFromAny(listType, []any{int64(1), "", int64(3)})
+	require.NotNil(t, val)
+	require.True(t, success, "list itself succeeds even if element had issue")
+	require.NoError(t, err, "list should be created successfully")
+
+	list := val.(types.List)
+	elems := list.Elements()
+	require.Equal(t, 3, len(elems))
+	require.Equal(t, int64(1), elems[0].(types.Int64).ValueInt64())
+	require.Equal(t, int64(0), elems[1].(types.Int64).ValueInt64(), "empty string should default to 0")
+	require.Equal(t, int64(3), elems[2].(types.Int64).ValueInt64())
 }
 
 func TestConvertAttrValueToRaw_UserQuotasWithRealValues(t *testing.T) {

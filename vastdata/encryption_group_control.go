@@ -4,6 +4,7 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -87,13 +88,13 @@ func (m *EncryptionGroupControl) performAction(ctx context.Context, rest *VMSRes
 
 	switch action {
 	case "revoke":
-		_, err = rest.EncryptionGroups.RevokeEncryptionGroupWithContext(ctx, encryptionGroupId)
+		err = rest.EncryptionGroups.EncryptionGroupRevokeEncryptionGroupWithContext_POST(ctx, encryptionGroupId, nil)
 	case "deactivate":
-		_, err = rest.EncryptionGroups.DeactivateEncryptionGroupWithContext(ctx, encryptionGroupId)
+		err = rest.EncryptionGroups.EncryptionGroupDeactivateEncryptionGroupWithContext_POST(ctx, encryptionGroupId, nil)
 	case "reinstate":
-		_, err = rest.EncryptionGroups.ReinstateEncryptionGroupWithContext(ctx, encryptionGroupId)
+		err = rest.EncryptionGroups.EncryptionGroupReinstateEncryptionGroupWithContext_POST(ctx, encryptionGroupId, nil)
 	case "rotate_key":
-		_, err = rest.EncryptionGroups.RotateEncryptionGroupKeyWithContext(ctx, encryptionGroupId)
+		err = rest.EncryptionGroups.EncryptionGroupRotateEncryptionGroupKeyWithContext_POST(ctx, encryptionGroupId, nil)
 	default:
 		return nil, fmt.Errorf("invalid action '%s'. Valid actions are: revoke, deactivate, reinstate, rotate_key", action)
 	}

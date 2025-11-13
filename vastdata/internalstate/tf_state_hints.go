@@ -119,6 +119,10 @@ type TFStateHints struct {
 	//   }
 	// NOTE: All common validators in is in: vastdata/schema_generation/common_modifiers.go
 	CommonModifiersMapping map[string]string
+
+	// Skip API calls during refresh and use current tfstate instead.
+	// Useful for offline or performance-critical scenarios. Default is false.
+	SkipRefreshAPICall bool
 }
 
 // SchemaReference encapsulates both create and read endpoints for a resource.

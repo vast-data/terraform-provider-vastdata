@@ -95,8 +95,6 @@ resource "vastdata_protection_policy" "protection_policy" {
 
 - `big_catalog` (Boolean) Indicates if Protection Policy will be used for VAST Catalog. There may only be 1 such policy.
 - `frames` (Attributes List) Defines the schedule for snapshot creation and the local and remote retention policies. Example: every 90m start-at 2025-07-27 20:10:35 keep-local 10h keep-remote 30d (see [below for nested schema](#nestedatt--frames))
-- `guid` (String) Do not specify this parameter.
-- `id` (Number) Do not specify this parameter.
 - `indestructible` (Boolean) Set to true to protect the protection policy from accidental or malicious deletion with the indestructibility feature. If this setting is enabled, authorized unlocking of the cluster's indestructibility mechanism is required to do any of the following: modifying the policy, deleting the policy or disabling this setting.
 - `remote_tenant_guid` (String) remote tenant guid
 - `target_object_id` (Number) ID of the remote peer. Specify ID of a ReplicationTarget (aka S3 replication peer) if clone_type is CLOUD_REPLICATION. Specify the ID of a NativeReplicationRemoteTarget if clone_type is NATIVE_REPLICATION.
@@ -105,7 +103,9 @@ resource "vastdata_protection_policy" "protection_policy" {
 ### Read-Only
 
 - `created` (String)
+- `guid` (String) unique identifier
 - `handle` (String)
+- `id` (Number) The ID of this resource.
 - `internal` (Boolean)
 - `is_local` (Boolean)
 - `is_on_schedule` (Boolean)

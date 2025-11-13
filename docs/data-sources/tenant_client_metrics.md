@@ -30,7 +30,7 @@ description: |-
 
 Required:
 
-- `enabled` (Boolean) Enables collection of client metrics.
+- `enabled` (Boolean) Enables collection of client metrics. If you enable the collection of client metrics, make sure bucket_owner and bucket_name are set as well.
 
 Read-Only:
 

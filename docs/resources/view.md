@@ -176,20 +176,28 @@ resource "vastdata_view" "vastdb_view" {
 - `bucket_creators_groups` (Set of String) For S3 endpoint views, specify a list of groups, by group name, whose bucket create requests use this view. Any request to create an S3 bucket that is sent by S3 API by a user who belongs to a group listed here will use this S3 Endpoint view. Take extra care not to duplicate bucket creators through groups: If you specify a group as a bucket creator group in one view and you also specify a user who belongs to that group as a bucket creator user in another view, view creation will not fail. Yet, there is a conflict between the two configurations and the selection of a view for configuring the user's buckets is not predictable.
 - `bucket_logging` (Attributes) (see [below for nested schema](#nestedatt--bucket_logging))
 - `bucket_owner` (String) Specifies a user to be the bucket owner. Specify as user name. Must be specified if S3 Bucket is included in protocols.
+- `bucket_owner_type` (String)
 - `cluster_id` (Number) Cluster ID
 - `create_dir` (Boolean) Create a directory at the specified path. Set to true if the specified path does not exist.
 - `create_dir_acl` (Attributes Set) Define ACL for the newly created dir (see [below for nested schema](#nestedatt--create_dir_acl))
 - `create_dir_mode` (Number) Unix permissions mode for the new dir
 - `default_retention_period` (String) Relevant if locking is enabled. Required if s3_locks_retention_mode is set to governance or compliance. Specifies a default retention period for objects in the bucket. If set, object versions that are placed in the bucket are automatically protected with the specified retention lock. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
 - `delete_dir` (Boolean) If set to true during view deletion, the underlying directory will also be deleted. This behavior is only effective during delete operations. For it to work properly, the Trash API must be enabled on the VAST cluster.
+- `event_notifications` (Attributes Set) (see [below for nested schema](#nestedatt--event_notifications))
 - `files_retention_mode` (String) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object.
+- `force` (Boolean) Force View removal.
 - `indestructible_object_duration` (Number) Retention period for objects, in days. Each object in the bucket is protected from deletion, overwriting, renaming and metadata changes for the specified number of days after its creation date.
 - `inherit_acl` (Boolean) Indicates whether the directory should inherit ACLs from its parent directory
 - `is_default_subsystem` (Boolean) Set to true to set view to be the default subsystem for block storage. There can be up to one default subsystem per tenant. The default subsystem is the default view selected when creating a block volume if no view is specified.
 - `is_indestructible_object_enabled` (Boolean) Set to true to enable indestructible object mode on the view. This is supported only if S3 is the only specified protocol. Other limitations also apply.
+- `is_kafka_encrypted_conn_allowed` (Boolean) True if encrypted connection is allowed for Kafka
+- `is_kafka_unencrypted_conn_allowed` (Boolean) True if unencrypted connection is allowed for Kafka
 - `is_seamless` (Boolean) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
+- `kafka_encrypted_auth_mechanism` (String) Authentication mechanism for encrypted connection
 - `kafka_first_join_group_timeout_sec` (Number) Kafka first join group timeout, in seconds
+- `kafka_is_authorization_required` (Boolean) True if authorization is required for Kafka
 - `kafka_rejoin_group_timeout_sec` (Number) Kafka rejoin group timeout, in seconds
+- `kafka_unencrypted_auth_mechanism` (String) Authentication mechanism for unencrypted connection
 - `kafka_vip_pools` (Set of Number) For Kafka-enabled views, an array of IDs of Virtual IP pools used to access event topics exposed by the view. The specified virtual IP pool must belong to the same tenant as the Kafka-enabled view. Must also not be a virtual IP pool that is excluded by the view policy's virtual IP pool association.
 - `locking` (Boolean) Set to true to enable object locking on a view. Object locking cannot be disabled after the view is created. Must be true if s3_versioning is true.
 - `max_retention_period` (String) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
@@ -211,6 +219,7 @@ resource "vastdata_view" "vastdb_view" {
 - `select_for_live_monitoring` (Boolean) Enables live monitoring on the view. Live monitoring can be enabled for up to ten views at one time. Analytics data for views is polled every 5 minutes by default and every 10 seconds with live monitoring.
 - `share` (String) SMB share name. Must be specified if SMB is specified in protocols.
 - `share_acl` (Attributes) Share-level ACL details (see [below for nested schema](#nestedatt--share_acl))
+- `smb_encryption_state` (String) Defines the encryption level for SMB
 - `tenant_id` (Number) Associates the specified tenant with the view.
 - `user_impersonation` (Attributes) (see [below for nested schema](#nestedatt--user_impersonation))
 
@@ -221,7 +230,6 @@ resource "vastdata_view" "vastdb_view" {
 - `cluster` (String) Parent Cluster
 - `created` (String)
 - `directory` (Boolean) Create the directory if it does not exist
-- `event_notifications` (Attributes Set) (see [below for nested schema](#nestedatt--event_notifications))
 - `guid` (String)
 - `has_bucket_logging_destination` (Boolean) Has a destination bucket configured as a destination for S3 bucket logging
 - `has_bucket_logging_sources` (Boolean) Is referenced by other S3 bucket views as the destination bucket for S3 bucket logging.
@@ -268,6 +276,19 @@ Optional:
 - `vid_or_vaid` (String) VID of user type grantee or VAID of group type grantee. This is a VAST user or group attribute. Specify this attribute or another attribute for the guarantee.
 
 
+<a id="nestedatt--event_notifications"></a>
+### Nested Schema for `event_notifications`
+
+Optional:
+
+- `broker_id` (Number) Event broker ID
+- `name` (String) Event unique name
+- `prefix_filter` (String) Event prefix filter
+- `suffix_filter` (String) Event suffix filter
+- `topic` (String) Event topic
+- `triggers` (Set of String) Event triggers
+
+
 <a id="nestedatt--share_acl"></a>
 ### Nested Schema for `share_acl`
 
@@ -281,12 +302,12 @@ Optional:
 
 Optional:
 
-- `fqdn` (String) FQDN of the grantee
-- `grantee` (String) Type of grantee
-- `name` (String) Name of the grantee
-- `perm` (String) Permission to grant to the grantee
-- `sid_str` (String) Grantee`s SID
-- `uid_or_gid` (Number) Grantee`s uid (if user) or gid (if group)
+- `fqdn` (String) FQDN of the chosen grantee
+- `grantee` (String) grantee type
+- `name` (String) name of the chosen grantee
+- `perm` (String) Grantee’s permissions
+- `sid_str` (String) grantee’s SID
+- `uid_or_gid` (Number) grantee’s uid (if user) or gid (if group)
 
 
 
@@ -300,16 +321,3 @@ Optional:
 - `identifier_type` (String) The identifier type of the specified identifier.
 - `login_name` (String) Full username of user to impersonate, including domain name
 - `username` (String) The username of the user to impersonate
-
-
-<a id="nestedatt--event_notifications"></a>
-### Nested Schema for `event_notifications`
-
-Read-Only:
-
-- `broker_id` (Number) Event broker ID
-- `name` (String) Event unique name
-- `prefix_filter` (String) Event prefix filter
-- `suffix_filter` (String) Event suffix filter
-- `topic` (String) Event topic
-- `triggers` (Set of String) Event triggers

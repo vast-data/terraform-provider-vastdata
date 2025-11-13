@@ -2,11 +2,12 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var ProtectionPolicySchemaRef = is.NewSchemaReference(
@@ -26,6 +27,12 @@ func (m *ProtectionPolicy) NewResourceManager(raw map[string]attr.Value, schema 
 		schema,
 		&is.TFStateHints{
 			SchemaRef: ProtectionPolicySchemaRef,
+			// SkipRefreshAPICall prevents drift detection from VAST API's duration normalization.
+			// The API normalizes time units (e.g., 14D → 2W, 1D → 24h, 168h → 1W), which causes
+			// Terraform to detect false drift even though the durations are equivalent.
+			// By skipping the refresh API call, we use the current Terraform state as-is,
+			// avoiding inconsistencies between user-specified values and API-normalized values.
+			SkipRefreshAPICall: true,
 			AdditionalSchemaAttributes: map[string]any{
 				// NOTE: original fields from OpenAPI spec with "-" is not acceptable in Terraform schema.
 				// We replace "frames" property 'in-place' here.

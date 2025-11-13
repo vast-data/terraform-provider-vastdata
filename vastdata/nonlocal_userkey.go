@@ -5,12 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var NonlocalUserKeySchemaRef = is.NewSchemaReference(
@@ -33,8 +34,8 @@ func (m *NonlocalUserKey) NewResourceManager(raw map[string]attr.Value, schema a
 			SchemaRef:            NonlocalUserKeySchemaRef,
 			SensitiveFields:      []string{"secret_key"},
 			ExcludedSchemaFields: []string{"login_name"},
-			SearchableFields:     []string{"uid", "username"}, // User can be found by uid or username
-			ComputedSchemaFields: []string{"uid", "username"},
+			SearchableFields:     []string{"uid", "sid", "username"}, // User can be found by uid, sid, or username
+			ComputedSchemaFields: []string{"uid", "sid", "username"},
 			AdditionalSchemaAttributes: map[string]any{
 				"pgp_public_key": rschema.StringAttribute{
 					Optional:    true,
@@ -59,17 +60,24 @@ func (m *NonlocalUserKey) TfState() *is.TFState {
 }
 
 func (m *NonlocalUserKey) API(rest *VMSRest) VastResourceAPIWithContext {
-	return rest.NonLocalUserKeys
+	return rest.Users
 }
 
 func (m *NonlocalUserKey) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	ts := m.tfstate
-	if !ts.IsKnownAndNotNull("uid") {
+	if !ts.IsKnownAndNotNull("uid") && !ts.IsKnownAndNotNull("sid") {
 		userRecord, err := rest.Users.GetWithContext(ctx, params{"name": ts.String("username")})
 		if err != nil {
 			return nil, err
 		}
-		ts.Set("uid", is.Must(toInt(userRecord["uid"])))
+		if uid, ok := userRecord["uid"]; ok {
+			if uid.(string) == "" {
+				// Fallback to sid if "uid" is empty string.
+				ts.Set("sid", userRecord["sid"])
+			} else {
+				ts.Set("uid", is.Must(toInt(userRecord["uid"])))
+			}
+		}
 	}
 	return nil, nil
 }
@@ -91,10 +99,19 @@ func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (Di
 	if _, err := m.ReadResource(ctx, rest); err != nil {
 		return nil, err
 	}
-	uid := ts.Int64("uid")
-	createParams := params{"uid": uid}
+
+	// Use uid if available, otherwise use sid
+	createParams := params{}
+	if ts.IsKnownAndNotNull("uid") {
+		createParams["uid"] = ts.Int64("uid")
+	} else if ts.IsKnownAndNotNull("sid") {
+		createParams["sid"] = ts.String("sid")
+	} else {
+		return nil, errors.New("either uid or sid must be set")
+	}
+
 	ts.SetToMapIfAvailable(createParams, "tenant_id", "enabled")
-	record, err := rest.NonLocalUserKeys.CreateWithContext(ctx, createParams)
+	record, err := rest.Users.UserNonLocalKeysWithContext_POST(ctx, createParams)
 	if err != nil {
 		return nil, err
 	}
@@ -110,14 +127,21 @@ func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (Di
 	} else {
 		record["encrypted_secret_key"] = types.StringNull()
 	}
-	record["uid"] = uid
+
+	// Preserve uid or sid in the record
+	if ts.IsKnownAndNotNull("uid") {
+		record["uid"] = ts.Int64("uid")
+	}
+	if ts.IsKnownAndNotNull("sid") {
+		record["sid"] = ts.String("sid")
+	}
+
 	return record, err
 }
 
 func (m *NonlocalUserKey) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
 	var (
 		ts          = m.tfstate
-		uid         = ts.Int64("uid")
 		planManager = plan.(*NonlocalUserKey)
 		planTs      = planManager.tfstate
 	)
@@ -125,11 +149,20 @@ func (m *NonlocalUserKey) UpdateResource(ctx context.Context, plan UpdateResourc
 	// Handle enabled/disabled status toggle
 	if planTs.IsKnownAndNotNull("enabled") {
 		updateParams := params{
-			"uid":        uid,
 			"access_key": ts.String("access_key"),
 			"enabled":    planTs.Bool("enabled"),
 		}
-		if _, err := rest.NonLocalUserKeys.UpdateNonIdWithContext(ctx, updateParams); err != nil {
+
+		// Use uid if available, otherwise use sid
+		if ts.IsKnownAndNotNull("uid") {
+			updateParams["uid"] = ts.Int64("uid")
+		} else if ts.IsKnownAndNotNull("sid") {
+			updateParams["sid"] = ts.String("sid")
+		} else {
+			return nil, errors.New("either uid or sid must be set")
+		}
+
+		if err := rest.Users.UserNonLocalKeysWithContext_PATCH(ctx, updateParams); err != nil {
 			return nil, err
 		}
 	}
@@ -162,8 +195,22 @@ func (m *NonlocalUserKey) DeleteResource(ctx context.Context, rest *VMSRest) err
 	if _, err := m.ReadResource(ctx, rest); err != nil {
 		return err
 	}
-	deleteParams := params{"access_key": accessKey, "uid": ts.Int64("uid")}
-	_, err := rest.NonLocalUserKeys.DeleteNonIdWithContext(ctx, nil, deleteParams)
+
+	deleteParams := params{"access_key": accessKey}
+
+	// Use uid if available, otherwise use sid
+	if ts.IsKnownAndNotNull("uid") {
+		deleteParams["uid"] = ts.Int64("uid")
+	} else if ts.IsKnownAndNotNull("sid") {
+		deleteParams["sid"] = ts.String("sid")
+	} else {
+		return errors.New("either uid or sid must be set for deletion")
+	}
+	if ts.IsKnownAndNotNull("tenant_id") {
+		deleteParams["tenant_id"] = ts.String("tenant_id")
+	}
+
+	err := rest.Users.UserNonLocalKeysWithContext_DELETE(ctx, deleteParams)
 	if ignoreStatusCodes(err, http.StatusNotFound) != nil {
 		return err
 	}

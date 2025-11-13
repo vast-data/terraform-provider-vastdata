@@ -138,8 +138,6 @@ resource "vastdata_global_snapshot" "gsnap1" {
 ### Optional
 
 - `enabled` (Boolean) Enables background sync, in which the snapshot data is copied from the source to the destination after the clone is created. During the copying stage, read requests are directed to the source if the requested data is not yet copied. If false, the snapshot data is not copied to the destination. Requests to read data from the cloned directory continue to read data from the cloned source.
-- `guid` (String) Do not specify this parameter.
-- `id` (Number) Do not specify this parameter.
 - `loanee_root_path` (String) ID of the path you want to clone. Specify only if cloning from a snapshot on the local cluster.
 - `loanee_snapshot` (String) Loanee snapshot name
 - `loanee_snapshot_id` (Number) ID of local snapshot to clone. Specify only if cloning from a snapshot on the local cluster.
@@ -155,7 +153,9 @@ resource "vastdata_global_snapshot" "gsnap1" {
 - `direction` (String)
 - `eta` (String) ETA
 - `external_state` (String) Global Snapshot Clone state
+- `guid` (String) unique identifier
 - `health` (String)
+- `id` (Number) The ID of this resource.
 - `loanee_tenant` (Attributes) (see [below for nested schema](#nestedatt--loanee_tenant))
 - `owner_tenant` (Attributes) (see [below for nested schema](#nestedatt--owner_tenant))
 - `restore_task` (Number)

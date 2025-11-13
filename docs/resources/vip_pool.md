@@ -93,7 +93,7 @@ resource "vastdata_vip_pool" "vastdata_vip_pool_ipv6" {
 
 ### Optional
 
-- `bgp_config_id` (Number) The ID of the BGP configuration to use for layer 3 connectivity configuration.
+- `bgp_config_id` (Number) The ID of the BGP configuration to use for layer 3 connectivity. configuration
 - `client_monitoring_ips` (List of List of String) External client monitoring IP ranges for VIP pool connectivity monitoring
 - `cluster_id` (Number)
 - `cnode_ids` (Set of Number) Dedicates a specific group of CNodes to the VIP pool. List the IDs of the CNodes. Separate IDs by commas. This is a way to dedicate a specific set of CNodes to a specific set of client hosts or applications. Overridden if cnode_names is passed.

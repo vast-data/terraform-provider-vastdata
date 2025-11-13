@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var QosPolicySchemaRef = is.NewSchemaReference(
@@ -23,7 +24,8 @@ func (m *QosPolicy) NewResourceManager(raw map[string]attr.Value, schema any) Re
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: QosPolicySchemaRef,
+			SkipRefreshAPICall: true,
+			SchemaRef:          QosPolicySchemaRef,
 		},
 	)}
 }

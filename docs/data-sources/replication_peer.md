@@ -40,7 +40,7 @@ data "vastdata_replication_peer" "vastdb_replication_peer_by_guid" {
 - `peer_certificate` (String) A certificate to use for authentication with the peer.
 - `peer_name` (String) Name of remote peer
 - `pool` (String)
-- `pool_id` (String) The ID of the VIP pool on the local cluster configured with the replication role
+- `pool_id` (Number) The ID of the VIP pool on the local cluster configured with the replication role
 - `pool_name` (String)
 - `remote_version` (String) The VAST software version running on the remote peer.
 - `remote_vip_range` (String) VIP range of the remote peer's replication VIP Pool

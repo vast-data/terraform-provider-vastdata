@@ -3,12 +3,12 @@
 page_title: "vastdata_s3_policy_attachment Resource - vastdata"
 subcategory: ""
 description: |-
-  One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid' or 'username').
+  One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid', 'sid', or 'username').
 ---
 
 # vastdata_s3_policy_attachment (Resource)
 
-One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid' or 'username').
+One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid', 'sid', or 'username').
 
 ## Example Usage
 
@@ -67,24 +67,24 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
         EOT
 }
 
-resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
-  uid  = 30109
+data "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
+  uid       = 30109
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 }
 
-resource "vastdata_group" "vastdb_group" {
-  name = "vastdb_group"
-  gid  = 30097
+data "vastdata_nonlocal_group" "vastdb_nonlocal_group" {
+  gid       = 30097
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 }
 
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment1" {
   s3_policy_id = vastdata_s3_policy.vastdb_s3policy.id
-  gid          = vastdata_group.vastdb_group.gid
+  gid          = data.vastdata_nonlocal_group.vastdb_nonlocal_group.gid
 }
 
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
   s3_policy_id   = vastdata_s3_policy.vastdb_s3policy.id
-  uid            = vastdata_user.vastdb_user.uid
+  uid            = data.vastdata_nonlocal_user.vastdb_nonlocal_user.uid
   ignore_present = true
 }
 
@@ -102,6 +102,7 @@ resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
 - `ignore_present` (Boolean) If set to true, the resource will not return an error if the specified S3 policy is already attached to the user or group. This is useful for gracefully handling pre-existing attachments.
 - `s3_policy_guid` (String) The GUID of the S3 policy to attach. Either 's3_policy_id' or 's3_policy_guid' must be provided.
 - `s3_policy_id` (Number) The ID of the S3 policy to attach. Either 's3_policy_id' or 's3_policy_guid' must be provided.
+- `sid` (String) The SID of the non-local user to attach the policy to. Either 'uid', 'sid', or 'username' must be provided for user attachments.
 - `tenant_id` (Number) The ID of the tenant to which the user or group belongs.
-- `uid` (Number) The UID of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.
-- `username` (String) The name of the non-local user to attach the policy to. Either 'uid' or 'username' must be provided for user attachments.
+- `uid` (Number) The UID of the non-local user to attach the policy to. Either 'uid', 'sid', or 'username' must be provided for user attachments.
+- `username` (String) The name of the non-local user to attach the policy to. Either 'uid', 'sid', or 'username' must be provided for user attachments.

@@ -31,11 +31,13 @@ data "vastdata_user" "vastdb_user_by_guid" {
 - `allow_delete_bucket` (Boolean) If enabled, the user has permission to delete S3 buckets. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden
 - `group_count` (Number) Group Count
 - `guid` (String) Global unique ID
+- `is_temporary_password` (Boolean) Password is temporary
 - `leading_gid` (Number) Leading GID
 - `leading_group_gid` (Number) Leading Group GID
 - `leading_group_name` (String) Leading Group
 - `local` (Boolean) not in use
 - `name` (String) The name of the user
+- `password_is_set` (Boolean) Password is set
 - `primary_group_sid` (String) Primary group SID
 - `s3_superuser` (Boolean) If enabled, the user has S3 superuser permission, which overrides S3 ACLs. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `sid` (String) SID

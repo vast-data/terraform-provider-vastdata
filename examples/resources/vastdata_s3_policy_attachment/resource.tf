@@ -52,24 +52,24 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
         EOT
 }
 
-resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
-  uid  = 30109
+data "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
+  uid       = 30109
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 }
 
-resource "vastdata_group" "vastdb_group" {
-  name = "vastdb_group"
-  gid  = 30097
+data "vastdata_nonlocal_group" "vastdb_nonlocal_group" {
+  gid       = 30097
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 }
 
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment1" {
   s3_policy_id = vastdata_s3_policy.vastdb_s3policy.id
-  gid          = vastdata_group.vastdb_group.gid
+  gid          = data.vastdata_nonlocal_group.vastdb_nonlocal_group.gid
 }
 
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
   s3_policy_id   = vastdata_s3_policy.vastdb_s3policy.id
-  uid            = vastdata_user.vastdb_user.uid
+  uid            = data.vastdata_nonlocal_user.vastdb_nonlocal_user.uid
   ignore_present = true
 }
 

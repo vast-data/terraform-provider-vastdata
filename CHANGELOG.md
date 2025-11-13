@@ -1,3 +1,39 @@
+
+## 3.0.0
+
+BREAKING CHANGES:
+
+* **vastdata_user**: `local_provider_id` is now a **required** field (was optional in v2.x). All user resources must specify a local provider.
+* **vastdata_group**: `local_provider_id` is now a **required** field (was optional in v2.x). All group resources must specify a local provider.
+
+NEW RESOURCES:
+
+* **vastdata_cluster**: Manage VAST cluster configuration
+* **vastdata_cluster_ekm**: Manage cluster external key management
+* **vastdata_cnode**: Manage VAST cluster nodes
+* **vastdata_cnode_bgp_config**: Manage BGP configuration for cluster nodes
+* **vastdata_iam_role**: Manage IAM roles
+* **vastdata_kerberos**: Manage Kerberos configuration
+* **vastdata_kerberos_keytab**: Manage Kerberos keytab files
+* **vastdata_manager_password**: Manage VMS manager passwords
+* **vastdata_oidc**: Manage OIDC authentication configuration
+* **vastdata_rack**: Manage VAST rack configuration
+* **vastdata_rack_bgp_config**: Manage BGP configuration for racks
+* **vastdata_supported_drives**: Manage supported drive configurations
+* **vastdata_tenant_nfs4_delegation**: Manage NFS4 delegation settings for tenants
+* **vastdata_topic**: Manage Kafka topics
+
+ENHANCEMENTS:
+
+* **vastdata_nonlocal_user**: Added support for searching users by `sid` field
+* **vastdata_nonlocal_user_key**: Added support for searching users by `sid` field; Improved documentation to correctly show usage with non-local users
+* **vastdata_s3_policy_attachment**: Added support for searching users/groups by `sid` field; Improved documentation and examples to correctly reference non-local users/groups instead of local users
+* **vastdata_active_directory**: Enhanced Active Directory integration capabilities
+* **vastdata_block_host_mapping**: Improved block host mapping configuration
+* **Provider HTTP Client**: Added support for `HTTPS_PROXY`, `HTTP_PROXY`, and `NO_PROXY` environment variables for proxy configuration
+* **Import Operations**: Enhanced import logic to prevent drift by only populating computed and required fields (optional fields remain null after import)
+
+
 ## 2.1.1
 
 ENHANCEMENTS:

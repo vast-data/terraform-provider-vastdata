@@ -28,7 +28,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 ### Optional
 
 - `access_flavor` (String) Applicable with MIXED_LAST_WINS security flavor (Access can be set via NFSv3 regardless of this option)
-- `allowed_characters` (String) How to determine which characters are allowed in file names. 'LCD' (default): Allows only characters allowed by all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. With this (default) option, the limitation on the length of a single component of the path is 255 characters. 'YOYO': Imposes no limitation beyond that of the client protocol.
+- `allowed_characters` (String) How to determine which characters are allowed in file names. 'LCD' (default): Allows only characters allowed by all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. With this (default) option, the limitation on the length of a single component of the path is 255 characters. 'NPL': Imposes no limitation beyond that of the client protocol.
 - `apple_sid` (Boolean) For use when connecting from Mac clients to SMB shares, this option enables Security IDs (SIDs) to be returned in Apple compatible representation.
 - `atime_frequency` (String) Frequency for updating the atime attribute of NFS files. atime is updated on read operations if the difference between the current time and the file's atime value is greater than the atime frequency. Default: 3600
 - `auth_source` (String) Specifies which source is trusted for the user's group memberships, when users' access to the view is authorized.
@@ -53,7 +53,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `gid_inheritance` (String) Specifies how files receive their owning group when they are created. 'LINUX' (default): Each new file inherits its owning group from the group ID of the user who creates the file. 'BSD': Each new file inherits its owning group from the group ID of the parent directory.
 - `guid` (String) Globally unique identifier
 - `id` (Number) ID
-- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting posix settings from the parent directory versus configured values
+- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting POSIX settings from the parent directory versus configured values.
 - `internal` (Boolean)
 - `is_s3_default_policy` (Boolean) Specifies whether to make this View Policy default for S3
 - `log_deleted` (Boolean) Log deleted files/dirs from trash dir
@@ -66,12 +66,10 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `nfs_enforce_tls_relaxed` (Boolean) Whether to relax TLS enforcement by not requiring TLS for auxiliary NFSv3 sub-protocols | (MOUNT, NLM, NSM, RQUOTA, NFSACL)
 - `nfs_minimal_protection_level` (String) Minimal Protection Level for NFSv4 client mounts: 'KRB_AUTH_ONLY' allows client mounts with Kerberos authentication only (using the RPCSEC_GSS authentication service), 'SYSTEM' allows client mounts using either the AUTH_SYS RCP security flavor (the traditional default NFS authentication scheme) or with Kerberos authentication, 'NONE' (default) allows client mounts with the AUTH_NONE (anonymous access), or AUTH_SYS RCP security flavors, or with Kerberos authentication.
 - `nfs_posix_acl` (Boolean) True if support is enabled for extended POSIX Access Control Lists (ACL) for NFSv3 clients.
-- `nfs_read_only` (String) Hosts with NFS read only permissions
 - `nfs_return_open_permissions` (Boolean) when using smb use open permissions for files
-- `path_length` (String) How to determine the maximum allowed path component name length. 'LCD' (default): Imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. 'YOYO': Imposes no limitation beyond that of the client protocol.
+- `path_length` (String) How to determine the maximum allowed path component name length. 'LCD' (default): Imposes the lowest common denominator file length limit of all VAST Cluster-supported protocols, regardless of the specific protocol enabled on a specific view. 'NPL': Imposes no limitation beyond that of the client protocol.
 - `pretty_atime_frequency` (String)
 - `pretty_auth_source` (String)
-- `s3_bucket_full_control` (String) Hosts with full permissions
 - `s3_bucket_listing` (String) Hosts with full permissions
 - `s3_bucket_read` (String) Hosts with full permissions
 - `s3_bucket_read_acp` (String) Hosts with full permissions
@@ -107,8 +105,10 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `full` (Set of String)
 - `nfs_all_squash` (Set of String) Hosts with all squash policy
 - `nfs_no_squash` (Set of String) Hosts with no squash policy
+- `nfs_read_only` (Set of String) Hosts with NFS read only permissions
 - `nfs_read_write` (Set of String) Hosts with NFS read/write permissions
 - `nfs_root_squash` (Set of String) Hosts with root squash policy
+- `permission_per_vip_pool` (Map of String)
 - `protocols` (Set of String) Array of protocols to audit
 - `protocols_audit` (Attributes) Audit settings. Any settings enabled here apply to attached views, in addition to any audit settings enabled on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read` (Set of String) Hosts with read permissions
@@ -121,7 +121,6 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `smb_read_only` (Set of String) Hosts with SMB read only permissions
 - `smb_read_write` (Set of String) Hosts with SMB read/write permissions
 - `trash_access` (Set of String) Hosts with trash access permission
-- `vip_pools` (Set of Number) Comma separated vip pool ids. Restricts view access to specified VIP pools.
 
 <a id="nestedatt--protocols_audit"></a>
 ### Nested Schema for `protocols_audit`
@@ -132,6 +131,8 @@ Read-Only:
 - `log_deleted_files_dirs` (Boolean) Log deleted files and directories
 - `log_full_path` (Boolean) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
 - `log_username` (Boolean) Log username of requesting user. Disabled by default
+- `modify_data` (Boolean)
 - `modify_data_md` (Boolean) Audit operations that modify data (including operations that change the file size) and metadata
 - `read_data` (Boolean) Audit operations that read data and metadata
+- `read_data_md` (Boolean)
 - `session_create_close` (Boolean) Audit session creation and closing operations for sessions that use Kerberos 5 authentication (krb5, krb5i, or krb5p)

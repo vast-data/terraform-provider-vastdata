@@ -36,6 +36,7 @@ data "vastdata_bgp_config" "vastdb_bgp_config_by_name" {
 - `external_asn` (Number) The ASN expected to be presented to CNodes by upstream routers.
 - `guid` (String)
 - `id` (Number) The ID of the BGP layer 3 connectivity configuration.
+- `ips_represent` (String) IP address representation (odd/even)
 - `md5_password` (String) A password used for BGP and BFD authentication.
 - `method` (String)
 - `name` (String) The name of the BGP layer 3 connectivity configuration.
@@ -44,3 +45,15 @@ data "vastdata_bgp_config" "vastdb_bgp_config_by_name" {
 - `subnet_bits` (Number) The number of bits in the subnet. For IPv4, this should be 32, for IPv6, 128 (i.e., a single address in the subnet)
 - `vip_migration_grace_period_sec` (Number) The period of time after a BGP session is dropped before the virtual IPs advertised in the session link are moved to another CNode, in seconds
 - `vlan` (Number)
+
+### Read-Only
+
+- `racks` (Attributes Set) (see [below for nested schema](#nestedatt--racks))
+
+<a id="nestedatt--racks"></a>
+### Nested Schema for `racks`
+
+Read-Only:
+
+- `ip_ranges` (Set of String)
+- `rack_id` (Number)

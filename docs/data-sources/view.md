@@ -34,13 +34,14 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `auto_commit` (String) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
 - `bucket` (String) S3 Bucket name
 - `bucket_owner` (String) S3 Bucket owner
+- `bucket_owner_type` (String)
 - `bulk_permission_update_progress` (Number) Progress
 - `bulk_permission_update_state` (String) State
 - `cluster` (String) Parent Cluster
 - `cluster__id` (String) Limit response by cluster ID
 - `cluster__name` (String) Filter response by cluster name.
 - `cluster_id` (Number) Parent Cluster ID
-- `create_dir` (String) Creates the directory specified by the path
+- `create_dir` (Boolean) Creates the directory specified by the path
 - `created` (String)
 - `default_retention_period` (String) Default retention period for objects in the bucket. Required if s3_locks_retention_mode is set to governance or compliance. Object versions that are placed in the bucket are automatically protected with the specified retention for the specified amount of time. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
 - `directory` (Boolean) Create the directory if it does not exist
@@ -53,10 +54,15 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `internal` (Boolean)
 - `is_default_subsystem` (Boolean) True if the view is the default subsystem for block storage. There can be up to one default subsystem per tenant. The default subsystem is the default view selected when creating a block volume if no view is specified.
 - `is_indestructible_object_enabled` (Boolean) True if indestructible object mode is enabled.
+- `is_kafka_encrypted_conn_allowed` (Boolean) True if encrypted connection is allowed for Kafka
+- `is_kafka_unencrypted_conn_allowed` (Boolean) True if unencrypted connection is allowed for Kafka
 - `is_remote` (Boolean)
 - `is_seamless` (Boolean) Supports seamless failover between replication peers by syncing file handles between the view and remote views on the replicated path on replication peers. This enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. This feature enables NFSv3 client users to retain the same mount point to the view in the event of a failover of the view path to a replication peer. Enabling this option may cause overhead and should only be enabled when the use case is relevant. To complete the configuration for seamless failover between any two peers, a seamless view must be created on each peer.
+- `kafka_encrypted_auth_mechanism` (String) Authentication mechanism for encrypted connection
 - `kafka_first_join_group_timeout_sec` (Number) Kafka first join group timeout in seconds
+- `kafka_is_authorization_required` (Boolean) True if authorization is required for Kafka
 - `kafka_rejoin_group_timeout_sec` (Number) Kafka rejoin group timeout in seconds
+- `kafka_unencrypted_auth_mechanism` (String) Authentication mechanism for unencrypted connection
 - `locking` (Boolean) Write Once Read Many (WORM) locking enabled
 - `logical_capacity` (Number) Logical Capacity consumed by view
 - `max_retention_period` (String) Applicable if locking is enabled. Sets a maximum retention period for files that are locked in the view. Files cannot be locked for longer than this period, whether they are locked manually (by setting the atime) or automatically, using auto-commit. Specify as an integer value followed by a letter for the unit (m - minutes, h - hours, d - days, y - years). Example: 2y (2 years).
@@ -67,6 +73,7 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `path` (String) The Element Store path exposed by the view. Begin with a forward slash. Do not include a trailing slash
 - `physical_capacity` (Number) Physical Capacity consumed by view
 - `policy` (String) The name of the associated view policy
+- `policy__id` (String) Filter by view policy ID
 - `policy__name` (String) Filter by view policy name
 - `policy_id` (Number) The ID of the associated view policy
 - `qos_policy` (String) QoS Policy
@@ -77,6 +84,7 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `s3_versioning` (Boolean) S3 Versioning enabled on S3 bucket.
 - `select_for_live_monitoring` (Boolean) True when the view has live monitoring enabled.  Views that have live monitoring enabled are polled for metrics every ten seconds. Otherwise, views are polled every five minutes.
 - `share` (String) Name of the SMB share. Must not include certain special characters.
+- `smb_encryption_state` (String) Defines the encryption level for SMB
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
 - `tenant_id` (Number) Tenant ID
@@ -138,9 +146,9 @@ Read-Only:
 - `fqdn` (String) FQDN of the chosen grantee
 - `grantee` (String) grantee type
 - `name` (String) name of the chosen grantee
-- `perm` (String) Grantee`s permissions
-- `sid_str` (String) grantee`s SID
-- `uid_or_gid` (Number) grantee`s uid (if user) or gid (if group)
+- `perm` (String) Grantee’s permissions
+- `sid_str` (String) grantee’s SID
+- `uid_or_gid` (Number) grantee’s uid (if user) or gid (if group)
 
 
 

@@ -3,13 +3,17 @@ package provider
 
 import (
 	"context"
+	"net/http"
+	"regexp"
+
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var FolderReadOnlySchemaRef = is.NewSchemaReference(
@@ -37,6 +41,12 @@ func (m *FolderReadOnly) NewResourceManager(raw map[string]attr.Value, schema an
 						Description: "Path of the folder to be read-only.",
 						PlanModifiers: []planmodifiers.String{
 							stringplanmodifier.RequiresReplace(),
+						},
+						Validators: []validator.String{
+							stringvalidator.RegexMatches(
+								regexp.MustCompile(`^/([^/].*/)?$`),
+								"must start and end with '/'",
+							),
 						},
 					},
 					"tenant_id": rschema.Int64Attribute{
@@ -72,32 +82,33 @@ func (m *FolderReadOnly) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *FolderReadOnly) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := getSearchParams(ctx, m.tfstate, nil)
-	return rest.Folders.GetReadOnlyWithContext(ctx, searchParams)
+	return rest.Folders.FolderReadOnlyWithContext_GET(ctx, searchParams)
 }
 
 func (m *FolderReadOnly) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	record, err := m.ReadDatasource(ctx, rest)
-	if err = ignoreStatusCodes(err, http.StatusBadRequest, http.StatusNotFound); err == nil {
-		return nil, ForceCleanState{}
+	if err != nil {
+		if err = ignoreStatusCodes(err, http.StatusBadRequest, http.StatusNotFound); err == nil {
+			return nil, ForceCleanState{}
+		}
 	}
 	return record, err
 }
 
 func (m *FolderReadOnly) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := getSearchParams(ctx, m.tfstate, nil)
-	record, err := rest.Folders.SetReadOnlyWithContext(ctx, searchParams)
+	record, err := rest.Folders.FolderReadOnlyWithContext_POST(ctx, searchParams)
 	return record, err
 }
 
 func (m *FolderReadOnly) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
-	planTfstate := plan.(*FolderReadOnly).tfstate
-	searchParams := getSearchParams(ctx, m.tfstate, planTfstate)
-	record, err := rest.Folders.SetReadOnlyWithContext(ctx, searchParams)
+	searchParams := getSearchParams(ctx, m.tfstate, nil)
+	record, err := rest.Folders.FolderReadOnlyWithContext_POST(ctx, searchParams)
 	return record, err
 }
 
 func (m *FolderReadOnly) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	searchParams := getSearchParams(ctx, m.tfstate, nil)
-	_, err := rest.Folders.DeleteReadOnly(searchParams)
+	err := rest.Folders.FolderReadOnlyWithContext_DELETE(ctx, searchParams)
 	return err
 }

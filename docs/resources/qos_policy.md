@@ -114,7 +114,8 @@ resource "vastdata_qos_policy" "vastdb_qos_policy" {
 
 ### Optional
 
-- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy. (see [below for nested schema](#nestedatt--attached_users))
+- `attached_iam_roles` (Set of Number) List of IAM Roles IDs which should be attached to that QOS Policy
+- `attached_users` (Attributes Set) The users to which to attach the policy, for a user QOS policy (see [below for nested schema](#nestedatt--attached_users))
 - `capacity_limits` (Attributes) Performance limits per unit of either used logical capacity or provisioned capacity, depending on the mode. Units are stated per limit. Valid values: 0-4294967296. 0 means unlimited. (see [below for nested schema](#nestedatt--capacity_limits))
 - `capacity_total_limits` (Attributes) (see [below for nested schema](#nestedatt--capacity_total_limits))
 - `is_default` (Boolean) Is default User QOS Policy

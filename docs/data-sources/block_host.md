@@ -41,3 +41,4 @@ data "vastdata_block_host" "vastdb_block_host_by_nqn" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
+- `tags` (Map of String)

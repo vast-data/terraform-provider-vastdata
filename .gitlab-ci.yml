@@ -6,25 +6,17 @@
 # - build: Comprehensive testing (vet, fmt, unit tests, benchmarks) + cross-platform builds
 # - test: Additional quality assurance testing with detailed coverage reporting  
 # - release: Manual release to GitHub
-#
-# Key improvements:
-# - go vet and go fmt validation
-# - Comprehensive test suite with race detection
-# - Performance benchmarks
-# - Test coverage reporting (HTML + Cobertura for GitLab)
-# - Enhanced error reporting with emojis for better visibility
 
 stages:
   - build
-  - test  # e2e testing only
+  - test
   - release
 
 # source: packaging/ci.Dockerfile
 image: 110450271409.dkr.ecr.eu-west-1.amazonaws.com/dev/terraform-plugin:CI-2025-06-06
 
 variables:
-#  ORION_BRANCH: comet/master  TODO: use this branch once lb_terraform_sanity [from-upstream] is merged.
-  ORION_BRANCH: SKIPCI/vlad/terrafrorm_plugin_tests
+  ORION_BRANCH: comet/master
   INSTALL_IMAGE: "prev_version"
 
 

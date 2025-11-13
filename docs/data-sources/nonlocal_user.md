@@ -51,6 +51,7 @@ data "vastdata_nonlocal_user" "vastdb_nonlocal_user_by_sid" {
 - `leading_group_name` (String)
 - `login_name` (String)
 - `name` (String)
+- `object_type` (String)
 - `primary_group_name` (String)
 - `primary_group_sid` (String)
 - `s3_connections_count` (Number)
@@ -59,7 +60,7 @@ data "vastdata_nonlocal_user" "vastdb_nonlocal_user_by_sid" {
 - `sid` (String)
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 - `uid` (Number)
-- `username` (String) username
+- `username` (String) User legal name
 - `vid` (Number)
 
 ### Read-Only

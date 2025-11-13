@@ -36,7 +36,6 @@ data "vastdata_tenant" "vastdb_default_tenant" {
 
 resource "vastdata_view_policy" "vastdb_view_policy" {
   name          = "vastdb_view_policy"
-  vip_pools     = [data.vastdata_vip_pool.vastdb_vippool.id]
   tenant_id     = data.vastdata_tenant.vastdb_default_tenant.id
   flavor        = "NFS"
   nfs_no_squash = ["10.0.0.1", "10.0.0.2"]
@@ -68,7 +67,7 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `expose_id_in_fsid` (Boolean)
 - `flavor` (String) Specifies the security flavor, which determines how file and directory permissions are applied in multiprotocol views.
 - `gid_inheritance` (String) Specifies how files receive their owning group when they are created.
-- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting posix settings from the parent directory versus configured values
+- `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting POSIX settings from the parent directory versus configured values.
 - `is_s3_default_policy` (Boolean) Specifies whether to make the view policy the default policy used for S3 endpoint views.
 - `nfs_all_squash` (Set of String) Specify which NFS client hosts have all squash. With all squash, all client users are mapped to nobody for all file and folder management operations on the export. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
@@ -82,8 +81,8 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `nfs_return_open_permissions` (Boolean) If enabled for NFS-exposed views, the NFS server unilaterally returns open (777) permission for all files and directories when responding to client side access checks.
 - `nfs_root_squash` (Set of String) Specify which NFS client hosts have root squash. With root squash, the root user is mapped to nobody for all file and folder management operations on the export. This enables you to prevent the strongest super user from corrupting all user data on the VAST Cluster. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `path_length` (String) Specifies the policy for limiting file path component name length.
+- `permission_per_vip_pool` (Map of String)
 - `protocols` (Set of String) Array of protocols to audit
-- `protocols_audit` (Attributes) Specify audit options to enable them for all attached views in addition to auditing options that are enabled globably on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read_only` (Set of String) Specify which NFS client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `read_write` (Set of String) Specify which NFS client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `s3_flavor_allow_free_listing` (Boolean) Allow NFS clients freely list bucket views and their subdirectories, regardless of individual object permissions.
@@ -103,7 +102,6 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `trash_access` (Set of String) Specify which NFS client hosts can access the trash folder. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. Trash folder access must also be enabled for the cluster.
 - `use_32bit_fileid` (Boolean) Sets the VAST Cluster's NFS server to use 32bit file IDs. This setting supports legacy 32-bit applications running over NFS.
 - `use_auth_provider` (Boolean) Not in use
-- `vip_pools` (Set of Number) Dedicate VIP Pools to the view policy. Specify VIP Pool IDs in a comma separated list.
 
 ### Read-Only
 
@@ -126,6 +124,7 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `log_username` (Boolean) Log username
 - `pretty_atime_frequency` (String)
 - `pretty_auth_source` (String)
+- `protocols_audit` (Attributes) Audit settings. Any settings enabled here apply to attached views, in addition to any audit settings enabled on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read` (Set of String) Hosts with read permissions
 - `s3_bucket_listing` (String) Hosts with full permissions
 - `s3_bucket_read` (String) Hosts with full permissions
@@ -148,12 +147,14 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 <a id="nestedatt--protocols_audit"></a>
 ### Nested Schema for `protocols_audit`
 
-Optional:
+Read-Only:
 
 - `create_delete_files_dirs_objects` (Boolean) Audit operations that create or delete files, directories, or objects
 - `log_deleted_files_dirs` (Boolean) Log deleted files and directories
 - `log_full_path` (Boolean) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
 - `log_username` (Boolean) Log username of requesting user. Disabled by default
+- `modify_data` (Boolean)
 - `modify_data_md` (Boolean) Audit operations that modify data (including operations that change the file size) and metadata
 - `read_data` (Boolean) Audit operations that read data and metadata
+- `read_data_md` (Boolean)
 - `session_create_close` (Boolean) Audit session creation and closing operations for sessions that use Kerberos 5 authentication (krb5, krb5i, or krb5p)

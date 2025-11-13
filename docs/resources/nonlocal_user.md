@@ -59,14 +59,8 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
 }
 
 
-resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
-  uid  = 30109
-}
-
-
 resource "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
-  uid                 = vastdata_user.vastdb_user.uid
+  uid                 = 30109
   tenant_id           = data.vastdata_tenant.vastdb_tenant.id
   allow_create_bucket = false
   allow_delete_bucket = true
@@ -98,7 +92,7 @@ resource "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
 - `sid` (String) User SID
 - `tenant_id` (Number) Tenant ID
 - `uid` (Number) User UID
-- `username` (String) User name
+- `username` (String) User legal name
 - `vid` (Number) Vast user ID
 
 ### Read-Only

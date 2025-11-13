@@ -88,15 +88,19 @@ func (m *TenantEncryptionGroupControl) performAction(ctx context.Context, rest *
 
 	switch action {
 	case "revoke":
-		_, err = rest.Tenants.RevokeEncryptionGroupWithContext(ctx, tenantId)
+		// Use new API: Tenants.TenantRevokeEncryptionGroupWithContext_POST
+		err = rest.Tenants.TenantRevokeEncryptionGroupWithContext_POST(ctx, tenantId, nil)
 	case "deactivate":
-		_, err = rest.Tenants.DeactivateEncryptionGroupWithContext(ctx, tenantId)
+		// Use new API: Tenants.TenantDeactivateEncryptionGroupWithContext_POST
+		err = rest.Tenants.TenantDeactivateEncryptionGroupWithContext_POST(ctx, tenantId, nil)
 	case "reinstate":
-		_, err = rest.Tenants.ReinstateEncryptionGroupWithContext(ctx, tenantId)
+		// Use new API: Tenants.TenantReinstateEncryptionGroupWithContext_POST
+		err = rest.Tenants.TenantReinstateEncryptionGroupWithContext_POST(ctx, tenantId, nil)
 	case "rotate_key":
-		_, err = rest.Tenants.RotateEncryptionGroupKeyWithContext(ctx, tenantId)
+		// Note: There may not be a rotate_key operation for tenants, only for encryption groups
+		return nil, fmt.Errorf("rotate_key action is not available for tenant encryption groups")
 	default:
-		return nil, fmt.Errorf("invalid action '%s'. Valid actions are: revoke, deactivate, reinstate, rotate_key", action)
+		return nil, fmt.Errorf("invalid action '%s'. Valid actions are: revoke, deactivate, reinstate", action)
 	}
 
 	return nil, err

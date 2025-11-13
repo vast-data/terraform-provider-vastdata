@@ -4,10 +4,11 @@ package internalstate
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
+	"github.com/vast-data/go-vast-client/openapi_schema"
 )
 
 func extractTypesFromSchema(schema any, kind SchemaContext) (map[string]attr.Type, error) {
@@ -84,7 +85,7 @@ func extractAttrsRecursive(meta map[string]attrMeta, prefix string, attrs map[st
 
 				if hints.SchemaRef != nil && hints.SchemaRef.Read != nil && prefix == "" {
 					// Top-level attributes.
-					searchableQueryParams, err := client.SearchableQueryParams(hints.SchemaRef.Read.Path)
+					searchableQueryParams, err := openapi_schema.SearchableQueryParams(hints.SchemaRef.Read.Path)
 					if err == nil && len(searchableQueryParams) > 0 {
 						searchableFields = append(searchableFields, searchableQueryParams...)
 					}

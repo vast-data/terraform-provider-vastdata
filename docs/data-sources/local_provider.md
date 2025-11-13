@@ -28,7 +28,7 @@ data "vastdata_local_provider" "vastdb_local_provider_by_name" {
 ### Optional
 
 - `assigned_tenants_preview` (String)
-- `description` (String)
+- `description` (String) Description of the local provider
 - `name` (String) Name of the local provider
 
 ### Read-Only

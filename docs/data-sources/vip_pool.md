@@ -41,7 +41,7 @@ data "vastdata_vip_pool" "vastdb_vip_pool_by_guid" {
 - `enabled` (Boolean) True if the VIP pool is enabled
 - `end_ip` (String) Not currently in use. Use ip_ranges instead.
 - `guid` (String) Global unique ID
-- `gw_ip` (String) The IP address of a local gateway device if client traffic is routed through one
+- `gw_ip` (String) The IP address of a local gateway device if client traffic is routed through one.
 - `gw_ipv6` (String) GW IPv6 Address
 - `id` (Number) VIP Pool ID
 - `name` (String) VIP pool name
@@ -63,7 +63,7 @@ data "vastdata_vip_pool" "vastdb_vip_pool_by_guid" {
 - `url` (String) The VIP Pool's endpoint URL for API operations
 - `vast_asn` (Number) The cluster's ASN. Applicable only if enable_l3 is true.
 - `vlan` (Number) VIPPool VLAN, if the VIP pool is tagged with a specific VLAN. The VIP pool is exposed only to the specified VLAN on the client data network
-- `vms_preferred` (Boolean) If true, CNodes participating in the vip pool are preferred in VMS host election
+- `vms_preferred` (Boolean) If true, CNodes participating in the vip pool are preferred in VMS host election.
 
 ### Read-Only
 

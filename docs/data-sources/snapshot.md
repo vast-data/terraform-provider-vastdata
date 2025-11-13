@@ -39,7 +39,6 @@ data "vastdata_snapshot" "vastdb_snapshot_by_guid" {
 - `name__contains` (String) Filter by part of snapshot name
 - `path` (String) Snapshot path
 - `policy` (String) Associated snapshot policy
-- `policy_id` (Number) Associated snapshot policy ID
 - `protection_policy` (String) Protection Policy Name
 - `protection_policy__id` (Number) Filter by snapshot policy ID
 - `protection_policy__name` (String) Filter by snapshot policy name
@@ -53,6 +52,7 @@ data "vastdata_snapshot" "vastdb_snapshot_by_guid" {
 - `type` (String)
 - `unique_phys_estimation` (Number) The usable capacity reclaimable by deleting the snapshot without deleting other snapshots on the path
 - `url` (String) Endpoint URL for API operations on the snapshot
+- `volume_id` (Number) Mapped volume id to filter by.
 
 ### Read-Only
 

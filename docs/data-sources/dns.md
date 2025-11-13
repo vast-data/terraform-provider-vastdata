@@ -40,6 +40,7 @@ data "vastdata_dns" "vastdb_dns_by_name" {
 - `invalid_type_response` (String)
 - `name` (String) Specifies a name for the VAST DNS server configuration
 - `net_type` (String)
+- `port` (Number) Specifies a port for the DNS
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
 - `title` (String)

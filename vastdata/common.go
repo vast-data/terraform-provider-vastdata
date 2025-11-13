@@ -19,15 +19,21 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-test/deep"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
+	"github.com/vast-data/go-vast-client/resources/untyped"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
+)
+
+const (
+	customRawKey = "@raw" // used to store raw string values in Record
 )
 
 var notImportable = false
@@ -351,11 +357,12 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 //
 // Returns:
 //   - error: any error that occurred during deletion, excluding 404s (they are ignored)
-func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState *is.TFState, managerName, op string) error {
+func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState *is.TFState, managerName, op string) (vast_client.Record, error) {
 	var err error
+	var result vast_client.Record
 	searchParams := getSearchParams(ctx, tfState, nil)
 	if len(searchParams) == 0 {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"%s[%s]: no search parameters provided for %q resource."+
 				" Verify presence of required fields or add searchable hints to resource",
 			op,
@@ -376,12 +383,12 @@ func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithCont
 	if id, ok := searchParams["id"]; ok {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
 		// If the ID is set, we assume it's a direct call by ID
-		_, err = api.DeleteByIdWithContext(ctx, id, deleteQueryParams, deleteBodyParams)
+		result, err = api.DeleteByIdWithContext(ctx, id, deleteQueryParams, deleteBodyParams)
 	} else {
 		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: no ID found, using search params.", op, managerName))
-		_, err = api.DeleteWithContext(ctx, searchParams, deleteQueryParams, deleteBodyParams)
+		result, err = api.DeleteWithContext(ctx, searchParams, deleteQueryParams, deleteBodyParams)
 	}
-	return ignoreStatusCodes(err, http.StatusNotFound)
+	return result, ignoreStatusCodes(err, http.StatusNotFound)
 
 }
 
@@ -519,6 +526,21 @@ func parseImportId(importID string, tfState *is.TFState) error {
 		} else {
 			return fmt.Errorf("field %q is not present in the resource schema", idField)
 		}
+	}
+	return nil
+}
+
+// ----------------------------------
+// Async tasks
+// ----------------------------------
+
+func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout time.Duration) error {
+	asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, timeout)
+	if err != nil {
+		return err
+	}
+	if asyncResult != nil {
+		return asyncResult.Err
 	}
 	return nil
 }

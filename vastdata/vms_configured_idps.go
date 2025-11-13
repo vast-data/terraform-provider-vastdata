@@ -48,14 +48,9 @@ func (m *VmsConfiguredIdps) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *VmsConfiguredIdps) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	vmsId := m.tfstate.Int64("vms_id")
-	idps, err := rest.Vms.GetConfiguredIdPsWithContext(ctx, vmsId)
+	record, err := rest.Vms.VmsConfiguredIdpsWithContext_GET(ctx, vmsId)
 	if err == nil {
-		// Convert []string to []any for Terraform compatibility
-		idpsAny := make([]any, len(idps))
-		for i, idp := range idps {
-			idpsAny[i] = idp
-		}
-		m.tfstate.Set("idps", idpsAny)
+		m.tfstate.Set("idps", record[customRawKey].([]any))
 	}
 	return nil, err
 }

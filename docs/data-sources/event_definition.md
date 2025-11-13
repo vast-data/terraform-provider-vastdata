@@ -46,7 +46,8 @@ data "vastdata_event_definition" "vastdb_event_definition_by_name" {
 - `raise_at_count` (Number) Raise an alarm after a specific number of recurrences
 - `severity` (String) The severity of the alarm
 - `trigger_off` (String) For 'Object Modified' alarms: a list of values
-- `trigger_on` (String) For 'Object Modified' alarms: a list of values | For 'Threshold/Rate' alarms: a list of 2 members. The first is an operator like gt/ge/lte and the second is a number
+- `trigger_on` (String) For 'Object Modified' alarms: a list of values | For 'Threshold/Rate' alarms: a list of 2
+members. The first is an operator like gt/ge/lte and the second is a number
 - `user_modified` (Boolean) Did a user modify this event definition
 
 ### Read-Only

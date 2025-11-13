@@ -62,7 +62,7 @@ func TestExtractMetaFromSchema(t *testing.T) {
 		require.True(t, ok, "unexpected attribute: %s", key)
 		attrType := attrDef.GetType()
 
-		converted, err := BuildAttrValueFromAny(attrType, val)
+		converted, _, err := BuildAttrValueFromAny(attrType, val)
 		require.NoError(t, err, "failed to build attr.Value for %q", key)
 
 		raw[key] = converted
@@ -686,7 +686,7 @@ func TestBuildAttrMapFromRecord_Complex(t *testing.T) {
 
 	attrMap := make(map[string]attr.Value)
 	for k, typ := range schema {
-		val, err := BuildAttrValueFromAny(typ, record[k])
+		val, _, err := BuildAttrValueFromAny(typ, record[k])
 		require.NoError(t, err, "failed at key: %s", k)
 		require.NotNil(t, val, "value should not be nil: %s", k)
 		attrMap[k] = val
@@ -734,7 +734,7 @@ func TestBuildAttrValueFromAny_ListOfListOfList(t *testing.T) {
 	}
 
 	// Call the builder
-	val, err := BuildAttrValueFromAny(tripleListType, record["triple_nested"])
+	val, _, err := BuildAttrValueFromAny(tripleListType, record["triple_nested"])
 	require.NoError(t, err)
 	require.False(t, val.IsNull())
 	require.False(t, val.IsUnknown())
@@ -993,6 +993,158 @@ func TestTFState_CopyKnownFieldsTo(t *testing.T) {
 	require.Equal(t, src.Meta["name"], dst.Meta["name"])
 }
 
+// TestTFState_CopyKnownFieldsTo_SkipsNullComputedFields verifies that null values
+// for computed fields are NOT copied, preventing them from overwriting API response values.
+// This addresses the issue where optional+computed fields like 'id' become null during updates.
+func TestTFState_CopyKnownFieldsTo_SkipsNullComputedFields(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":       rschema.Int64Attribute{Optional: true, Computed: true}, // optional+computed
+		"guid":     rschema.StringAttribute{Computed: true},                // computed-only
+		"name":     rschema.StringAttribute{Optional: true},                // optional-only
+		"required": rschema.StringAttribute{Required: true},                // required
+	}}
+
+	// Source (plan) has null values for computed fields
+	plan := NewTFStateMust(map[string]attr.Value{
+		"id":       types.Int64Null(),  // null in plan
+		"guid":     types.StringNull(), // null in plan
+		"name":     types.StringValue("updated_name"),
+		"required": types.StringValue("updated_required"),
+	}, schema, nil)
+
+	// Destination (state) has values set from API response
+	state := NewTFStateMust(map[string]attr.Value{
+		"id":       types.Int64Value(42),         // from API
+		"guid":     types.StringValue("abc-123"), // from API
+		"name":     types.StringValue("old_name"),
+		"required": types.StringValue("old_required"),
+	}, schema, nil)
+
+	// Copy from plan to state
+	plan.CopyKnownFieldsTo(state)
+
+	// Verify: computed fields should NOT be overwritten by null values from plan
+	assert.Equal(t, int64(42), state.Raw["id"].(types.Int64).ValueInt64(),
+		"id should NOT be overwritten by null from plan")
+	assert.Equal(t, "abc-123", state.Raw["guid"].(types.String).ValueString(),
+		"guid should NOT be overwritten by null from plan")
+
+	// Verify: non-computed fields SHOULD be copied from plan
+	assert.Equal(t, "updated_name", state.Raw["name"].(types.String).ValueString(),
+		"name should be updated from plan")
+	assert.Equal(t, "updated_required", state.Raw["required"].(types.String).ValueString(),
+		"required should be updated from plan")
+}
+
+// TestTFState_CopyKnownFieldsTo_CopiesNonNullComputedFields verifies that non-null
+// computed fields ARE copied (user-specified values should be preserved).
+func TestTFState_CopyKnownFieldsTo_CopiesNonNullComputedFields(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":   rschema.Int64Attribute{Optional: true, Computed: true},
+		"name": rschema.StringAttribute{Optional: true},
+	}}
+
+	// Plan has a user-specified value for the optional+computed field
+	plan := NewTFStateMust(map[string]attr.Value{
+		"id":   types.Int64Value(99), // user specified value
+		"name": types.StringValue("new_name"),
+	}, schema, nil)
+
+	state := NewTFStateMust(map[string]attr.Value{
+		"id":   types.Int64Value(42),
+		"name": types.StringValue("old_name"),
+	}, schema, nil)
+
+	// Copy from plan to state
+	plan.CopyKnownFieldsTo(state)
+
+	// Verify: non-null computed value should be copied
+	assert.Equal(t, int64(99), state.Raw["id"].(types.Int64).ValueInt64(),
+		"id should be updated with user-specified value from plan")
+	assert.Equal(t, "new_name", state.Raw["name"].(types.String).ValueString(),
+		"name should be updated from plan")
+}
+
+// TestTFState_CopyKnownFieldsTo_CopiesNullForOptionalFields verifies that null values
+// for OPTIONAL (non-computed) fields ARE copied, allowing users to clear field values.
+// This is the key difference from computed fields - users must be able to clear optional fields.
+func TestTFState_CopyKnownFieldsTo_CopiesNullForOptionalFields(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":             rschema.Int64Attribute{Optional: true, Computed: true}, // optional+computed
+		"optional_field": rschema.StringAttribute{Optional: true},                // optional-only
+		"description":    rschema.StringAttribute{Optional: true},                // optional-only
+		"tags":           rschema.ListAttribute{ElementType: types.StringType, Optional: true},
+	}}
+
+	// Scenario: User removes optional_field and tags from config, wants to clear them
+	// Plan has null values for fields user wants to clear
+	plan := NewTFStateMust(map[string]attr.Value{
+		"id":             types.Int64Null(),                // computed field - should NOT be copied
+		"optional_field": types.StringNull(),               // optional field - SHOULD be copied to clear it
+		"description":    types.StringValue("kept"),        // user keeps this
+		"tags":           types.ListNull(types.StringType), // optional field - SHOULD be copied to clear it
+	}, schema, nil)
+
+	// State has values from previous apply
+	state := NewTFStateMust(map[string]attr.Value{
+		"id":             types.Int64Value(42),           // from API
+		"optional_field": types.StringValue("old_value"), // old value user wants to clear
+		"description":    types.StringValue("old_description"),
+		"tags": types.ListValueMust(
+			types.StringType,
+			[]attr.Value{types.StringValue("tag1"), types.StringValue("tag2")},
+		), // old tags user wants to clear
+	}, schema, nil)
+
+	// Copy from plan to state
+	plan.CopyKnownFieldsTo(state)
+
+	// Verify: computed field with null should NOT be copied (preserves API value)
+	assert.Equal(t, int64(42), state.Raw["id"].(types.Int64).ValueInt64(),
+		"id (computed) should NOT be overwritten by null from plan - API value preserved")
+
+	// Verify: optional fields with null SHOULD be copied (allows user to clear)
+	assert.True(t, state.Raw["optional_field"].(types.String).IsNull(),
+		"optional_field should be cleared (set to null) as user intended")
+
+	assert.True(t, state.Raw["tags"].(types.List).IsNull(),
+		"tags should be cleared (set to null) as user intended")
+
+	// Verify: optional field with value should be copied normally
+	assert.Equal(t, "kept", state.Raw["description"].(types.String).ValueString(),
+		"description should be updated from plan")
+}
+
+// TestTFState_CopyKnownFieldsTo_RequiredFieldsWithNull verifies behavior with required fields
+func TestTFState_CopyKnownFieldsTo_RequiredFieldsWithNull(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"name": rschema.StringAttribute{Required: true},
+		"id":   rschema.Int64Attribute{Optional: true, Computed: true},
+	}}
+
+	// Plan with null for required field (shouldn't happen in real scenarios, but testing edge case)
+	plan := NewTFStateMust(map[string]attr.Value{
+		"name": types.StringNull(), // required field with null (edge case)
+		"id":   types.Int64Null(),  // computed field with null
+	}, schema, nil)
+
+	state := NewTFStateMust(map[string]attr.Value{
+		"name": types.StringValue("existing_name"),
+		"id":   types.Int64Value(42),
+	}, schema, nil)
+
+	// Copy from plan to state
+	plan.CopyKnownFieldsTo(state)
+
+	// Required field with null should be copied (not skipped)
+	assert.True(t, state.Raw["name"].(types.String).IsNull(),
+		"required field with null should be copied")
+
+	// Computed field with null should NOT be copied
+	assert.Equal(t, int64(42), state.Raw["id"].(types.Int64).ValueInt64(),
+		"computed field with null should NOT be copied")
+}
+
 func TestTFState_CopyNonEmptyFieldsTo(t *testing.T) {
 	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
 		"id":     rschema.Int64Attribute{Computed: true},
@@ -1038,6 +1190,117 @@ func TestTFState_FillFromRecord(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, "auto", state.String("computed_field"))
+}
+
+// TestTFState_FillFromRecordForImport verifies that FillFromRecordForImport fills
+// computed and required fields, but NOT optional fields. This prevents drift after import
+// by keeping optional fields null in both plan and state (when not specified in config).
+func TestTFState_FillFromRecordForImport(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":             rschema.Int64Attribute{Optional: true, Computed: true},               // optional+computed
+		"name":           rschema.StringAttribute{Required: true},                              // required
+		"description":    rschema.StringAttribute{Optional: true},                              // optional-only
+		"tags":           rschema.ListAttribute{ElementType: types.StringType, Optional: true}, // optional list
+		"nfs_read_only":  rschema.ListAttribute{ElementType: types.StringType, Optional: true}, // optional list
+		"computed_field": rschema.StringAttribute{Computed: true},                              // computed-only
+	}}
+
+	state := NewTFStateMust(map[string]attr.Value{
+		"id":             types.Int64Null(),
+		"name":           types.StringNull(),
+		"description":    types.StringNull(),
+		"tags":           types.ListNull(types.StringType),
+		"nfs_read_only":  types.ListNull(types.StringType),
+		"computed_field": types.StringNull(),
+	}, schema, nil)
+
+	// Simulate API response from import
+	record := Record{
+		"id":             int64(5),
+		"name":           "test-policy",
+		"description":    "my description",              // optional field - should NOT be filled
+		"tags":           []interface{}{"tag1", "tag2"}, // optional field - should NOT be filled
+		"nfs_read_only":  []interface{}{},               // optional field - should NOT be filled
+		"computed_field": "auto-generated",
+	}
+
+	// Fill from record using import method
+	err := state.FillFromRecordForImport(record)
+	require.NoError(t, err)
+
+	// Verify computed and required fields ARE filled
+	assert.Equal(t, int64(5), state.Int64("id"),
+		"id (optional+computed) should be filled")
+	assert.Equal(t, "test-policy", state.String("name"),
+		"name (required) should be filled")
+	assert.Equal(t, "auto-generated", state.String("computed_field"),
+		"computed_field should be filled")
+
+	// Verify optional-only fields are NOT filled (remain null)
+	assert.True(t, state.Get("description").IsNull(),
+		"description (optional-only) should NOT be filled - prevents drift!")
+	assert.True(t, state.Get("tags").IsNull(),
+		"tags (optional-only) should NOT be filled - prevents drift!")
+	assert.True(t, state.Get("nfs_read_only").IsNull(),
+		"nfs_read_only (optional-only) should NOT be filled - prevents drift!")
+}
+
+// TestTFState_FillFromRecordForImport_vs_Regular compares import vs regular fill behavior
+// Both methods skip optional-only fields, but import includes required fields.
+func TestTFState_FillFromRecordForImport_vs_Regular(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":       rschema.Int64Attribute{Optional: true, Computed: true},
+		"name":     rschema.StringAttribute{Required: true},
+		"optional": rschema.StringAttribute{Optional: true},
+		"computed": rschema.StringAttribute{Computed: true},
+	}}
+
+	record := Record{
+		"id":       int64(42),
+		"name":     "test",
+		"optional": "optional_value",
+		"computed": "computed_value",
+	}
+
+	// Test regular FillFromRecord (used during create/update/read)
+	stateRegular := NewTFStateMust(map[string]attr.Value{
+		"id":       types.Int64Null(),
+		"name":     types.StringNull(),
+		"optional": types.StringNull(),
+		"computed": types.StringNull(),
+	}, schema, nil)
+
+	err := stateRegular.FillFromRecord(record)
+	require.NoError(t, err)
+
+	// Regular fill: only computed fields, NOT optional or required
+	assert.True(t, stateRegular.Get("optional").IsNull(),
+		"FillFromRecord should NOT fill optional fields")
+	assert.True(t, stateRegular.Get("name").IsNull(),
+		"FillFromRecord should NOT fill required fields")
+	assert.False(t, stateRegular.Get("computed").IsNull(),
+		"FillFromRecord should fill computed fields")
+
+	// Test FillFromRecordForImport (used during import)
+	stateImport := NewTFStateMust(map[string]attr.Value{
+		"id":       types.Int64Null(),
+		"name":     types.StringNull(),
+		"optional": types.StringNull(),
+		"computed": types.StringNull(),
+	}, schema, nil)
+
+	err = stateImport.FillFromRecordForImport(record)
+	require.NoError(t, err)
+
+	// Import fill: computed + required, but NOT optional-only
+	assert.True(t, stateImport.Get("optional").IsNull(),
+		"FillFromRecordForImport should NOT fill optional-only fields")
+	assert.Equal(t, "test", stateImport.String("name"),
+		"FillFromRecordForImport SHOULD fill required fields")
+	assert.Equal(t, "computed_value", stateImport.String("computed"),
+		"FillFromRecordForImport should fill computed fields")
+	assert.Equal(t, int64(42), stateImport.Int64("id"),
+		"FillFromRecordForImport should fill optional+computed fields")
 }
 
 func TestGetGenericSearchParams(t *testing.T) {
@@ -1638,3 +1901,845 @@ func TestTFState_SetOrAdd_OverwriteExistingValue(t *testing.T) {
 }
 
 // NOTE: SetState is simplified in the implementation; skipping write-only persistence behavior tests.
+
+// ==========================================
+// Tests for GetUpdateParams
+// ==========================================
+
+func TestGetUpdateParams_ExcludesEditOnlyFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":            rschema.Int64Attribute{Optional: true},
+			"name":          rschema.StringAttribute{Optional: true},
+			"enabled":       rschema.BoolAttribute{Optional: true},   // edit-only
+			"description":   rschema.StringAttribute{Optional: true}, // regular field
+			"delete_option": rschema.StringAttribute{Optional: true}, // delete-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+		DeleteOnlyBodyFields: map[string]string{
+			"delete_option": "",
+		},
+	}
+
+	// Current state (old)
+	stateRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("old-name"),
+		"enabled":       types.BoolValue(false),
+		"description":   types.StringValue("old-desc"),
+		"delete_option": types.StringValue("old-opt"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state (new)
+	planRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("new-name"), // CHANGED
+		"enabled":       types.BoolValue(true),         // CHANGED (edit-only)
+		"description":   types.StringValue("new-desc"), // CHANGED
+		"delete_option": types.StringValue("new-opt"),  // CHANGED (delete-only)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get update params
+	updateParams := planState.GetUpdateParams(currentState)
+
+	// Should include regular changed fields
+	assert.Contains(t, updateParams, "name")
+	assert.Equal(t, "new-name", updateParams["name"])
+	assert.Contains(t, updateParams, "description")
+	assert.Equal(t, "new-desc", updateParams["description"])
+
+	// Should NOT include edit-only fields
+	assert.NotContains(t, updateParams, "enabled", "edit-only field should be excluded")
+
+	// Should NOT include delete-only fields
+	assert.NotContains(t, updateParams, "delete_option", "delete-only field should be excluded")
+
+	// Should NOT include id
+	assert.NotContains(t, updateParams, "id", "id should not be in update params")
+}
+
+func TestGetUpdateParams_NoHints(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":   rschema.Int64Attribute{Optional: true},
+			"name": rschema.StringAttribute{Optional: true},
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("old-name"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, nil) // No hints
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("new-name"),
+	}
+	planState := NewTFStateMust(planRaw, schema, nil)
+
+	// Get update params - should work like GetChangedParams when no hints
+	updateParams := planState.GetUpdateParams(currentState)
+
+	assert.Contains(t, updateParams, "name")
+	assert.Equal(t, "new-name", updateParams["name"])
+}
+
+func TestGetUpdateParams_OnlyEditOnlyFieldsChanged(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":      rschema.Int64Attribute{Optional: true},
+			"name":    rschema.StringAttribute{Optional: true},
+			"enabled": rschema.BoolAttribute{Optional: true}, // edit-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"name":    types.StringValue("same-name"),
+		"enabled": types.BoolValue(false),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - only edit-only field changed
+	planRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"name":    types.StringValue("same-name"), // NOT changed
+		"enabled": types.BoolValue(true),          // CHANGED (edit-only)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get update params - should be empty
+	updateParams := planState.GetUpdateParams(currentState)
+
+	assert.Empty(t, updateParams, "Should be empty when only edit-only fields changed")
+}
+
+// ==========================================
+// Tests for GetChangedEditOnlyParams
+// ==========================================
+
+func TestGetChangedEditOnlyParams_ReturnsOnlyChangedEditOnlyFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":          rschema.Int64Attribute{Optional: true},
+			"name":        rschema.StringAttribute{Optional: true},
+			"enabled":     rschema.BoolAttribute{Optional: true},   // edit-only
+			"auto_start":  rschema.BoolAttribute{Optional: true},   // edit-only
+			"description": rschema.StringAttribute{Optional: true}, // regular field
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled", "auto_start"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("old-name"),
+		"enabled":     types.BoolValue(false),
+		"auto_start":  types.BoolValue(false),
+		"description": types.StringValue("old-desc"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("new-name"), // CHANGED (regular)
+		"enabled":     types.BoolValue(true),         // CHANGED (edit-only)
+		"auto_start":  types.BoolValue(false),        // NOT changed (edit-only)
+		"description": types.StringValue("new-desc"), // CHANGED (regular)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get changed edit-only params
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	// Should include only CHANGED edit-only field
+	assert.Contains(t, editOnlyParams, "enabled")
+	assert.Equal(t, true, editOnlyParams["enabled"])
+
+	// Should NOT include unchanged edit-only field
+	assert.NotContains(t, editOnlyParams, "auto_start", "unchanged edit-only field should be excluded")
+
+	// Should NOT include regular fields
+	assert.NotContains(t, editOnlyParams, "name", "regular field should be excluded")
+	assert.NotContains(t, editOnlyParams, "description", "regular field should be excluded")
+}
+
+func TestGetChangedEditOnlyParams_NoHints(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":   rschema.Int64Attribute{Optional: true},
+			"name": rschema.StringAttribute{Optional: true},
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("old-name"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, nil) // No hints
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":   types.Int64Value(1),
+		"name": types.StringValue("new-name"),
+	}
+	planState := NewTFStateMust(planRaw, schema, nil)
+
+	// Get changed edit-only params - should be empty
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	assert.Empty(t, editOnlyParams, "Should be empty when no hints provided")
+}
+
+func TestGetChangedEditOnlyParams_NoChanges(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":      rschema.Int64Attribute{Optional: true},
+			"enabled": rschema.BoolAttribute{Optional: true}, // edit-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"enabled": types.BoolValue(true),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - no changes
+	planRaw := map[string]attr.Value{
+		"id":      types.Int64Value(1),
+		"enabled": types.BoolValue(true), // NOT changed
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get changed edit-only params - should be empty
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	assert.Empty(t, editOnlyParams, "Should be empty when no edit-only fields changed")
+}
+
+// ==========================================
+// Tests for GetUpdateParams + GetChangedEditOnlyParams
+// Combined (Disjoint Sets)
+// ==========================================
+
+func TestGetUpdateParams_And_GetChangedEditOnlyParams_AreDisjoint(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":            rschema.Int64Attribute{Optional: true},
+			"name":          rschema.StringAttribute{Optional: true},
+			"enabled":       rschema.BoolAttribute{Optional: true},   // edit-only
+			"auto_start":    rschema.BoolAttribute{Optional: true},   // edit-only
+			"description":   rschema.StringAttribute{Optional: true}, // regular field
+			"delete_option": rschema.StringAttribute{Optional: true}, // delete-only
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled", "auto_start"},
+		DeleteOnlyBodyFields: map[string]string{
+			"delete_option": "",
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("old-name"),
+		"enabled":       types.BoolValue(false),
+		"auto_start":    types.BoolValue(false),
+		"description":   types.StringValue("old-desc"),
+		"delete_option": types.StringValue("old-opt"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - all fields changed
+	planRaw := map[string]attr.Value{
+		"id":            types.Int64Value(1),
+		"name":          types.StringValue("new-name"),
+		"enabled":       types.BoolValue(true),
+		"auto_start":    types.BoolValue(true),
+		"description":   types.StringValue("new-desc"),
+		"delete_option": types.StringValue("new-opt"),
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get both sets
+	updateParams := planState.GetUpdateParams(currentState)
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	// Verify updateParams contains regular fields only
+	assert.Contains(t, updateParams, "name")
+	assert.Contains(t, updateParams, "description")
+	assert.Len(t, updateParams, 2, "Should have exactly 2 regular changed fields")
+
+	// Verify editOnlyParams contains edit-only fields only
+	assert.Contains(t, editOnlyParams, "enabled")
+	assert.Contains(t, editOnlyParams, "auto_start")
+	assert.Len(t, editOnlyParams, 2, "Should have exactly 2 edit-only changed fields")
+
+	// Verify NO overlap between the two sets
+	for key := range updateParams {
+		assert.NotContains(t, editOnlyParams, key, "Field %q should not be in both sets", key)
+	}
+	for key := range editOnlyParams {
+		assert.NotContains(t, updateParams, key, "Field %q should not be in both sets", key)
+	}
+
+	// Verify delete-only fields are in neither set
+	assert.NotContains(t, updateParams, "delete_option")
+	assert.NotContains(t, editOnlyParams, "delete_option")
+
+	// Verify id is in neither set
+	assert.NotContains(t, updateParams, "id")
+	assert.NotContains(t, editOnlyParams, "id")
+}
+
+func TestGetUpdateParams_And_GetChangedEditOnlyParams_CompletePartitioning(t *testing.T) {
+	// This test verifies that GetUpdateParams + GetChangedEditOnlyParams together
+	// capture ALL changed optional/required fields (excluding delete-only and id)
+
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":          rschema.Int64Attribute{Optional: true},
+			"name":        rschema.StringAttribute{Optional: true},
+			"enabled":     rschema.BoolAttribute{Optional: true}, // edit-only
+			"description": rschema.StringAttribute{Optional: true},
+		},
+	}
+
+	hints := &TFStateHints{
+		EditOnlyFields: []string{"enabled"},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("old-name"),
+		"enabled":     types.BoolValue(false),
+		"description": types.StringValue("old-desc"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state - all fields changed
+	planRaw := map[string]attr.Value{
+		"id":          types.Int64Value(1),
+		"name":        types.StringValue("new-name"),
+		"enabled":     types.BoolValue(true),
+		"description": types.StringValue("new-desc"),
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get all changed params using old method
+	allChangedParams := planState.GetChangedParams(currentState)
+
+	// Get partitioned sets
+	updateParams := planState.GetUpdateParams(currentState)
+	editOnlyParams := planState.GetChangedEditOnlyParams(currentState)
+
+	// Combine the two partitioned sets
+	combinedParams := make(vast_client.Params)
+	for k, v := range updateParams {
+		combinedParams[k] = v
+	}
+	for k, v := range editOnlyParams {
+		combinedParams[k] = v
+	}
+
+	// The combined params should equal all changed params (minus id)
+	delete(allChangedParams, "id")
+
+	assert.Equal(t, len(allChangedParams), len(combinedParams),
+		"Combined params should have same length as all changed params (minus id)")
+
+	for key, val := range allChangedParams {
+		assert.Contains(t, combinedParams, key, "Key %q missing from combined params", key)
+		assert.Equal(t, val, combinedParams[key], "Value mismatch for key %q", key)
+	}
+}
+
+func TestGetUpdateParams_WithDeleteOnlyParamFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":           rschema.Int64Attribute{Optional: true},
+			"name":         rschema.StringAttribute{Optional: true},
+			"delete_param": rschema.StringAttribute{Optional: true}, // delete-only param
+		},
+	}
+
+	hints := &TFStateHints{
+		DeleteOnlyParamFields: map[string]string{
+			"delete_param": "force",
+		},
+	}
+
+	// Current state
+	stateRaw := map[string]attr.Value{
+		"id":           types.Int64Value(1),
+		"name":         types.StringValue("old-name"),
+		"delete_param": types.StringValue("old-param"),
+	}
+	currentState := NewTFStateMust(stateRaw, schema, hints)
+
+	// Plan state
+	planRaw := map[string]attr.Value{
+		"id":           types.Int64Value(1),
+		"name":         types.StringValue("new-name"),
+		"delete_param": types.StringValue("new-param"), // CHANGED (delete-only param)
+	}
+	planState := NewTFStateMust(planRaw, schema, hints)
+
+	// Get update params
+	updateParams := planState.GetUpdateParams(currentState)
+
+	// Should include regular fields
+	assert.Contains(t, updateParams, "name")
+
+	// Should NOT include delete-only param fields
+	assert.NotContains(t, updateParams, "delete_param", "delete-only param field should be excluded")
+}
+
+// TestGetAllValues_PrimitiveTypes tests GetAllValues with primitive types (string, int64, bool)
+func TestGetAllValues_PrimitiveTypes(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"string_field": rschema.StringAttribute{Optional: true},
+			"int_field":    rschema.Int64Attribute{Optional: true},
+			"bool_field":   rschema.BoolAttribute{Optional: true},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"string_field": types.StringValue("test_value"),
+		"int_field":    types.Int64Value(42),
+		"bool_field":   types.BoolValue(true),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	// Verify all fields are returned
+	assert.Len(t, result, 3)
+	assert.Equal(t, "test_value", result["string_field"])
+	assert.Equal(t, int64(42), result["int_field"])
+	assert.Equal(t, true, result["bool_field"])
+}
+
+// TestGetAllValues_NullAndUnknownValues tests that null and unknown values are included
+func TestGetAllValues_NullAndUnknownValues(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"null_string":    rschema.StringAttribute{Optional: true},
+			"unknown_string": rschema.StringAttribute{Optional: true},
+			"known_string":   rschema.StringAttribute{Optional: true},
+			"null_int":       rschema.Int64Attribute{Optional: true},
+			"unknown_int":    rschema.Int64Attribute{Optional: true},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"null_string":    types.StringNull(),
+		"unknown_string": types.StringUnknown(),
+		"known_string":   types.StringValue("known"),
+		"null_int":       types.Int64Null(),
+		"unknown_int":    types.Int64Unknown(),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	// All fields should be in the result, including null and unknown
+	assert.Len(t, result, 5)
+	assert.Nil(t, result["null_string"])
+	assert.Nil(t, result["unknown_string"])
+	assert.Equal(t, "known", result["known_string"])
+	assert.Nil(t, result["null_int"])
+	assert.Nil(t, result["unknown_int"])
+}
+
+// TestGetAllValues_Lists tests GetAllValues with list attributes
+func TestGetAllValues_Lists(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"string_list": rschema.ListAttribute{
+				ElementType: types.StringType,
+				Optional:    true,
+			},
+			"int_list": rschema.ListAttribute{
+				ElementType: types.Int64Type,
+				Optional:    true,
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"string_list": types.ListValueMust(
+			types.StringType,
+			[]attr.Value{
+				types.StringValue("item1"),
+				types.StringValue("item2"),
+				types.StringValue("item3"),
+			},
+		),
+		"int_list": types.ListValueMust(
+			types.Int64Type,
+			[]attr.Value{
+				types.Int64Value(10),
+				types.Int64Value(20),
+			},
+		),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	assert.Len(t, result, 2)
+
+	// Check string list
+	stringList, ok := result["string_list"].([]interface{})
+	require.True(t, ok, "string_list should be a []interface{}")
+	assert.Len(t, stringList, 3)
+	assert.Equal(t, "item1", stringList[0])
+	assert.Equal(t, "item2", stringList[1])
+	assert.Equal(t, "item3", stringList[2])
+
+	// Check int list
+	intList, ok := result["int_list"].([]interface{})
+	require.True(t, ok, "int_list should be a []interface{}")
+	assert.Len(t, intList, 2)
+	assert.Equal(t, int64(10), intList[0])
+	assert.Equal(t, int64(20), intList[1])
+}
+
+// TestGetAllValues_Sets tests GetAllValues with set attributes
+func TestGetAllValues_Sets(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"string_set": rschema.SetAttribute{
+				ElementType: types.StringType,
+				Optional:    true,
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"string_set": types.SetValueMust(
+			types.StringType,
+			[]attr.Value{
+				types.StringValue("alpha"),
+				types.StringValue("beta"),
+			},
+		),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	assert.Len(t, result, 1)
+
+	// Check set (should be converted to []interface{})
+	set, ok := result["string_set"].([]interface{})
+	require.True(t, ok, "string_set should be a []interface{}")
+	assert.Len(t, set, 2)
+}
+
+// TestGetAllValues_NestedObjects tests GetAllValues with nested object attributes
+func TestGetAllValues_NestedObjects(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"nested_single": rschema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]rschema.Attribute{
+					"name": rschema.StringAttribute{Optional: true},
+					"age":  rschema.Int64Attribute{Optional: true},
+				},
+			},
+			"nested_list": rschema.ListNestedAttribute{
+				Optional: true,
+				NestedObject: rschema.NestedAttributeObject{
+					Attributes: map[string]rschema.Attribute{
+						"id":    rschema.Int64Attribute{Optional: true},
+						"value": rschema.StringAttribute{Optional: true},
+					},
+				},
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"nested_single": types.ObjectValueMust(
+			map[string]attr.Type{
+				"name": types.StringType,
+				"age":  types.Int64Type,
+			},
+			map[string]attr.Value{
+				"name": types.StringValue("John"),
+				"age":  types.Int64Value(30),
+			},
+		),
+		"nested_list": types.ListValueMust(
+			types.ObjectType{
+				AttrTypes: map[string]attr.Type{
+					"id":    types.Int64Type,
+					"value": types.StringType,
+				},
+			},
+			[]attr.Value{
+				types.ObjectValueMust(
+					map[string]attr.Type{
+						"id":    types.Int64Type,
+						"value": types.StringType,
+					},
+					map[string]attr.Value{
+						"id":    types.Int64Value(1),
+						"value": types.StringValue("first"),
+					},
+				),
+				types.ObjectValueMust(
+					map[string]attr.Type{
+						"id":    types.Int64Type,
+						"value": types.StringType,
+					},
+					map[string]attr.Value{
+						"id":    types.Int64Value(2),
+						"value": types.StringValue("second"),
+					},
+				),
+			},
+		),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	assert.Len(t, result, 2)
+
+	// Check nested single object
+	nestedSingle, ok := result["nested_single"].(map[string]interface{})
+	require.True(t, ok, "nested_single should be a map[string]interface{}")
+	assert.Equal(t, "John", nestedSingle["name"])
+	assert.Equal(t, int64(30), nestedSingle["age"])
+
+	// Check nested list
+	nestedList, ok := result["nested_list"].([]interface{})
+	require.True(t, ok, "nested_list should be a []interface{}")
+	assert.Len(t, nestedList, 2)
+
+	firstItem, ok := nestedList[0].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, int64(1), firstItem["id"])
+	assert.Equal(t, "first", firstItem["value"])
+
+	secondItem, ok := nestedList[1].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, int64(2), secondItem["id"])
+	assert.Equal(t, "second", secondItem["value"])
+}
+
+// TestGetAllValues_EmptyState tests GetAllValues with an empty state
+func TestGetAllValues_EmptyState(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"field1": rschema.StringAttribute{Optional: true},
+			"field2": rschema.Int64Attribute{Optional: true},
+		},
+	}
+
+	raw := map[string]attr.Value{}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	// Should return empty map
+	assert.Empty(t, result)
+}
+
+// TestGetAllValues_MixedTypes tests GetAllValues with various mixed types
+func TestGetAllValues_MixedTypes(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":         rschema.Int64Attribute{Optional: true},
+			"name":       rschema.StringAttribute{Optional: true},
+			"enabled":    rschema.BoolAttribute{Optional: true},
+			"null_field": rschema.StringAttribute{Optional: true},
+			"tags":       rschema.ListAttribute{ElementType: types.StringType, Optional: true},
+			"metadata": rschema.SingleNestedAttribute{
+				Optional: true,
+				Attributes: map[string]rschema.Attribute{
+					"key":   rschema.StringAttribute{Optional: true},
+					"value": rschema.StringAttribute{Optional: true},
+				},
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"id":         types.Int64Value(123),
+		"name":       types.StringValue("test"),
+		"enabled":    types.BoolValue(false),
+		"null_field": types.StringNull(),
+		"tags": types.ListValueMust(
+			types.StringType,
+			[]attr.Value{types.StringValue("tag1"), types.StringValue("tag2")},
+		),
+		"metadata": types.ObjectValueMust(
+			map[string]attr.Type{
+				"key":   types.StringType,
+				"value": types.StringType,
+			},
+			map[string]attr.Value{
+				"key":   types.StringValue("env"),
+				"value": types.StringValue("prod"),
+			},
+		),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	assert.Len(t, result, 6)
+	assert.Equal(t, int64(123), result["id"])
+	assert.Equal(t, "test", result["name"])
+	assert.Equal(t, false, result["enabled"])
+	assert.Nil(t, result["null_field"])
+
+	tags, ok := result["tags"].([]interface{})
+	require.True(t, ok)
+	assert.Len(t, tags, 2)
+
+	metadata, ok := result["metadata"].(map[string]interface{})
+	require.True(t, ok)
+	assert.Equal(t, "env", metadata["key"])
+	assert.Equal(t, "prod", metadata["value"])
+}
+
+// TestGetAllValues_EmptyLists tests GetAllValues with empty lists and sets
+func TestGetAllValues_EmptyLists(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"empty_list": rschema.ListAttribute{
+				ElementType: types.StringType,
+				Optional:    true,
+			},
+			"empty_set": rschema.SetAttribute{
+				ElementType: types.Int64Type,
+				Optional:    true,
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"empty_list": types.ListValueMust(types.StringType, []attr.Value{}),
+		"empty_set":  types.SetValueMust(types.Int64Type, []attr.Value{}),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	assert.Len(t, result, 2)
+
+	emptyList, ok := result["empty_list"].([]interface{})
+	require.True(t, ok)
+	assert.Empty(t, emptyList)
+
+	emptySet, ok := result["empty_set"].([]interface{})
+	require.True(t, ok)
+	assert.Empty(t, emptySet)
+}
+
+// TestGetAllValues_SkipRefreshUseCase tests GetAllValues in the context of SkipRefreshAPICall
+// This simulates the protection_policy scenario where GetAllValues is used as a Record
+func TestGetAllValues_SkipRefreshUseCase(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":   rschema.Int64Attribute{Optional: true, Computed: true},
+			"name": rschema.StringAttribute{Optional: true},
+			"frames": rschema.ListNestedAttribute{
+				Optional: true,
+				NestedObject: rschema.NestedAttributeObject{
+					Attributes: map[string]rschema.Attribute{
+						"every":       rschema.StringAttribute{Optional: true},
+						"keep_local":  rschema.StringAttribute{Optional: true},
+						"keep_remote": rschema.StringAttribute{Optional: true},
+					},
+				},
+			},
+		},
+	}
+
+	// Simulate user's configuration with duration values
+	raw := map[string]attr.Value{
+		"id":   types.Int64Value(42),
+		"name": types.StringValue("test-policy"),
+		"frames": types.ListValueMust(
+			types.ObjectType{
+				AttrTypes: map[string]attr.Type{
+					"every":       types.StringType,
+					"keep_local":  types.StringType,
+					"keep_remote": types.StringType,
+				},
+			},
+			[]attr.Value{
+				types.ObjectValueMust(
+					map[string]attr.Type{
+						"every":       types.StringType,
+						"keep_local":  types.StringType,
+						"keep_remote": types.StringType,
+					},
+					map[string]attr.Value{
+						"every":       types.StringValue("1D"),
+						"keep_local":  types.StringValue("14D"),
+						"keep_remote": types.StringValue("8D"),
+					},
+				),
+			},
+		),
+	}
+
+	tfState := NewTFStateMust(raw, schema, nil)
+	result := tfState.GetAllValues()
+
+	// Verify the result can be used as a Record (map[string]any)
+	assert.Len(t, result, 3)
+	assert.Equal(t, int64(42), result["id"])
+	assert.Equal(t, "test-policy", result["name"])
+
+	// Verify frames structure is preserved
+	frames, ok := result["frames"].([]interface{})
+	require.True(t, ok, "frames should be []interface{}")
+	assert.Len(t, frames, 1)
+
+	frame, ok := frames[0].(map[string]interface{})
+	require.True(t, ok, "frame should be map[string]interface{}")
+
+	// Verify duration values are preserved exactly as user specified
+	assert.Equal(t, "1D", frame["every"])
+	assert.Equal(t, "14D", frame["keep_local"])
+	assert.Equal(t, "8D", frame["keep_remote"])
+
+	// This demonstrates that GetAllValues preserves user's original values
+	// without any normalization, which is the desired behavior for SkipRefreshAPICall
+}

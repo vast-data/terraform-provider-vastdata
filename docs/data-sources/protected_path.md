@@ -32,7 +32,7 @@ data "vastdata_protected_path" "vastdb_protected_path_by_guid" {
 - `bw` (Number) Replication Bandwidth
 - `capabilities` (String) Indicates if the protected path supports global access streams or async replication streams or sync replication.
 - `enabled` (Boolean) start/pause replication
-- `estimated_read_only_time` (String)
+- `estimated_read_only_time` (Number)
 - `eta` (String)
 - `failback_allowed` (String)
 - `failover` (Boolean) Trigger failover command
@@ -41,6 +41,7 @@ data "vastdata_protected_path" "vastdb_protected_path_by_guid" {
 - `health` (String)
 - `inode_count` (String)
 - `internal` (Boolean)
+- `is_gn_enabled` (Boolean) Indicates whether the Protected Path is enabled for Global Access
 - `is_local` (Boolean)
 - `last_restore_point_creation_time` (String)
 - `last_restore_point_time` (String)
@@ -79,3 +80,13 @@ data "vastdata_protected_path" "vastdb_protected_path_by_guid" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
+- `members_info` (Attributes Map) Members info per Replication Peer (see [below for nested schema](#nestedatt--members_info))
+
+<a id="nestedatt--members_info"></a>
+### Nested Schema for `members_info`
+
+Read-Only:
+
+- `capabilities` (String)
+- `role` (String)
+- `state` (String)

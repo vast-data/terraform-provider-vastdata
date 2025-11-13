@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -20,6 +21,19 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
+)
+
+// Operation constants for resource operations
+const (
+	OpMetadata       = "Metadata"
+	OpSchema         = "Schema"
+	OpConfigure      = "Configure"
+	OpImportState    = "ImportState"
+	OpCreate         = "Create"
+	OpRead           = "Read"
+	OpUpdate         = "Update"
+	OpDelete         = "Delete"
+	OpValidateConfig = "ValidateConfig"
 )
 
 type Resource struct {
@@ -46,7 +60,7 @@ func (r *Resource) ManagerWithSchemaOnly(ctx context.Context) (ResourceManager, 
 	switch sch := any(*schema).(type) {
 	case rschema.Schema:
 		for k, a := range sch.Attributes {
-			zeroRaw[k], _ = is.BuildAttrValueFromAny(a.GetType(), nil)
+			zeroRaw[k], _, _ = is.BuildAttrValueFromAny(a.GetType(), nil)
 		}
 	default:
 		// Fallback to passing nil Raw if schema kind unexpected
@@ -84,58 +98,57 @@ func (r *Resource) NewManager(state any) ResourceManager {
 // ----------------------------------------
 
 func (r *Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	withContext(ctx, "Metadata", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpMetadata, r.managerName, func(ctx context.Context) {
 		r.metadataImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
-	withContext(ctx, "Schema", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpSchema, r.managerName, func(ctx context.Context) {
 		r.schemaImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	withContext(ctx, "Configure", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpConfigure, r.managerName, func(ctx context.Context) {
 		r.configureImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	withContext(ctx, "ImportState", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpImportState, r.managerName, func(ctx context.Context) {
 		r.importStateImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	withContext(ctx, "Create", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpCreate, r.managerName, func(ctx context.Context) {
 		r.createImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	withContext(ctx, "Read", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpRead, r.managerName, func(ctx context.Context) {
 		r.readImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	withContext(ctx, "Update", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpUpdate, r.managerName, func(ctx context.Context) {
 		r.updateImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	withContext(ctx, "Delete", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpDelete, r.managerName, func(ctx context.Context) {
 		r.deleteImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
-	withContext(ctx, "ValidateConfig", r.managerName, func(ctx context.Context) {
+	withContext(ctx, OpValidateConfig, r.managerName, func(ctx context.Context) {
 		r.validateConfigImpl(ctx, req, resp)
 	})
-
 }
 
 // ----------------------------------------
@@ -306,8 +319,8 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
-		// On import, populate computed and required fields
-		if err = tfState.FillFromRecordIncludingRequired(record.(Record), true); err != nil {
+		// On import, populate computed and required fields (but NOT optional fields)
+		if err = tfState.FillFromRecordForImport(record.(Record)); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: error filling state.", managerName),
 				err.Error(),
@@ -365,7 +378,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				if imp, ok := manager.(DeleteResource); ok {
 					imp.DeleteResource(ctx, rest)
 				} else {
-					if err = r.deleteRecordBySearchParams(ctx, manager, "TransactionDelete"); err != nil {
+					if _, err = r.deleteRecordBySearchParams(ctx, manager, "TransactionDelete"); err != nil {
 						tflog.Warn(
 							ctx,
 							fmt.Sprintf("TransactionDelete[%s]:"+
@@ -444,7 +457,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			if len(createParamsDiff) > 0 {
 				id, exists := record.(Record)["id"]
 				if !exists {
-					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
+					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
 				}
 				// Send only difference between current record from vast and createParams.
 				if record, err = api.UpdateWithContext(ctx, id, createParamsDiff); err == nil {
@@ -464,32 +477,48 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		return
 	}
 
-	if imp, ok := manager.(AfterCreateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterCreateResource[%s]: do.", managerName))
-		if err = imp.AfterCreateResource(ctx, rest, record.(Record)); err != nil {
+	// Ensure record is not empty, otherwise set to nil.
+	if record, ok := record.(Record); ok && record.Empty() {
+		record = nil
+	}
+
+	if record != nil {
+		// In case record is AsyncTask
+		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), 10*time.Minute); err != nil {
 			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterCreateResource[%q]", managerName),
+				fmt.Sprintf("AsyncTask - create[%s].", managerName),
 				err.Error(),
 			)
 			return
 		}
-	} else if len(tfState.Hints.EditOnlyFields) > 0 {
-		// Update fields on resource that cannot be set on creation. For instance "enabled" field for some resources.
-		updateParams := tfState.GetReadEditOnlyParams()
-		if len(updateParams) > 0 {
-			tflog.Debug(ctx, fmt.Sprintf("Create[%s]: Update 'EditOnly' fields.", managerName))
-			id, exists := record.(Record)["id"]
-			if !exists {
-				panic(fmt.Sprintf("Create[%s]: record does not have 'id' field.", managerName))
+
+		// Handle AfterCreateResource hook
+		if imp, ok := manager.(AfterCreateResource); ok {
+			tflog.Debug(ctx, fmt.Sprintf("AfterCreateResource[%s]: do.", managerName))
+			if err = imp.AfterCreateResource(ctx, rest, record.(Record)); err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("AfterCreateResource[%q]", managerName),
+					err.Error(),
+				)
+				return
 			}
-			_, err = api.UpdateWithContext(ctx, id, updateParams)
-			for k, v := range updateParams {
-				record.(Record)[k] = v // Update record with new values.
+		} else if len(tfState.Hints.EditOnlyFields) > 0 {
+			// Update fields on resource that cannot be set on creation. For instance "enabled" field for some resources.
+			updateParams := tfState.GetReadEditOnlyParams()
+			if len(updateParams) > 0 {
+				tflog.Debug(ctx, fmt.Sprintf("Create[%s]: Update 'EditOnly' fields.", managerName))
+				id, exists := record.(Record)["id"]
+				if !exists {
+					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
+				}
+				_, err = api.UpdateWithContext(ctx, id, updateParams)
+				for k, v := range updateParams {
+					record.(Record)[k] = v // Update record with new values.
+				}
 			}
 		}
-	}
 
-	if record != nil {
+		// Handle response transformation
 		if transformer, ok := manager.(TransformResponseRecord); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
@@ -559,9 +588,16 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 		tflog.Debug(ctx, fmt.Sprintf("ReadResource[%s]: do.", managerName))
 		record, err = imp.ReadResource(ctx, rest)
 	} else {
-		// Delegate to the default read implementation
-		tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
-		record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
+		// Check if we should skip API calls and use current tfstate
+		if tfState.Hints.SkipRefreshAPICall {
+			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: skip API call, using current tfstate as record.", managerName))
+			// Convert current tfstate to map[string]any and use as record
+			record = Record(tfState.GetAllValues())
+		} else {
+			// Delegate to the default read implementation
+			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
+			record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
+		}
 	}
 
 	if err != nil {
@@ -673,17 +709,25 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		// For other resources please implement CreateResource to avoid entering this branch.
 		id, exists := record.(Record)["id"]
 		if !exists {
-			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field.", managerName))
+			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
 		}
-		updateParams := planTfState.DiffFields(tfState, is.FilterOr, nil, is.SearchOptional, is.SearchRequired)
+
+		// Get update params excluding edit-only and delete-only fields
+		updateParams := planTfState.GetUpdateParams(tfState)
 		if transformer, ok := stateManger.(TransformRequestBody); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformRequestBody[%s]: do.", managerName))
 			updateParams = transformer.TransformRequestBody(updateParams)
 		}
 
 		delete(updateParams, "id") // Remove ID from update parameters, as it should not be updated.
-		if record, err = api.UpdateWithContext(ctx, id, updateParams); err == nil {
-			r.checkIntegrity(ctx, record.(Record), updateParams)
+		if len(updateParams) == 0 {
+			tflog.Debug(
+				ctx, fmt.Sprintf("Update[%s]: no update request parameters. Skipping update...", managerName),
+			)
+		} else {
+			if record, err = api.UpdateWithContext(ctx, id, updateParams); err == nil {
+				r.checkIntegrity(ctx, record.(Record), updateParams)
+			}
 		}
 	}
 
@@ -695,7 +739,21 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
+	// Ensure record is not empty, otherwise set to nil.
+	if record, ok := record.(Record); ok && record.Empty() {
+		record = nil
+	}
+
 	if record != nil {
+		// In case record is AsyncTask
+		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), 10*time.Minute); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("AsyncTask - update[%s].", managerName),
+				err.Error(),
+			)
+			return
+		}
+
 		if transformer, ok := stateManger.(TransformResponseRecord); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
@@ -710,19 +768,53 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 			)
 			return
 		}
+
+		if imp, ok := stateManger.(AfterUpdateResource); ok {
+			tflog.Debug(ctx, fmt.Sprintf("AfterUpdateResource[%s]: do.", managerName))
+			if err = imp.AfterUpdateResource(ctx, planManager.(AfterUpdateResource), rest, record.(Record)); err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("AfterUpdateResource[%q]", managerName),
+					err.Error(),
+				)
+				return
+			}
+		} else if len(tfState.Hints.EditOnlyFields) > 0 {
+			// Only handle edit-only fields automatically if AfterUpdateResource is not implemented
+			// If AfterUpdateResource is implemented, it's assumed to handle edit-only fields itself
+			editOnlyParams := planTfState.GetChangedEditOnlyParams(tfState)
+			if len(editOnlyParams) > 0 {
+				tflog.Debug(ctx, fmt.Sprintf("Update[%s]: Updating 'EditOnly' fields.", managerName))
+				id, exists := record.(Record)["id"]
+				if !exists {
+					resp.Diagnostics.AddError(
+						fmt.Sprintf("Update[%s]: cannot update edit-only fields.", managerName),
+						"Record does not have 'id' field",
+					)
+					return
+				}
+				var editRecord DisplayableRecord
+				if editRecord, err = api.UpdateWithContext(ctx, id, editOnlyParams); err != nil {
+					resp.Diagnostics.AddError(
+						fmt.Sprintf("Update[%s]: error updating edit-only fields.", managerName),
+						err.Error(),
+					)
+					return
+				}
+				// Update the record with edit-only values
+				if editRecord != nil && !editRecord.(Record).Empty() {
+					for k, v := range editRecord.(Record) {
+						record.(Record)[k] = v
+					}
+				} else {
+					for k, v := range editOnlyParams {
+						record.(Record)[k] = v
+					}
+				}
+			}
+		}
+
 	} else {
 		tflog.Debug(ctx, fmt.Sprintf("Update[%s]: no record returned, skipping internalstate update.", managerName))
-	}
-
-	if imp, ok := stateManger.(AfterUpdateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterUpdateResource[%s]: do.", managerName))
-		if err = imp.AfterUpdateResource(ctx, planManager.(AfterUpdateResource), rest, record.(Record)); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterUpdateResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
 	}
 
 	// Copy changes from plan to state.
@@ -772,7 +864,17 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 	} else {
 		// Delegate to the default delete implementation
 		tflog.Debug(ctx, fmt.Sprintf("Delete[%s]: use default implementation.", managerName))
-		err = r.deleteRecordBySearchParams(ctx, manager, "Delete")
+		record, err := r.deleteRecordBySearchParams(ctx, manager, "Delete")
+		if err == nil && record != nil {
+			// In case record is AsyncTask
+			if err := handleMaybeAsyncTask(ctx, rest, record, 10*time.Minute); err != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("AsyncTask - delete[%s].", managerName),
+					err.Error(),
+				)
+				return
+			}
+		}
 	}
 
 	if err != nil {
@@ -906,7 +1008,7 @@ func (r *Resource) getRecordBySearchParams(ctx context.Context, manager, planMan
 
 }
 
-func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager ResourceManager, op string) error {
+func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager ResourceManager, op string) (Record, error) {
 	var (
 		rest        = r.providerData.Client
 		managerName = r.managerName

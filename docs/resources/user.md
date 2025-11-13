@@ -48,8 +48,9 @@ resource "vastdata_user" "vastdb_user" {
 
 
 resource "vastdata_group" "vastdb_group" {
-  name = "vastdb_group"
-  gid  = 30097
+  name              = "vastdb_group"
+  gid               = 30097
+  local_provider_id = 1
 }
 
 resource "vastdata_user" "vastdb_user" {
@@ -121,6 +122,7 @@ resource "vastdata_user" "vastdb_user" {
 
 ### Required
 
+- `local_provider_id` (Number) The ID of the local provider to which to add the user
 - `name` (String) User name
 
 ### Optional
@@ -130,7 +132,7 @@ resource "vastdata_user" "vastdb_user" {
 - `gids` (Set of Number) List of group GIDs of all groups to which the user should belong.
 - `leading_gid` (Number) Leading GID
 - `local` (Boolean) Not in use
-- `local_provider_id` (Number) The ID of the local provider to which to add the user
+- `password` (String, Sensitive) Password
 - `s3_policies_ids` (Set of Number) S3 policies IDs, denoting which S3 identity policies are associated with the user. The user is granted and denied S3 permissions according to the associated S3 identity policies.
 - `s3_superuser` (Boolean) Set to true to give the user S3 superuser permission. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `uid` (Number) NFS UID
@@ -141,9 +143,11 @@ resource "vastdata_user" "vastdb_user" {
 - `groups` (Set of String) List of groups to which the user belongs
 - `guid` (String) Global unique ID
 - `id` (Number) The ID of this resource.
+- `is_temporary_password` (Boolean) Password is temporary
 - `leading_group_gid` (Number) Leading Group GID
 - `leading_group_name` (String) Leading Group
 - `local_provider` (Attributes) (see [below for nested schema](#nestedatt--local_provider))
+- `password_is_set` (Boolean) Password is set
 - `primary_group_sid` (String) Primary group SID
 - `s3_policies` (Attributes Set) (see [below for nested schema](#nestedatt--s3_policies))
 - `sid` (String) SID

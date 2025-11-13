@@ -66,7 +66,7 @@ func (m *TenantClientMetrics) API(rest *VMSRest) VastResourceAPIWithContext {
 
 func (m *TenantClientMetrics) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantId := m.tfstate.Int64("tenant_id")
-	return rest.Tenants.GetClientMetricsWithContext(ctx, tenantId)
+	return rest.Tenants.TenantClientMetricsWithContext_GET(ctx, tenantId)
 }
 
 func (m *TenantClientMetrics) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -110,10 +110,9 @@ func ensureTenantClientMetricsUpdatedWith(ctx context.Context, stateTs, fieldsTs
 		// Strip nils recursively to avoid sending nulls in nested objects
 		raw := map[string]any(params)
 		params = is.RemoveNilValues(raw).(map[string]any)
-		// Use the custom API method to update client metrics
-		return rest.Tenants.UpdateClientMetricsWithContext(ctx, tenantId, params)
+		return rest.Tenants.TenantClientMetricsWithContext_PATCH(ctx, tenantId, params)
 	}
 
 	// If no fields to update, just get the current client metrics
-	return rest.Tenants.GetClientMetricsWithContext(ctx, tenantId)
+	return rest.Tenants.TenantClientMetricsWithContext_GET(ctx, tenantId)
 }

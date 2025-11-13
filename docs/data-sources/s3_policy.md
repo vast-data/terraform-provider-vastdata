@@ -33,6 +33,7 @@ data "vastdata_s3_policy" "vastdb_s3_policy_by_name" {
 
 - `enabled` (Boolean)
 - `guid` (String)
+- `iam_roles__id` (String)
 - `id` (Number) The ID of an S3 identity policy.
 - `is_replicated` (Boolean)
 - `name` (String) The name of the S3 identity policy.
@@ -45,4 +46,4 @@ data "vastdata_s3_policy" "vastdb_s3_policy_by_name" {
 ### Read-Only
 
 - `groups` (Set of String) The groups to which the S3 identity policy is attached.
-- `users` (Set of String) The users to which the S3 identity policy is attached.
+- `users` (Set of String) The principals to which the S3 identity policy is attached.

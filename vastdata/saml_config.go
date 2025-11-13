@@ -68,7 +68,7 @@ func (m *SamlConfig) TfState() *is.TFState {
 }
 
 func (m *SamlConfig) API(rest *VMSRest) VastResourceAPIWithContext {
-	return rest.SamlConfigs
+	return rest.Vms
 }
 
 func (m *SamlConfig) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -77,7 +77,7 @@ func (m *SamlConfig) ReadDatasource(ctx context.Context, rest *VMSRest) (Display
 	}
 	vmsId := m.tfstate.Int64("vms_id")
 	idpName := m.tfstate.String("idp_name")
-	return rest.SamlConfigs.GetConfigWithContext(ctx, vmsId, idpName)
+	return rest.Vms.VmsSamlConfigWithContext_GET(ctx, vmsId, params{"idp_name": idpName})
 }
 
 func (m *SamlConfig) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -101,7 +101,7 @@ func (m *SamlConfig) UpdateResource(ctx context.Context, plan UpdateResource, re
 func (m *SamlConfig) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	vmsId := m.tfstate.Int64("vms_id")
 	idpName := m.tfstate.String("idp_name")
-	_, err := rest.SamlConfigs.DeleteConfigWithContext(ctx, vmsId, idpName)
+	_, err := rest.Vms.VmsSamlConfigWithContext_DELETE(ctx, vmsId, params{"idp_name": idpName})
 	return ignoreStatusCodes(err, http.StatusNotFound)
 }
 
@@ -124,13 +124,12 @@ func ensureSamlConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFSt
 	if data, ok := fieldsTs.SetIfAvailable(
 		"saml_settings",
 	); ok {
-		// Use the custom API method to update SAML config
-		if _, err := rest.SamlConfigs.UpdateConfigWithContext(ctx, vmsId, idpName, data); err != nil {
+		if _, err := rest.Vms.VmsSamlConfigWithContext_POST(ctx, vmsId, params{"idp_name": idpName}, data); err != nil {
 			return nil, err
 		}
 		return nil, nil
 	}
 
 	// If no fields to update, just get the current SAML config
-	return rest.SamlConfigs.GetConfigWithContext(ctx, vmsId, idpName)
+	return rest.Vms.VmsSamlConfigWithContext_GET(ctx, vmsId, params{"idp_name": idpName})
 }

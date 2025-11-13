@@ -27,7 +27,8 @@ data "vastdata_volume" "vastdb_volume_by_name" {
 
 ### Optional
 
-- `capacity` (Number) The amount of data written to the volume.
+- `capacity` (Number) The amount of data written to the volume (deprecated as of 5.4).
+- `created` (String)
 - `id` (Number) Volume ID
 - `is_monitored` (Boolean) Is this volume live monitored (default - False).
 - `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
@@ -35,9 +36,34 @@ data "vastdata_volume" "vastdb_volume_by_name" {
 - `name` (String) The path to the volume relative to the view path.
 - `namespace_id` (Number) Available for mapped volumes, the namespace ID as used by hosts to search the volume within the subsystem. Each namespace ID is unique within the subsystem. If a volume snapshot is mapped to any host(s), a snapshot volume is created with its own namespace ID.
 - `nguid` (String) The NGUID used by block hosts to access the volume.
+- `qos_policy_id` (Number) QOS Policy ID
 - `size` (Number) The size of the volume, (in GB)
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 - `tenant_name` (String) The name of the tenant to which the volume belongs.
 - `uuid` (String) The UUID, used by hosts to search the volume in the subsystem.
 - `view__id` (Number) View ID by which to filter
 - `view_id` (Number) Id of the block subsystem view to which the volume belongs.
+
+### Read-Only
+
+- `qos_policy` (Attributes) (see [below for nested schema](#nestedatt--qos_policy))
+- `snapshot_data` (Attributes) (see [below for nested schema](#nestedatt--snapshot_data))
+- `tags` (Map of String)
+
+<a id="nestedatt--qos_policy"></a>
+### Nested Schema for `qos_policy`
+
+Read-Only:
+
+- `id` (Number) ID
+- `name` (String) Name
+
+
+<a id="nestedatt--snapshot_data"></a>
+### Nested Schema for `snapshot_data`
+
+Read-Only:
+
+- `created` (String) snapshot's creation time
+- `id` (Number) snapshot's ID
+- `name` (String) snapshot's name

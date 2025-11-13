@@ -3,7 +3,8 @@ data "vastdata_tenant" "vastdb_tenant" {
 }
 
 resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
+  name              = "vastdb_user"
+  local_provider_id = 1
 }
 
 resource "vastdata_s3_policy" "vastdb_s3policy1" {

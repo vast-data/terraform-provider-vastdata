@@ -373,6 +373,54 @@ func (s *TFState) IsKnownAndNotNull(path string) bool {
 	return !s.IsNull(path) && !s.IsUnknown(path)
 }
 
+// StringWithFallback gets a string value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) StringWithFallback(fallback *TFState, path string) (string, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.String(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.String(path), true
+	}
+	return "", false
+}
+
+// BoolWithFallback gets a bool value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) BoolWithFallback(fallback *TFState, path string) (bool, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.Bool(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.Bool(path), true
+	}
+	return false, false
+}
+
+// Int64WithFallback gets an int64 value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) Int64WithFallback(fallback *TFState, path string) (int64, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.Int64(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.Int64(path), true
+	}
+	return 0, false
+}
+
+// Float64WithFallback gets a float64 value from the current TFState, falling back to another TFState if not found
+// Returns the value and a boolean indicating if it was found in either state
+func (s *TFState) Float64WithFallback(fallback *TFState, path string) (float64, bool) {
+	if s.IsKnownAndNotNull(path) {
+		return s.Float64(path), true
+	}
+	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+		return fallback.Float64(path), true
+	}
+	return 0.0, false
+}
+
 func (s *TFState) Get(path string) attr.Value {
 	s.assertEnabled()
 	parts := parsePath(path)
@@ -417,7 +465,8 @@ func (s *TFState) Set(key string, value any) {
 	}
 	destType := s.Type(key)
 
-	val := Must(BuildAttrValueFromAny(destType, value))
+	attrVal, _, err := BuildAttrValueFromAny(destType, value)
+	val := Must(attrVal, err)
 	s.Raw[key] = val
 }
 
@@ -430,7 +479,8 @@ func (s *TFState) SetOrAdd(key string, value any) {
 	destType := s.Type(key)
 
 	// Convert the value to the appropriate type
-	val := Must(BuildAttrValueFromAny(destType, value))
+	attrVal, _, err := BuildAttrValueFromAny(destType, value)
+	val := Must(attrVal, err)
 
 	// Set the value in Raw (this will add the key if it doesn't exist)
 	s.Raw[key] = val
@@ -541,6 +591,22 @@ func (s *TFState) FillFromRecord(record Record) error {
 // - If includeRequired is true, also sets attributes marked Required (even if not Computed).
 // - Optional non-computed attributes are not set.
 func (s *TFState) FillFromRecordIncludingRequired(record Record, includeRequired bool) error {
+	return s.fillFromRecordInternal(record, includeRequired, false)
+}
+
+// FillFromRecordForImport populates TF state from backend record during import operations.
+// It fills computed and required fields, but NOT optional fields.
+// This prevents drift after import by ensuring optional fields remain null in both plan and state
+// (since they're not specified in config).
+func (s *TFState) FillFromRecordForImport(record Record) error {
+	return s.fillFromRecordInternal(record, true, false)
+}
+
+// fillFromRecordInternal is the internal implementation for filling state from records.
+// Parameters:
+// - includeRequired: if true, sets required fields (even if not computed)
+// - includeOptional: if true, sets optional fields (even if not computed or required)
+func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, includeOptional bool) error {
 	if record == nil {
 		return errors.New("record is nil")
 	}
@@ -551,13 +617,25 @@ func (s *TFState) FillFromRecordIncludingRequired(record Record, includeRequired
 		}
 		// Decide whether to set this field
 		if !s.IsComputed(key) {
-			// Not computed: only set if required and includeRequired
-			if !(includeRequired && s.IsRequired(key)) {
+			// Not computed: check if we should include it
+			shouldInclude := false
+			if includeRequired && s.IsRequired(key) {
+				shouldInclude = true
+			}
+			if includeOptional && s.IsOptional(key) {
+				shouldInclude = true
+			}
+			if !shouldInclude {
 				continue
 			}
 		}
-		val, err := BuildAttrValueFromAny(typ, rawVal)
-		if err != nil {
+		val, success, err := BuildAttrValueFromAny(typ, rawVal)
+		if !success {
+			// Soft error - parsing failed (e.g., empty string for int64)
+			continue
+		}
+		if err != nil && val == nil {
+			// Hard error - no value could be produced
 			return fmt.Errorf(
 				"FillFromRecord for %q failed: %w\nInspected object:\n%v",
 				key, err, record.PrettyJson("     "),
@@ -601,14 +679,24 @@ func (s *TFState) CopyNonEmptyFieldsTo(other *TFState) {
 
 // CopyKnownFieldsTo copies only known fields from this TFState
 // to another, along with their associated attribute metadata.
+// It skips unknown values and null values for computed fields (which should come from API responses).
 func (s *TFState) CopyKnownFieldsTo(other *TFState) {
 	s.assertEnabled()
 	other.assertEnabled()
 
 	for k, v := range s.Raw {
 		if v.IsUnknown() {
-			continue // skip null or unknown values
+			continue // skip unknown values
 		}
+
+		// Skip null values for computed fields to avoid overwriting values from API responses
+		// Example: During update, id=5 is set by FillFromRecord from API, but plan has id=null
+		// We should NOT overwrite the API value with null from the plan
+		meta, ok := s.Meta[k]
+		if ok && meta.Computed && v.IsNull() {
+			continue
+		}
+
 		other.Raw[k] = v
 		other.Meta[k] = s.Meta[k]
 	}
@@ -832,6 +920,67 @@ func (s *TFState) GetReadEditOnlyParams() vast_client.Params {
 		), true)
 	}
 	return searchParams
+}
+
+// GetChangedEditOnlyParams returns edit-only fields that have changed between this TFState (plan)
+// and another TFState (current state).
+//
+// This is used in UpdateResource to handle edit-only fields separately from the main update.
+// Edit-only fields are those that cannot be set during creation but can be modified via update operations.
+func (s *TFState) GetChangedEditOnlyParams(otherState *TFState) vast_client.Params {
+	searchParams := make(vast_client.Params)
+	if s.Hints != nil && len(s.Hints.EditOnlyFields) > 0 {
+		// Get all changed fields
+		diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional)
+
+		// Keep only edit-only fields
+		for key := range diffParams {
+			if !slices.Contains(s.Hints.EditOnlyFields, key) {
+				delete(diffParams, key)
+			}
+		}
+
+		searchParams.Update(diffParams, true)
+	}
+	return searchParams
+}
+
+// GetChangedParams returns a map of parameters that differ between this TFState (plan)
+// and another TFState (current state), returning only the changed fields.
+// This is commonly used in UpdateResource methods to send only modified fields to the API.
+func (s *TFState) GetChangedParams(otherState *TFState) vast_client.Params {
+	diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional, SearchRequired)
+	return diffParams
+}
+
+// GetUpdateParams returns a map of changed parameters suitable for update operations,
+// excluding edit-only fields and delete-only fields.
+//
+// This method:
+//  1. Gets all changed fields between plan and current state (like GetChangedParams)
+//  2. Excludes EditOnlyFields - fields that should only be set via separate edit operations
+//  3. Excludes DeleteOnlyBodyFields - fields only used during delete operations
+//  4. Excludes DeleteOnlyParamFields - query params only used during delete operations
+//
+// EditOnlyFields should be handled separately after the main update operation.
+func (s *TFState) GetUpdateParams(otherState *TFState) vast_client.Params {
+	// Build exclusion list
+	var exclude []string
+	if s.Hints != nil {
+		exclude = append(exclude, s.Hints.EditOnlyFields...)                                   // Edit only fields should be updated separately
+		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyBodyFields))...)  // Delete only fields should not be in update
+		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyParamFields))...) // Delete only fields should not be in update
+	}
+
+	// Get all changed params
+	diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional, SearchRequired)
+
+	// Remove excluded fields from the diff
+	for _, excludeField := range exclude {
+		delete(diffParams, excludeField)
+	}
+
+	return diffParams
 }
 
 // GetDeleteOnlyBodyParams returns a map of parameters used exclusively for delete operations (delete-only).
