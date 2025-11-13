@@ -206,6 +206,9 @@ func (m *NonlocalUserKey) DeleteResource(ctx context.Context, rest *VMSRest) err
 	} else {
 		return errors.New("either uid or sid must be set for deletion")
 	}
+	if ts.IsKnownAndNotNull("tenant_id") {
+		deleteParams["tenant_id"] = ts.String("tenant_id")
+	}
 
 	err := rest.Users.UserNonLocalKeysWithContext_DELETE(ctx, deleteParams)
 	if ignoreStatusCodes(err, http.StatusNotFound) != nil {
