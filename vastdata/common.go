@@ -32,6 +32,10 @@ import (
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
+const (
+	customRawKey = "@raw" // used to store raw string values in Record
+)
+
 var notImportable = false
 
 // ProviderData contains the client and configuration passed from the provider

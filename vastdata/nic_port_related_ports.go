@@ -52,19 +52,13 @@ func (m *NicPortRelatedPorts) ReadDatasource(ctx context.Context, rest *VMSRest)
 		return nil, fmt.Errorf("nic_port_id is required")
 	}
 
-	relatedIds, err := rest.NicPorts.NicPortRelatedNicportsWithContext_GET(ctx, nicPortId)
+	record, err := rest.NicPorts.NicPortRelatedNicportsWithContext_GET(ctx, nicPortId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get related NIC ports: %w", err)
 	}
 
-	// Convert []int64 to []any for the record
-	relatedIdsAny := make([]any, len(relatedIds))
-	for i, id := range relatedIds {
-		relatedIdsAny[i] = id
-	}
-
 	return Record{
 		"nic_port_id":          nicPortId,
-		"related_nic_port_ids": relatedIdsAny,
+		"related_nic_port_ids": record[customRawKey].([]any),
 	}, nil
 }
