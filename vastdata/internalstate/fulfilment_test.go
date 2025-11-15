@@ -419,8 +419,8 @@ func TestConvertAttrValueToRaw_UserQuotasExample(t *testing.T) {
 }
 
 func TestBuildAttrValueFromAny_EmptyString(t *testing.T) {
-	// Test the new functionality for handling empty strings
-	// Empty string for Int64 should return 0, false (not successful), and error
+	// Test soft skip behavior in FillFromRecord - unparseable strings return 0 with success=false
+	// Empty string for Int64 returns 0 with success=false (soft skip)
 	val, success, err := BuildAttrValueFromAny(types.Int64Type, "")
 	require.NotNil(t, val)
 	require.False(t, success, "empty string should not be considered successful parse")
@@ -441,12 +441,26 @@ func TestBuildAttrValueFromAny_EmptyString(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int64(100), val.(types.Int64).ValueInt64())
 
-	// Test with invalid string
+	// Test with invalid string - soft skip behavior (success=false)
 	val, success, err = BuildAttrValueFromAny(types.Int64Type, "not-a-number")
 	require.NotNil(t, val)
-	require.False(t, success)
-	require.Error(t, err)
+	require.False(t, success, "unparseable string should not be considered successful parse")
+	require.Error(t, err, "unparseable string should produce an error")
 	require.Equal(t, int64(0), val.(types.Int64).ValueInt64())
+
+	// Test with "UNKNOWN" string - soft skip behavior (the original issue)
+	val, success, err = BuildAttrValueFromAny(types.Int64Type, "UNKNOWN")
+	require.NotNil(t, val)
+	require.False(t, success, "UNKNOWN string should not be considered successful parse")
+	require.Error(t, err, "UNKNOWN should produce an error")
+	require.Equal(t, int64(0), val.(types.Int64).ValueInt64(), "UNKNOWN should default to 0")
+
+	// Test with "UNKNOWN" for Float64Type as well - soft skip behavior
+	val, success, err = BuildAttrValueFromAny(types.Float64Type, "UNKNOWN")
+	require.NotNil(t, val)
+	require.False(t, success, "UNKNOWN string should not be considered successful parse")
+	require.Error(t, err, "UNKNOWN should produce an error")
+	require.Equal(t, 0.0, val.(types.Float64).ValueFloat64(), "UNKNOWN should default to 0.0")
 }
 
 func TestBuildAttrValueFromAny_OtherTypes(t *testing.T) {

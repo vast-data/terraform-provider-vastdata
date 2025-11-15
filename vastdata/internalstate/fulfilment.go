@@ -146,7 +146,8 @@ func BuildAttrValueFromAny(t attr.Type, val any) (attr.Value, bool, error) {
 	case types.Float64Type.String():
 		f, err := ToFloat(val)
 		if err != nil {
-			return nil, true, err
+			// Cannot parse - return default value 0.0 with success=false
+			return types.Float64Value(0.0), false, err
 		}
 		return types.Float64Value(f), true, nil
 	case types.BoolType.String():

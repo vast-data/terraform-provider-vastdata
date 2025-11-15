@@ -3,10 +3,11 @@
 package internalstate
 
 import (
+	"testing"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestGetType_ReturnsElemTypeForPointer(t *testing.T) {
