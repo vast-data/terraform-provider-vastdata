@@ -179,11 +179,16 @@ resource "vastdata_quota" "vastdb_quota" {
 
 Optional:
 
-- `entity` (Attributes) (see [below for nested schema](#nestedatt--group_quotas--entity))
+- `email` (String) The email used to send the user or group notifications of exceeding quota limits.
 - `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
 - `hard_limit` (Number) Hard quota limit
 - `hard_limit_inodes` (Number) Hard inodes quota limit
+- `identifier` (String)
+- `identifier_type` (String)
 - `is_accountable` (Boolean)
+- `is_group` (Boolean) True for a group quota. False for a user quota.
+- `is_iam_role` (Boolean)
+- `name` (String) A user or group name
 - `percent_capacity` (Number)
 - `percent_inodes` (Number) Percentage of files and directories limit in use
 - `quota_system_id` (Number)
@@ -193,20 +198,7 @@ Optional:
 - `time_to_block` (String) Grace period expiration time
 - `used_capacity` (Number) Used capacity in bytes
 - `used_inodes` (Number) Used inodes
-
-<a id="nestedatt--group_quotas--entity"></a>
-### Nested Schema for `group_quotas.entity`
-
-Optional:
-
-- `email` (String) The email used to send the user or group notifications of exceeding quota limits.
-- `identifier` (String)
-- `identifier_type` (String)
-- `is_group` (Boolean) True for a group quota. False for a user quota.
-- `is_iam_role` (Boolean)
-- `name` (String) A user or group name
 - `vast_id` (Number) VAST ID of the user or group with the listed user/group quota
-
 
 
 <a id="nestedatt--user_quotas"></a>
@@ -214,11 +206,16 @@ Optional:
 
 Optional:
 
-- `entity` (Attributes) (see [below for nested schema](#nestedatt--user_quotas--entity))
+- `email` (String) The email used to send the user or group notifications of exceeding quota limits.
 - `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
 - `hard_limit` (Number) Hard quota limit
 - `hard_limit_inodes` (Number) Hard inodes quota limit
+- `identifier` (String)
+- `identifier_type` (String)
 - `is_accountable` (Boolean)
+- `is_group` (Boolean) True for a group quota. False for a user quota.
+- `is_iam_role` (Boolean)
+- `name` (String) A user or group name
 - `percent_capacity` (Number)
 - `percent_inodes` (Number) Percentage of files and directories limit in use
 - `quota_system_id` (Number)
@@ -228,20 +225,7 @@ Optional:
 - `time_to_block` (String) Grace period expiration time
 - `used_capacity` (Number) Used capacity in bytes
 - `used_inodes` (Number) Used inodes
-
-<a id="nestedatt--user_quotas--entity"></a>
-### Nested Schema for `user_quotas.entity`
-
-Optional:
-
-- `email` (String) The email used to send the user or group notifications of exceeding quota limits.
-- `identifier` (String)
-- `identifier_type` (String)
-- `is_group` (Boolean) True for a group quota. False for a user quota.
-- `is_iam_role` (Boolean)
-- `name` (String) A user or group name
 - `vast_id` (Number) VAST ID of the user or group with the listed user/group quota
-
 
 
 <a id="nestedatt--default_group_quota"></a>
