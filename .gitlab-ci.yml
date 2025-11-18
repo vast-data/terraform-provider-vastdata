@@ -212,56 +212,18 @@ release_terraform_plugin:
   stage: release
   before_script:
     - mkdir -p ~/.ssh/
+    - cp "$GITHUB_KEY" ~/.ssh/id_rsa
+    - chmod 0400 ~/.ssh/id_rsa
     - |
-      # Debug GITHUB_KEY variable
-      echo "Checking GITHUB_KEY type..."
-      if [ -f "$GITHUB_KEY" ]; then
-        echo "✓ GITHUB_KEY is a file path: $GITHUB_KEY"
-        cp "$GITHUB_KEY" ~/.ssh/id_rsa
-      else
-        echo "✓ GITHUB_KEY is content (variable), length: ${#GITHUB_KEY} characters"
-        # Write using sed to properly handle literal \n in the variable
-        echo "$GITHUB_KEY" | sed 's/\\n/\n/g' > ~/.ssh/id_rsa
-      fi
-    - chmod 0600 ~/.ssh/id_rsa
-    - |
-      # Debug: Check key format
-      echo "Checking SSH key format..."
-      echo "Total lines in key file:"
-      wc -l ~/.ssh/id_rsa
-      echo "First line:"
-      head -n 1 ~/.ssh/id_rsa
-      echo "Last line:"
-      tail -n 1 ~/.ssh/id_rsa
-      echo "File size:"
-      ls -lh ~/.ssh/id_rsa
-      
-      # Check for hidden characters
-      echo "Checking for problematic characters..."
-      if grep -q $'\r' ~/.ssh/id_rsa; then
-        echo "Found carriage returns - removing..."
-        sed -i 's/\r$//' ~/.ssh/id_rsa
-      fi
-      
-      # Check second line for spaces (sometimes printf adds extra spaces)
-      echo "Second line (first line of key data):"
-      sed -n '2p' ~/.ssh/id_rsa | od -c | head -n 2
-      
       # Validate key format
       echo "Validating SSH key..."
       if ssh-keygen -l -f ~/.ssh/id_rsa 2>&1; then
         echo "✅ SSH key is valid"
       else
         echo "❌ SSH key validation failed!"
-        echo "Showing first 5 lines with visible characters:"
-        head -n 5 ~/.ssh/id_rsa | cat -A
-        
-        echo "Attempting to fix by rewriting the key..."
-        # Sometimes the issue is trailing whitespace or format - try using base64
-        # and see if the content is parseable
-        
-        # Skip validation and just test SSH connection directly
-        echo "Skipping validation - will test actual SSH connection..."
+        echo "Showing first 3 lines with visible characters:"
+        head -n 3 ~/.ssh/id_rsa | cat -A
+        exit 1
       fi
     - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
     - |
