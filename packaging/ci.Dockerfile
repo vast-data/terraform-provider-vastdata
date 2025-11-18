@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     make \
     xz-utils \
+    openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 ENV UPX_VERSION=4.2.1
