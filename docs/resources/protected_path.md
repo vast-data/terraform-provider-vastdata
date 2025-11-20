@@ -52,10 +52,12 @@ resource "vastdata_tenant" "tenant" {
 
 resource "vastdata_view_policy" "view_policy" {
   name          = "view-policy1"
-  vip_pools     = [vastdata_vip_pool.protocols_pool.id]
   tenant_id     = vastdata_tenant.tenant.id
   flavor        = "NFS"
   nfs_no_squash = ["10.0.0.1", "10.0.0.2"]
+  permission_per_vip_pool = {
+    tostring(vastdata_vip_pool.protocols_pool.id) = "RW"
+  }
 }
 
 resource "vastdata_view" "view" {
