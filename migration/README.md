@@ -1,21 +1,35 @@
 # VastData Terraform Provider Migration Tool
 
-Migrate Terraform configurations from VastData provider **1.x** to **2.0**.
+Migrate Terraform configurations from VastData provider and tf state files **1.x** to **2.0**
 
-## Why This Tool is Needed
+## Migration Tools
+
+This directory contains two migration tools:
+
+1. **Configuration Migration** (`migration_script.py`) - Migrates `.tf` configuration files from v1.x to v2.0
+2. **State Migration** (`state_migration.py`) - Migrates `.tfstate` files from v1.7/v2.x to v3.0
+
+## Why These Tools Are Needed
+
+### Configuration Migration
 
 VastData provider **2.0** uses the new Terraform Plugin Framework and includes breaking changes:
 - Resource type renames (e.g., `vastdata_administators_managers` → `vastdata_administrator_manager`)
 - Attribute name changes (e.g., `type_` → `type`, `permissions_list` → `permissions`)
 - Schema structure transformations (block lists to attributes, IP range formats, etc.)
 
+### State Migration
+
+When upgrading from provider v1.6.7 to v2.x, the Terraform state file format is incompatible due to:
+- Schema changes in resources (e.g., `vip_pools` → `permission_per_vip_pool` in `view_policy`)
+- Attribute type changes (e.g., `ip_ranges` block format → list of tuples)
+- New required fields (e.g., `local_provider_id` in `user` and `group`)
+
+The state migration tool solves this by re-importing all resources with the new provider version.
+
 ## Quick Start
 
-### Prerequisites
-- Python 3.9 or higher
-- Terraform CLI (for validation)
-
-### Usage
+### Configuration Migration (v1.x → v2.0)
 
 ```bash
 # Run migration
@@ -34,17 +48,67 @@ VastData provider **2.0** uses the new Terraform Plugin Framework and includes b
 ./run_migration.sh --clean
 ```
 
+### State Migration
+
+#### For Local State Files
+
+```bash
+# Migrate local tfstate file
+./state_migration.py \
+  --state /path/to/terraform.tfstate \
+  --terraform-dir /path/to/terraform/config
+```
+
+#### For Remote S3 State Files
+
+```bash
+# Migrate state from S3
+./state_migration.py \
+  --s3-bucket my-terraform-state-bucket \
+  --s3-key path/to/terraform.tfstate \
+  --s3-access-key AKIAIOSFODNN7EXAMPLE \
+  --s3-secret-key wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY \
+  --terraform-dir /path/to/terraform/config
+
+# With custom S3 endpoint (for VAST S3)
+./state_migration.py \
+  --s3-bucket my-bucket \
+  --s3-key terraform.tfstate \
+  --s3-access-key ACCESS_KEY \
+  --s3-secret-key SECRET_KEY \
+  --s3-endpoint https://s3.prod.vast.local \
+  --terraform-dir /path/to/terraform/config
+```
+
+**Note:** The state migration tool creates a new `terraform-migrated.tfstate` file. If you're using S3 backend, you'll need to manually upload the new state file to S3 after verification.
+
 After conversion, **you** need to:
 1. Review the converted files
 2. Run `terraform validate` 
 3. Run `terraform plan`
 4. Run `terraform apply` (if you're satisfied with the changes)
 
+### State Migration Workflow
+
+The state migration tool:
+1. **Downloads** state file (from S3 or reads local file)
+2. **Parses** state file and extracts all resources
+3. **Generates** import script with `terraform import` commands for each resource
+4. **Creates** summary of resources to be imported
+5. **You execute** the import script to re-import resources with new provider
+
+After running the state migration tool:
+1. **Review** the generated `import_summary.txt`
+2. **Ensure** your `.tf` files are updated to v2.x format (use configuration migration tool first)
+3. **Run** the generated `import_resources.sh` script
+4. **Verify** with `terraform plan` (using the new state)
+5. **Upload** state to S3 as `terraform.tfstate` (if using remote backend)
+
 ### What It Does
 
 This tool **ONLY** converts your Terraform configuration files:
 
-1. **Updates provider version**: `version = "1.7.0"` → `version = "2.0.0"`
+1. **Updates provider version**: `version = "1.6.x"` → `version = "2.0.0"`
 2. **Transforms resource types**: `vastdata_administators_managers` → `vastdata_administrator_manager`
 3. **Updates attribute names**: `type_` → `type`, `permissions_list` → `permissions`
 4. **Converts schema structures**: Block lists to attributes, IP ranges, etc.
@@ -61,7 +125,7 @@ terraform {
   required_providers {
     vastdata = {
       source = "vast-data/vastdata"
-      version = "1.7.0"
+      version = "1.6.7"
     }
   }
 }
@@ -332,7 +396,203 @@ Rename resources in `.tf` files using find-and-replace:
 - `vastdata_active_directory2` → `vastdata_active_directory`
 - `vastdata_kafka_brokers` → `vastdata_kafka_broker`
 
-## Validation and Testing
+## Complete Migration Example
+
+### Step 1: Backup Everything
+
+```bash
+# Backup your configuration
+cp -r /path/to/terraform/config /path/to/terraform/config.backup
+
+# Backup your state (if local)
+cp terraform.tfstate terraform.tfstate.v1.7.backup
+
+# If using S3, download a backup
+aws s3 cp s3://my-bucket/terraform.tfstate ./terraform.tfstate.v1.6.backup
+```
+
+### Step 2: Migrate Configuration Files (v1.x → v2.0)
+
+```bash
+cd /path/to/terraform-provider-vastdata/migration
+
+# Run configuration migration
+./run_migration.sh /path/to/terraform/config /path/to/terraform/config_migrated
+
+# Review changes
+diff -r /path/to/terraform/config /path/to/terraform/config_migrated
+
+# If satisfied, replace old config
+rm -rf /path/to/terraform/config
+mv /path/to/terraform/config_migrated /path/to/terraform/config
+```
+
+### Step 3: Update Provider Version in Configuration
+
+Edit your `versions.tf` or main `.tf` file:
+
+```hcl
+terraform {
+  required_providers {
+    vastdata = {
+      source  = "vast-data/vastdata"
+      version = "~> 3.0"  # Update to v3.0
+    }
+  }
+}
+```
+
+### Step 4: Migrate State File
+
+#### Option A: Local State
+
+```bash
+# Install boto3 if you'll migrate from S3 later
+pip install boto3
+
+# Run state migration
+./state_migration.py \
+  --state /path/to/terraform/config/terraform.tfstate \
+  --terraform-dir /path/to/terraform/config
+
+# Review the summary
+cat /path/to/terraform/config/import_summary.txt
+
+# Execute the import
+cd /path/to/terraform/config
+./import_resources.sh
+```
+
+#### Option B: Remote S3 State
+
+```bash
+# Install boto3
+pip install boto3
+
+# Download and migrate state
+./state_migration.py \
+  --s3-bucket my-terraform-state-bucket \
+  --s3-key prod/vast/terraform.tfstate \
+  --s3-access-key YOUR_ACCESS_KEY \
+  --s3-secret-key YOUR_SECRET_KEY \
+  --terraform-dir /path/to/terraform/config
+
+# For VAST S3 endpoint
+./state_migration.py \
+  --s3-bucket tf-state \
+  --s3-key terraform.tfstate \
+  --s3-access-key YOUR_ACCESS_KEY \
+  --s3-secret-key YOUR_SECRET_KEY \
+  --s3-endpoint https://s3.prod.vast.local \
+  --terraform-dir /path/to/terraform/config
+
+# Review the summary
+cat /path/to/terraform/config/import_summary.txt
+
+# Execute the import
+cd /path/to/terraform/config
+./import_resources.sh
+```
+
+### Step 5: Verify and Apply
+
+```bash
+cd /path/to/terraform/config
+
+# Verify state
+terraform plan
+
+# If plan shows no changes or only expected changes, you're good!
+# If there are unexpected changes, review and fix
+
+# Apply if needed
+terraform apply
+
+# Note: The script creates terraform-migrated.tfstate, not terraform.tfstate
+# You may need to rename it or configure terraform to use it
+```
+
+### Step 6: Upload New State to S3 (if using remote backend)
+
+```bash
+# Backup old state in S3
+aws s3 cp s3://my-bucket/terraform.tfstate s3://my-bucket/terraform.tfstate.v1.7.backup
+
+# Upload new state
+aws s3 cp terraform.tfstate s3://my-bucket/terraform.tfstate
+
+# Or for VAST S3
+aws s3 cp terraform.tfstate s3://my-bucket/terraform.tfstate \
+  --endpoint-url https://s3.prod.vast.local
+```
+
+## Troubleshooting
+
+### Configuration Migration Issues
+
+**Issue**: Dynamic blocks not converted correctly
+- **Solution**: Review and manually adjust dynamic blocks
+
+**Issue**: Resource references broken after migration
+- **Solution**: Run the migration script again, it updates references automatically
+
+### State Migration Issues
+
+**Issue**: `terraform import` fails with "resource not found"
+- **Solution**: Ensure the resource still exists in VAST cluster
+- Check if resource was deleted or renamed in the VAST UI
+
+**Issue**: Import fails with "field 'x' is required"
+- **Solution**: Check if the resource requires additional fields in v3.0
+- Review the CHANGELOG.md for breaking changes
+
+**Issue**: Import succeeds but `terraform plan` shows many changes
+- **Solution**: Some attributes may have changed defaults or formats
+- Review each change and update your `.tf` files accordingly
+
+**Issue**: boto3 import error when using S3 state
+- **Solution**: Install boto3: `pip install -r requirements-state.txt`
+
+**Issue**: S3 access denied
+- **Solution**: Verify your access key, secret key, and bucket permissions
+- For VAST S3, ensure you're using the correct endpoint URL
+
+### Common v3.0 Breaking Changes
+
+If you see these errors after migration, update your configuration:
+
+1. **`vip_pools` not found in view_policy**:
+   ```hcl
+   # Old (v2.x)
+   vip_pools = [1, 2, 3]
+   
+   # New (v3.0)
+   permission_per_vip_pool = {
+     "1" = "RW"
+     "2" = "RW"  
+     "3" = "RW"
+   }
+   ```
+
+2. **`protocols_audit` is read-only**:
+   ```hcl
+   # Remove this from your config - it's now computed
+   # protocols_audit = { ... }
+   
+   # Use protocols instead
+   protocols = ["NFS", "SMB", "S3"]
+   ```
+
+3. **`tenant_id` required in protected_path**:
+   ```hcl
+   resource "vastdata_protected_path" "example" {
+     name                 = "my-path"
+     source_dir           = "/data"
+     target_exported_dir  = "/backup"  # Also now required
+     tenant_id            = 1           # Now required
+     protection_policy_id = vastdata_protection_policy.example.id
+   }
+   ```
 
 ### After File Conversion (Your Responsibility)
 After the converter finishes, you must:

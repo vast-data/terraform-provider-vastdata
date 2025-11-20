@@ -1,0 +1,3 @@
+# Python requirements for state migration (S3 support)
+boto3>=1.26.0
+
