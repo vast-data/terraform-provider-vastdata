@@ -13,6 +13,10 @@ BREAKING CHANGES:
 
 * **vastdata_user**: `local_provider_id` is now a **required** field (was optional in v2.x). All user resources must specify a local provider.
 * **vastdata_group**: `local_provider_id` is now a **required** field (was optional in v2.x). All group resources must specify a local provider.
+* **vastdata_view_policy**: `vip_pools` attribute (Set of Number) has been replaced with `permission_per_vip_pool` (Map of String). Users must migrate their configurations to use the new attribute format.
+* **vastdata_view_policy**: `protocols_audit` attribute is now **read-only** (was optional/configurable in v2.x). This attribute is now computed from the cluster settings and cannot be set directly on the view policy. Use the `protocols` attribute instead for specifying which protocols to audit.
+* **vastdata_protected_path**: `tenant_id` is now a **required** field (was optional in v2.x). All protected path resources must specify a tenant ID.
+* **vastdata_protected_path**: `target_exported_dir` is now a **required** field (was optional in v2.x). All protected path resources must specify a target export directory.
 
 NEW RESOURCES:
 
