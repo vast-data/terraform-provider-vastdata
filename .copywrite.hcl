@@ -15,5 +15,8 @@ project {
 
     # Release Engineering tooling configuration
     ".release/*.hcl",
+
+    # Test files and virtual environment
+    "tests/**"
   ]
 }

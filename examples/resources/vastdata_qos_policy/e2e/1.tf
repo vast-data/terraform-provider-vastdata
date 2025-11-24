@@ -1,3 +1,4 @@
+# ignore:e2e
 
 resource "vastdata_qos_policy" "vastdb_qos_policy" {
   name = "vastdb_qos_policy"

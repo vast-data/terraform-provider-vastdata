@@ -11,7 +11,7 @@ resource "vastdata_protection_policy" "vastdb_ppolicy" {
   tenant_id      = vastdata_tenant.vastdb_tenant.id
   frames = [{
     every      = "1D"
-    keep_local = "14D"
+    keep_local = "2W"
     start_at   = "2025-08-01 09:00:00"
     }, {
     every      = "1D"

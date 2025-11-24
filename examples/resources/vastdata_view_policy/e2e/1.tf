@@ -1,8 +1,3 @@
-
-data "vastdata_vip_pool" "vastdb_vippool" {
-  name = "vippool-1"
-}
-
 data "vastdata_tenant" "vastdb_default_tenant" {
   name = "default"
 }

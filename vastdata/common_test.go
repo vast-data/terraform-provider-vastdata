@@ -3,218 +3,350 @@
 package provider
 
 import (
-	"fmt"
+	"context"
+	"reflect"
 	"testing"
-
-	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/stretchr/testify/assert"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
-// ---------- normalizeNumber ----------
-
-func TestNormalizeNumber(t *testing.T) {
-	assert.Equal(t, int64(10), normalizeNumber(float64(10)))
-	assert.Equal(t, float64(10.5), normalizeNumber(float64(10.5)))
-	assert.Equal(t, "abc", normalizeNumber("abc"))
-
-	// Slices
-	inputSlice := []any{float64(1), float64(2.5), "str"}
-	expected := []any{int64(1), float64(2.5), "str"}
-	assert.Equal(t, expected, normalizeNumber(inputSlice))
-
-	// Maps
-	inputMap := map[string]any{
-		"x": float64(7),
-		"y": []any{float64(3), "b"},
-	}
-	expectedMap := map[string]any{
-		"x": int64(7),
-		"y": []any{int64(3), "b"},
-	}
-	assert.Equal(t, expectedMap, normalizeNumber(inputMap))
-}
-
-// ---------- convertMapKeysRecursive ----------
-
-func TestConvertMapKeysRecursive_UnderscoreToDash(t *testing.T) {
-	input := map[string]any{
-		"start_at": "val",
-		"nested": map[string]any{
-			"keep_local": "val2",
-		},
-	}
-	expected := map[string]any{
-		"start-at": "val",
-		"nested": map[string]any{
-			"keep-local": "val2",
-		},
-	}
-	out := convertMapKeysRecursive(input, underscoreToDash)
-	assert.Equal(t, expected, out)
-}
-
-func TestConvertMapKeysRecursive_DashToUnderscore(t *testing.T) {
-	input := map[string]any{
-		"start-at": "val",
-		"nested": map[string]any{
-			"keep-local": "val2",
-		},
-	}
-	expected := map[string]any{
-		"start_at": "val",
-		"nested": map[string]any{
-			"keep_local": "val2",
-		},
-	}
-	out := convertMapKeysRecursive(input, dashToUnderscore)
-	assert.Equal(t, expected, out)
-}
-
-// ---------- underscoreToDash / dashToUnderscore ----------
-
-func TestKeyTransformHelpers(t *testing.T) {
-	assert.Equal(t, "start-at", underscoreToDash("start_at"))
-	assert.Equal(t, "keep_local", dashToUnderscore("keep-local"))
-}
-
-// ---------- validateOneOf / validateAllOf / validateNoneOf ----------
-
-func TestValidateOneOf(t *testing.T) {
-	tf := mustTFState(map[string]attr.Value{
-		"a": types.StringValue("x"),
-		"b": types.StringNull(), // defined, but null initially
-		"c": types.StringNull(),
-	})
-
-	err := validateOneOf(tf, "a", "b", "c")
-	assert.NoError(t, err)
-
-	// Create new TFState with both a and b set
-	tf = mustTFState(map[string]attr.Value{
-		"a": types.StringValue("x"),
-		"b": types.StringValue("y"),
-		"c": types.StringNull(),
-	})
-	err = validateOneOf(tf, "a", "b", "c")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "only one of")
-}
-
-func TestValidateAllOf(t *testing.T) {
-	tf := mustTFState(map[string]attr.Value{
-		"a": types.StringValue("x"),
-		"b": types.StringValue("y"),
-		"c": types.StringNull(), // present, but intentionally null
-	})
-	err := validateAllOf(tf, "a", "b", "c")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "must be set")
-
-	// Now make all present
-	tf = mustTFState(map[string]attr.Value{
-		"a": types.StringValue("x"),
-		"b": types.StringValue("y"),
-		"c": types.StringValue("z"),
-	})
-	err = validateAllOf(tf, "a", "b", "c")
-	assert.NoError(t, err)
-}
-
-func TestValidateNoneOf(t *testing.T) {
-	tf := mustTFState(map[string]attr.Value{
-		"a": types.StringValue("x"),
-		"b": types.StringValue("y"),
-	})
-
-	err := validateNoneOf(tf, "a", "b")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), `none of ["a" "b"] should be set`)
-	assert.Contains(t, err.Error(), `[a b]`)
-
-	tf = mustTFState(map[string]attr.Value{
-		"a": types.StringValue("x"),
-		"b": types.StringNull(), // explicitly null
-	})
-	err = validateNoneOf(tf, "a", "b")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), `none of ["a" "b"] should be set`)
-	assert.Contains(t, err.Error(), `[a]`)
-
-	tf = mustTFState(map[string]attr.Value{
-		"a": types.StringNull(),
-		"b": types.StringNull(),
-	})
-	err = validateNoneOf(tf, "a", "b")
-	assert.NoError(t, err)
-}
-
-// ---------- TFState: Getters ----------
-
-func TestTFState_String(t *testing.T) {
-	tf := mustTFState(map[string]attr.Value{
-		"foo": types.StringValue("bar"),
-	})
-	assert.Equal(t, "bar", tf.String("foo"))
-}
-
-func TestTFState_IsKnownAndNotNull(t *testing.T) {
-	tf := mustTFState(map[string]attr.Value{
-		"x": types.StringValue("test"),
-	})
-	assert.True(t, tf.IsKnownAndNotNull("x"))
-}
-
-// ---------- TFState: ToMap / ToSlice ----------
-
-func TestTFState_ToMap(t *testing.T) {
-	tf := mustTFState(map[string]attr.Value{
-		"config": mustBuildAttr(types.ObjectType{
-			AttrTypes: map[string]attr.Type{
-				"enabled": types.BoolType,
+func TestPopulateIDFieldsFromNestedObjects(t *testing.T) {
+	tests := []struct {
+		name           string
+		tfstateKeys    map[string]attr.Value
+		record         Record
+		expectedRecord Record
+		description    string
+	}{
+		{
+			name: "extract local_provider_id from local_provider",
+			tfstateKeys: map[string]attr.Value{
+				"id":                types.Int64Value(123),
+				"name":              types.StringValue("test-group"),
+				"local_provider_id": types.Int64Null(),
 			},
-		}, map[string]any{"enabled": true}),
-	})
-	result := tf.ToMap("config")
-	assert.Equal(t, map[string]any{"enabled": true}, result)
-}
-
-func TestTFState_ToSlice(t *testing.T) {
-	tf := mustTFState(map[string]attr.Value{
-		"items": mustBuildAttr(types.ListType{ElemType: types.StringType}, []any{"a", "b"}),
-	})
-	assert.Equal(t, []any{"a", "b"}, tf.ToSlice("items"))
-}
-
-// ---------- Helpers ----------
-
-func mustTFState(raw map[string]attr.Value) *internalstate.TFState {
-	// Provide a minimal dummy schema to enable TFState
-	schema := rschema.Schema{
-		Attributes: map[string]rschema.Attribute{
-			"a":     rschema.StringAttribute{Optional: true},
-			"b":     rschema.StringAttribute{Optional: true},
-			"c":     rschema.StringAttribute{Optional: true},
-			"foo":   rschema.StringAttribute{Optional: true},
-			"bar":   rschema.StringAttribute{Optional: true},
-			"items": rschema.ListAttribute{ElementType: types.StringType, Optional: true},
-			"config": rschema.SingleNestedAttribute{
-				Attributes: map[string]rschema.Attribute{
-					"enabled": rschema.BoolAttribute{Optional: true},
+			record: Record{
+				"id":   int64(123),
+				"name": "test-group",
+				"local_provider": map[string]any{
+					"id":   int64(5),
+					"name": "provider-name",
 				},
 			},
+			expectedRecord: Record{
+				"id":   int64(123),
+				"name": "test-group",
+				"local_provider": map[string]any{
+					"id":   int64(5),
+					"name": "provider-name",
+				},
+				"local_provider_id": int64(5),
+			},
+			description: "Should extract local_provider_id from local_provider.id",
+		},
+		{
+			name: "extract tenant_id from tenant",
+			tfstateKeys: map[string]attr.Value{
+				"id":        types.Int64Value(456),
+				"name":      types.StringValue("test-role"),
+				"tenant_id": types.Int64Null(),
+			},
+			record: Record{
+				"id":   int64(456),
+				"name": "test-role",
+				"tenant": map[string]any{
+					"id":   int64(28),
+					"name": "tenant-name",
+					"guid": "abc-123",
+				},
+			},
+			expectedRecord: Record{
+				"id":   int64(456),
+				"name": "test-role",
+				"tenant": map[string]any{
+					"id":   int64(28),
+					"name": "tenant-name",
+					"guid": "abc-123",
+				},
+				"tenant_id": int64(28),
+			},
+			description: "Should extract tenant_id from tenant.id",
+		},
+		{
+			name: "multiple _id fields",
+			tfstateKeys: map[string]attr.Value{
+				"id":                 types.Int64Value(789),
+				"name":               types.StringValue("test-snapshot"),
+				"loanee_tenant_id":   types.Int64Null(),
+				"remote_target_id":   types.Int64Null(),
+				"loanee_snapshot_id": types.Int64Null(),
+			},
+			record: Record{
+				"id":   int64(789),
+				"name": "test-snapshot",
+				"loanee_tenant": map[string]any{
+					"id":   int64(1),
+					"name": "default",
+					"guid": "xyz-456",
+				},
+				"remote_target": map[string]any{
+					"id":   int64(10),
+					"name": "remote-cluster",
+				},
+				"loanee_snapshot": map[string]any{
+					"id":   int64(42),
+					"name": "snap-1",
+				},
+			},
+			expectedRecord: Record{
+				"id":   int64(789),
+				"name": "test-snapshot",
+				"loanee_tenant": map[string]any{
+					"id":   int64(1),
+					"name": "default",
+					"guid": "xyz-456",
+				},
+				"loanee_tenant_id": int64(1),
+				"remote_target": map[string]any{
+					"id":   int64(10),
+					"name": "remote-cluster",
+				},
+				"remote_target_id": int64(10),
+				"loanee_snapshot": map[string]any{
+					"id":   int64(42),
+					"name": "snap-1",
+				},
+				"loanee_snapshot_id": int64(42),
+			},
+			description: "Should extract multiple _id fields from nested objects",
+		},
+		{
+			name: "id field already exists in record",
+			tfstateKeys: map[string]attr.Value{
+				"id":                types.Int64Value(111),
+				"name":              types.StringValue("test-existing"),
+				"local_provider_id": types.Int64Value(99),
+			},
+			record: Record{
+				"id":                int64(111),
+				"name":              "test-existing",
+				"local_provider_id": int64(99), // Already exists
+				"local_provider": map[string]any{
+					"id":   int64(5),
+					"name": "provider-name",
+				},
+			},
+			expectedRecord: Record{
+				"id":                int64(111),
+				"name":              "test-existing",
+				"local_provider_id": int64(99), // Should remain unchanged
+				"local_provider": map[string]any{
+					"id":   int64(5),
+					"name": "provider-name",
+				},
+			},
+			description: "Should not overwrite existing _id field",
+		},
+		{
+			name: "parent object does not exist",
+			tfstateKeys: map[string]attr.Value{
+				"id":                types.Int64Value(222),
+				"name":              types.StringValue("test-no-parent"),
+				"local_provider_id": types.Int64Null(),
+			},
+			record: Record{
+				"id":   int64(222),
+				"name": "test-no-parent",
+				// No local_provider object
+			},
+			expectedRecord: Record{
+				"id":   int64(222),
+				"name": "test-no-parent",
+				// local_provider_id should not be added
+			},
+			description: "Should not add _id field if parent object doesn't exist",
+		},
+		{
+			name: "parent object is null",
+			tfstateKeys: map[string]attr.Value{
+				"id":                types.Int64Value(333),
+				"name":              types.StringValue("test-null-parent"),
+				"local_provider_id": types.Int64Null(),
+			},
+			record: Record{
+				"id":             int64(333),
+				"name":           "test-null-parent",
+				"local_provider": nil,
+			},
+			expectedRecord: Record{
+				"id":             int64(333),
+				"name":           "test-null-parent",
+				"local_provider": nil,
+			},
+			description: "Should not add _id field if parent object is nil",
+		},
+		{
+			name: "parent object is not a map",
+			tfstateKeys: map[string]attr.Value{
+				"id":                types.Int64Value(444),
+				"name":              types.StringValue("test-invalid-parent"),
+				"local_provider_id": types.Int64Null(),
+			},
+			record: Record{
+				"id":             int64(444),
+				"name":           "test-invalid-parent",
+				"local_provider": "not-a-map",
+			},
+			expectedRecord: Record{
+				"id":             int64(444),
+				"name":           "test-invalid-parent",
+				"local_provider": "not-a-map",
+			},
+			description: "Should not add _id field if parent is not a map",
+		},
+		{
+			name: "parent object has no id field",
+			tfstateKeys: map[string]attr.Value{
+				"id":                types.Int64Value(555),
+				"name":              types.StringValue("test-no-id"),
+				"local_provider_id": types.Int64Null(),
+			},
+			record: Record{
+				"id":   int64(555),
+				"name": "test-no-id",
+				"local_provider": map[string]any{
+					"name": "provider-name",
+					// No "id" field
+				},
+			},
+			expectedRecord: Record{
+				"id":   int64(555),
+				"name": "test-no-id",
+				"local_provider": map[string]any{
+					"name": "provider-name",
+				},
+			},
+			description: "Should not add _id field if parent has no id field",
+		},
+		{
+			name: "parent id field is nil",
+			tfstateKeys: map[string]attr.Value{
+				"id":                types.Int64Value(666),
+				"name":              types.StringValue("test-nil-id"),
+				"local_provider_id": types.Int64Null(),
+			},
+			record: Record{
+				"id":   int64(666),
+				"name": "test-nil-id",
+				"local_provider": map[string]any{
+					"id":   nil,
+					"name": "provider-name",
+				},
+			},
+			expectedRecord: Record{
+				"id":   int64(666),
+				"name": "test-nil-id",
+				"local_provider": map[string]any{
+					"id":   nil,
+					"name": "provider-name",
+				},
+			},
+			description: "Should not add _id field if parent id is nil",
+		},
+		{
+			name: "no _id fields in tfstate",
+			tfstateKeys: map[string]attr.Value{
+				"id":   types.Int64Value(777),
+				"name": types.StringValue("test-no-id-fields"),
+			},
+			record: Record{
+				"id":   int64(777),
+				"name": "test-no-id-fields",
+				"local_provider": map[string]any{
+					"id":   int64(5),
+					"name": "provider-name",
+				},
+			},
+			expectedRecord: Record{
+				"id":   int64(777),
+				"name": "test-no-id-fields",
+				"local_provider": map[string]any{
+					"id":   int64(5),
+					"name": "provider-name",
+				},
+			},
+			description: "Should not modify record if no _id fields in tfstate",
 		},
 	}
-	return internalstate.NewTFStateMust(raw, schema, nil)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a minimal tfstate with the test keys
+			tfstate := &is.TFState{
+				Raw: tt.tfstateKeys,
+			}
+
+			// Make a copy of the record for testing
+			recordCopy := make(Record)
+			for k, v := range tt.record {
+				recordCopy[k] = v
+			}
+
+			// Call the function
+			ctx := context.Background()
+			PopulateIDFieldsFromNestedObjects(ctx, tfstate, recordCopy)
+
+			// Verify the result
+			for expectedKey, expectedValue := range tt.expectedRecord {
+				actualValue, exists := recordCopy[expectedKey]
+				if !exists {
+					if expectedValue != nil {
+						t.Errorf("%s: expected key %q to exist in record, but it doesn't", tt.description, expectedKey)
+					}
+					continue
+				}
+
+				// Use deep equality for comparison (handles maps, slices, etc.)
+				if !reflect.DeepEqual(expectedValue, actualValue) {
+					t.Errorf("%s: for key %q, expected value %v, got %v", tt.description, expectedKey, expectedValue, actualValue)
+				}
+			}
+
+			// Verify no unexpected keys were added
+			for actualKey := range recordCopy {
+				if _, expected := tt.expectedRecord[actualKey]; !expected {
+					t.Errorf("%s: unexpected key %q was added to record", tt.description, actualKey)
+				}
+			}
+		})
+	}
 }
 
-func mustBuildAttr(t attr.Type, val any) attr.Value {
-	v, _, err := internalstate.BuildAttrValueFromAny(t, val)
-	if err != nil {
-		panic(fmt.Sprintf("build attr failed: %v", err))
-	}
-	return v
+func TestPopulateIDFieldsFromNestedObjects_NilInputs(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("nil record", func(t *testing.T) {
+		tfstate := &is.TFState{
+			Raw: map[string]attr.Value{
+				"local_provider_id": types.Int64Null(),
+			},
+		}
+		// Should not panic
+		PopulateIDFieldsFromNestedObjects(ctx, tfstate, nil)
+	})
+
+	t.Run("nil tfstate", func(t *testing.T) {
+		record := Record{
+			"id": int64(123),
+		}
+		// Should not panic
+		PopulateIDFieldsFromNestedObjects(ctx, nil, record)
+	})
+
+	t.Run("both nil", func(t *testing.T) {
+		// Should not panic
+		PopulateIDFieldsFromNestedObjects(ctx, nil, nil)
+	})
 }

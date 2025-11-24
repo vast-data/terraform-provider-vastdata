@@ -24,7 +24,8 @@ func (m *Rack) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: RackSchemaRef,
+			ComputedSchemaFields: []string{"ip_range"},
+			SchemaRef:            RackSchemaRef,
 		},
 	)}
 }

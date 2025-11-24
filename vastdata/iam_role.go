@@ -26,8 +26,9 @@ func (m *IamRole) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:      IamRoleSchemaRef,
-			EditOnlyFields: []string{"revoke_access_keys"},
+			SchemaRef:            IamRoleSchemaRef,
+			ComputedSchemaFields: []string{"tenant_id"},
+			EditOnlyFields:       []string{"revoke_access_keys"},
 			AdditionalSchemaAttributes: map[string]any{
 				"revoke_access_keys": rschema.BoolAttribute{
 					Optional:    true,
@@ -43,7 +44,8 @@ func (m *IamRole) NewDatasourceManager(raw map[string]attr.Value, schema any) Da
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: IamRoleSchemaRef,
+			ComputedSchemaFields: []string{"tenant_id"},
+			SchemaRef:            IamRoleSchemaRef,
 		},
 	)}
 }

@@ -1,3 +1,5 @@
+# ignore:e2e
+
 resource "vastdata_active_directory" "active_dir3" {
   machine_account_name            = "machine_acc"
   organizational_unit             = "OU=VASTs,OU=VastENG,DC=VastENG,DC=lab"

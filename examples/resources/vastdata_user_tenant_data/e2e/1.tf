@@ -72,6 +72,7 @@ resource "vastdata_s3_policy" "vastdb_s3policy2" {
 
 resource "vastdata_user_tenant_data" "vastdb_user_tenant_data" {
   user_id             = vastdata_user.vastdb_user.id
+  tenant_id           = data.vastdata_tenant.vastdb_tenant.id
   allow_create_bucket = true
   allow_delete_bucket = true
   s3_policies_ids = [

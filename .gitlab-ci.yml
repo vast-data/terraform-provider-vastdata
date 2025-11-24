@@ -16,7 +16,7 @@ stages:
 image: 110450271409.dkr.ecr.eu-west-1.amazonaws.com/dev/terraform-plugin:CI-2025-09-19
 
 variables:
-  ORION_BRANCH: comet/master
+  ORION_BRANCH: SKIPCI/vlad/terraform_check_drifts
   INSTALL_IMAGE: "prev_version"
 
 

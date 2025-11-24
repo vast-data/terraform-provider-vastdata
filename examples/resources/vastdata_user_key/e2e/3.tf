@@ -11,7 +11,7 @@ resource "vastdata_tenant" "vastdb_tenant" {
 
 resource "vastdata_user" "vastdb_user" {
   name              = "vastdb_user"
-  uid               = 555100
+  uid               = 5001
   local_provider_id = vastdata_local_provider.vastdb_local_provider.id
 }
 

@@ -37,7 +37,13 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
 
 resource "vastdata_user" "vastdb_user" {
   name              = "vastdb_user"
-  uid               = 30109
+  uid               = 5001
+  local_provider_id = 1
+}
+
+resource "vastdata_group" "vastdb_group" {
+  name              = "vastdb_group"
+  gid               = 5002
   local_provider_id = 1
 }
 

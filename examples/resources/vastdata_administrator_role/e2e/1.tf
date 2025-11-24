@@ -4,7 +4,7 @@ resource "vastdata_administrator_realm" "vastdb_realm" {
 }
 
 resource "vastdata_administrator_role" "vastdb_role" {
-  name        = "vastdb_role"
-  permissions = "view"
-  realm       = vastdata_administrator_realm.vastdb_realm.id
+  name             = "vastdb_role"
+  permissions_list = ["create_events"]
+  realm            = vastdata_administrator_realm.vastdb_realm.id
 }

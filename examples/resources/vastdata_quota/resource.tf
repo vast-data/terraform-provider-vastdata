@@ -42,14 +42,17 @@ resource "vastdata_quota" "vastdb_quota" {
 
 # --------------------
 
+
 resource "vastdata_group" "vastdb_quota_group" {
-  name = "vastdb_quota_group"
-  gid  = 57593
+  name              = "vastdb_quota_group"
+  gid               = 5001
+  local_provider_id = 1
 }
 
 resource "vastdata_user" "vastdb_quota_user" {
-  name = "vastdb-quota-user"
-  uid  = 776107
+  name              = "vastdb-quota-user"
+  uid               = 5002
+  local_provider_id = 1
 }
 
 resource "vastdata_view_policy" "vastdb_view_policy" {
@@ -72,12 +75,7 @@ resource "vastdata_quota" "vastdb_quota" {
   soft_limit    = 100000
   hard_limit    = 100000
   is_user_quota = true
-  default_user_quota = {
-    grace_period      = "09 01:00:00"
-    hard_limit        = 2000
-    soft_limit        = 1000
-    hard_limit_inodes = 20000000
-  }
+
   user_quotas = [{
     name            = vastdata_user.vastdb_quota_user.name
     identifier      = vastdata_user.vastdb_quota_user.name

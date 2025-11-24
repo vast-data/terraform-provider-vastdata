@@ -45,20 +45,20 @@ resource "vastdata_view" "vastdb_view" {
 
 # --------------------
 
-data "vastdata_user" "vastdb_user" {
-  name = "runner"
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdb_user"
+  local_provider_id = 1
 }
 
 data "vastdata_view_policy" "vastdb_view_policy_s3_default" {
   name = "s3_default_policy"
 }
 
-
 resource "vastdata_view" "vastdb_view" {
   path                 = "/vastdb_view/s3"
   bucket               = "vastdb-s3-bucket"
   create_dir           = true
-  bucket_owner         = data.vastdata_user.vastdb_user.name
+  bucket_owner         = vastdata_user.vastdb_user.name
   policy_id            = data.vastdata_view_policy.vastdb_view_policy_s3_default.id
   s3_unverified_lookup = true
   protocols            = ["S3"]
@@ -66,9 +66,9 @@ resource "vastdata_view" "vastdb_view" {
 
 # --------------------
 
-
-data "vastdata_user" "vastdb_user" {
-  name = "runner"
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdb_user"
+  local_provider_id = 1
 }
 
 data "vastdata_view_policy" "vastdb_view_policy_s3_default" {
@@ -79,7 +79,7 @@ resource "vastdata_view" "vastdb_view1" {
   path         = "/vastdb_view/s3-1"
   bucket       = "vastdb-s3-bucket-1"
   create_dir   = true
-  bucket_owner = data.vastdata_user.vastdb_user.name
+  bucket_owner = vastdata_user.vastdb_user.name
   policy_id    = data.vastdata_view_policy.vastdb_view_policy_s3_default.id
   protocols    = ["S3"]
 }
@@ -88,7 +88,7 @@ resource "vastdata_view" "vastdb_view2" {
   path         = "/vastdb_view/s3-2"
   bucket       = "vastdb-s3-bucket-2"
   create_dir   = true
-  bucket_owner = data.vastdata_user.vastdb_user.name
+  bucket_owner = vastdata_user.vastdb_user.name
   policy_id    = data.vastdata_view_policy.vastdb_view_policy_s3_default.id
   bucket_logging = {
     prefix         = "/logs"
@@ -116,9 +116,9 @@ resource "vastdata_view" "vastdb_view" {
 
 # --------------------
 
-
-data "vastdata_user" "vastdb_user" {
-  name = "runner"
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdb_user"
+  local_provider_id = 1
 }
 
 data "vastdata_view_policy" "vastdb_view_policy_s3_default" {
@@ -129,7 +129,7 @@ resource "vastdata_view" "vastdb_view" {
   path                      = "/vastdb_view-bucket"
   bucket                    = "vastdb-bucket"
   create_dir                = true
-  bucket_owner              = data.vastdata_user.vastdb_user.name
+  bucket_owner              = vastdata_user.vastdb_user.name
   policy_id                 = data.vastdata_view_policy.vastdb_view_policy_s3_default.id
   allow_s3_anonymous_access = true
   s3_versioning             = true

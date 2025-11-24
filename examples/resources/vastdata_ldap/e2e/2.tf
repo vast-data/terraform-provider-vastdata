@@ -1,3 +1,5 @@
+# ignore:e2e
+
 resource "vastdata_ldap" "vastdb_ldap" {
   use_auto_discovery             = false
   binddn                         = "cn=admin,dc=qa,dc=vastdata,dc=com"

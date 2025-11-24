@@ -1,0 +1,7 @@
+# Testing dependencies for Terraform Provider E2E tests
+# Install with: pip install -r requirements-test.txt
+
+pytest>=7.0.0
+pytest-xdist>=3.0.0
+plumbum>=1.8.0
+

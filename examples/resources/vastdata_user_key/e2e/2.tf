@@ -1,13 +1,16 @@
-
+data "vastdata_tenant" "vastdb_tenant" {
+  name = "default"
+}
 
 resource "vastdata_user" "vastdb_user" {
   name              = "vastdb_user"
-  uid               = 30109
+  uid               = 5001
   local_provider_id = 1
 }
 
 resource "vastdata_user_key" "vastdb_user_key" {
-  user_id = vastdata_user.vastdb_user.id
+  user_id   = vastdata_user.vastdb_user.id
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
 
   pgp_public_key = <<-EOT
     -----BEGIN PGP PUBLIC KEY BLOCK-----

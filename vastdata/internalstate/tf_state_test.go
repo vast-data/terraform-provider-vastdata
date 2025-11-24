@@ -2743,3 +2743,126 @@ func TestGetAllValues_SkipRefreshUseCase(t *testing.T) {
 	// This demonstrates that GetAllValues preserves user's original values
 	// without any normalization, which is the desired behavior for SkipRefreshAPICall
 }
+
+// TestGetCreateParams_WithWriteOnlyFields tests that GetCreateParams includes write-only fields
+// This is critical for resources like administrator_manager where password is write-only
+func TestGetCreateParams_WithWriteOnlyFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id": rschema.Int64Attribute{
+				Computed: true,
+			},
+			"username": rschema.StringAttribute{
+				Required: true,
+			},
+			"password": rschema.StringAttribute{
+				Required:  true,
+				Sensitive: true,
+			},
+			"email": rschema.StringAttribute{
+				Optional: true,
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"username": types.StringValue("admin"),
+		"password": types.StringValue("secret123"),
+		"email":    types.StringValue("admin@example.com"),
+	}
+
+	hints := &TFStateHints{
+		WriteOnlyFields: []string{"password"},
+		SensitiveFields: []string{"password"},
+	}
+
+	tfState := NewTFStateMust(raw, schema, hints)
+	result := tfState.GetCreateParams()
+
+	// Verify that write-only fields ARE included in create params
+	assert.Contains(t, result, "username", "username should be included")
+	assert.Contains(t, result, "password", "password (write-only) should be included in create params")
+	assert.Contains(t, result, "email", "email should be included")
+	assert.Equal(t, "admin", result["username"])
+	assert.Equal(t, "secret123", result["password"])
+	assert.Equal(t, "admin@example.com", result["email"])
+
+	// Verify that computed ID is not included
+	assert.NotContains(t, result, "id", "id should not be included in create params")
+}
+
+// TestGetCreateParams_WithMultipleWriteOnlyFields tests multiple write-only fields
+func TestGetCreateParams_WithMultipleWriteOnlyFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"username": rschema.StringAttribute{
+				Required: true,
+			},
+			"password": rschema.StringAttribute{
+				Required: true,
+			},
+			"password_retype": rschema.StringAttribute{
+				Optional: true,
+			},
+			"roles": rschema.ListAttribute{
+				ElementType: types.Int64Type,
+				Required:    true,
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"username":        types.StringValue("testuser"),
+		"password":        types.StringValue("pass123"),
+		"password_retype": types.StringValue("pass123"),
+		"roles":           types.ListValueMust(types.Int64Type, []attr.Value{types.Int64Value(1), types.Int64Value(5)}),
+	}
+
+	hints := &TFStateHints{
+		WriteOnlyFields: []string{"password", "password_retype"},
+		SensitiveFields: []string{"password", "password_retype"},
+	}
+
+	tfState := NewTFStateMust(raw, schema, hints)
+	result := tfState.GetCreateParams()
+
+	// Verify ALL fields including write-only are included
+	assert.Contains(t, result, "username")
+	assert.Contains(t, result, "password", "password should be included")
+	assert.Contains(t, result, "password_retype", "password_retype should be included")
+	assert.Contains(t, result, "roles")
+
+	assert.Equal(t, "testuser", result["username"])
+	assert.Equal(t, "pass123", result["password"])
+	assert.Equal(t, "pass123", result["password_retype"])
+}
+
+// TestGetCreateParams_WithOptionalWriteOnlyFields tests optional write-only fields
+func TestGetCreateParams_WithOptionalWriteOnlyFields(t *testing.T) {
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"username": rschema.StringAttribute{
+				Required: true,
+			},
+			"password": rschema.StringAttribute{
+				Optional: true, // Optional write-only field
+			},
+		},
+	}
+
+	raw := map[string]attr.Value{
+		"username": types.StringValue("admin"),
+		"password": types.StringValue("secret"),
+	}
+
+	hints := &TFStateHints{
+		WriteOnlyFields: []string{"password"},
+	}
+
+	tfState := NewTFStateMust(raw, schema, hints)
+	result := tfState.GetCreateParams()
+
+	// Optional write-only fields should also be included
+	assert.Contains(t, result, "password", "optional write-only field should be included")
+	assert.Equal(t, "secret", result["password"])
+}

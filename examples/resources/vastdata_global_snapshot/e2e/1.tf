@@ -1,5 +1,5 @@
 resource "vastdata_tenant" "vastdb_tenant" {
-  name = "test-drift-tenant"
+  name = "vastdb-drift-tenant"
 }
 
 resource "vastdata_view_policy" "vastdb_view_policy" {
@@ -9,14 +9,14 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 }
 
 resource "vastdata_view" "vastdb_view1" {
-  path       = "/test-gs-view"
+  path       = "/vastdb-gs-view"
   policy_id  = vastdata_view_policy.vastdb_view_policy.id
   create_dir = true
   protocols  = ["NFS", "NFS4"]
 }
 
 resource "vastdata_view" "vastdb_view2" {
-  path       = "/test-gs-snapclone"
+  path       = "/vastdb-gs-snapclone"
   policy_id  = vastdata_view_policy.vastdb_view_policy.id
   create_dir = true
   protocols  = ["NFS", "NFS4"]
@@ -25,11 +25,11 @@ resource "vastdata_view" "vastdb_view2" {
 
 resource "vastdata_snapshot" "snap1" {
   path = "${vastdata_view.vastdb_view1.path}/"
-  name = "test-gs-snapshot"
+  name = "vastdb-gs-snapshot"
 }
 
 resource "vastdata_global_snapshot" "gsnap1" {
-  name               = "test-gs-global-snap"
+  name               = "vastdb-gs-global-snap"
   loanee_root_path   = "${vastdata_view.vastdb_view2.path}/"
   loanee_snapshot_id = vastdata_snapshot.snap1.id
   loanee_tenant_id   = vastdata_tenant.vastdb_tenant.id

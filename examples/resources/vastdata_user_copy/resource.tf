@@ -19,8 +19,9 @@ resource "vastdata_local_provider" "vastdb_local_provider1" {
 }
 
 resource "vastdata_user" "vastdb_user1" {
-  name = "vastdb_user"
-  uid  = 30017
+  name              = "vastdb_user"
+  uid               = 30017
+  local_provider_id = 1
 }
 
 resource "vastdata_user_copy" "copy_specific_users" {

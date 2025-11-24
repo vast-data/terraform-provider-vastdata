@@ -35,7 +35,7 @@ resource "vastdata_view" "vastdb_view" {
   path                 = "/vastdb_view/subsystem"
   name                 = "vastdb-subsystem"
   create_dir           = true
-  is_default_subsystem = true
+  is_default_subsystem = false
   policy_id            = data.vastdata_view_policy.vastdb_view_policy_default.id
   protocols            = ["BLOCK"]
 }
@@ -50,7 +50,7 @@ resource "vastdata_volume" "vastdb_volume" {
 resource "vastdata_block_host" "vastdb_block_host" {
   name      = "vastdb-block-host"
   tenant_id = data.vastdata_tenant.vastdb_default_tenant.id
-  nqn       = "nqn.2014-08.org.nvmexpress:uuid:12345678-1234-1234-1234-123456789012"
+  nqn       = "nqn.2014-08.org.nvmexpress:vastdb:12345678-1234-1234-1234-123456789012"
 }
 
 resource "vastdata_block_host_mapping" "vastdb_block_host_mapping" {

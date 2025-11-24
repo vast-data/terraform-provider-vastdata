@@ -71,11 +71,14 @@ func (m *NonlocalUserKey) ReadResource(ctx context.Context, rest *VMSRest) (Disp
 			return nil, err
 		}
 		if uid, ok := userRecord["uid"]; ok {
-			if uid.(string) == "" {
-				// Fallback to sid if "uid" is empty string.
-				ts.Set("sid", userRecord["sid"])
+			// Handle uid which can be a number (float64/int), string, or empty string
+			uidInt, err := is.ToInt(uid)
+			if err == nil && uidInt != 0 {
+				// Valid non-zero uid, use it
+				ts.Set("uid", uidInt)
 			} else {
-				ts.Set("uid", is.Must(toInt(userRecord["uid"])))
+				// uid is empty string, zero, or invalid - fallback to sid
+				ts.Set("sid", userRecord["sid"])
 			}
 		}
 	}

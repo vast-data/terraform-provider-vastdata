@@ -319,6 +319,11 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
+
+		// Automatically populate _id fields from nested objects
+		// e.g., extract local_provider_id from local_provider.id
+		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
+
 		// On import, populate computed and required fields (but NOT optional fields)
 		if err = tfState.FillFromRecordForImport(record.(Record)); err != nil {
 			resp.Diagnostics.AddError(
@@ -623,6 +628,10 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
+
+		// Automatically populate _id fields from nested objects
+		// e.g., extract local_provider_id from local_provider.id
+		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
 
 		// In particular scenarios we might want to populate all internalstate in custom handler.
 		// In this case we might want to return nil to avoid this population.

@@ -20,8 +20,8 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
   subnet_cidr = "24"
 
   ip_ranges = [
-    ["11.0.0.6", "11.0.0.10"],
-    ["11.0.0.20", "11.0.0.40"]
+    ["16.0.0.6", "16.0.0.10"],
+    ["16.0.0.20", "16.0.0.40"]
   ]
 }
 
@@ -34,7 +34,7 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
   subnet_cidr               = "24"
   enable_weighted_balancing = true
   ip_ranges = [
-    ["11.0.0.50", "11.0.0.80"],
+    ["16.0.0.50", "16.0.0.80"],
   ]
 }
 
@@ -53,7 +53,7 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
   vms_preferred = true
   subnet_cidr   = "24"
   ip_ranges = [
-    ["11.0.0.50", "11.0.0.80"],
+    ["16.0.0.50", "16.0.0.80"],
   ]
 }
 

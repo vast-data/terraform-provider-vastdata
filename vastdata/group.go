@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var GroupSchemaRef = is.NewSchemaReference(
@@ -23,7 +24,8 @@ func (m *Group) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: GroupSchemaRef,
+			ComputedSchemaFields: []string{"local_provider_id"},
+			SchemaRef:            GroupSchemaRef,
 		},
 	)}
 }
@@ -33,7 +35,8 @@ func (m *Group) NewDatasourceManager(raw map[string]attr.Value, schema any) Data
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: GroupSchemaRef,
+			ComputedSchemaFields: []string{"local_provider_id"},
+			SchemaRef:            GroupSchemaRef,
 		},
 	)}
 }

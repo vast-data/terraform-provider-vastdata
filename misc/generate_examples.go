@@ -74,8 +74,8 @@ func main() {
 		path   string
 		output string
 	}{
-		{"../examples/resources", "resource.tf"},
-		{"../examples/data-sources", "data-source.tf"},
+		{"examples/resources", "resource.tf"},
+		{"examples/data-sources", "data-source.tf"},
 	}
 
 	for _, base := range baseDirs {
@@ -167,11 +167,20 @@ func appendCleaned(builder *strings.Builder, path string) (bool, error) {
 
 	for scanner.Scan() {
 		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+
+		// Skip copyright notices
 		if strings.Contains(line, "Copyright (c) HashiCorp") {
 			continue
 		}
+
+		// Skip test-specific markers (these are for pytest, not docs)
+		if trimmed == "# ignore:e2e" {
+			continue
+		}
+
 		content.WriteString(line + "\n")
-		if strings.TrimSpace(line) != "" {
+		if trimmed != "" {
 			hasContent = true
 		}
 	}
