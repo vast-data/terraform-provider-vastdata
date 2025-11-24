@@ -1,4 +1,12 @@
 
+## 3.0.1
+
+ENHANCEMENTS:
+
+* **Documentation**: Added missing breaking changes to v3.0.0 release notes.
+* **Schema Descriptions**: Updated OpenAPI schema processing to restore missing property descriptions.
+
+
 ## 3.0.0
 
 BREAKING CHANGES:

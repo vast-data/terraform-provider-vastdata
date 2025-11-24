@@ -38,6 +38,20 @@ var (
 	getSchemaType         = openapi_schema.GetSchemaType
 )
 
+// getKnownDescription returns known descriptions for properties that lost their descriptions
+func getKnownDescription(propertyName string, schema *openapi3.Schema) string {
+	// Known properties that have descriptions in source Swagger but lost during conversion
+	knownDescriptions := map[string]string{
+		"permission_per_vip_pool": "VIP pools permissions map - {vippool_id: permission}. Example - {1: 'RW'}.",
+	}
+
+	if desc, ok := knownDescriptions[propertyName]; ok {
+		return desc
+	}
+
+	return ""
+}
+
 type SchemaEntry struct {
 	Prop        *openapi3.Schema
 	Required    bool
@@ -92,6 +106,9 @@ func addSchemaEntries(
 		desc := schema.Description
 		if desc == "" {
 			desc = schema.Title
+		}
+		if desc == "" {
+			desc = getKnownDescription(name, schema)
 		}
 
 		// Ensure at least one flag is set; default to Optional when none provided

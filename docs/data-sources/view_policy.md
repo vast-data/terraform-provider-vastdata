@@ -108,7 +108,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `nfs_read_only` (Set of String) Hosts with NFS read only permissions
 - `nfs_read_write` (Set of String) Hosts with NFS read/write permissions
 - `nfs_root_squash` (Set of String) Hosts with root squash policy
-- `permission_per_vip_pool` (Map of String)
+- `permission_per_vip_pool` (Map of String) VIP pools permissions map - {vippool_id: permission}. Example - {1: 'RW'}.
 - `protocols` (Set of String) Array of protocols to audit
 - `protocols_audit` (Attributes) Audit settings. Any settings enabled here apply to attached views, in addition to any audit settings enabled on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read` (Set of String) Hosts with read permissions
