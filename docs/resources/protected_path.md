@@ -159,7 +159,7 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `aggr_phys_estimation` (Number) The usable capacity reclaimable by deleting all of its snapshots
 - `bucket_name` (String)
 - `bw` (Number) Replication Bandwidth
-- `estimated_read_only_time` (Number)
+- `estimated_read_only_time` (String)
 - `eta` (String)
 - `failback_allowed` (String)
 - `failover` (Boolean) Trigger failover command
