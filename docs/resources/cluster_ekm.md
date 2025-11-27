@@ -25,20 +25,26 @@ resource "vastdata_cluster_ekm" "vastdb_cluster_ekm" {
   # Certificate Configuration
   ekm_certificate = <<-EOT
     -----BEGIN CERTIFICATE-----
-    ...
-    -----END CERTIFICATE-----
+    .
+    .  <content>
+    .
+-----END CERTIFICATE-----
   EOT
 
   ekm_private_key = <<-EOT
     -----BEGIN PRIVATE KEY-----
-    ...
-    -----END PRIVATE KEY-----
+    .
+    .  <content>
+    .
+-----END PRIVATE KEY-----
   EOT
 
   ekm_ca_certificate = <<-EOT
     -----BEGIN CERTIFICATE-----
-    ...
-    -----END CERTIFICATE-----
+    .
+    .  <content>
+    .
+-----END CERTIFICATE-----
   EOT
 
   # Thales-specific Configuration

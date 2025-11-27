@@ -1,6 +1,5 @@
-
 resource "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
-  uid = 1000
+  uid = 5001
 }
 
 # ---------------------
@@ -45,8 +44,15 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
 }
 
 
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdb_user"
+  uid               = 30109
+  local_provider_id = 1
+}
+
+
 resource "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
-  uid                 = 30109
+  uid                 = vastdata_user.vastdb_user.uid
   tenant_id           = data.vastdata_tenant.vastdb_tenant.id
   allow_create_bucket = false
   allow_delete_bucket = true

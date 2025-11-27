@@ -68,15 +68,20 @@ resource "vastdata_qos_policy" "vastdb_qos_policy" {
 
 # --------------------
 
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdbuser"
+  local_provider_id = 1
+}
+
 resource "vastdata_qos_policy" "vastdb_qos_policy" {
   name        = "vastdb_qos_policy"
   policy_type = "USER"
   attached_users = [
     {
-      name             = "runner"
-      fqdn             = "runner.vastdb.local"
+      name             = vastdata_user.vastdb_user.name
+      fqdn             = "${vastdata_user.vastdb_user.name}.vastdb.local"
       identifier_type  = "username"
-      identifier_value = "runner"
+      identifier_value = vastdata_user.vastdb_user.name
     }
   ]
 

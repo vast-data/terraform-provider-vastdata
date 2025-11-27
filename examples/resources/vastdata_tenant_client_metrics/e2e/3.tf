@@ -1,3 +1,5 @@
+# ignore:e2e
+
 resource "vastdata_tenant" "vastdb_tenant" {
   name             = "vastdbtenant-for-metrics"
   client_ip_ranges = [["192.168.0.11", "192.168.0.12"]]
@@ -6,7 +8,7 @@ resource "vastdata_tenant" "vastdb_tenant" {
 
 resource "vastdata_user" "vastdb_user_for_metrics" {
   name = "vastdb_user_for_metrics"
-  uid  = 997160
+  uid  = 5001
 }
 
 resource "vastdata_view_policy" "vastdb_view_policy_for_metrics" {

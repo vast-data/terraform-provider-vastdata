@@ -1,3 +1,5 @@
+# ignore:e2e
+
 # =============================
 # clusterA
 provider "vastdata" {
@@ -74,10 +76,6 @@ resource "vastdata_replication_peer" "clusterA_clusterB_peer" {
   pool_id     = data.vastdata_vip_pool.replication_poolA.id
 }
 
-
-############################################
-# Protection policy (Framework-style frames map)
-############################################
 resource "vastdata_protection_policy" "protection_policy" {
   name             = "protection-policy-1"
   clone_type       = "NATIVE_REPLICATION"

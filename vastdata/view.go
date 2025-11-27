@@ -28,7 +28,7 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 		schema,
 		&is.TFStateHints{
 			SchemaRef:             ViewSchemaRef,
-			SkipRefreshAPICall:    true,
+			SkipRefreshAPICall:    true, // Prevents drift from API normalization (TERF-176)
 			DeleteOnlyBodyFields:  map[string]string{"delete_dir": ""},
 			DeleteOnlyParamFields: map[string]string{"force": "force"},
 			ImportFields:          []string{"path", "tenant_name"},

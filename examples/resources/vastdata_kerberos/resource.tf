@@ -7,6 +7,22 @@ resource "vastdata_kerberos" "basic_kerberos" {
   enabled            = true
 }
 
+
+# ---------------------
+# Complete examples
+# ---------------------
+
+resource "vastdata_kerberos" "basic_kerberos" {
+  realm              = "EXAMPLE.COM"
+  service_principals = ["nfs/vastcluster.example.com"]
+  kdc                = ["kdc.example.com"]
+  kadmin_servers     = ["kadmin.example.com"]
+  enabled            = true
+}
+
+# --------------------
+
+
 # Advanced Kerberos configuration with multiple service principals
 resource "vastdata_kerberos" "advanced_kerberos" {
   realm = "CORP.EXAMPLE.COM"
@@ -26,12 +42,5 @@ resource "vastdata_kerberos" "advanced_kerberos" {
   enabled = true
 }
 
-# Kerberos configuration with IP addresses
-resource "vastdata_kerberos" "ip_based_kerberos" {
-  realm              = "VASTDB.LOCAL"
-  service_principals = ["nfs/vastdb"]
-  kdc                = ["10.27.14.107"]
-  kadmin_servers     = ["10.27.14.107"]
-  enabled            = true
-}
+# --------------------
 

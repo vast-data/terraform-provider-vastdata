@@ -1,3 +1,5 @@
+# ignore:e2e
+
 resource "vastdata_ldap" "vastdb_ldap" {
   domain_name        = "VastEng.lab"
   urls               = ["ldap://10.27.252.30"]

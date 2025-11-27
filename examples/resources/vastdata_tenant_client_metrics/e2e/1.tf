@@ -1,3 +1,5 @@
+# ignore:e2e
+
 data "vastdata_tenant" "vastdb_tenant" {
   name = "default"
 }

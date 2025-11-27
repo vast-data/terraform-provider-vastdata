@@ -176,6 +176,10 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
 
+		// Automatically populate _id fields from nested objects
+		// e.g., extract local_provider_id from local_provider.id
+		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
+
 		if err = tfState.FillFromRecord(record.(Record)); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("Read[%s]: error filling datasource.", managerName),

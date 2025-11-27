@@ -1,6 +1,6 @@
-# e2e:skip
+# ignore:e2e
 
-# E2E test: Multiple environments with different keytab strategies
+# Multiple environments with different keytab strategies
 resource "vastdata_kerberos" "production_kerberos" {
   realm = "PROD.COMPANY.COM"
   service_principals = [

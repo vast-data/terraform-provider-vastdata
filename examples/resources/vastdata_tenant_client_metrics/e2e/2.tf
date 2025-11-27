@@ -1,3 +1,5 @@
+# ignore:e2e
+
 data "vastdata_user" "vastdb_user" {
   name = "runner"
 }

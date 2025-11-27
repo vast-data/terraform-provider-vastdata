@@ -1,16 +1,21 @@
-# ignore:example
+# ignore:e2e
 
-resource "vastdata_active_directory" "vastdb_active_directory" {
-  machine_account_name = "machine_acc"
+resource "vastdata_ldap" "vastdb_ldap" {
+  domain_name        = "VastEng.lab"
+  urls               = ["ldap://10.27.252.30"]
+  binddn             = "cn=admin,dc=qa,dc=vastdata,dc=com"
+  searchbase         = "dc=qa,dc=vastdata,dc=com"
+  bindpw             = "vastdata"
+  use_auto_discovery = "false"
+  use_ldaps          = "false"
+  port               = "389"
+  method             = "simple"
+  query_groups_mode  = "COMPATIBLE"
+  use_tls            = "false"
+}
+
+resource "vastdata_active_directory" "ad1" {
+  machine_account_name = "sales-devvm-tal"
   organizational_unit  = "OU=VASTs,OU=VastENG,DC=VastENG,DC=lab"
-  use_auto_discovery   = "false"
-  binddn               = "cn=admin,dc=qa,dc=vastdata,dc=com"
-  searchbase           = "dc=qa,dc=vastdata,dc=com"
-  bindpw               = "vastdata"
-  use_ldaps            = "false"
-  domain_name          = "VastEng.lab"
-  method               = "simple"
-  query_groups_mode    = "COMPATIBLE"
-  use_tls              = "false"
-  urls                 = ["ldap://10.27.252.30"]
+  ldap_id              = vastdata_ldap.vastdb_ldap.id
 }

@@ -14,15 +14,15 @@ One-to-one association between an S3 policy and a non-local group or user. This 
 
 ```terraform
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment1" {
-  s3_policy_id = 1
-  gid          = 1000
+  s3_policy_id      = 1
+  gid               = 5001
+  local_provider_id = 1
 }
 
 # Create another S3 policy attachment with ignore_present set to true.
-# It will not fail if the user with uid=777 already has s3_policy_id=1 attached.
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
   s3_policy_id   = 1
-  uid            = 777
+  uid            = 5002
   ignore_present = true
 }
 
@@ -67,24 +67,88 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
         EOT
 }
 
-data "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
-  uid       = 30109
-  tenant_id = data.vastdata_tenant.vastdb_tenant.id
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdb_user"
+  uid               = 30109
+  local_provider_id = 1
 }
 
-data "vastdata_nonlocal_group" "vastdb_nonlocal_group" {
-  gid       = 30097
-  tenant_id = data.vastdata_tenant.vastdb_tenant.id
+resource "vastdata_group" "vastdb_group" {
+  name              = "vastdb_group"
+  gid               = 30097
+  local_provider_id = 1
 }
 
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment1" {
   s3_policy_id = vastdata_s3_policy.vastdb_s3policy.id
-  gid          = data.vastdata_nonlocal_group.vastdb_nonlocal_group.gid
+  gid          = vastdata_group.vastdb_group.gid
 }
 
 resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
   s3_policy_id   = vastdata_s3_policy.vastdb_s3policy.id
-  uid            = data.vastdata_nonlocal_user.vastdb_nonlocal_user.uid
+  uid            = vastdata_user.vastdb_user.uid
+  ignore_present = true
+}
+
+# --------------------
+
+data "vastdata_tenant" "vastdb_tenant" {
+  name = "default"
+}
+
+resource "vastdata_s3_policy" "vastdb_s3policy" {
+  name      = "vastdb_s3policy"
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
+  policy    = <<EOT
+        {
+           "Version":"2012-10-17",
+           "Statement":[
+              {
+                 "Effect":"Allow",
+                 "Action": "s3:ListAllMyBuckets",
+                 "Resource":"*"
+              },
+              {
+                 "Effect":"Allow",
+                 "Action":["s3:ListObjects","s3:GetBucketLocation"],
+                 "Resource":"arn:aws:s3:::DOC-EXAMPLE-BUCKET1"
+              },
+              {
+                 "Effect":"Allow",
+                 "Action":[
+                    "s3:PutObject",
+                    "s3:PutObjectAcl",
+                    "s3:GetObject",
+                    "s3:GetObjectAcl",
+                    "s3:DeleteObject"
+                 ],
+                 "Resource":"arn:aws:s3:::DOC-EXAMPLE-BUCKET1/*"
+              }
+           ]
+        }
+        EOT
+}
+
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdb_user"
+  uid               = 5001
+  local_provider_id = 1
+}
+
+resource "vastdata_group" "vastdb_group" {
+  name              = "vastdb_group"
+  gid               = 5002
+  local_provider_id = 1
+}
+
+resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment1" {
+  s3_policy_id = vastdata_s3_policy.vastdb_s3policy.id
+  groupname    = vastdata_group.vastdb_group.name
+}
+
+resource "vastdata_s3_policy_attachment" "vastdb_policy_attachment2" {
+  s3_policy_id   = vastdata_s3_policy.vastdb_s3policy.id
+  sid            = vastdata_user.vastdb_user.sid
   ignore_present = true
 }
 

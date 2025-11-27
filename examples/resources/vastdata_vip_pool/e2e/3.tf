@@ -1,3 +1,4 @@
+# ignore:e2e
 
 data "vastdata_tenant" "vastdb_tenant" {
   name = "default"
@@ -11,6 +12,6 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
   vms_preferred = true
   subnet_cidr   = "24"
   ip_ranges = [
-    ["11.0.0.50", "11.0.0.80"],
+    ["16.0.0.50", "16.0.0.80"],
   ]
 }

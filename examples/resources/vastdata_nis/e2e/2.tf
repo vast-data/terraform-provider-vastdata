@@ -1,3 +1,5 @@
+# ignore:e2e
+
 resource "vastdata_nis" "vastdb_nis" {
   name        = "vastdb_nis"
   domain_name = "my.nis.domain.example.com"

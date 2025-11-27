@@ -14,7 +14,7 @@ description: |-
 
 ```terraform
 resource "vastdata_nonlocal_group" "vastdb_nonlocal_group" {
-  gid = 1000
+  gid = 5001
 }
 
 # ---------------------
@@ -106,10 +106,10 @@ resource "vastdata_nonlocal_group" "vastdb_nonlocal_group" {
 
 # --------------------
 
-
 resource "vastdata_group" "vastdb_group" {
-  name = "vastdb_group"
-  gid  = 1001
+  name              = "vastdb_group"
+  gid               = 5001
+  local_provider_id = 1
 }
 
 resource "vastdata_nonlocal_group" "vastdb_nonlocal_group" {

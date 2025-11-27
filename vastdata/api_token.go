@@ -25,8 +25,9 @@ func (m *ApiToken) NewResourceManager(raw map[string]attr.Value, schema any) Res
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:      ApiTokenSchemaRef,
-			ReadOnlyFields: []string{"archived"},
+			SkipRefreshAPICall: true,
+			SchemaRef:          ApiTokenSchemaRef,
+			ReadOnlyFields:     []string{"archived"},
 		},
 	)}
 }

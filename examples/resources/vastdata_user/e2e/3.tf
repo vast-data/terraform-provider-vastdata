@@ -37,7 +37,7 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
 
 resource "vastdata_user" "vastdb_user" {
   name              = "vastdb_user"
-  uid               = 30109
+  uid               = 5001
   local_provider_id = 1
   s3_policies_ids = [
     vastdata_s3_policy.vastdb_s3policy.id

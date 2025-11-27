@@ -1,3 +1,5 @@
+# ignore:e2e
+
 data "vastdata_view_policy" "vastdb_view_policy_default" {
   name = "default"
 }

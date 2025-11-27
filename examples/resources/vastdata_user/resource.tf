@@ -1,10 +1,9 @@
-
 # Create a user with a specific UID.
 resource "vastdata_user" "example-user" {
-  name = "example"
-  uid  = 9000
+  name              = "example"
+  uid               = 5001
+  local_provider_id = 1
 }
-
 
 resource "vastdata_local_provider" "vastdb_local_provider1" {
   name = "vastdb_local_provider1"
@@ -13,7 +12,7 @@ resource "vastdata_local_provider" "vastdb_local_provider1" {
 // Create a user with local provider.
 resource "vastdata_user" "vastdb_user1" {
   name              = "vastdb_user1"
-  uid               = 30117
+  uid               = 5002
   local_provider_id = vastdata_local_provider.vastdb_local_provider1.id
 }
 
@@ -23,8 +22,9 @@ resource "vastdata_user" "vastdb_user1" {
 
 
 resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
-  uid  = 30109
+  name              = "vastdb_user"
+  uid               = 30109
+  local_provider_id = 1
   gids = [
     1001
   ]
@@ -32,23 +32,22 @@ resource "vastdata_user" "vastdb_user" {
 
 # --------------------
 
-
 resource "vastdata_group" "vastdb_group" {
   name              = "vastdb_group"
-  gid               = 30097
+  gid               = 5001
   local_provider_id = 1
+
 }
 
 resource "vastdata_user" "vastdb_user" {
   name                = "vastdb_user"
-  uid                 = 30109
-  local               = true
+  uid                 = 5003
   allow_create_bucket = true
   allow_delete_bucket = true
   s3_superuser        = false
   leading_gid         = vastdata_group.vastdb_group.gid
+  local_provider_id   = 1
   gids = [
-    1001,
     vastdata_group.vastdb_group.gid
   ]
 }
@@ -93,8 +92,9 @@ resource "vastdata_s3_policy" "vastdb_s3policy" {
 }
 
 resource "vastdata_user" "vastdb_user" {
-  name = "vastdb_user"
-  uid  = 30109
+  name              = "vastdb_user"
+  uid               = 5001
+  local_provider_id = 1
   s3_policies_ids = [
     vastdata_s3_policy.vastdb_s3policy.id
   ]

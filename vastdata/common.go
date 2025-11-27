@@ -77,6 +77,60 @@ func (CustomImportOnly) Error() string {
 	return "custom-import-only"
 }
 
+// PopulateIDFieldsFromNestedObjects examines all keys in tfstate that end with "_id"
+// and attempts to populate them from nested objects in the record.
+//
+// For example:
+//   - If tfstate has key "local_provider_id" but record doesn't have it
+//   - Look for record["local_provider"] (object with "id" and "name")
+//   - Extract record["local_provider"]["id"] and set record["local_provider_id"]
+//
+// This handles the common API pattern where responses contain nested objects
+// like {tenant: {id: 1, name: "foo"}} but the schema expects tenant_id: 1
+func PopulateIDFieldsFromNestedObjects(ctx context.Context, tfstate *is.TFState, record Record) {
+	if record == nil || tfstate == nil {
+		return
+	}
+
+	// Iterate over all tfstate keys
+	for key := range tfstate.Raw {
+		// Check if key ends with "_id"
+		if !strings.HasSuffix(key, "_id") {
+			continue
+		}
+
+		// Check if this field already exists in the record
+		if _, exists := record[key]; exists {
+			continue
+		}
+
+		// Derive the parent object name by removing "_id" suffix
+		// e.g., "local_provider_id" -> "local_provider"
+		parentKey := strings.TrimSuffix(key, "_id")
+
+		// Check if parent object exists in record
+		parentValue, parentExists := record[parentKey]
+		if !parentExists || parentValue == nil {
+			continue
+		}
+
+		// Try to cast parent to map[string]any
+		parentMap, ok := parentValue.(map[string]any)
+		if !ok {
+			continue
+		}
+
+		// Try to extract "id" from the parent object
+		if id, idExists := parentMap["id"]; idExists && id != nil {
+			record[key] = id
+			tflog.Debug(ctx, fmt.Sprintf(
+				"PopulateIDFieldsFromNestedObjects: extracted %s=%v from %s.id",
+				key, id, parentKey,
+			))
+		}
+	}
+}
+
 // Helpers
 var (
 	toInt   func(val any) (int64, error)             = is.ToInt

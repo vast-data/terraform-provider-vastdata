@@ -29,11 +29,6 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 # Complete examples
 # ---------------------
 
-
-data "vastdata_vip_pool" "vastdb_vippool" {
-  name = "vippool-1"
-}
-
 data "vastdata_tenant" "vastdb_default_tenant" {
   name = "default"
 }

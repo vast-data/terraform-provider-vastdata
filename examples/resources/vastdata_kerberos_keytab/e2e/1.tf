@@ -1,4 +1,4 @@
-# e2e:skip
+# ignore:e2e
 
 # Basic e2e test: Generate keytab only
 resource "vastdata_kerberos" "vastdb_kerberos" {
