@@ -1,3 +1,9 @@
+## 3.0.3
+
+BUG FIXES:
+
+* **vastdata_protected_path**: Fixed `estimated_read_only_time` field type inconsistency. The field changed from String to Number between v2.1.1 and v3.0.0, which prevented Terraform from automatically converting existing state. The field is now forced to always be a string type, ensuring compatibility and preventing import/state migration issues.
+* **vastdata_administrator_manager**: Fixed import error where the `roles` field was returning objects with `{id, name}` structure instead of just role IDs. Import now properly converts roles to a slice of IDs, resolving "unexpected type map[string]interface {} for int" errors during resource import operations.
 
 ## 3.0.2
 

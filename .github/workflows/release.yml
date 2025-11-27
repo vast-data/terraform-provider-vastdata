@@ -136,30 +136,36 @@ jobs:
           # Try different changelog formats
           echo "Extracting changelog for version $VERSION..."
           
-          # Format 1: ## Version 1.0.0 or ## v1.0.0
-          awk -v tag="## Version $VERSION" '
+          # Format 1: ## 3.0.3 (version without v prefix)
+          awk -v version="$VERSION" '
           BEGIN { found=0 }
-          $0 ~ tag { found=1; next }
-          found && /^## (Version |v|\[)/ { exit }
+          /^## / {
+            if (found) { exit }
+            if ($2 == version) { found=1; next }
+          }
           found { print }
           ' CHANGELOG.md > release_notes.md
           
-          # Format 2: ## [1.0.0] or ## [v1.0.0] (if first attempt was empty)
+          # Format 2: ## v3.0.3 (version with v prefix, if first attempt was empty)
           if [ ! -s release_notes.md ]; then
-            awk -v tag="## \\[$VERSION\\]" '
+            awk -v tag="$TAG" '
             BEGIN { found=0 }
-            $0 ~ tag { found=1; next }
-            found && /^## \[/ { exit }
+            /^## / {
+              if (found) { exit }
+              if ($2 == tag) { found=1; next }
+            }
             found { print }
             ' CHANGELOG.md > release_notes.md
           fi
           
-          # Format 3: ## v1.0.0 (if still empty)
+          # Format 3: ## [3.0.3] or ## Version 3.0.3 (if still empty)
           if [ ! -s release_notes.md ]; then
-            awk -v tag="## $TAG" '
+            awk -v version="$VERSION" '
             BEGIN { found=0 }
-            $0 ~ tag { found=1; next }
-            found && /^## / { exit }
+            /^## / {
+              if (found) { exit }
+              if ($0 ~ "## (Version |\\[)" version) { found=1; next }
+            }
             found { print }
             ' CHANGELOG.md > release_notes.md
           fi
