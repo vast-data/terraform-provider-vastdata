@@ -641,6 +641,14 @@ func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, in
 				key, err, record.PrettyJson("     "),
 			)
 		}
+
+		// If user has declared a value (known and non-null), always preserve it.
+		// User's config takes precedence over API response.
+		if existing, ok := s.Raw[key]; ok && !existing.IsNull() && !existing.IsUnknown() {
+			// Preserve the user-declared value
+			continue
+		}
+
 		s.Raw[key] = val
 	}
 	return nil

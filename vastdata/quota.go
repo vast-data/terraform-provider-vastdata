@@ -24,8 +24,7 @@ func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 		raw,
 		schema,
 		&is.TFStateHints{
-			SkipRefreshAPICall: true,
-			SchemaRef:          QuotaSchemaRef,
+			SchemaRef: QuotaSchemaRef,
 		},
 	)}
 }
