@@ -23,8 +23,8 @@ RESOURCE_IMPORT_MAP = {
     # Resources that import by simple ID
     "vastdata_tenant": (["id"], "id"),
     "vastdata_vip_pool": (["id"], "id"),
-    "vastdata_view_policy": (["name", "tenant_name"], None),  # Composite key
-    "vastdata_view": (["path", "tenant_name"], None),  # Composite key
+    "vastdata_view_policy": (["id"], "id"),
+    "vastdata_view": (["id"], "id"),
     "vastdata_user": (["id"], "id"),
     "vastdata_group": (["id"], "id"),
     "vastdata_nonlocal_user": (["username", "context", "tenant_id"], None),
@@ -239,12 +239,31 @@ def build_import_id(resource: Dict) -> Optional[str]:
     
     # Composite key import (use key=value format)
     import_values = []
-    for field in import_fields:
-        value = attributes.get(field)
-        if value is None:
-            log_warning(f"Missing field '{field}' for {resource['address']}")
-            return None
-        import_values.append(f"{field}={value}")
+    for field_spec in import_fields:
+        # Handle field specifications: can be a string or tuple of (field, fallback_field, ...)
+        if isinstance(field_spec, tuple):
+            # Try each field in order until we find a non-null value
+            value = None
+            used_field = None
+            for field in field_spec:
+                value = attributes.get(field)
+                if value is not None:
+                    used_field = field
+                    break
+            
+            if value is None:
+                log_warning(f"Missing all fallback fields {field_spec} for {resource['address']}")
+                return None
+            
+            import_values.append(f"{used_field}={value}")
+        else:
+            # Simple field (string)
+            field = field_spec
+            value = attributes.get(field)
+            if value is None:
+                log_warning(f"Missing field '{field}' for {resource['address']}")
+                return None
+            import_values.append(f"{field}={value}")
     
     return ','.join(import_values)
 
@@ -277,15 +296,27 @@ def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir
     
     log_info(f"Generating import script: {script_path}")
     
+    # Generate stub resource definitions
+    resources_tf_path = os.path.join(terraform_dir, "resources.tf")
+    with open(resources_tf_path, 'w') as f:
+        f.write("# Auto-generated stub resource definitions for import\n")
+        f.write("# These are minimal definitions required by terraform import\n\n")
+        for resource in resources:
+            resource_type = resource['type']
+            resource_name = resource['address'].split('.', 1)[1]  # Extract name from address
+            f.write(f'resource "{resource_type}" "{resource_name}" {{\n')
+            f.write('  # Configuration will be populated from import\n')
+            f.write('}\n\n')
+    
     with open(script_path, 'w') as f:
         f.write("#!/bin/bash\n")
         f.write("# Auto-generated Terraform import script\n")
         f.write("# This script will create a new state file with all imported resources\n\n")
         f.write("set -e  # Exit on error\n\n")
         f.write(f"cd \"{terraform_dir}\"\n\n")
-        f.write("# Initialize Terraform\n")
+        f.write("# Initialize Terraform (may be skipped if dev_overrides are active)\n")
         f.write("echo \"Initializing Terraform...\"\n")
-        f.write("terraform init\n\n")
+        f.write("terraform init || true  # Don't fail if dev_overrides are in effect\n\n")
         f.write("# Remove existing state if present\n")
         f.write("if [ -f terraform.tfstate ]; then\n")
         f.write("    echo \"Removing existing state...\"\n")
@@ -458,16 +489,54 @@ Examples:
     
     # Copy .tf files from source to temp directory for import
     log_info("Copying Terraform configuration files to temporary directory...")
-    tf_files = []
+    
+    # Extract provider and terraform blocks from source .tf files
+    provider_blocks = []
+    terraform_blocks = []
+    
     for file in os.listdir(source_dir):
         if file.endswith('.tf'):
             src_path = os.path.join(source_dir, file)
-            dst_path = os.path.join(temp_dir, file)
-            shutil.copy2(src_path, dst_path)
-            tf_files.append(file)
+            with open(src_path, 'r') as f:
+                content = f.read()
+                
+                # Simple extraction of provider and terraform blocks
+                # This is a basic approach - we capture the blocks we need
+                if 'provider "' in content:
+                    # Extract provider block(s)
+                    import re
+                    providers = re.findall(r'provider\s+"[^"]+"\s+\{[^}]*\}', content, re.DOTALL)
+                    provider_blocks.extend(providers)
+                
+                if 'terraform {' in content or 'required_providers' in content:
+                    # Extract terraform block
+                    start = content.find('terraform {')
+                    if start != -1:
+                        brace_count = 0
+                        in_block = False
+                        block_content = ""
+                        for i, char in enumerate(content[start:]):
+                            block_content += char
+                            if char == '{':
+                                brace_count += 1
+                                in_block = True
+                            elif char == '}':
+                                brace_count -= 1
+                                if brace_count == 0 and in_block:
+                                    terraform_blocks.append(block_content)
+                                    break
     
-    if not tf_files:
-        log_warning("No .tf files found in source directory")
+    # Create a minimal provider.tf file in temp directory
+    provider_tf_path = os.path.join(temp_dir, 'provider.tf')
+    with open(provider_tf_path, 'w') as f:
+        f.write("# Auto-generated provider configuration for import\n\n")
+        if terraform_blocks:
+            f.write(terraform_blocks[0] + "\n\n")
+        if provider_blocks:
+            for provider in provider_blocks:
+                f.write(provider + "\n\n")
+    
+    log_info("Created minimal provider configuration (resource definitions excluded)")
     
     # Get state file
     if args.s3_bucket:

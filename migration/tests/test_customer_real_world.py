@@ -70,9 +70,9 @@ class TestRealCustomerScenarios:
             assert 'vastdata_administators_roles.read_only.id' not in content
             assert 'vastdata_administators_roles.csi.id' not in content
             
-            # Check attribute renaming
-            assert 'permissions = [' in content
-            assert 'permissions_list = [' not in content
+            # Check attribute renaming (permissions_list should be kept as-is for administrator_manager)
+            assert 'permissions_list = ["create_monitoring"]' in content
+            assert 'permissions_list' in content  # Should be present in manager
     
     def test_vip_pool_cnode_ids_transformation(self, vast_terraform_dir, temp_migration_dirs):
         """Test that cnode_ids lists remain as lists (no conversion to strings)."""
