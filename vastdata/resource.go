@@ -635,7 +635,7 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 
 		// In particular scenarios we might want to populate all internalstate in custom handler.
 		// In this case we might want to return nil to avoid this population.
-		if err = tfState.FillFromRecord(record.(Record)); err != nil {
+		if err = tfState.FillFromRecordIncludingRequired(record.(Record), true); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("Read[%s] error filling resource.", managerName),
 				err.Error(),

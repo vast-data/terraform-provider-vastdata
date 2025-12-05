@@ -7,7 +7,7 @@ resource "vastdata_tenant" "vastdb_tenant" {
 resource "vastdata_protection_policy" "vastdb_ppolicy" {
   name           = "vastdb_ppolicy"
   indestructible = "false"
-  prefix         = "policy-1"
+  prefix         = "vastdb-policy"
   clone_type     = "LOCAL"
   tenant_id      = vastdata_tenant.vastdb_tenant.id
   frames = [{
