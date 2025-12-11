@@ -24,8 +24,7 @@ func (m *QosPolicy) NewResourceManager(raw map[string]attr.Value, schema any) Re
 		raw,
 		schema,
 		&is.TFStateHints{
-			SkipRefreshAPICall: true,
-			SchemaRef:          QosPolicySchemaRef,
+			SchemaRef: QosPolicySchemaRef,
 		},
 	)}
 }

@@ -28,7 +28,6 @@ from pathlib import Path
 ALLOWED_DRIFT_RESOURCES = {
     "vastdata_administrator_manager",
     "vastdata_administrator_role",
-    "vastdata_api_token",
     "vastdata_bgp_config",
     "vastdata_block_host_mapping",
     "vastdata_view",
