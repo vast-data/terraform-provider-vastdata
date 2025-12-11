@@ -1,3 +1,10 @@
+## 3.0.4
+
+BUG FIXES:
+
+* Populate required fields during import
+* **vastdata_protected_path**: Fixed drift during import
+
 ## 3.0.3
 
 BUG FIXES:
