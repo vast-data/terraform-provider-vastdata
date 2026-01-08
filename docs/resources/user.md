@@ -140,6 +140,7 @@ resource "vastdata_user" "vastdb_user" {
 
 ### Read-Only
 
+- `access_keys` (Attributes Set) S3 Access Keys (see [below for nested schema](#nestedatt--access_keys))
 - `group_count` (Number) Group Count
 - `groups` (Set of String) List of groups to which the user belongs
 - `guid` (String) Global unique ID
@@ -156,6 +157,17 @@ resource "vastdata_user" "vastdb_user" {
 - `title` (String)
 - `url` (String) Endpoint URL for API operations on the user
 - `vid` (Number) User's VAST ID
+
+<a id="nestedatt--access_keys"></a>
+### Nested Schema for `access_keys`
+
+Read-Only:
+
+- `access_key` (String)
+- `creation_time` (String)
+- `enabled` (Boolean)
+- `tenant_id` (Number)
+
 
 <a id="nestedatt--local_provider"></a>
 ### Nested Schema for `local_provider`

@@ -137,3 +137,15 @@ resource "vastdata_user_tenant_data" "vastdb_user_tenant_data" {
 - `s3_policies_ids` (Set of Number) IDs of S3 policies to attach to the user.
 - `s3_superuser` (Boolean) Grants the user S3 super user permission, which enables the user to override S3 ACLs. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `tenant_id` (Number) Tenant ID
+
+### Read-Only
+
+- `s3_policies` (Attributes Set) (see [below for nested schema](#nestedatt--s3_policies))
+
+<a id="nestedatt--s3_policies"></a>
+### Nested Schema for `s3_policies`
+
+Read-Only:
+
+- `id` (Number) Identity Policy ID
+- `name` (String) Identity Policy name

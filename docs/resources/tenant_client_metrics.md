@@ -143,6 +143,10 @@ resource "vastdata_tenant_client_metrics" "client_metrics1" {
 - `config` (Attributes) (see [below for nested schema](#nestedatt--config))
 - `user_defined_columns` (Attributes Set) Description of table columns (see [below for nested schema](#nestedatt--user_defined_columns))
 
+### Read-Only
+
+- `default_columns` (Attributes Set) Default predefined table columns (see [below for nested schema](#nestedatt--default_columns))
+
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
 
@@ -185,6 +189,41 @@ Optional:
 
 <a id="nestedatt--user_defined_columns--field--value_type"></a>
 ### Nested Schema for `user_defined_columns.field.value_type`
+
+Optional:
+
+- `column_type` (String) The type of the value (e.g., "string", "bool")
+
+
+
+
+<a id="nestedatt--default_columns"></a>
+### Nested Schema for `default_columns`
+
+Required:
+
+- `field` (Attributes) Column type (see [below for nested schema](#nestedatt--default_columns--field))
+- `name` (String) Name of the object
+
+<a id="nestedatt--default_columns--field"></a>
+### Nested Schema for `default_columns.field`
+
+Optional:
+
+- `column_type` (String)
+- `key_type` (Attributes) Column type for the map key (only when `column_type` is "map") (see [below for nested schema](#nestedatt--default_columns--field--key_type))
+- `value_type` (Attributes) Column type for the map value (only when `column_type` is "map") (see [below for nested schema](#nestedatt--default_columns--field--value_type))
+
+<a id="nestedatt--default_columns--field--key_type"></a>
+### Nested Schema for `default_columns.field.key_type`
+
+Optional:
+
+- `column_type` (String) The type of the key (e.g., "string", "bool")
+
+
+<a id="nestedatt--default_columns--field--value_type"></a>
+### Nested Schema for `default_columns.field.value_type`
 
 Optional:
 

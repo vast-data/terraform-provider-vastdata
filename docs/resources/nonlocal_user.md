@@ -100,18 +100,52 @@ resource "vastdata_nonlocal_user" "vastdb_nonlocal_user" {
 - `tenant_id` (Number) Tenant ID
 - `uid` (Number) User UID
 - `username` (String) User legal name
-- `vid` (Number) Vast user ID
 
 ### Read-Only
 
-- `access_keys` (Attributes Set) A set of access keys with creation time, key, remote, and status. (see [below for nested schema](#nestedatt--access_keys))
+- `access_keys` (Attributes Set) (see [below for nested schema](#nestedatt--access_keys))
+- `group_count` (Number)
+- `groups` (Set of String)
+- `historical_sids` (Set of String)
+- `leading_group_gid` (Number)
+- `leading_group_name` (String)
+- `name` (String)
+- `object_type` (String)
+- `primary_group_name` (String)
+- `primary_group_sid` (String)
+- `quotas` (Attributes Set) (see [below for nested schema](#nestedatt--quotas))
+- `s3_connections_count` (Number)
+- `s3_policies` (Set of String)
+- `s3_remote_policies` (Set of String)
+- `s3_vid` (Number)
+- `user_qos_policies` (Attributes Set) (see [below for nested schema](#nestedatt--user_qos_policies))
+- `vid` (Number)
+- `vids` (Set of Number) VAST IDs
 
 <a id="nestedatt--access_keys"></a>
 ### Nested Schema for `access_keys`
 
 Read-Only:
 
+- `access_key` (String)
 - `creation_time` (String)
-- `key` (String)
-- `remote` (String)
-- `status` (String)
+- `enabled` (Boolean)
+- `remote` (Boolean)
+
+
+<a id="nestedatt--quotas"></a>
+### Nested Schema for `quotas`
+
+Read-Only:
+
+- `id` (Number)
+- `name` (String)
+
+
+<a id="nestedatt--user_qos_policies"></a>
+### Nested Schema for `user_qos_policies`
+
+Read-Only:
+
+- `id` (Number)
+- `name` (String)

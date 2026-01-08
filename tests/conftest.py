@@ -176,7 +176,7 @@ def terraform_cmd(terraform_workdir, terraform_config_file):
     return cmd
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def tf_examples_dir():
     """Path to examples directory."""
     return Path(__file__).parent.parent / "examples" / "resources"

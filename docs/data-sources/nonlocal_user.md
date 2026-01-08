@@ -65,7 +65,7 @@ data "vastdata_nonlocal_user" "vastdb_nonlocal_user_by_sid" {
 
 ### Read-Only
 
-- `access_keys` (Attributes Set) A set of access keys with creation time, key, remote, and status. (see [below for nested schema](#nestedatt--access_keys))
+- `access_keys` (Attributes Set) (see [below for nested schema](#nestedatt--access_keys))
 - `groups` (Set of String)
 - `historical_sids` (Set of String)
 - `quotas` (Attributes Set) (see [below for nested schema](#nestedatt--quotas))
@@ -80,10 +80,10 @@ data "vastdata_nonlocal_user" "vastdb_nonlocal_user_by_sid" {
 
 Read-Only:
 
+- `access_key` (String)
 - `creation_time` (String)
-- `key` (String)
-- `remote` (String)
-- `status` (String)
+- `enabled` (Boolean)
+- `remote` (Boolean)
 
 
 <a id="nestedatt--quotas"></a>

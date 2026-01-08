@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -32,18 +31,6 @@ func (m *NonlocalUser) NewResourceManager(raw map[string]attr.Value, schema any)
 			SchemaRef:      NonlocalUserSchemaRef,
 			ImportFields:   []string{"username", "context", "tenant_id"},
 			AdditionalSchemaAttributes: map[string]any{
-				"access_keys": rschema.SetNestedAttribute{
-					Computed:    true,
-					Description: "A set of access keys with creation time, key, remote, and status.",
-					NestedObject: rschema.NestedAttributeObject{
-						Attributes: map[string]rschema.Attribute{
-							"creation_time": rschema.StringAttribute{Computed: true},
-							"key":           rschema.StringAttribute{Computed: true},
-							"remote":        rschema.StringAttribute{Computed: true},
-							"status":        rschema.StringAttribute{Computed: true},
-						},
-					},
-				},
 				"s3_policies_ids": rschema.SetAttribute{
 					ElementType: types.Int64Type,
 					Optional:    true,
@@ -62,21 +49,6 @@ func (m *NonlocalUser) NewDatasourceManager(raw map[string]attr.Value, schema an
 		&is.TFStateHints{
 			SchemaRef:      NonlocalUserSchemaRef,
 			ReadOnlyFields: []string{"context", "vid"},
-			AdditionalSchemaAttributes: map[string]any{
-				"access_keys": dschema.SetNestedAttribute{
-					Computed:    true,
-					Optional:    false,
-					Description: "A set of access keys with creation time, key, remote, and status.",
-					NestedObject: dschema.NestedAttributeObject{
-						Attributes: map[string]dschema.Attribute{
-							"creation_time": dschema.StringAttribute{Computed: true},
-							"key":           dschema.StringAttribute{Computed: true},
-							"remote":        dschema.StringAttribute{Computed: true},
-							"status":        dschema.StringAttribute{Computed: true},
-						},
-					},
-				},
-			},
 		}),
 	}
 }

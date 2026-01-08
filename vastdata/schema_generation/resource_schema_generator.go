@@ -97,8 +97,12 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			return nil, fmt.Errorf("failed to get GET model schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
-		if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
-			return nil, fmt.Errorf("failed to get patch model schema for resource %q: %w", resourcePath, err)
+		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPatch, resourcePath)
+		if err != nil {
+			// Fallback: use PATCH request body schema
+			if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
+				return nil, fmt.Errorf("failed to get model schema for PATCH resource %q: %w", resourcePath, err)
+			}
 		}
 
 	default:
