@@ -1,3 +1,10 @@
+## 3.0.5
+
+BUG FIXES:
+
+* **vastdata_nonlocal_user**: Fixed `access_keys` field schema generation. The field was missing from the resource schema because PATCH request body schema was used instead of PATCH response schema. Now correctly uses the PATCH response schema which includes computed fields like `access_keys`.
+*  Fixed GUID fallback mechanism not updating `id` in state.
+
 ## 3.0.4
 
 BUG FIXES:

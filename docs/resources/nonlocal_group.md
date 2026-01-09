@@ -135,3 +135,5 @@ resource "vastdata_nonlocal_group" "vastdb_nonlocal_group" {
 ### Read-Only
 
 - `name` (String) The name of the non-local group.
+- `provider_type` (String)
+- `s3_policies` (Set of String)

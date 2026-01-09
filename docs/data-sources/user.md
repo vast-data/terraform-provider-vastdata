@@ -48,6 +48,7 @@ data "vastdata_user" "vastdb_user_by_guid" {
 
 ### Read-Only
 
+- `access_keys` (Attributes Set) S3 Access Keys (see [below for nested schema](#nestedatt--access_keys))
 - `gids` (Set of Number) List of GIDs of groups to which the user belongs
 - `groups` (Set of String) List of groups to which the user belongs
 - `id` (Number) The ID of this resource.
@@ -55,6 +56,17 @@ data "vastdata_user" "vastdb_user_by_guid" {
 - `s3_policies` (Attributes Set) (see [below for nested schema](#nestedatt--s3_policies))
 - `s3_policies_ids` (Set of Number) S3 policies IDs, denoting which S3 identity policies are associated with the user. The user is granted and denied S3 permissions according to the associated S3 identity policies
 - `sids` (Set of String) SID list
+
+<a id="nestedatt--access_keys"></a>
+### Nested Schema for `access_keys`
+
+Read-Only:
+
+- `access_key` (String)
+- `creation_time` (String)
+- `enabled` (Boolean)
+- `tenant_id` (Number)
+
 
 <a id="nestedatt--local_provider"></a>
 ### Nested Schema for `local_provider`

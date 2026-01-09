@@ -49,23 +49,23 @@ TEST_TYPE="${1:-all}"
 case "$TEST_TYPE" in
     "all")
         shift || true  # Remove test type, keep the rest for pytest
-        echo -e "${GREEN}Running all tests (parametrized)...${NC}\n"
+        echo -e "${GREEN}Running all tests...${NC}\n"
+        pytest . -v "$@"
+        ;;
+    "e2e")
+        shift || true  # Remove test type, keep the rest for pytest
+        echo -e "${GREEN}Running e2e resource tests (parametrized)...${NC}\n"
         pytest test_e2e_resources.py::test_individual_resource -v "$@"
         ;;
-    "single")
+    "auxiliary")
         shift || true  # Remove test type, keep the rest for pytest
-        echo -e "${GREEN}Running single test (all resources)...${NC}\n"
-        pytest test_e2e_resources.py::test_terraform_provider_e2e -v "$@"
-        ;;
-    "parallel")
-        shift || true  # Remove test type, keep the rest for pytest
-        echo -e "${GREEN}Running tests in parallel...${NC}\n"
-        pytest test_e2e_resources.py::test_individual_resource -n auto -v "$@"
+        echo -e "${GREEN}Running auxiliary tests...${NC}\n"
+        pytest test_auxiliary.py -v "$@"
         ;;
     "failfast")
         shift || true  # Remove test type, keep the rest for pytest
         echo -e "${GREEN}Running tests (stop at first failure)...${NC}\n"
-        pytest test_e2e_resources.py::test_individual_resource -x -v "$@"
+        pytest . -x -v "$@"
         ;;
     "resource")
         shift || true  # Remove test type
@@ -82,10 +82,12 @@ case "$TEST_TYPE" in
     *)
         echo -e "${RED}ERROR: Unknown test type: $TEST_TYPE${NC}"
         echo ""
-        echo "Usage: ./run_tests.sh [all|single|parallel|failfast|resource <name>] [pytest-args]"
+        echo "Usage: ./run_tests.sh [all|e2e|auxiliary|single|parallel|failfast|resource <name>] [pytest-args]"
         echo ""
         echo "Examples:"
-        echo "  ./run_tests.sh all              # Run all tests (one per resource)"
+        echo "  ./run_tests.sh all              # Run all tests (e2e + auxiliary)"
+        echo "  ./run_tests.sh e2e              # Run e2e resource tests only"
+        echo "  ./run_tests.sh auxiliary        # Run auxiliary tests only"
         echo "  ./run_tests.sh single           # Run single test (all resources)"
         echo "  ./run_tests.sh parallel         # Run tests in parallel"
         echo "  ./run_tests.sh failfast         # Stop at first failure"
