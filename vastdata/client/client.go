@@ -26,7 +26,7 @@ func NewRest(
 		SslVerify:    sslVerify,
 		UserAgent:    getUserAgent(pluginVer),
 		Timeout:      &timeout,
-		UseBasicAuth: true,
+		UseBasicAuth: false,
 		RespectProxy: true,
 
 		BeforeRequestFn: BeforeRequestFnCallback,
