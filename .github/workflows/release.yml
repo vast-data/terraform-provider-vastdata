@@ -41,6 +41,21 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Check if release already exists
+      id: check_release
+      run: |
+        # Check if a GitHub release for this tag already exists
+        RELEASE_EXISTS=$(gh release view "${{ github.ref_name }}" --json name 2>&1 || echo "not found")
+        if [[ "$RELEASE_EXISTS" != *"not found"* && "$RELEASE_EXISTS" != *"release not found"* ]]; then
+          echo "ERROR: Release ${{ github.ref_name }} already exists!"
+          echo "Existing release details:"
+          gh release view "${{ github.ref_name }}"
+          exit 1
+        fi
+        echo "Release ${{ github.ref_name }} does not exist yet. Proceeding with release creation."
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
