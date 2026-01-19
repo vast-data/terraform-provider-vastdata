@@ -1,3 +1,9 @@
+## 3.0.6
+
+ENHANCEMENTS:
+
+* Use bearer token auth instead of basic auth
+
 ## 3.0.5
 
 BUG FIXES:
