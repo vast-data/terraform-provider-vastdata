@@ -54,30 +54,34 @@ The state migration tool solves this by re-importing all resources with the new 
 
 ```bash
 # Migrate local tfstate file
+# Arguments: source_dir output_dir
 ./state_migration.py \
-  --state /path/to/terraform.tfstate \
-  --terraform-dir /path/to/terraform/config
+  /path/to/terraform/config \
+  /path/to/migration/output
 ```
 
 #### For Remote S3 State Files
 
 ```bash
 # Migrate state from S3
+# Arguments: source_dir output_dir --s3-* options
 ./state_migration.py \
+  /path/to/terraform/config \
+  /path/to/migration/output \
   --s3-bucket my-terraform-state-bucket \
   --s3-key path/to/terraform.tfstate \
   --s3-access-key AKIAIOSFODNN7EXAMPLE \
-  --s3-secret-key wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY \
-  --terraform-dir /path/to/terraform/config
+  --s3-secret-key wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 # With custom S3 endpoint (for VAST S3)
 ./state_migration.py \
+  /path/to/terraform/config \
+  /path/to/migration/output \
   --s3-bucket my-bucket \
   --s3-key terraform.tfstate \
   --s3-access-key ACCESS_KEY \
   --s3-secret-key SECRET_KEY \
-  --s3-endpoint https://s3.prod.vast.local \
-  --terraform-dir /path/to/terraform/config
+  --s3-endpoint https://s3.prod.vast.local
 ```
 
 **Note:** The state migration tool creates a new `terraform-migrated.tfstate` file. If you're using S3 backend, you'll need to manually upload the new state file to S3 after verification.
@@ -451,16 +455,12 @@ terraform {
 pip install boto3
 
 # Run state migration
+# Arguments: source_dir (where terraform.tfstate is located) output_dir (where migrated state will be saved)
 ./state_migration.py \
-  --state /path/to/terraform/config/terraform.tfstate \
-  --terraform-dir /path/to/terraform/config
+  /path/to/terraform/config \
+  /path/to/migration/output
 
-# Review the summary
-cat /path/to/terraform/config/import_summary.txt
-
-# Execute the import
-cd /path/to/terraform/config
-./import_resources.sh
+# The migrated state will be in /path/to/migration/output/terraform.tfstate
 ```
 
 #### Option B: Remote S3 State
@@ -470,28 +470,26 @@ cd /path/to/terraform/config
 pip install boto3
 
 # Download and migrate state
+# Arguments: source_dir (where .tf files are) output_dir (where migrated state will be saved)
 ./state_migration.py \
+  /path/to/terraform/config \
+  /path/to/migration/output \
   --s3-bucket my-terraform-state-bucket \
   --s3-key prod/vast/terraform.tfstate \
   --s3-access-key YOUR_ACCESS_KEY \
-  --s3-secret-key YOUR_SECRET_KEY \
-  --terraform-dir /path/to/terraform/config
+  --s3-secret-key YOUR_SECRET_KEY
 
 # For VAST S3 endpoint
 ./state_migration.py \
+  /path/to/terraform/config \
+  /path/to/migration/output \
   --s3-bucket tf-state \
   --s3-key terraform.tfstate \
   --s3-access-key YOUR_ACCESS_KEY \
   --s3-secret-key YOUR_SECRET_KEY \
-  --s3-endpoint https://s3.prod.vast.local \
-  --terraform-dir /path/to/terraform/config
+  --s3-endpoint https://s3.prod.vast.local
 
-# Review the summary
-cat /path/to/terraform/config/import_summary.txt
-
-# Execute the import
-cd /path/to/terraform/config
-./import_resources.sh
+# The migrated state will be in /path/to/migration/output/terraform.tfstate
 ```
 
 ### Step 5: Verify and Apply
