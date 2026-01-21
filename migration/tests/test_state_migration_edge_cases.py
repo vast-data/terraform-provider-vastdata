@@ -875,5 +875,54 @@ class TestFixtureStateFiles:
             assert 'vastdata_nonlocal_user' in resource_types
 
 
+def test_v2_resource_name_compatibility():
+    """
+    Test that both resource naming variants are recognized during state migration.
+    The provider v3.x uses vastdata_s3_life_cycle_rule (with underscores),
+    but some old states may have vastdata_s3_lifecycle_rule (without underscores).
+    Both should be importable.
+    """
+    state = {
+        "version": 4,
+        "terraform_version": "1.5.0",
+        "resources": [
+            {
+                "mode": "managed",
+                "type": "vastdata_s3_life_cycle_rule",  # v2.x naming with underscores
+                "name": "test_lifecycle",
+                "provider": "provider[\"registry.terraform.io/vast-data/vastdata\"]",
+                "instances": [
+                    {
+                        "schema_version": 0,
+                        "attributes": {
+                            "id": 123,
+                            "name": "test-lifecycle-rule",
+                            "prefix": "/",
+                            "enabled": True,
+                            "view_id": 5,
+                            "expiration_days": 30
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    
+    resources = extract_resources(state)
+    
+    # Should extract the resource
+    assert len(resources) == 1
+    assert resources[0]['type'] == 'vastdata_s3_life_cycle_rule'
+    assert resources[0]['name'] == 'test_lifecycle'
+    assert resources[0]['attributes']['id'] == 123
+    
+    # Should have import configuration for v2.x name
+    assert 'vastdata_s3_life_cycle_rule' in RESOURCE_IMPORT_MAP
+    
+    # Should be able to build import ID
+    import_id = build_import_id(resources[0])
+    assert import_id == '123'
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v', '--tb=short'])

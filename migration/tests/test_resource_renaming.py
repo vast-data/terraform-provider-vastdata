@@ -39,6 +39,8 @@ class TestResourceRenaming:
             "vastdata_non_local_user_key": "vastdata_nonlocal_user_key",
             "vastdata_non_local_group": "vastdata_nonlocal_group",
             "vastdata_saml": "vastdata_saml_config",
+            # Add underscores
+            "vastdata_s3_lifecycle_rule": "vastdata_s3_life_cycle_rule",
         }
         
         for old_name, new_name in expected_mappings.items():
@@ -224,3 +226,30 @@ resource "vastdata_unknown_resource" "unknown1" {
         assert 'team = "platform"' in result
         assert 'auto_backup = true' in result
         assert 'retention_days = 30' in result
+    
+    def test_s3_lifecycle_rule_add_underscores(self):
+        """
+        Test that vastdata_s3_lifecycle_rule is renamed to vastdata_s3_life_cycle_rule.
+        Regression test: Some v2.x configs may have vastdata_s3_lifecycle_rule (no underscores),
+        but v3.x provider expects vastdata_s3_life_cycle_rule (with underscores).
+        """
+        terraform_content = '''resource "vastdata_s3_lifecycle_rule" "test" {
+  name            = "test-lifecycle-rule"
+  prefix          = "/"
+  enabled         = true
+  view_id         = vastdata_view.test.id
+  expiration_days = 30
+}'''
+        
+        lines = terraform_content.split('\n')
+        result, consumed = transform_resource_block(lines, 0)
+        
+        assert result is not None
+        # Should be changed to vastdata_s3_life_cycle_rule (with underscores)
+        assert "vastdata_s3_life_cycle_rule" in result
+        # Should NOT remain as vastdata_s3_lifecycle_rule (without underscores)
+        assert 'resource "vastdata_s3_lifecycle_rule"' not in result
+        
+        # Verify it's in the rename map
+        assert "vastdata_s3_lifecycle_rule" in resource_type_rename_map
+        assert resource_type_rename_map["vastdata_s3_lifecycle_rule"] == "vastdata_s3_life_cycle_rule"

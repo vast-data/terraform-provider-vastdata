@@ -65,6 +65,7 @@ RESOURCE_IMPORT_MAP = {
     "vastdata_nonlocal_user_key": (["id"], "id"),
     "vastdata_apitoken": (["id"], "id"),
     "vastdata_s3_lifecycle_rule": (["id"], "id"),
+    "vastdata_s3_life_cycle_rule": (["id"], "id"),
     # Note: v3.0 new resources are not included as they don't need migration from v1.6.7
 }
 

@@ -58,3 +58,4 @@ __pycache__/
 *.pyo
 *.pyd
 /tests/venv/*
+/out/

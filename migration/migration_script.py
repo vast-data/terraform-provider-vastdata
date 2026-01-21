@@ -27,7 +27,8 @@ resource_type_rename_map = {
     "vastdata_saml": "vastdata_saml_config",
     # Additional resource renames from QA
     "vastdata_blockhost": "vastdata_block_host",
-    "vastdata_s3_life_cycle_rule": "vastdata_s3_lifecycle_rule",
+    # Correct the naming: add underscores
+    "vastdata_s3_lifecycle_rule": "vastdata_s3_life_cycle_rule",
 }
 
 # Key groups for different Terraform block types
