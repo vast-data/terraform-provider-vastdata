@@ -26,13 +26,8 @@ func (m *ProtectionPolicy) NewResourceManager(raw map[string]attr.Value, schema 
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: ProtectionPolicySchemaRef,
-			// SkipRefreshAPICall prevents drift detection from VAST API's duration normalization.
-			// The API normalizes time units (e.g., 14D → 2W, 1D → 24h, 168h → 1W), which causes
-			// Terraform to detect false drift even though the durations are equivalent.
-			// By skipping the refresh API call, we use the current Terraform state as-is,
-			// avoiding inconsistencies between user-specified values and API-normalized values.
-			SkipRefreshAPICall: true,
+			SchemaRef:               ProtectionPolicySchemaRef,
+			PreserveUserValueFields: []string{"frames"},
 			AdditionalSchemaAttributes: map[string]any{
 				// NOTE: original fields from OpenAPI spec with "-" is not acceptable in Terraform schema.
 				// We replace "frames" property 'in-place' here.

@@ -610,6 +610,8 @@ func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, in
 	if record == nil {
 		return errors.New("record is nil")
 	}
+
+	hints := s.Hints
 	for key, rawVal := range record {
 		typ, ok := s.TypeMap[key]
 		if !ok {
@@ -644,11 +646,13 @@ func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, in
 
 		// For user-configurable fields (Optional or Required), preserve the user's declared value
 		// if it exists and is known. Computed-only fields should always come from API.
-		isUserConfigurable := s.IsOptional(key) || s.IsRequired(key)
-		if isUserConfigurable {
-			if existing, ok := s.Raw[key]; ok && !existing.IsNull() && !existing.IsUnknown() {
-				// Preserve the user-declared value
-				continue
+		if existing, ok := s.Raw[key]; ok && !existing.IsNull() && !existing.IsUnknown() {
+			isUserConfigurable := s.IsOptional(key) || s.IsRequired(key)
+			if isUserConfigurable {
+				if hints != nil && contains(hints.PreserveUserValueFields, key) {
+					// Preserve the user-declared value
+					continue
+				}
 			}
 		}
 

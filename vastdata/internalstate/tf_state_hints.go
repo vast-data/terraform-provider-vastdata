@@ -70,6 +70,13 @@ type TFStateHints struct {
 	// For instance some resources have field "enabled" that cannot be set to false along with create (POST) request.
 	EditOnlyFields []string
 
+	// PreserveUserValueFields lists fields whose user-declared values should be preserved
+	// during refresh/read operations, rather than being overwritten with API values.
+	// By default, all fields are updated from API during refresh to sync external changes.
+	// Only fields listed here will preserve their user-configured values.
+	// Typical use case: optional fields that should not be overwritten even if the API returns different values.
+	PreserveUserValueFields []string
+
 	// DeleteOnlyBodyFields maps Terraform attribute names to API body field names
 	// for fields that are only allowed to be sent in DELETE request bodies.
 	// Key: Terraform schema field name; Value: API body field name.

@@ -26,9 +26,9 @@ func (m *GlobalLocalSnapshot) NewResourceManager(raw map[string]attr.Value, sche
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:            GlobalLocalSnapshotSchemaRef,
-			SkipRefreshAPICall:   true,
-			RequiredSchemaFields: []string{"name", "loanee_root_path", "loanee_tenant_id", "loanee_snapshot_id"},
+			SchemaRef:               GlobalLocalSnapshotSchemaRef,
+			PreserveUserValueFields: []string{"loanee_root_path"},
+			RequiredSchemaFields:    []string{"name", "loanee_root_path", "loanee_tenant_id", "loanee_snapshot_id"},
 		},
 	)}
 }

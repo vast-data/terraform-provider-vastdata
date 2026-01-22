@@ -24,6 +24,13 @@ func (m *QosPolicy) NewResourceManager(raw map[string]attr.Value, schema any) Re
 		raw,
 		schema,
 		&is.TFStateHints{
+			PreserveUserValueFields: []string{
+				"attached_users",
+				"static_limits",
+				"capacity_total_limits",
+				"capacity_limits",
+				"static_total_limits",
+			},
 			SchemaRef: QosPolicySchemaRef,
 		},
 	)}
