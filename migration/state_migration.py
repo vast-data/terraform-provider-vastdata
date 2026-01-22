@@ -66,7 +66,41 @@ RESOURCE_IMPORT_MAP = {
     "vastdata_apitoken": (["id"], "id"),
     "vastdata_s3_lifecycle_rule": (["id"], "id"),
     "vastdata_s3_life_cycle_rule": (["id"], "id"),
+    # v1.x legacy resource names (plural forms and old naming)
+    "vastdata_administators_managers": (["id"], "id"),
+    "vastdata_administators_roles": (["id"], "id"),
+    "vastdata_administators_realms": (["id"], "id"),
+    "vastdata_kafka_brokers": (["id"], "id"),
+    "vastdata_replication_peers": (["id"], "id"),
+    "vastdata_s3_replication_peers": (["id"], "id"),
+    "vastdata_active_directory2": (["id"], "id"),
+    "vastdata_non_local_user": (["username", "context", "tenant_id"], None),
+    "vastdata_non_local_user_key": (["id"], "id"),
+    "vastdata_non_local_group": (["groupname", "context", "tenant_id"], None),
+    "vastdata_saml": (["id"], "id"),
+    "vastdata_blockhost": (["id"], "id"),
     # Note: v3.0 new resources are not included as they don't need migration from v1.6.7
+}
+
+# Map v1/v2 legacy resource names to v3 resource names
+# Used when generating stub resource definitions for terraform import
+RESOURCE_NAME_TRANSLATION = {
+    # v1.x plural forms → v3.x singular forms
+    "vastdata_administators_managers": "vastdata_administrator_manager",
+    "vastdata_administators_roles": "vastdata_administrator_role",
+    "vastdata_administators_realms": "vastdata_administrator_realm",
+    "vastdata_kafka_brokers": "vastdata_kafka_broker",
+    "vastdata_replication_peers": "vastdata_replication_peer",
+    "vastdata_s3_replication_peers": "vastdata_s3_replication_peer",
+    # v1.x/v2.x old naming → v3.x new naming
+    "vastdata_active_directory2": "vastdata_active_directory",
+    "vastdata_non_local_user": "vastdata_nonlocal_user",
+    "vastdata_non_local_user_key": "vastdata_nonlocal_user_key",
+    "vastdata_non_local_group": "vastdata_nonlocal_group",
+    "vastdata_saml": "vastdata_saml_config",
+    "vastdata_blockhost": "vastdata_block_host",
+    # v2.x naming variant → v3.x naming
+    "vastdata_s3_lifecycle_rule": "vastdata_s3_life_cycle_rule",
 }
 
 
@@ -303,7 +337,9 @@ def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir
         f.write("# Auto-generated stub resource definitions for import\n")
         f.write("# These are minimal definitions required by terraform import\n\n")
         for resource in resources:
-            resource_type = resource['type']
+            resource_type_from_state = resource['type']
+            # Translate v1/v2 resource names to v3 names
+            resource_type = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
             resource_name = resource['address'].split('.', 1)[1]  # Extract name from address
             f.write(f'resource "{resource_type}" "{resource_name}" {{\n')
             f.write('  # Configuration will be populated from import\n')
@@ -334,14 +370,28 @@ def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir
                 f.write(f"# SKIPPED: {resource['address']} (no import ID)\n")
                 continue
             
-            address = resource['address']
-            f.write(f"# Import {idx}/{len(resources)}: {address}\n")
-            f.write(f"echo \"[{idx}/{len(resources)}] Importing {address}...\"\n")
-            f.write(f"if terraform import '{address}' '{import_id}'; then\n")
-            f.write(f"    echo \"  ✓ Successfully imported {address}\"\n")
+            # Original address from state (may use v1/v2 resource name)
+            original_address = resource['address']
+            
+            # Translate resource type to v3 name for import command
+            # Address format: resource_type.resource_name
+            parts = original_address.split('.', 1)
+            if len(parts) == 2:
+                resource_type_from_state = parts[0]
+                resource_name = parts[1]
+                # Translate to v3 resource name
+                resource_type_v3 = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
+                translated_address = f"{resource_type_v3}.{resource_name}"
+            else:
+                translated_address = original_address
+            
+            f.write(f"# Import {idx}/{len(resources)}: {original_address} (as {translated_address})\n")
+            f.write(f"echo \"[{idx}/{len(resources)}] Importing {translated_address}...\"\n")
+            f.write(f"if terraform import '{translated_address}' '{import_id}'; then\n")
+            f.write(f"    echo \"  ✓ Successfully imported {translated_address}\"\n")
             f.write(f"    IMPORT_COUNT=$((IMPORT_COUNT + 1))\n")
             f.write(f"else\n")
-            f.write(f"    echo \"  ✗ Failed to import {address}\"\n")
+            f.write(f"    echo \"  ✗ Failed to import {translated_address}\"\n")
             f.write(f"    FAILED_COUNT=$((FAILED_COUNT + 1))\n")
             f.write(f"fi\n\n")
         

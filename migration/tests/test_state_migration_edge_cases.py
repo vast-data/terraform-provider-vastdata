@@ -924,5 +924,138 @@ def test_v2_resource_name_compatibility():
     assert import_id == '123'
 
 
+def test_v1_legacy_resource_names():
+    """
+    Test that v1.x legacy resource names are recognized during state migration.
+    Regression test for: v1.x used plural forms (e.g., vastdata_kafka_brokers)
+    and different naming (e.g., vastdata_administators_managers, vastdata_active_directory2).
+    """
+    v1_legacy_names = {
+        # Plural forms
+        "vastdata_administators_managers": "vastdata_administrator_manager",
+        "vastdata_administators_roles": "vastdata_administrator_role",
+        "vastdata_administators_realms": "vastdata_administrator_realm",
+        "vastdata_kafka_brokers": "vastdata_kafka_broker",
+        "vastdata_replication_peers": "vastdata_replication_peer",
+        "vastdata_s3_replication_peers": "vastdata_s3_replication_peer",
+        # Old naming
+        "vastdata_active_directory2": "vastdata_active_directory",
+        "vastdata_non_local_user": "vastdata_nonlocal_user",
+        "vastdata_non_local_user_key": "vastdata_nonlocal_user_key",
+        "vastdata_non_local_group": "vastdata_nonlocal_group",
+        "vastdata_saml": "vastdata_saml_config",
+        "vastdata_blockhost": "vastdata_block_host",
+    }
+    
+    # Verify all v1 names are in the import map
+    for v1_name, v3_name in v1_legacy_names.items():
+        assert v1_name in RESOURCE_IMPORT_MAP, f"Missing v1 resource name: {v1_name}"
+    
+    # Test with actual v1 state (s3_replication_peers example from bug report)
+    state = {
+        "version": 4,
+        "terraform_version": "1.5.7",
+        "resources": [
+            {
+                "mode": "managed",
+                "type": "vastdata_s3_replication_peers",  # v1 plural form
+                "name": "test_peer",
+                "provider": "provider[\"registry.terraform.io/vast-data/vastdata\"]",
+                "instances": [
+                    {
+                        "schema_version": 0,
+                        "attributes": {
+                            "id": 123,
+                            "name": "test-s3-replication-peer"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    
+    resources = extract_resources(state)
+    
+    # Should extract the resource
+    assert len(resources) == 1
+    assert resources[0]['type'] == 'vastdata_s3_replication_peers'
+    assert resources[0]['name'] == 'test_peer'
+    assert resources[0]['attributes']['id'] == 123
+    
+    # Should have import configuration
+    assert 'vastdata_s3_replication_peers' in RESOURCE_IMPORT_MAP
+    
+    # Should be able to build import ID
+    import_id = build_import_id(resources[0])
+    assert import_id == '123'
+
+
+def test_resource_name_translation_in_stubs():
+    """
+    Test that v1/v2 resource names are translated to v3 names in generated stub files.
+    This ensures terraform import commands use the correct resource type.
+    """
+    import tempfile
+    import shutil
+    
+    # Create temporary directories
+    with tempfile.TemporaryDirectory() as temp_dir:
+        output_dir = os.path.join(temp_dir, "output")
+        terraform_dir = os.path.join(temp_dir, "terraform")
+        os.makedirs(output_dir)
+        os.makedirs(terraform_dir)
+        
+        # Create resources with v1 legacy names
+        resources = [
+            {
+                'type': 'vastdata_s3_replication_peers',  # v1 plural
+                'name': 'test_peer',
+                'address': 'vastdata_s3_replication_peers.test_peer',
+                'attributes': {'id': '123'}
+            },
+            {
+                'type': 'vastdata_administators_managers',  # v1 typo
+                'name': 'test_admin',
+                'address': 'vastdata_administators_managers.test_admin',
+                'attributes': {'id': '456'}
+            },
+            {
+                'type': 'vastdata_blockhost',  # v1 no underscore
+                'name': 'test_host',
+                'address': 'vastdata_blockhost.test_host',
+                'attributes': {'id': '789'}
+            }
+        ]
+        
+        # Generate import script (which creates resources.tf)
+        script_path = generate_import_script(resources, output_dir, terraform_dir)
+        
+        # Read generated resources.tf
+        resources_tf_path = os.path.join(terraform_dir, "resources.tf")
+        with open(resources_tf_path, 'r') as f:
+            content = f.read()
+        
+        # Verify v1 names are translated to v3 names in stubs
+        assert 'vastdata_s3_replication_peer' in content  # singular, not plural
+        assert 'vastdata_s3_replication_peers' not in content
+        
+        assert 'vastdata_administrator_manager' in content  # fixed typo, singular
+        assert 'vastdata_administators_managers' not in content
+        
+        assert 'vastdata_block_host' in content  # with underscore
+        assert 'vastdata_blockhost' not in content
+        
+        # Read generated import script
+        with open(script_path, 'r') as f:
+            script_content = f.read()
+        
+        # Verify import commands also use v3 names
+        assert "terraform import 'vastdata_s3_replication_peer.test_peer'" in script_content
+        assert "terraform import 'vastdata_administators_managers" not in script_content
+        
+        assert "terraform import 'vastdata_administrator_manager.test_admin'" in script_content
+        assert "terraform import 'vastdata_block_host.test_host'" in script_content
+
+
 if __name__ == '__main__':
     pytest.main([__file__, '-v', '--tb=short'])

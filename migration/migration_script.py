@@ -252,13 +252,13 @@ def transform_resource_block(lines, i):
                 attr_key = "type"
             elif attr_key == "use32bit_fileid":
                 attr_key = "use_32bit_fileid"
+            elif attr_key == "permissions" and current_resource_type == "vastdata_administrator_manager":
+                # For administrator_manager: permissions -> permissions_list
+                attr_key = "permissions_list"
             elif attr_key == "permissions_list" and current_resource_type != "vastdata_administrator_manager":
                 # For administrator_role and other resources: permissions_list -> permissions
                 # Exception: administrator_manager keeps permissions_list
                 attr_key = "permissions"
-            elif attr_key == "permissions" and current_resource_type == "vastdata_administrator_manager":
-                # For administrator_manager: permissions -> permissions_list
-                attr_key = "permissions_list"
 
             group = get_group_for_key(attr_key)
             if group == "List of Number --> String":
