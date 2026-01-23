@@ -24,7 +24,8 @@ func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: QuotaSchemaRef,
+			PreserveUserValueFields: []string{"default_group_quota", "default_user_quota"},
+			SchemaRef:               QuotaSchemaRef,
 		},
 	)}
 }

@@ -128,6 +128,8 @@ resource "vastdata_quota" "vastdb_quota" {
 - `create_dir` (Boolean) Set to true to create the directory if the directory was not created yet.
 - `create_dir_mode` (Number) Unix permissions mode for the new directory
 - `default_email` (String) Emails are sent to users if and when they exceed their user/group quota limits. default_email is a default email address that is used instead of a user's email address in the event that no email address is found for the user on a provider and no email suffix is set.
+- `default_group_quota` (Attributes) (see [below for nested schema](#nestedatt--default_group_quota))
+- `default_user_quota` (Attributes) (see [below for nested schema](#nestedatt--default_user_quota))
 - `enable_alarms` (Boolean) Enables alarms on relevant events for user and group quotas. Applicable only if is_user_quota is true. Raises alarms reporting the number of users that exceed their quotas and when one or more users is/are blocked from writing to the quota directory.
 - `enable_email_providers` (Boolean) Set to true to enable querying Active Directory and LDAP services for user emails when sending user notifications to users if they exceed their user/group quota limits. If enabled, the provider query is the first priority source for a user's email. If a user's email is not found on the provider, a global suffix is used to form an email. If no suffix is set, default_email is used.
 - `grace_period` (String) Quota enforcement grace period. An alarm is triggered and write operations are blocked if storage usage continues to exceed the soft limit for the grace period. Format: [DD] [HH:[MM:]]ss
@@ -145,8 +147,6 @@ resource "vastdata_quota" "vastdb_quota" {
 
 - `cluster` (String) Parent Cluster
 - `cluster_id` (Number) Parent Cluster ID
-- `default_group_quota` (Attributes) (see [below for nested schema](#nestedatt--default_group_quota))
-- `default_user_quota` (Attributes) (see [below for nested schema](#nestedatt--default_user_quota))
 - `guid` (String) Quota guid
 - `id` (Number) The ID of this resource.
 - `internal` (Boolean)
@@ -171,6 +171,32 @@ resource "vastdata_quota" "vastdb_quota" {
 - `used_effective_capacity_tb` (Number) Used effective capacity in TB
 - `used_inodes` (Number) Number of directories and unique files under the path
 - `used_limited_capacity` (Number)
+
+<a id="nestedatt--default_group_quota"></a>
+### Nested Schema for `default_group_quota`
+
+Optional:
+
+- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `hard_limit` (Number) Hard quota limit
+- `hard_limit_inodes` (Number) Hard inodes quota limit
+- `quota_system_id` (Number)
+- `soft_limit` (Number) Soft quota limit
+- `soft_limit_inodes` (Number) Soft inodes quota limit
+
+
+<a id="nestedatt--default_user_quota"></a>
+### Nested Schema for `default_user_quota`
+
+Optional:
+
+- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `hard_limit` (Number) Hard quota limit
+- `hard_limit_inodes` (Number) Hard inodes quota limit
+- `quota_system_id` (Number)
+- `soft_limit` (Number) Soft quota limit
+- `soft_limit_inodes` (Number) Soft inodes quota limit
+
 
 <a id="nestedatt--group_quotas"></a>
 ### Nested Schema for `group_quotas`
@@ -224,29 +250,3 @@ Optional:
 - `used_capacity` (Number) Used capacity in bytes
 - `used_inodes` (Number) Used inodes
 - `vast_id` (Number) VAST ID of the user or group with the listed user/group quota
-
-
-<a id="nestedatt--default_group_quota"></a>
-### Nested Schema for `default_group_quota`
-
-Read-Only:
-
-- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
-- `hard_limit` (Number) Hard quota limit
-- `hard_limit_inodes` (Number) Hard inodes quota limit
-- `quota_system_id` (Number)
-- `soft_limit` (Number) Soft quota limit
-- `soft_limit_inodes` (Number) Soft inodes quota limit
-
-
-<a id="nestedatt--default_user_quota"></a>
-### Nested Schema for `default_user_quota`
-
-Read-Only:
-
-- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
-- `hard_limit` (Number) Hard quota limit
-- `hard_limit_inodes` (Number) Hard inodes quota limit
-- `quota_system_id` (Number)
-- `soft_limit` (Number) Soft quota limit
-- `soft_limit_inodes` (Number) Soft inodes quota limit
