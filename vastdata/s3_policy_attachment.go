@@ -27,20 +27,27 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 		schema,
 		&is.TFStateHints{
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
-				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'gid' or 'groupname') or a user (identified by 'uid', 'sid', or 'username').",
+				Description: "One-to-one association between an S3 policy and a non-local group or user. This resource attaches a single S3 policy to either a group (identified by 'group_sid', 'groupname', or 'gid') or a user (identified by 'uid', 'sid', or 'username').",
 				SchemaAttributes: map[string]any{
-					"gid": rschema.Int64Attribute{
+					"group_sid": rschema.StringAttribute{
 						Optional:    true,
-						Description: "The GID of the non-local group to attach the policy to. Either 'gid' or 'groupname' must be provided for group attachments.",
-						PlanModifiers: []planmodifiers.Int64{
-							int64planmodifier.RequiresReplace(),
+						Description: "The SID of the non-local group to attach the policy to. Either 'group_sid', 'groupname', or 'gid' must be provided for group attachments. Recommended for AD groups that may not have a valid GID.",
+						PlanModifiers: []planmodifiers.String{
+							stringplanmodifier.RequiresReplace(),
 						},
 					},
 					"groupname": rschema.StringAttribute{
 						Optional:    true,
-						Description: "The name of the non-local group to attach the policy to. Either 'gid' or 'groupname' must be provided for group attachments.",
+						Description: "The name of the non-local group to attach the policy to. Either 'group_sid', 'groupname', or 'gid' must be provided for group attachments.",
 						PlanModifiers: []planmodifiers.String{
 							stringplanmodifier.RequiresReplace(),
+						},
+					},
+					"gid": rschema.Int64Attribute{
+						Optional:    true,
+						Description: "The GID of the non-local group to attach the policy to. Either 'group_sid', 'groupname', or 'gid' must be provided for group attachments.",
+						PlanModifiers: []planmodifiers.Int64{
+							int64planmodifier.RequiresReplace(),
 						},
 					},
 					"uid": rschema.Int64Attribute{
@@ -138,11 +145,11 @@ func (m *S3PolicyAttachment) ensurePolicyIDAndGUID(ctx context.Context, rest *VM
 }
 
 // validateS3PolicyAttachmentConfig validates that exactly one user/group identifier is set
-// (gid, groupname, uid, sid, or username) and exactly one of s3_policy_id/s3_policy_guid is set.
+// (group_sid, groupname, gid, uid, sid, or username) and exactly one of s3_policy_id/s3_policy_guid is set.
 // This validation is performed at runtime when resource references can be resolved.
 func (m *S3PolicyAttachment) validateS3PolicyAttachmentConfig() error {
 	// Validate that exactly one user/group identifier is provided
-	if err := validateOneOf(m.tfstate, "gid", "groupname", "uid", "sid", "username"); err != nil {
+	if err := validateOneOf(m.tfstate, "group_sid", "groupname", "gid", "uid", "sid", "username"); err != nil {
 		return err
 	}
 
@@ -162,26 +169,30 @@ func (m *S3PolicyAttachment) getSearchParamsFromState(tfState *is.TFState) (para
 	)
 
 	switch {
-	case tfState.IsKnownAndNotNull("gid"):
-		key = "gid"
-		val = tfState.Int64("gid")
+	case tfState.IsKnownAndNotNull("group_sid"):
+		key = "sid"
+		val = tfState.String("group_sid")
 		attachContext = "group"
 	case tfState.IsKnownAndNotNull("groupname"):
 		key = "groupname"
 		val = tfState.String("groupname")
 		attachContext = "group"
-	case tfState.IsKnownAndNotNull("uid"):
-		key = "uid"
-		val = tfState.Int64("uid")
-		attachContext = "user"
 	case tfState.IsKnownAndNotNull("sid"):
 		key = "sid"
 		val = tfState.String("sid")
+		attachContext = "user"
+	case tfState.IsKnownAndNotNull("uid"):
+		key = "uid"
+		val = tfState.Int64("uid")
 		attachContext = "user"
 	case tfState.IsKnownAndNotNull("username"):
 		key = "username"
 		val = tfState.String("username")
 		attachContext = "user"
+	case tfState.IsKnownAndNotNull("gid"):
+		key = "gid"
+		val = tfState.Int64("gid")
+		attachContext = "group"
 	}
 
 	searchParams := params{key: val}
