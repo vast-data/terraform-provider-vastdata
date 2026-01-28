@@ -28,6 +28,8 @@ func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 				"default_group_quota",
 				"default_user_quota",
 				"grace_period",
+				"group_quotas",
+				"user_quotas",
 			},
 			SchemaRef: QuotaSchemaRef,
 		},
