@@ -1,3 +1,15 @@
+## 3.0.7
+
+BUG FIXES:
+
+* **vastdata_quota**: Fixed `default_user_quota` and `default_group_quota` fields incorrectly marked as read-only.
+* **vastdata_view_policy**: Fixed `protocols_audit` field incorrectly marked as read-only.
+*  Fixed drift detection not reverting changes made through VAST UI. Resources now properly detect and revert manual changes made outside of Terraform, ensuring infrastructure state consistency.
+
+ENHANCEMENTS:
+
+* **vastdata_s3_policy_attachment**: Added `group_sid` field to support groups that may not have valid POSIX GIDs (e.g., `gid = -1`).
+
 ## 3.0.6
 
 ENHANCEMENTS:
