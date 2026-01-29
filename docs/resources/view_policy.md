@@ -151,6 +151,7 @@ Optional:
 - `create_delete_files_dirs_objects` (Boolean) Audit operations that create or delete files, directories, or objects
 - `log_deleted_files_dirs` (Boolean) Log deleted files and directories
 - `log_full_path` (Boolean) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
+- `log_hostname` (Boolean) Log hostname
 - `log_username` (Boolean) Log username of requesting user. Disabled by default
 - `modify_data` (Boolean)
 - `modify_data_md` (Boolean) Audit operations that modify data (including operations that change the file size) and metadata
