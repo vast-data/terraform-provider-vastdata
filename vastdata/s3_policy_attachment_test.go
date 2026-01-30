@@ -20,9 +20,11 @@ import (
 func createTestS3PolicyAttachment(rawValues map[string]attr.Value) *S3PolicyAttachment {
 	schema := rschema.Schema{
 		Attributes: map[string]rschema.Attribute{
-			"gid":            rschema.Int64Attribute{Optional: true},
+			"group_sid":      rschema.StringAttribute{Optional: true},
 			"groupname":      rschema.StringAttribute{Optional: true},
+			"gid":            rschema.Int64Attribute{Optional: true},
 			"uid":            rschema.Int64Attribute{Optional: true},
+			"sid":            rschema.StringAttribute{Optional: true},
 			"username":       rschema.StringAttribute{Optional: true},
 			"s3_policy_id":   rschema.Int64Attribute{Optional: true},
 			"s3_policy_guid": rschema.StringAttribute{Optional: true, Computed: true},
@@ -34,9 +36,11 @@ func createTestS3PolicyAttachment(rawValues map[string]attr.Value) *S3PolicyAtta
 
 	// Ensure all schema fields have values (null if not provided)
 	fullRawValues := map[string]attr.Value{
-		"gid":            types.Int64Null(),
+		"group_sid":      types.StringNull(),
 		"groupname":      types.StringNull(),
+		"gid":            types.Int64Null(),
 		"uid":            types.Int64Null(),
+		"sid":            types.StringNull(),
 		"username":       types.StringNull(),
 		"s3_policy_id":   types.Int64Null(),
 		"s3_policy_guid": types.StringNull(),
@@ -146,6 +150,32 @@ func TestS3PolicyAttachment_validateS3PolicyAttachmentConfig(t *testing.T) {
 				"gid":            types.Int64Value(1001),
 				"s3_policy_id":   types.Int64Value(100),
 				"s3_policy_guid": types.StringValue("policy-guid-123"),
+			},
+			expectErr: true,
+			errMsg:    "only one of",
+		},
+		{
+			name: "valid_with_group_sid",
+			rawValues: map[string]attr.Value{
+				"group_sid":    types.StringValue("S-1-5-21-3775954470-3969645310-4227734646-72157"),
+				"s3_policy_id": types.Int64Value(100),
+			},
+			expectErr: false,
+		},
+		{
+			name: "valid_with_sid_for_user",
+			rawValues: map[string]attr.Value{
+				"sid":          types.StringValue("S-1-5-21-1234567890-1234567890-1234567890-2000"),
+				"s3_policy_id": types.Int64Value(100),
+			},
+			expectErr: false,
+		},
+		{
+			name: "invalid_mixing_group_sid_and_gid",
+			rawValues: map[string]attr.Value{
+				"group_sid":    types.StringValue("S-1-5-21-1234567890-1234567890-1234567890-1000"),
+				"gid":          types.Int64Value(1001),
+				"s3_policy_id": types.Int64Value(100),
 			},
 			expectErr: true,
 			errMsg:    "only one of",
@@ -339,6 +369,142 @@ func TestS3PolicyAttachment_ImportResourceState(t *testing.T) {
 				case string:
 					assert.Equal(t, v, attachment.tfstate.String(key), "Field %s should have correct string value", key)
 				}
+			}
+		})
+	}
+}
+
+func TestS3PolicyAttachment_getSearchParamsFromState(t *testing.T) {
+	tests := []struct {
+		name            string
+		rawValues       map[string]attr.Value
+		expectedKey     string
+		expectedContext string
+		checkValueFunc  func(*testing.T, interface{})
+	}{
+		{
+			name: "group_sid",
+			rawValues: map[string]attr.Value{
+				"group_sid": types.StringValue("S-1-5-21-3775954470-3969645310-4227734646-72157"),
+				"context":   types.StringValue("ad"),
+			},
+			expectedKey:     "sid",
+			expectedContext: "group",
+			checkValueFunc: func(t *testing.T, val interface{}) {
+				assert.Equal(t, "S-1-5-21-3775954470-3969645310-4227734646-72157", val)
+			},
+		},
+		{
+			name: "groupname",
+			rawValues: map[string]attr.Value{
+				"groupname": types.StringValue("test-group"),
+			},
+			expectedKey:     "groupname",
+			expectedContext: "group",
+			checkValueFunc: func(t *testing.T, val interface{}) {
+				assert.Equal(t, "test-group", val)
+			},
+		},
+		{
+			name: "sid_for_user",
+			rawValues: map[string]attr.Value{
+				"sid": types.StringValue("S-1-5-21-1234567890-1234567890-1234567890-2000"),
+			},
+			expectedKey:     "sid",
+			expectedContext: "user",
+			checkValueFunc: func(t *testing.T, val interface{}) {
+				assert.Equal(t, "S-1-5-21-1234567890-1234567890-1234567890-2000", val)
+			},
+		},
+		{
+			name: "uid",
+			rawValues: map[string]attr.Value{
+				"uid": types.Int64Value(2001),
+			},
+			expectedKey:     "uid",
+			expectedContext: "user",
+			checkValueFunc: func(t *testing.T, val interface{}) {
+				assert.Equal(t, int64(2001), val)
+			},
+		},
+		{
+			name: "username",
+			rawValues: map[string]attr.Value{
+				"username": types.StringValue("test-user"),
+			},
+			expectedKey:     "username",
+			expectedContext: "user",
+			checkValueFunc: func(t *testing.T, val interface{}) {
+				assert.Equal(t, "test-user", val)
+			},
+		},
+		{
+			name: "gid_checked_last",
+			rawValues: map[string]attr.Value{
+				"gid":     types.Int64Value(1001),
+				"context": types.StringValue("ad"),
+			},
+			expectedKey:     "gid",
+			expectedContext: "group",
+			checkValueFunc: func(t *testing.T, val interface{}) {
+				assert.Equal(t, int64(1001), val)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			schema := rschema.Schema{
+				Attributes: map[string]rschema.Attribute{
+					"group_sid":      rschema.StringAttribute{Optional: true},
+					"groupname":      rschema.StringAttribute{Optional: true},
+					"gid":            rschema.Int64Attribute{Optional: true},
+					"uid":            rschema.Int64Attribute{Optional: true},
+					"sid":            rschema.StringAttribute{Optional: true},
+					"username":       rschema.StringAttribute{Optional: true},
+					"s3_policy_id":   rschema.Int64Attribute{Optional: true},
+					"s3_policy_guid": rschema.StringAttribute{Optional: true, Computed: true},
+					"ignore_present": rschema.BoolAttribute{Optional: true, Computed: true},
+					"context":        rschema.StringAttribute{Optional: true},
+					"tenant_id":      rschema.Int64Attribute{Optional: true},
+				},
+			}
+
+			// Ensure all schema fields have values (null if not provided)
+			fullRawValues := map[string]attr.Value{
+				"group_sid":      types.StringNull(),
+				"groupname":      types.StringNull(),
+				"gid":            types.Int64Null(),
+				"uid":            types.Int64Null(),
+				"sid":            types.StringNull(),
+				"username":       types.StringNull(),
+				"s3_policy_id":   types.Int64Null(),
+				"s3_policy_guid": types.StringNull(),
+				"ignore_present": types.BoolNull(),
+				"context":        types.StringNull(),
+				"tenant_id":      types.Int64Null(),
+			}
+
+			// Override with provided values
+			for k, v := range tt.rawValues {
+				fullRawValues[k] = v
+			}
+
+			attachment := &S3PolicyAttachment{
+				tfstate: is.NewTFStateMust(fullRawValues, schema, nil),
+			}
+
+			searchParams, attachContext := attachment.getSearchParamsFromState(attachment.tfstate)
+
+			assert.Equal(t, tt.expectedContext, attachContext, "Attach context should match")
+
+			// Check that the expected key is present in searchParams
+			val, ok := searchParams[tt.expectedKey]
+			require.True(t, ok, "Expected key %s should be present in search params", tt.expectedKey)
+
+			// Use the checkValueFunc to verify the value
+			if tt.checkValueFunc != nil {
+				tt.checkValueFunc(t, val)
 			}
 		})
 	}

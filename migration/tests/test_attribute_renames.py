@@ -45,8 +45,8 @@ class TestAttributeRenames:
         assert "vastdata_s3_replication_peer" in result
         assert "vastdata_s3_replication_peers" not in result
     
-    def test_permissions_list_to_permissions_transformation(self):
-        """Test that permissions_list is renamed to permissions."""
+    def test_permissions_list_to_permissions_for_administrator_role(self):
+        """Test that permissions_list is converted to permissions for administrator_role."""
         terraform_content = '''resource "vastdata_administators_roles" "role1" {
   name             = "role1"
   permissions_list = ["create_support", "create_settings", "create_security"]
@@ -56,13 +56,28 @@ class TestAttributeRenames:
         result, consumed = transform_resource_block(lines, 0)
         
         assert result is not None
-        # Check that permissions_list is renamed to permissions
+        # Check that permissions_list is converted to permissions for administrator_role
         assert 'permissions = ["create_support", "create_settings", "create_security"]' in result
         assert 'permissions_list' not in result
         
         # Check that resource name is also renamed
         assert "vastdata_administrator_role" in result
         assert "vastdata_administators_roles" not in result
+    
+    def test_permissions_preserved_for_administrator_role(self):
+        """Test that permissions attribute stays as permissions for administrator_role."""
+        terraform_content = '''resource "vastdata_administrator_role" "role1" {
+  name        = "role1"
+  permissions = ["create_support", "create_settings"]
+}'''
+        
+        lines = terraform_content.split('\n')
+        result, consumed = transform_resource_block(lines, 0)
+        
+        assert result is not None
+        # Check that permissions stays as permissions (not converted)
+        assert 'permissions = ["create_support", "create_settings"]' in result
+        assert 'permissions_list' not in result
     
     def test_multiple_attribute_renames_in_single_resource(self):
         """Test multiple attribute renames in the same resource."""
@@ -78,11 +93,12 @@ class TestAttributeRenames:
         result, consumed = transform_resource_block(lines, 0)
         
         assert result is not None
-        # Check both attribute renames
+        # Check attribute renames
         assert 'type = "AWS_S3"' in result
+        # permissions_list should be converted to permissions for non-administrator_manager resources
         assert 'permissions = ["read", "write"]' in result
-        assert 'type_' not in result
         assert 'permissions_list' not in result
+        assert 'type_' not in result
         
         # Check resource rename
         assert "vastdata_s3_replication_peer" in result
@@ -110,7 +126,7 @@ class TestAttributeRenames:
         
         assert result is not None
         # Check that indentation is preserved
-        assert '  permissions = [' in result
+        assert '  permissions = [' in result  # permissions_list converted to permissions
         assert '    type = "ADVANCED"' in result
     
     def test_attribute_renames_with_complex_values(self):
@@ -134,8 +150,8 @@ class TestAttributeRenames:
         assert 'var.additional_permissions' in result
         assert 'type = var.s3_type != null ? var.s3_type : "CUSTOM_S3"' in result
     
-    def test_administrator_manager_permissions_rename(self):
-        """Test that permissions is converted to permissions_list for vastdata_administrator_manager."""
+    def test_administrator_manager_permissions_to_permissions_list(self):
+        """Test that permissions is converted to permissions_list for administrator_manager."""
         terraform_content = '''resource "vastdata_administrator_manager" "manager" {
   username = "test-manager"
   permissions = ["read", "write"]
@@ -150,7 +166,7 @@ class TestAttributeRenames:
         # Check that permissions is converted to permissions_list for administrator_manager
         assert 'permissions_list = ["read", "write"]' in result
         assert 'type = "STANDARD"' in result
-        # Should not have the old attribute name
+        # Old attribute should be gone
         assert 'permissions = ["read", "write"]' not in result
     
     def test_attribute_rename_in_nested_blocks(self):
@@ -225,9 +241,9 @@ resource "vastdata_administators_managers" "manager1" {
         assert "vastdata_administrator_manager" in result
         
         # Check attribute renames
-        assert 'permissions = ["create_support", "create_settings"]' in result  # administrator_role uses permissions
+        assert 'permissions = ["create_support", "create_settings"]' in result  # administrator_role: permissions_list -> permissions
         assert 'type = "AWS_S3"' in result
-        assert 'permissions_list = ["create_monitoring"]' in result  # administrator_manager uses permissions_list
+        assert 'permissions_list = ["create_monitoring"]' in result  # administrator_manager keeps permissions_list
         
         # Check originals are gone
         assert 'type_' not in result
@@ -263,6 +279,7 @@ resource "vastdata_administators_managers" "manager1" {
         
         # Check that exact matches are renamed
         assert 'type = "EXACT_MATCH"' in result
+        # permissions_list should be converted to permissions for non-administrator_manager resources
         assert 'permissions = ["EXACT_MATCH"]' in result
         
         # Check that partial matches are not renamed

@@ -12,10 +12,12 @@ import argparse
 import subprocess
 import tempfile
 import shutil
+import threading
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 
 # Resource import field mappings
 # Format: resource_type -> (import_fields, id_field_in_state)
@@ -65,7 +67,42 @@ RESOURCE_IMPORT_MAP = {
     "vastdata_nonlocal_user_key": (["id"], "id"),
     "vastdata_apitoken": (["id"], "id"),
     "vastdata_s3_lifecycle_rule": (["id"], "id"),
+    "vastdata_s3_life_cycle_rule": (["id"], "id"),
+    # v1.x legacy resource names (plural forms and old naming)
+    "vastdata_administators_managers": (["id"], "id"),
+    "vastdata_administators_roles": (["id"], "id"),
+    "vastdata_administators_realms": (["id"], "id"),
+    "vastdata_kafka_brokers": (["id"], "id"),
+    "vastdata_replication_peers": (["id"], "id"),
+    "vastdata_s3_replication_peers": (["id"], "id"),
+    "vastdata_active_directory2": (["id"], "id"),
+    "vastdata_non_local_user": (["username", "context", "tenant_id"], None),
+    "vastdata_non_local_user_key": (["id"], "id"),
+    "vastdata_non_local_group": (["groupname", "context", "tenant_id"], None),
+    "vastdata_saml": (["id"], "id"),
+    "vastdata_blockhost": (["id"], "id"),
     # Note: v3.0 new resources are not included as they don't need migration from v1.6.7
+}
+
+# Map v1/v2 legacy resource names to v3 resource names
+# Used when generating stub resource definitions for terraform import
+RESOURCE_NAME_TRANSLATION = {
+    # v1.x plural forms → v3.x singular forms
+    "vastdata_administators_managers": "vastdata_administrator_manager",
+    "vastdata_administators_roles": "vastdata_administrator_role",
+    "vastdata_administators_realms": "vastdata_administrator_realm",
+    "vastdata_kafka_brokers": "vastdata_kafka_broker",
+    "vastdata_replication_peers": "vastdata_replication_peer",
+    "vastdata_s3_replication_peers": "vastdata_s3_replication_peer",
+    # v1.x/v2.x old naming → v3.x new naming
+    "vastdata_active_directory2": "vastdata_active_directory",
+    "vastdata_non_local_user": "vastdata_nonlocal_user",
+    "vastdata_non_local_user_key": "vastdata_nonlocal_user_key",
+    "vastdata_non_local_group": "vastdata_nonlocal_group",
+    "vastdata_saml": "vastdata_saml_config",
+    "vastdata_blockhost": "vastdata_block_host",
+    # v2.x naming variant → v3.x naming
+    "vastdata_s3_lifecycle_rule": "vastdata_s3_life_cycle_rule",
 }
 
 
@@ -215,6 +252,82 @@ def extract_resources(state: Dict) -> List[Dict]:
     return resources
 
 
+def separate_vast_resources(resources: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
+    """Separate VAST resources from other provider resources
+    
+    Returns:
+        Tuple of (vast_resources, non_vast_resources)
+    """
+    vast_resources = []
+    non_vast_resources = []
+    
+    for resource in resources:
+        resource_type = resource.get('type', '')
+        if resource_type.startswith('vastdata_'):
+            vast_resources.append(resource)
+        else:
+            non_vast_resources.append(resource)
+    
+    log_info(f"Separated resources: {len(vast_resources)} VAST, {len(non_vast_resources)} non-VAST")
+    return vast_resources, non_vast_resources
+
+
+def extract_state_resources_raw(state: Dict) -> List[Dict]:
+    """Extract raw resource entries from state for preservation
+    
+    This preserves the original state structure for non-VAST resources
+    """
+    raw_resources = []
+    
+    if 'resources' in state:
+        # TF >= 0.12 format
+        for resource in state['resources']:
+            raw_resources.append(resource)
+    else:
+        # Legacy format
+        log_warning("Legacy state format - non-VAST resources may not be preserved correctly")
+    
+    return raw_resources
+
+
+def merge_non_vast_resources_to_state(state_file: str, non_vast_resources: List[Dict], original_state: Dict):
+    """Merge non-VAST resources into the migrated state file
+    
+    Args:
+        state_file: Path to the migrated state file
+        non_vast_resources: List of raw resource objects from original state
+        original_state: Original state dict for metadata
+    """
+    if not non_vast_resources:
+        log_info("No non-VAST resources to merge")
+        return
+    
+    log_info(f"Merging {len(non_vast_resources)} non-VAST resources into migrated state")
+    
+    try:
+        # Read the migrated state
+        with open(state_file, 'r') as f:
+            migrated_state = json.load(f)
+        
+        # Add non-VAST resources to the migrated state
+        if 'resources' not in migrated_state:
+            migrated_state['resources'] = []
+        
+        migrated_state['resources'].extend(non_vast_resources)
+        
+        # Increment serial number
+        migrated_state['serial'] = migrated_state.get('serial', 0) + 1
+        
+        # Write back
+        with open(state_file, 'w') as f:
+            json.dump(migrated_state, f, indent=2)
+        
+        log_success(f"Successfully merged {len(non_vast_resources)} non-VAST resources")
+    except Exception as e:
+        log_error(f"Failed to merge non-VAST resources: {e}")
+        raise
+
+
 def build_import_id(resource: Dict) -> Optional[str]:
     """Build import ID string for a resource"""
     resource_type = resource['type']
@@ -290,6 +403,110 @@ def run_import_script(script_path: str, output_dir: str) -> Tuple[int, int]:
         return 1
 
 
+def import_single_resource(resource: Dict, terraform_dir: str, lock: threading.Lock) -> Tuple[bool, str, str]:
+    """Import a single resource using terraform import
+    
+    Args:
+        resource: Resource dict with type, address, attributes
+        terraform_dir: Directory containing terraform configuration
+        lock: Threading lock for terraform state operations
+        
+    Returns:
+        Tuple of (success, resource_address, error_message)
+    """
+    import_id = build_import_id(resource)
+    if not import_id:
+        return False, resource['address'], "No import ID could be built"
+    
+    original_address = resource['address']
+    
+    # Translate resource type to v3 name for import command
+    parts = original_address.split('.', 1)
+    if len(parts) == 2:
+        resource_type_from_state = parts[0]
+        resource_name = parts[1]
+        resource_type_v3 = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
+        translated_address = f"{resource_type_v3}.{resource_name}"
+    else:
+        translated_address = original_address
+    
+    # Use lock to ensure terraform operations are serialized (terraform doesn't support concurrent state modifications)
+    with lock:
+        try:
+            result = subprocess.run(
+                ['terraform', 'import', translated_address, import_id],
+                cwd=terraform_dir,
+                capture_output=True,
+                text=True,
+                timeout=300  # 5 minute timeout per resource
+            )
+            
+            if result.returncode == 0:
+                return True, translated_address, ""
+            else:
+                error_msg = result.stderr if result.stderr else result.stdout
+                return False, translated_address, error_msg
+        except subprocess.TimeoutExpired:
+            return False, translated_address, "Import timeout (>5 minutes)"
+        except Exception as e:
+            return False, translated_address, str(e)
+
+
+def run_parallel_imports(resources: List[Dict], terraform_dir: str, max_workers: int = 5) -> Tuple[int, int, List[str]]:
+    """Import resources in parallel using ThreadPoolExecutor
+    
+    Args:
+        resources: List of resource dicts to import
+        terraform_dir: Directory containing terraform configuration
+        max_workers: Number of parallel workers (default: 5)
+        
+    Returns:
+        Tuple of (success_count, failed_count, failed_resources)
+    """
+    log_info(f"Starting parallel import with {max_workers} workers for {len(resources)} resources")
+    
+    # Terraform state operations need to be serialized
+    state_lock = threading.Lock()
+    
+    success_count = 0
+    failed_count = 0
+    failed_resources = []
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all import tasks
+        future_to_resource = {
+            executor.submit(import_single_resource, resource, terraform_dir, state_lock): resource
+            for resource in resources
+        }
+        
+        # Process completed imports
+        for future in as_completed(future_to_resource):
+            resource = future_to_resource[future]
+            try:
+                success, address, error = future.result()
+                
+                if success:
+                    success_count += 1
+                    log_success(f"[{success_count + failed_count}/{len(resources)}] ✓ Imported {address}")
+                else:
+                    failed_count += 1
+                    failed_resources.append(address)
+                    log_error(f"[{success_count + failed_count}/{len(resources)}] ✗ Failed {address}: {error[:100]}")
+            except Exception as e:
+                failed_count += 1
+                failed_resources.append(resource['address'])
+                log_error(f"✗ Exception importing {resource['address']}: {e}")
+    
+    log_info("=" * 80)
+    log_info("Import Summary:")
+    log_info(f"  Total resources: {len(resources)}")
+    log_info(f"  Successfully imported: {success_count}")
+    log_info(f"  Failed: {failed_count}")
+    log_info("=" * 80)
+    
+    return success_count, failed_count, failed_resources
+
+
 def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir: str) -> str:
     """Generate shell script with terraform import commands"""
     script_path = os.path.join(output_dir, "import_resources.sh")
@@ -302,7 +519,9 @@ def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir
         f.write("# Auto-generated stub resource definitions for import\n")
         f.write("# These are minimal definitions required by terraform import\n\n")
         for resource in resources:
-            resource_type = resource['type']
+            resource_type_from_state = resource['type']
+            # Translate v1/v2 resource names to v3 names
+            resource_type = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
             resource_name = resource['address'].split('.', 1)[1]  # Extract name from address
             f.write(f'resource "{resource_type}" "{resource_name}" {{\n')
             f.write('  # Configuration will be populated from import\n')
@@ -333,14 +552,28 @@ def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir
                 f.write(f"# SKIPPED: {resource['address']} (no import ID)\n")
                 continue
             
-            address = resource['address']
-            f.write(f"# Import {idx}/{len(resources)}: {address}\n")
-            f.write(f"echo \"[{idx}/{len(resources)}] Importing {address}...\"\n")
-            f.write(f"if terraform import '{address}' '{import_id}'; then\n")
-            f.write(f"    echo \"  ✓ Successfully imported {address}\"\n")
+            # Original address from state (may use v1/v2 resource name)
+            original_address = resource['address']
+            
+            # Translate resource type to v3 name for import command
+            # Address format: resource_type.resource_name
+            parts = original_address.split('.', 1)
+            if len(parts) == 2:
+                resource_type_from_state = parts[0]
+                resource_name = parts[1]
+                # Translate to v3 resource name
+                resource_type_v3 = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
+                translated_address = f"{resource_type_v3}.{resource_name}"
+            else:
+                translated_address = original_address
+            
+            f.write(f"# Import {idx}/{len(resources)}: {original_address} (as {translated_address})\n")
+            f.write(f"echo \"[{idx}/{len(resources)}] Importing {translated_address}...\"\n")
+            f.write(f"if terraform import '{translated_address}' '{import_id}'; then\n")
+            f.write(f"    echo \"  ✓ Successfully imported {translated_address}\"\n")
             f.write(f"    IMPORT_COUNT=$((IMPORT_COUNT + 1))\n")
             f.write(f"else\n")
-            f.write(f"    echo \"  ✗ Failed to import {address}\"\n")
+            f.write(f"    echo \"  ✗ Failed to import {translated_address}\"\n")
             f.write(f"    FAILED_COUNT=$((FAILED_COUNT + 1))\n")
             f.write(f"fi\n\n")
         
@@ -455,6 +688,8 @@ Examples:
     parser.add_argument('--s3-access-key', help='AWS/S3 access key ID')
     parser.add_argument('--s3-secret-key', help='AWS/S3 secret access key')
     parser.add_argument('--s3-endpoint', help='Custom S3 endpoint URL (for VAST S3 or S3-compatible storage)')
+    parser.add_argument('--max-workers', type=int, default=5, 
+                       help='Maximum number of parallel workers for resource imports (default: 5)')
     
     args = parser.parse_args()
     
@@ -557,7 +792,10 @@ Examples:
     # Parse state
     state = parse_tfstate(state_file)
     
-    # Extract resources
+    # Extract raw resources for preservation
+    raw_resources = extract_state_resources_raw(state)
+    
+    # Extract resources with structured format
     resources = extract_resources(state)
     
     if not resources:
@@ -565,11 +803,43 @@ Examples:
         shutil.rmtree(temp_dir)
         return
     
-    # Generate import script in temp directory
-    script_path = generate_import_script(resources, temp_dir, temp_dir)
+    # Separate VAST resources from non-VAST resources
+    vast_resources, non_vast_resource_structs = separate_vast_resources(resources)
+    
+    # Get raw non-VAST resources for preservation
+    non_vast_raw_resources = []
+    if non_vast_resource_structs:
+        non_vast_types = {r['type'] for r in non_vast_resource_structs}
+        for raw_res in raw_resources:
+            if raw_res.get('type') in non_vast_types:
+                non_vast_raw_resources.append(raw_res)
+        log_info(f"Preserving {len(non_vast_raw_resources)} non-VAST provider resources")
+    
+    if not vast_resources:
+        log_warning("No VAST resources found in state file")
+        if non_vast_raw_resources:
+            log_info("Only non-VAST resources found - copying state as-is")
+            os.makedirs(output_dir, exist_ok=True)
+            shutil.copy(state_file, os.path.join(output_dir, 'terraform.tfstate'))
+            log_success("State file copied successfully")
+        shutil.rmtree(temp_dir)
+        return
+    
+    # Generate stub resource definitions for VAST resources only
+    resources_tf_path = os.path.join(temp_dir, "resources.tf")
+    with open(resources_tf_path, 'w') as f:
+        f.write("# Auto-generated stub resource definitions for VAST resources import\n")
+        f.write("# Non-VAST resources will be preserved from original state\n\n")
+        for resource in vast_resources:
+            resource_type_from_state = resource['type']
+            resource_type = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
+            resource_name = resource['address'].split('.', 1)[1]
+            f.write(f'resource "{resource_type}" "{resource_name}" {{\n')
+            f.write('  # Configuration will be populated from import\n')
+            f.write('}\n\n')
     
     # Create summary in temp directory (for reference during import)
-    create_import_summary(resources, temp_dir)
+    create_import_summary(vast_resources, temp_dir)
     
     # Clean up temp file if downloaded from S3
     if args.s3_bucket and state_file:
@@ -579,27 +849,71 @@ Examples:
             pass
     
     log_success("=" * 80)
-    log_info("Running import script...")
+    log_info(f"Running parallel import with {args.max_workers} workers for {len(vast_resources)} VAST resources...")
     log_success("=" * 80)
     
-    # Execute the import script
-    returncode = run_import_script(script_path, temp_dir)
+    # Initialize terraform in temp directory
+    log_info("Initializing Terraform...")
+    init_result = subprocess.run(
+        ['terraform', 'init'],
+        cwd=temp_dir,
+        capture_output=True,
+        text=True
+    )
+    if init_result.returncode != 0 and 'dev_overrides' not in init_result.stdout:
+        log_warning(f"Terraform init had issues: {init_result.stderr}")
+    
+    # Remove existing state if present
+    state_path = os.path.join(temp_dir, 'terraform.tfstate')
+    if os.path.exists(state_path):
+        os.remove(state_path)
+    
+    # Execute parallel imports
+    success_count, failed_count, failed_resources = run_parallel_imports(vast_resources, temp_dir, max_workers=args.max_workers)
+    
+    returncode = 0 if failed_count == 0 else 1
     
     log_success("=" * 80)
-    if returncode == 0:
+    if returncode == 0 or (failed_count > 0 and success_count > 0):
         # Create output directory
         os.makedirs(output_dir, exist_ok=True)
         
-        # Move only the migrated state file to output directory
+        # Get migrated state file path
         migrated_state = os.path.join(temp_dir, 'terraform.tfstate')
         output_state = os.path.join(output_dir, 'terraform.tfstate')
         
         if os.path.exists(migrated_state):
+            # Merge non-VAST resources into the migrated state
+            if non_vast_raw_resources:
+                log_info("=" * 80)
+                merge_non_vast_resources_to_state(migrated_state, non_vast_raw_resources, state)
+            
+            # Move the final merged state to output directory
             shutil.move(migrated_state, output_state)
-            log_success("State migration complete!")
-            log_success("=" * 80)
-            print(f"\nMigration successful!")
-            print(f"  - Source directory (unchanged): {source_dir}")
+            
+            if returncode == 0:
+                log_success("State migration complete!")
+                log_success("=" * 80)
+                print(f"\nMigration successful!")
+                print(f"  - VAST resources imported: {success_count}")
+                if non_vast_raw_resources:
+                    print(f"  - Non-VAST resources preserved: {len(non_vast_raw_resources)}")
+            else:
+                log_warning("State migration completed with some failures")
+                log_warning("=" * 80)
+                print(f"\nMigration partially successful!")
+                print(f"  - VAST resources imported: {success_count}")
+                print(f"  - VAST resources failed: {failed_count}")
+                if non_vast_raw_resources:
+                    print(f"  - Non-VAST resources preserved: {len(non_vast_raw_resources)}")
+                if failed_resources:
+                    print(f"\nFailed resources:")
+                    for res in failed_resources[:10]:  # Show first 10
+                        print(f"    - {res}")
+                    if len(failed_resources) > 10:
+                        print(f"    ... and {len(failed_resources) - 10} more")
+            
+            print(f"\n  - Source directory (unchanged): {source_dir}")
             print(f"  - Migrated state file: {output_state}")
             print(f"\nNext steps:")
             print(f"  1. Update .tf files from {source_dir} to v2.x format")
@@ -614,21 +928,26 @@ Examples:
         else:
             log_error("Migrated state file not found!")
             sys.exit(1)
+            
+        # Don't exit with error if some resources succeeded
+        if returncode != 0 and success_count > 0:
+            returncode = 0
     else:
         log_error("State migration failed!")
         log_error("=" * 80)
-        print(f"\nSome imports failed. Check the logs in: {temp_dir}")
-        print(f"  - Import script: {script_path}")
+        print(f"\nAll imports failed. Check the logs in: {temp_dir}")
+        print(f"  - Resources file: {os.path.join(temp_dir, 'resources.tf')}")
         print(f"  - Summary: {temp_dir}/import_summary.txt")
         print(f"\nTemp directory preserved for debugging: {temp_dir}")
         sys.exit(1)
     
-    # Clean up temp directory
-    try:
-        shutil.rmtree(temp_dir)
-        log_info("Cleaned up temporary files")
-    except Exception as e:
-        log_warning(f"Could not clean up temp directory {temp_dir}: {e}")
+    # Clean up temp directory (only if migration succeeded)
+    if returncode == 0:
+        try:
+            shutil.rmtree(temp_dir)
+            log_info("Cleaned up temporary files")
+        except Exception as e:
+            log_warning(f"Could not clean up temp directory {temp_dir}: {e}")
 
 
 if __name__ == '__main__':

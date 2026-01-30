@@ -82,6 +82,7 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `path_length` (String) Specifies the policy for limiting file path component name length.
 - `permission_per_vip_pool` (Map of String) VIP pools permissions map - {vippool_id: permission}. Example - {1: 'RW'}.
 - `protocols` (Set of String) Array of protocols to audit
+- `protocols_audit` (Attributes) Specify audit options to enable them for all attached views in addition to auditing options that are enabled globably on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read_only` (Set of String) Specify which NFS client hosts can access the view with read-only access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `read_write` (Set of String) Specify which NFS client hosts can access the view with read-write access. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `s3_flavor_allow_free_listing` (Boolean) Allow NFS clients freely list bucket views and their subdirectories, regardless of individual object permissions.
@@ -123,7 +124,6 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `log_username` (Boolean) Log username
 - `pretty_atime_frequency` (String)
 - `pretty_auth_source` (String)
-- `protocols_audit` (Attributes) Audit settings. Any settings enabled here apply to attached views, in addition to any audit settings enabled on the cluster. (see [below for nested schema](#nestedatt--protocols_audit))
 - `read` (Set of String) Hosts with read permissions
 - `s3_bucket_listing` (String) Hosts with full permissions
 - `s3_bucket_read` (String) Hosts with full permissions
@@ -146,11 +146,12 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 <a id="nestedatt--protocols_audit"></a>
 ### Nested Schema for `protocols_audit`
 
-Read-Only:
+Optional:
 
 - `create_delete_files_dirs_objects` (Boolean) Audit operations that create or delete files, directories, or objects
 - `log_deleted_files_dirs` (Boolean) Log deleted files and directories
 - `log_full_path` (Boolean) Log full Element Store path to the requested resource. Enabled by default. May affect performance. When disabled, the view path is recorded.
+- `log_hostname` (Boolean) Log hostname
 - `log_username` (Boolean) Log username of requesting user. Disabled by default
 - `modify_data` (Boolean)
 - `modify_data_md` (Boolean) Audit operations that modify data (including operations that change the file size) and metadata

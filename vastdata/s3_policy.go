@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var S3PolicySchemaRef = is.NewSchemaReference(
@@ -23,9 +24,10 @@ func (m *S3Policy) NewResourceManager(raw map[string]attr.Value, schema any) Res
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:            S3PolicySchemaRef,
-			EditOnlyFields:       []string{"enabled"},
-			OptionalSchemaFields: []string{"enabled"},
+			PreserveUserValueFields: []string{"policy"},
+			SchemaRef:               S3PolicySchemaRef,
+			EditOnlyFields:          []string{"enabled"},
+			OptionalSchemaFields:    []string{"enabled"},
 		},
 	)}
 }

@@ -113,6 +113,171 @@ resource "vastdata_quota" "vastdb_quota" {
 }
 
 # --------------------
+
+data "vastdata_view_policy" "default_policy" {
+  name = "default"
+}
+
+resource "vastdata_view" "user_defaults_only" {
+  path       = "/vastdb-user-defaults"
+  policy_id  = data.vastdata_view_policy.default_policy.id
+  create_dir = true
+  protocols  = ["NFS"]
+}
+
+# Quota that applies default limits to ALL users without exceptions
+resource "vastdata_quota" "user_defaults_only" {
+  name          = "user-vastdb-defaults-only"
+  path          = vastdata_view.user_defaults_only.path
+  default_email = "quota-admin@example.com"
+
+  # Enable user quotas
+  is_user_quota          = true
+  enable_alarms          = true
+  enable_email_providers = true
+
+  # Overall directory limits
+  soft_limit   = 10000000000 # 10GB total
+  hard_limit   = 20000000000 # 20GB total
+  grace_period = "1:00:00"   # 1 hour
+
+  # Every user gets the same limits
+  default_user_quota = {
+    soft_limit   = 100000000 # 100MB per user
+    hard_limit   = 200000000 # 200MB per user
+    grace_period = "30m"     # 30 minutes
+  }
+}
+
+# --------------------
+
+data "vastdata_view_policy" "default_policy_groups" {
+  name = "default"
+}
+
+resource "vastdata_view" "group_defaults_only" {
+  path       = "/vastdb-group-defaults"
+  policy_id  = data.vastdata_view_policy.default_policy_groups.id
+  create_dir = true
+  protocols  = ["NFS", "NFS4"]
+}
+
+# Quota that applies default limits to ALL groups without exceptions
+resource "vastdata_quota" "group_defaults_only" {
+  name          = "group-vastdb-defaults-only"
+  path          = vastdata_view.group_defaults_only.path
+  default_email = "group-admin@example.com"
+
+  # Enable user/group quotas
+  is_user_quota = true
+  enable_alarms = true
+
+  # Create directory with specific permissions
+  create_dir      = true
+  create_dir_mode = 775
+  inherit_acl     = false
+
+  # Overall directory limits (capacity and inodes)
+  soft_limit        = 5000000000  # 5GB total
+  hard_limit        = 10000000000 # 10GB total
+  soft_limit_inodes = 50000
+  hard_limit_inodes = 100000
+  grace_period      = "12:00:00" # 12 hours
+
+  # Every group gets the same limits
+  # Useful for enforcing uniform quota policies across all groups
+  default_group_quota = {
+    soft_limit        = 500000000  # 500MB per group
+    hard_limit        = 1000000000 # 1GB per group
+    soft_limit_inodes = 5000       # 5000 files/dirs per group
+    hard_limit_inodes = 10000      # 10000 files/dirs per group
+    grace_period      = "6:00:00"  # 6 hours
+  }
+}
+
+# --------------------
+
+
+resource "vastdata_local_provider" "vastdb_provider" {
+  name        = "vastdb-provider"
+  description = "Test local provider"
+  managed_by  = ["TENANT_ADMIN", "SUPER_ADMIN"]
+}
+
+resource "vastdata_tenant" "vastdb_tenant" {
+  name              = "vastdb-tenant"
+  client_ip_ranges  = [["192.168.100.50", "192.168.100.54"]]
+  local_provider_id = vastdata_local_provider.vastdb_provider.id
+  force_delete      = true
+}
+
+resource "vastdata_user" "vastdb_user" {
+  name              = "vastdb_user"
+  local_provider_id = vastdata_local_provider.vastdb_provider.id
+}
+
+resource "vastdata_group" "vastdb_group" {
+  name              = "vastdb_group"
+  gid               = 50001
+  local_provider_id = vastdata_local_provider.vastdb_provider.id
+}
+
+resource "vastdata_view_policy" "vastdb_view_policy" {
+  name          = "vastdb-view-policy"
+  flavor        = "NFS"
+  nfs_no_squash = ["10.0.0.1", "10.0.0.2"]
+  tenant_id     = vastdata_tenant.vastdb_tenant.id
+}
+
+resource "vastdata_view" "vastdb_view" {
+  path       = "/vastdb-path"
+  policy_id  = vastdata_view_policy.vastdb_view_policy.id
+  create_dir = true
+  protocols  = ["NFS", "NFS4"]
+  tenant_id  = vastdata_tenant.vastdb_tenant.id
+}
+
+resource "vastdata_quota" "quota1" {
+  name              = "vastdb-quota"
+  path              = vastdata_view.vastdb_view.path
+  default_email     = "user@example.com"
+  soft_limit        = 100000
+  hard_limit        = 100000
+  soft_limit_inodes = 1000000
+  hard_limit_inodes = 1000000
+  is_user_quota     = true
+  enable_alarms     = true
+  tenant_id         = vastdata_tenant.vastdb_tenant.id
+  default_user_quota = {
+    soft_limit        = 50000
+    hard_limit        = 100000
+    hard_limit_inodes = 10000
+  }
+  default_group_quota = {
+    soft_limit        = 75000
+    hard_limit        = 150000
+    hard_limit_inodes = 15000
+  }
+  user_quotas = [{
+    grace_period    = "02:00:00"
+    hard_limit      = 15000
+    soft_limit      = 15000
+    identifier      = "vastdb-quota-user"
+    identifier_type = "username"
+    name            = vastdata_user.vastdb_user.name
+    email           = "user1@example.com"
+  }]
+  group_quotas = [{
+    grace_period    = "4 03:00:00"
+    hard_limit      = 15000
+    soft_limit      = 15000
+    identifier      = "vastdb-quota-group"
+    identifier_type = "group"
+    name            = "vastdb-quota-group"
+  }]
+}
+
+# --------------------
 ```
 
 <!-- schema generated by tfplugindocs -->
@@ -128,6 +293,8 @@ resource "vastdata_quota" "vastdb_quota" {
 - `create_dir` (Boolean) Set to true to create the directory if the directory was not created yet.
 - `create_dir_mode` (Number) Unix permissions mode for the new directory
 - `default_email` (String) Emails are sent to users if and when they exceed their user/group quota limits. default_email is a default email address that is used instead of a user's email address in the event that no email address is found for the user on a provider and no email suffix is set.
+- `default_group_quota` (Attributes) (see [below for nested schema](#nestedatt--default_group_quota))
+- `default_user_quota` (Attributes) (see [below for nested schema](#nestedatt--default_user_quota))
 - `enable_alarms` (Boolean) Enables alarms on relevant events for user and group quotas. Applicable only if is_user_quota is true. Raises alarms reporting the number of users that exceed their quotas and when one or more users is/are blocked from writing to the quota directory.
 - `enable_email_providers` (Boolean) Set to true to enable querying Active Directory and LDAP services for user emails when sending user notifications to users if they exceed their user/group quota limits. If enabled, the provider query is the first priority source for a user's email. If a user's email is not found on the provider, a global suffix is used to form an email. If no suffix is set, default_email is used.
 - `grace_period` (String) Quota enforcement grace period. An alarm is triggered and write operations are blocked if storage usage continues to exceed the soft limit for the grace period. Format: [DD] [HH:[MM:]]ss
@@ -145,8 +312,6 @@ resource "vastdata_quota" "vastdb_quota" {
 
 - `cluster` (String) Parent Cluster
 - `cluster_id` (Number) Parent Cluster ID
-- `default_group_quota` (Attributes) (see [below for nested schema](#nestedatt--default_group_quota))
-- `default_user_quota` (Attributes) (see [below for nested schema](#nestedatt--default_user_quota))
 - `guid` (String) Quota guid
 - `id` (Number) The ID of this resource.
 - `internal` (Boolean)
@@ -171,6 +336,32 @@ resource "vastdata_quota" "vastdb_quota" {
 - `used_effective_capacity_tb` (Number) Used effective capacity in TB
 - `used_inodes` (Number) Number of directories and unique files under the path
 - `used_limited_capacity` (Number)
+
+<a id="nestedatt--default_group_quota"></a>
+### Nested Schema for `default_group_quota`
+
+Optional:
+
+- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `hard_limit` (Number) Hard quota limit
+- `hard_limit_inodes` (Number) Hard inodes quota limit
+- `quota_system_id` (Number)
+- `soft_limit` (Number) Soft quota limit
+- `soft_limit_inodes` (Number) Soft inodes quota limit
+
+
+<a id="nestedatt--default_user_quota"></a>
+### Nested Schema for `default_user_quota`
+
+Optional:
+
+- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
+- `hard_limit` (Number) Hard quota limit
+- `hard_limit_inodes` (Number) Hard inodes quota limit
+- `quota_system_id` (Number)
+- `soft_limit` (Number) Soft quota limit
+- `soft_limit_inodes` (Number) Soft inodes quota limit
+
 
 <a id="nestedatt--group_quotas"></a>
 ### Nested Schema for `group_quotas`
@@ -224,29 +415,3 @@ Optional:
 - `used_capacity` (Number) Used capacity in bytes
 - `used_inodes` (Number) Used inodes
 - `vast_id` (Number) VAST ID of the user or group with the listed user/group quota
-
-
-<a id="nestedatt--default_group_quota"></a>
-### Nested Schema for `default_group_quota`
-
-Read-Only:
-
-- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
-- `hard_limit` (Number) Hard quota limit
-- `hard_limit_inodes` (Number) Hard inodes quota limit
-- `quota_system_id` (Number)
-- `soft_limit` (Number) Soft quota limit
-- `soft_limit_inodes` (Number) Soft inodes quota limit
-
-
-<a id="nestedatt--default_user_quota"></a>
-### Nested Schema for `default_user_quota`
-
-Read-Only:
-
-- `grace_period` (String) Quota enforcement grace period in seconds, minutes, hours or days. Example: 90m
-- `hard_limit` (Number) Hard quota limit
-- `hard_limit_inodes` (Number) Hard inodes quota limit
-- `quota_system_id` (Number)
-- `soft_limit` (Number) Soft quota limit
-- `soft_limit_inodes` (Number) Soft inodes quota limit

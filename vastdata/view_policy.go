@@ -24,9 +24,10 @@ func (m *ViewPolicy) NewResourceManager(raw map[string]attr.Value, schema any) R
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:      ViewPolicySchemaRef,
-			ReadOnlyFields: []string{"serves_tenant"},
-			ImportFields:   []string{"name", "tenant_name"},
+			SchemaRef:               ViewPolicySchemaRef,
+			PreserveUserValueFields: []string{"protocols_audit"},
+			ReadOnlyFields:          []string{"serves_tenant"},
+			ImportFields:            []string{"name", "tenant_name"},
 		},
 	)}
 }

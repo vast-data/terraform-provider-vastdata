@@ -268,7 +268,7 @@ class TestSchemaTransformations:
         # Check cnode_ids remains as list (no transformation)
         assert 'cnode_ids = [4, 5, 6]' in result
         
-        # Check permissions_list is transformed to permissions
+        # Check permissions_list is transformed to permissions for generic resources
         assert 'permissions = ["read", "write"]' in result
     
     def test_transformation_preserves_indentation(self):

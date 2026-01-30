@@ -24,7 +24,8 @@ func (m *S3ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: S3ReplicationPeerSchemaRef,
+			PreserveUserValueFields: []string{"access_key"},
+			SchemaRef:               S3ReplicationPeerSchemaRef,
 		},
 	)}
 }

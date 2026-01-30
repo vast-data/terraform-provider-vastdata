@@ -13,7 +13,7 @@ resource "vastdata_s3_replication_peer" "aws_peer" {
   secret_key    = "fcESVNih9Ykb/bDSmKipQdinnHObrRyv9nre+nR1"
 }
 
-# Administrator role with permissions (renamed from permissions_list)
+# Administrator role with permissions (converted from permissions_list)
 resource "vastdata_administrator_role" "test_role" {
   name             = "test-role"
   permissions = ["create_support", "create_settings", "create_security"]
@@ -23,7 +23,7 @@ resource "vastdata_administrator_role" "test_role" {
 resource "vastdata_administrator_manager" "test_manager" {
   username         = "test-manager"
   password         = "SecurePassword123"
-  permissions = ["create_monitoring", "view_logs"]
+  permissions_list = ["create_monitoring", "view_logs"]
   roles            = [1, 2, 3]
 }
 
@@ -43,8 +43,8 @@ resource "vastdata_administrator_manager" "complex_manager" {
   username = "complex-manager"
   password = "ComplexPassword456"
   
-  # This should be transformed
-  permissions = [
+  # This should be converted: permissions -> permissions_list
+  permissions_list = [
     "create_support",
     "create_monitoring", 
     "view_logs"
@@ -55,7 +55,7 @@ resource "vastdata_administrator_manager" "complex_manager" {
     for_each = var.access_controls
     content {
       type = access_controls.value.type
-      permissions = access_controls.value.permissions
+      permissions_list = access_controls.value.permissions
     }
   }
 }

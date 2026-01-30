@@ -851,14 +851,19 @@ class TestComprehensiveTransformationCategories:
             
             converted_content = converted_file.read_text()
             
-            # Check attribute renaming: permissions_list -> permissions
+            # Check attribute renaming: permissions_list -> permissions (except for administrator_manager)
             if "permissions_list" in original_content:
                 lines = original_content.split('\n')
                 for line in lines:
                     if "permissions_list" in line and "=" in line:
-                        # Should be renamed to permissions
-                        assert "permissions =" in converted_content, \
-                            f"permissions_list not renamed to permissions in {conf_file}"
+                        # For administrator_manager: stays as permissions_list
+                        # For others: converted to permissions
+                        if "administrator_manager" in conf_file or "administrators_managers" in conf_file:
+                            assert "permissions_list =" in converted_content, \
+                                f"permissions_list not preserved for administrator_manager in {conf_file}"
+                        else:
+                            assert "permissions =" in converted_content, \
+                                f"permissions_list not converted to permissions in {conf_file}"
                         break
             
             # Basic validation that lists are still present (detailed validation would need HCL parsing)

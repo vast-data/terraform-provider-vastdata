@@ -227,8 +227,9 @@ class TestQAIssues:
         result, consumed = transform_resource_block(lines, 0)
         
         assert result is not None
-        assert 'resource vastdata_s3_lifecycle_rule s3_lifecycle_rule1' in result
-        assert 'vastdata_s3_life_cycle_rule' not in result
+        # Verify resource type is correctly renamed (lifecycle -> life_cycle with underscores)
+        assert 'resource vastdata_s3_life_cycle_rule s3_lifecycle_rule1' in result
+        assert 'vastdata_s3_lifecycle_rule' not in result
         # Verify attributes are preserved
         assert 'name = var.s3_lifecycle_name' in result
         assert 'max_size = 10000000' in result
@@ -338,9 +339,9 @@ resource vastdata_s3_life_cycle_rule s3_lifecycle_rule1 {
         assert 'user_quotas = [' in result
         assert 'group_quotas = [' in result
         
-        # Issue #5: s3_life_cycle_rule rename
-        assert 'resource vastdata_s3_lifecycle_rule s3_lifecycle_rule1' in result
-        assert 'vastdata_s3_life_cycle_rule' not in result
+        # Issue #5: s3_life_cycle_rule rename (lifecycle -> life_cycle with underscores)
+        assert 'resource vastdata_s3_life_cycle_rule s3_lifecycle_rule1' in result
+        assert 'vastdata_s3_lifecycle_rule ' not in result  # Old name should be gone
 
     def test_nested_entity_blocks_in_quotas(self):
         """Test that nested entity blocks within quotas are properly flattened."""
@@ -427,12 +428,12 @@ data "vastdata_blockhost" "existing_host" {
         # Verify resource type renames
         assert 'resource vastdata_block_host host1' in result
         assert 'resource vastdata_kafka_broker broker1' in result
-        assert 'resource vastdata_s3_lifecycle_rule rule1' in result
+        assert 'resource vastdata_s3_life_cycle_rule rule1' in result
         
-        # Verify references are updated
+        # Verify references are updated to use new resource names
         assert 'host_ref = vastdata_block_host.host1.id' in result
         assert 'broker_ref = vastdata_kafka_broker.broker1.name' in result
-        assert 'rule_ref = vastdata_s3_lifecycle_rule.rule1.id' in result
+        assert 'rule_ref = vastdata_s3_life_cycle_rule.rule1.id' in result
         
         # Verify output references are updated
         assert 'value = vastdata_block_host.host1.name' in result
@@ -444,4 +445,4 @@ data "vastdata_blockhost" "existing_host" {
         # Ensure old names are completely removed
         assert 'vastdata_blockhost' not in result
         assert 'vastdata_kafka_brokers' not in result
-        assert 'vastdata_s3_life_cycle_rule' not in result
+        assert 'vastdata_s3_lifecycle_rule ' not in result  # Old name (without underscores) should be gone
