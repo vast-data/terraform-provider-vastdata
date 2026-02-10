@@ -8,6 +8,7 @@ Migrates existing tfstate from v1.6.7 to v2.x by re-importing resources.
 import os
 import sys
 import json
+import re
 import argparse
 import subprocess
 import tempfile
@@ -17,7 +18,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 
 # Resource import field mappings
 # Format: resource_type -> (import_fields, id_field_in_state)
@@ -213,14 +214,14 @@ def extract_resources(state: Dict) -> List[Dict]:
                 else:
                     address = f"{resource_type}.{name}"
                 
-                # Handle indexed resources
-                if len(instances) > 1:
-                    index_key = instance.get('index_key')
-                    if index_key is not None:
-                        if isinstance(index_key, str):
-                            address = f"{address}[\"{index_key}\"]"
-                        else:
-                            address = f"{address}[{index_key}]"
+                # Handle indexed resources (for_each/count)
+                # Always add index if present, regardless of instance count
+                index_key = instance.get('index_key')
+                if index_key is not None:
+                    if isinstance(index_key, str):
+                        address = f"{address}[\"{index_key}\"]"
+                    else:
+                        address = f"{address}[{index_key}]"
                 
                 resources.append({
                     'address': address,
@@ -514,6 +515,8 @@ def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir
     log_info(f"Generating import script: {script_path}")
     
     # Generate stub resource definitions
+    # Use resource type and name directly from state (no address parsing needed!)
+    seen_resources = set()
     resources_tf_path = os.path.join(terraform_dir, "resources.tf")
     with open(resources_tf_path, 'w') as f:
         f.write("# Auto-generated stub resource definitions for import\n")
@@ -522,10 +525,18 @@ def generate_import_script(resources: List[Dict], output_dir: str, terraform_dir
             resource_type_from_state = resource['type']
             # Translate v1/v2 resource names to v3 names
             resource_type = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
-            resource_name = resource['address'].split('.', 1)[1]  # Extract name from address
-            f.write(f'resource "{resource_type}" "{resource_name}" {{\n')
-            f.write('  # Configuration will be populated from import\n')
-            f.write('}\n\n')
+            
+            # Use the base name directly from state structure (no parsing!)
+            # State already has the base name without for_each/count indices
+            base_name = resource['name']
+            
+            # Only write each unique resource block once (for_each/count resources share the same block)
+            resource_key = f"{resource_type}.{base_name}"
+            if resource_key not in seen_resources:
+                seen_resources.add(resource_key)
+                f.write(f'resource "{resource_type}" "{base_name}" {{\n')
+                f.write('  # Configuration will be populated from import\n')
+                f.write('}\n\n')
     
     with open(script_path, 'w') as f:
         f.write("#!/bin/bash\n")
@@ -739,7 +750,6 @@ Examples:
                 # This is a basic approach - we capture the blocks we need
                 if 'provider "' in content:
                     # Extract provider block(s)
-                    import re
                     providers = re.findall(r'provider\s+"[^"]+"\s+\{[^}]*\}', content, re.DOTALL)
                     provider_blocks.extend(providers)
                 
@@ -826,6 +836,8 @@ Examples:
         return
     
     # Generate stub resource definitions for VAST resources only
+    # Use resource type and name directly from state (no address parsing needed!)
+    seen_resources = set()
     resources_tf_path = os.path.join(temp_dir, "resources.tf")
     with open(resources_tf_path, 'w') as f:
         f.write("# Auto-generated stub resource definitions for VAST resources import\n")
@@ -833,10 +845,18 @@ Examples:
         for resource in vast_resources:
             resource_type_from_state = resource['type']
             resource_type = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
-            resource_name = resource['address'].split('.', 1)[1]
-            f.write(f'resource "{resource_type}" "{resource_name}" {{\n')
-            f.write('  # Configuration will be populated from import\n')
-            f.write('}\n\n')
+            
+            # Use the base name directly from state structure (no parsing!)
+            # State already has the base name without for_each/count indices
+            base_name = resource['name']
+            
+            # Only write each unique resource block once (for_each/count resources share the same block)
+            resource_key = f"{resource_type}.{base_name}"
+            if resource_key not in seen_resources:
+                seen_resources.add(resource_key)
+                f.write(f'resource "{resource_type}" "{base_name}" {{\n')
+                f.write('  # Configuration will be populated from import\n')
+                f.write('}\n\n')
     
     # Create summary in temp directory (for reference during import)
     create_import_summary(vast_resources, temp_dir)
