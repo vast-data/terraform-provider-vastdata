@@ -733,8 +733,15 @@ Examples:
     log_info(f"Source directory: {source_dir}")
     log_info(f"Output directory: {output_dir}")
     
-    # Copy .tf files from source to temp directory for import
+    # Copy .tf files and modules from source to temp directory for import
     log_info("Copying Terraform configuration files to temporary directory...")
+    
+    # Copy modules directory if it exists
+    modules_src = os.path.join(source_dir, 'modules')
+    if os.path.exists(modules_src) and os.path.isdir(modules_src):
+        modules_dst = os.path.join(temp_dir, 'modules')
+        shutil.copytree(modules_src, modules_dst)
+        log_info(f"Copied modules directory")
     
     # Extract provider and terraform blocks from source .tf files
     provider_blocks = []
@@ -836,27 +843,148 @@ Examples:
         return
     
     # Generate stub resource definitions for VAST resources only
-    # Use resource type and name directly from state (no address parsing needed!)
-    seen_resources = set()
+    # Group resources by type and name to detect for_each/count
+    # Also track which modules are used
+    resource_groups = {}
+    module_instances = {}  # Track module instances: module.name -> [keys]
+    
+    for resource in vast_resources:
+        resource_type_from_state = resource['type']
+        resource_type = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
+        base_name = resource['name']
+        module = resource.get('module', '')
+        
+        # Track module usage
+        if module:
+            # Extract module name and key from module path like "module.views["env1"]"
+            module_match = re.match(r'module\.([^.\[]+)(?:\["([^"]+)"\])?', module)
+            if module_match:
+                module_name = module_match.group(1)
+                module_key = module_match.group(2)
+                
+                if module_name not in module_instances:
+                    module_instances[module_name] = []
+                if module_key and module_key not in module_instances[module_name]:
+                    module_instances[module_name].append(module_key)
+        
+        # Group resources for generating resource blocks
+        key = f"{resource_type}.{base_name}"
+        if key not in resource_groups:
+            resource_groups[key] = []
+        resource_groups[key].append(resource)
+    
+    # Generate resource blocks
     resources_tf_path = os.path.join(temp_dir, "resources.tf")
     with open(resources_tf_path, 'w') as f:
         f.write("# Auto-generated stub resource definitions for VAST resources import\n")
         f.write("# Non-VAST resources will be preserved from original state\n\n")
-        for resource in vast_resources:
-            resource_type_from_state = resource['type']
-            resource_type = RESOURCE_NAME_TRANSLATION.get(resource_type_from_state, resource_type_from_state)
+        
+        # Generate module blocks first
+        if module_instances:
+            f.write("# Module blocks (copied from source, adjust as needed)\n")
             
-            # Use the base name directly from state structure (no parsing!)
-            # State already has the base name without for_each/count indices
-            base_name = resource['name']
+            # Try to extract original module blocks from source files
+            original_module_blocks = {}
+            for file in os.listdir(source_dir):
+                if file.endswith('.tf'):
+                    src_path = os.path.join(source_dir, file)
+                    with open(src_path, 'r') as src_f:
+                        content = src_f.read()
+                        # Extract module blocks using brace matching
+                        for module_name in module_instances.keys():
+                            match_start = content.find(f'module "{module_name}"')
+                            if match_start != -1:
+                                # Find the opening brace
+                                brace_start = content.find('{', match_start)
+                                if brace_start != -1:
+                                    # Count braces to find matching closing brace
+                                    brace_count = 0
+                                    block_end = brace_start
+                                    for i in range(brace_start, len(content)):
+                                        if content[i] == '{':
+                                            brace_count += 1
+                                        elif content[i] == '}':
+                                            brace_count -= 1
+                                            if brace_count == 0:
+                                                block_end = i + 1
+                                                break
+                                    
+                                    # Extract the complete module block
+                                    module_block = content[match_start:block_end]
+                                    original_module_blocks[module_name] = module_block
             
-            # Only write each unique resource block once (for_each/count resources share the same block)
-            resource_key = f"{resource_type}.{base_name}"
-            if resource_key not in seen_resources:
-                seen_resources.add(resource_key)
-                f.write(f'resource "{resource_type}" "{base_name}" {{\n')
+            # Generate module blocks
+            for module_name, keys in module_instances.items():
+                if module_name in original_module_blocks:
+                    # Use the original module block but fix the source path
+                    module_block = original_module_blocks[module_name]
+                    
+                    # Replace the source path to use local ./modules/ directory
+                    # Handle various source path formats:
+                    # source = "../something/modules/name" -> source = "./modules/name"
+                    # source = "./modules/name" -> source = "./modules/name" (no change)
+                    # source = "path/to/module" -> source = "./modules/name"
+                    module_block = re.sub(
+                        r'source\s*=\s*"[^"]*"',
+                        f'source = "./modules/{module_name}"',
+                        module_block
+                    )
+                    
+                    f.write(module_block + '\n\n')
+                else:
+                    # Generate a minimal module block
+                    f.write(f'module "{module_name}" {{\n')
+                    
+                    # Detect if module uses for_each based on keys
+                    if len(keys) > 1 or keys:
+                        for_each_map = '{' + ', '.join(f'"{k}" = "{k}"' for k in keys) + '}'
+                        f.write(f'  for_each = {for_each_map}\n')
+                    
+                    module_src_path = f"./modules/{module_name}"
+                    f.write(f'  source = "{module_src_path}"\n')
+                    f.write('  # TODO: Add required variables from your configuration\n')
+                    f.write('}\n\n')
+        
+        # Generate resource blocks
+        for resource_key, instances in resource_groups.items():
+            resource_type, base_name = resource_key.split('.', 1)
+            
+            # Skip resources that belong to modules (they're defined in the module)
+            if instances[0].get('module'):
+                continue
+            
+            # Check if this resource uses for_each or count
+            has_string_keys = any('["' in inst['address'] for inst in instances)
+            has_numeric_keys = any('[' in inst['address'] and '["' not in inst['address'] for inst in instances)
+            
+            f.write(f'resource "{resource_type}" "{base_name}" {{\n')
+            
+            if has_string_keys:
+                # for_each detected - create minimal for_each map from state keys
+                keys = []
+                for inst in instances:
+                    # Extract key from address like policies["dev"]
+                    if '["' in inst['address']:
+                        start = inst['address'].index('["') + 2
+                        end = inst['address'].index('"]', start)
+                        key = inst['address'][start:end]
+                        keys.append(key)
+                
+                # Create a minimal for_each map
+                for_each_map = '{' + ', '.join(f'"{k}" = "{k}"' for k in keys) + '}'
+                f.write(f'  for_each = {for_each_map}\n')
                 f.write('  # Configuration will be populated from import\n')
-                f.write('}\n\n')
+                f.write('  # Note: Adjust for_each expression to match your original configuration\n')
+            elif has_numeric_keys:
+                # count detected
+                count_val = len(instances)
+                f.write(f'  count = {count_val}\n')
+                f.write('  # Configuration will be populated from import\n')
+                f.write('  # Note: Adjust count expression to match your original configuration\n')
+            else:
+                f.write('  # Configuration will be populated from import\n')
+            
+            f.write('}\n\n')
     
     # Create summary in temp directory (for reference during import)
     create_import_summary(vast_resources, temp_dir)
@@ -873,15 +1001,37 @@ Examples:
     log_success("=" * 80)
     
     # Initialize terraform in temp directory
-    log_info("Initializing Terraform...")
-    init_result = subprocess.run(
-        ['terraform', 'init'],
-        cwd=temp_dir,
-        capture_output=True,
-        text=True
-    )
-    if init_result.returncode != 0 and 'dev_overrides' not in init_result.stdout:
-        log_warning(f"Terraform init had issues: {init_result.stderr}")
+    # Check if dev_overrides is configured (skip provider init but still get modules)
+    terraformrc_path = os.path.expanduser("~/.terraformrc")
+    has_dev_overrides = False
+    if os.path.exists(terraformrc_path):
+        with open(terraformrc_path, 'r') as f:
+            terraformrc_content = f.read()
+            if 'dev_overrides' in terraformrc_content:
+                has_dev_overrides = True
+                log_info("Detected dev_overrides in ~/.terraformrc")
+    
+    if has_dev_overrides:
+        # With dev_overrides, only get modules (skip provider installation)
+        log_info("Installing modules...")
+        get_result = subprocess.run(
+            ['terraform', 'get'],
+            cwd=temp_dir,
+            capture_output=True,
+            text=True
+        )
+        if get_result.returncode != 0:
+            log_warning(f"Terraform get had issues: {get_result.stderr}")
+    else:
+        log_info("Initializing Terraform...")
+        init_result = subprocess.run(
+            ['terraform', 'init'],
+            cwd=temp_dir,
+            capture_output=True,
+            text=True
+        )
+        if init_result.returncode != 0:
+            log_warning(f"Terraform init had issues: {init_result.stderr}")
     
     # Remove existing state if present
     state_path = os.path.join(temp_dir, 'terraform.tfstate')

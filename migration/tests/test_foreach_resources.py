@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) HashiCorp, Inc.
+
 """
 Test for_each and count resource handling in state migration
 Tests that resources created with for_each/count are properly handled
