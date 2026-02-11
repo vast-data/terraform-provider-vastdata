@@ -253,7 +253,9 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			if !ok {
 				return nil, fmt.Errorf("additional schema attribute %q is not a valid rschema.Attribute (got %T)", k, v)
 			}
-			attrs[k] = att
+			// Apply injectModifiers to AdditionalSchemaAttributes too!
+			// This ensures they get UseStateForUnknown() for computed fields
+			attrs[k] = injectModifiers(att, k, hints)
 		}
 	}
 
@@ -467,7 +469,7 @@ func buildResourceAttribute(
 			attributes := buildResourceAttributesFromMap(ctx, nested, hints)
 
 			if isOrdered {
-				return rschema.ListNestedAttribute{
+				att := rschema.ListNestedAttribute{
 					NestedObject: rschema.NestedAttributeObject{
 						Attributes: attributes,
 					},
@@ -478,9 +480,10 @@ func buildResourceAttribute(
 					Description:         desc,
 					MarkdownDescription: desc,
 				}
+				return injectModifiers(att, name, hints)
 			}
 
-			return rschema.SetNestedAttribute{
+			att := rschema.SetNestedAttribute{
 				NestedObject: rschema.NestedAttributeObject{
 					Attributes: attributes,
 				},
@@ -491,6 +494,7 @@ func buildResourceAttribute(
 				Description:         desc,
 				MarkdownDescription: desc,
 			}
+			return injectModifiers(att, name, hints)
 
 		case openapi3.TypeArray:
 			inner := resolveComposedSchema(resolveAllRefs(itemSchema.Items))
@@ -589,7 +593,7 @@ func buildResourceAttribute(
 		if len(schema.Properties) > 0 {
 			nested := make(map[string]*SchemaEntry)
 			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
-			return rschema.SingleNestedAttribute{
+			att := rschema.SingleNestedAttribute{
 				Attributes:          buildResourceAttributesFromMap(ctx, nested, hints),
 				Required:            entry.Required,
 				Optional:            entry.Optional,
@@ -598,6 +602,7 @@ func buildResourceAttribute(
 				Description:         desc,
 				MarkdownDescription: desc,
 			}
+			return injectModifiers(att, name, hints)
 		}
 
 		warnWithContext(ctx, fmt.Sprintf("Skipping. Object attribute %q has no properties or additionalProperties", name))

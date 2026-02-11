@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -279,7 +280,8 @@ func infoWithContext(ctx context.Context, message string) {
 }
 
 // injectModifiers applies plan modifiers from hints and automatically adds UseStateForUnknown()
-// to computed-only attributes (i.e., not required, optional, or sensitive).
+// to computed attributes (both computed-only and optional+computed).
+// This prevents "known after apply" noise for unchanged computed fields.
 func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) schema.Attribute {
 	switch a := attr.(type) {
 
@@ -291,7 +293,9 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		if a.Computed && !a.Required && !a.Optional && !a.Sensitive {
+		// Add UseStateForUnknown for all computed attributes (optional+computed or computed-only)
+		// This prevents "known after apply" noise when the field hasn't changed
+		if a.Computed && !a.Required && !a.Sensitive {
 			a.PlanModifiers = append(a.PlanModifiers, stringplanmodifier.UseStateForUnknown())
 		}
 		return a
@@ -304,7 +308,7 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		if a.Computed && !a.Required && !a.Optional && !a.Sensitive {
+		if a.Computed && !a.Required && !a.Sensitive {
 			a.PlanModifiers = append(a.PlanModifiers, int64planmodifier.UseStateForUnknown())
 		}
 		return a
@@ -317,36 +321,60 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		if a.Computed && !a.Required && !a.Optional && !a.Sensitive {
+		if a.Computed && !a.Required && !a.Sensitive {
 			a.PlanModifiers = append(a.PlanModifiers, float64planmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.BoolAttribute:
-		if a.Computed && !a.Required && !a.Optional && !a.Sensitive {
+		if a.Computed && !a.Required && !a.Sensitive {
 			a.PlanModifiers = append(a.PlanModifiers, boolplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.ListAttribute:
-		if a.Computed && !a.Required && !a.Optional && !a.Sensitive {
+		if a.Computed && !a.Required && !a.Sensitive {
 			a.PlanModifiers = append(a.PlanModifiers, listplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.SetAttribute:
-		if a.Computed && !a.Required && !a.Optional && !a.Sensitive {
+		if a.Computed && !a.Required && !a.Sensitive {
 			a.PlanModifiers = append(a.PlanModifiers, setplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.MapAttribute:
-		if a.Computed && !a.Required && !a.Optional && !a.Sensitive {
+		if a.Computed && !a.Required && !a.Sensitive {
 			a.PlanModifiers = append(a.PlanModifiers, mapplanmodifier.UseStateForUnknown())
 		}
 		return a
 
-	// Not implemented for nested attributes
+	case schema.SingleNestedAttribute:
+		if a.Computed && !a.Required && !a.Sensitive {
+			a.PlanModifiers = append(a.PlanModifiers, objectplanmodifier.UseStateForUnknown())
+		}
+		return a
+
+	case schema.ObjectAttribute:
+		if a.Computed && !a.Required && !a.Sensitive {
+			a.PlanModifiers = append(a.PlanModifiers, objectplanmodifier.UseStateForUnknown())
+		}
+		return a
+
+	case schema.ListNestedAttribute:
+		if a.Computed && !a.Required && !a.Sensitive {
+			a.PlanModifiers = append(a.PlanModifiers, listplanmodifier.UseStateForUnknown())
+		}
+		return a
+
+	case schema.SetNestedAttribute:
+		if a.Computed && !a.Required && !a.Sensitive {
+			a.PlanModifiers = append(a.PlanModifiers, setplanmodifier.UseStateForUnknown())
+		}
+		return a
+
+	// For other unsupported attribute types, return as-is
 	default:
 		return attr
 	}
