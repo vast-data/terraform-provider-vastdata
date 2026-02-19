@@ -838,11 +838,10 @@ class TestSpecialCharactersAndUnicode:
         }
         
         resources = extract_resources(state)
-        # The current implementation doesn't handle single instances as indexed
-        # Only multiple instances get indexed
+
         assert len(resources) == 1
-        # With single instance, no index is added
-        assert resources[0]['address'] == 'vastdata_tenant.tenants'
+        assert resources[0]['address'] == 'vastdata_tenant.tenants["key"with"quotes"]'
+        assert resources[0]['name'] == 'tenants'
 
 
 class TestFixtureStateFiles:
