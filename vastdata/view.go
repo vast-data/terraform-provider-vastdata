@@ -27,11 +27,10 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:               ViewSchemaRef,
-			PreserveUserValueFields: []string{"share_acl"},
-			DeleteOnlyBodyFields:    map[string]string{"delete_dir": ""},
-			DeleteOnlyParamFields:   map[string]string{"force": "force"},
-			ImportFields:            []string{"path", "tenant_name"},
+			SchemaRef:             ViewSchemaRef,
+			DeleteOnlyBodyFields:  map[string]string{"delete_dir": ""},
+			DeleteOnlyParamFields: map[string]string{"force": "force"},
+			ImportFields:          []string{"path", "tenant_name"},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
 				"alias":                    ValidatorPathStartsWithSlash,

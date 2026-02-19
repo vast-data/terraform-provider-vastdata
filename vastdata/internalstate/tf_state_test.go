@@ -2866,3 +2866,203 @@ func TestGetCreateParams_WithOptionalWriteOnlyFields(t *testing.T) {
 	assert.Contains(t, result, "password", "optional write-only field should be included")
 	assert.Equal(t, "secret", result["password"])
 }
+
+// TestListsHaveSameContentIgnoringOrder_SimpleStrings tests order-independent comparison for simple string lists
+func TestListsHaveSameContentIgnoringOrder_SimpleStrings(t *testing.T) {
+	// Same content, different order
+	listA, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringValue("b"),
+		types.StringValue("c"),
+	})
+	listB, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("c"),
+		types.StringValue("a"),
+		types.StringValue("b"),
+	})
+
+	assert.True(t, listsHaveSameContentIgnoringOrder(listA, listB), "lists with same content but different order should be equal")
+
+	// Different content
+	listC, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringValue("b"),
+		types.StringValue("d"),
+	})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listC), "lists with different content should not be equal")
+
+	// Different lengths
+	listD, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringValue("b"),
+	})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listD), "lists with different lengths should not be equal")
+}
+
+// TestListsHaveSameContentIgnoringOrder_NestedLists tests order-independent comparison for nested lists (like client_ip_ranges)
+func TestListsHaveSameContentIgnoringOrder_NestedLists(t *testing.T) {
+	// This mimics client_ip_ranges: List(List(String))
+	innerListType := types.ListType{ElemType: types.StringType}
+
+	// Create inner lists (IP ranges)
+	range1, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("172.21.112.1"),
+		types.StringValue("172.21.112.4"),
+	})
+	range2, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("12.0.0.6"),
+		types.StringValue("12.0.0.10"),
+	})
+	range3, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("192.168.0.1"),
+		types.StringValue("192.168.0.10"),
+	})
+
+	// List A: [range1, range2, range3]
+	listA, _ := types.ListValue(innerListType, []attr.Value{range1, range2, range3})
+
+	// List B: [range3, range1, range2] (same content, different order)
+	listB, _ := types.ListValue(innerListType, []attr.Value{range3, range1, range2})
+
+	assert.True(t, listsHaveSameContentIgnoringOrder(listA, listB), "nested lists with same content but different order should be equal")
+
+	// List C: [range1, range3, range3] (duplicate, different from A)
+	listC, _ := types.ListValue(innerListType, []attr.Value{range1, range3, range3})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listC), "nested lists with different content should not be equal")
+}
+
+// TestListsHaveSameContentIgnoringOrder_ClientIPRanges tests the exact use case from tenant.client_ip_ranges
+func TestListsHaveSameContentIgnoringOrder_ClientIPRanges(t *testing.T) {
+	innerListType := types.ListType{ElemType: types.StringType}
+
+	// User config order
+	userRange1, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("172.21.112.1"),
+		types.StringValue("172.21.112.4"),
+	})
+	userRange2, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("12.0.0.6"),
+		types.StringValue("12.0.0.10"),
+	})
+
+	userList, _ := types.ListValue(innerListType, []attr.Value{userRange1, userRange2})
+
+	// API returns in different order
+	apiRange1, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("12.0.0.6"),
+		types.StringValue("12.0.0.10"),
+	})
+	apiRange2, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("172.21.112.1"),
+		types.StringValue("172.21.112.4"),
+	})
+
+	apiList, _ := types.ListValue(innerListType, []attr.Value{apiRange1, apiRange2})
+
+	assert.True(t, listsHaveSameContentIgnoringOrder(userList, apiList), "client_ip_ranges should match regardless of order")
+}
+
+// TestListsHaveSameContentIgnoringOrder_Integers tests with integer lists
+func TestListsHaveSameContentIgnoringOrder_Integers(t *testing.T) {
+	listA, _ := types.ListValue(types.Int64Type, []attr.Value{
+		types.Int64Value(1),
+		types.Int64Value(2),
+		types.Int64Value(3),
+	})
+	listB, _ := types.ListValue(types.Int64Type, []attr.Value{
+		types.Int64Value(3),
+		types.Int64Value(1),
+		types.Int64Value(2),
+	})
+
+	assert.True(t, listsHaveSameContentIgnoringOrder(listA, listB), "integer lists with same content should be equal")
+
+	listC, _ := types.ListValue(types.Int64Type, []attr.Value{
+		types.Int64Value(1),
+		types.Int64Value(2),
+		types.Int64Value(4),
+	})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listC), "integer lists with different content should not be equal")
+}
+
+// TestListsHaveSameContentIgnoringOrder_Duplicates tests handling of duplicate elements
+func TestListsHaveSameContentIgnoringOrder_Duplicates(t *testing.T) {
+	// List with duplicates: ["a", "b", "a"]
+	listA, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringValue("b"),
+		types.StringValue("a"),
+	})
+
+	// Same duplicates, different order: ["a", "a", "b"]
+	listB, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringValue("a"),
+		types.StringValue("b"),
+	})
+
+	assert.True(t, listsHaveSameContentIgnoringOrder(listA, listB), "lists with same duplicates should be equal")
+
+	// Different number of duplicates: ["a", "b", "b"]
+	listC, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringValue("b"),
+		types.StringValue("b"),
+	})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listC), "lists with different duplicate counts should not be equal")
+}
+
+// TestListsHaveSameContentIgnoringOrder_EmptyLists tests empty list handling
+func TestListsHaveSameContentIgnoringOrder_EmptyLists(t *testing.T) {
+	emptyA, _ := types.ListValue(types.StringType, []attr.Value{})
+	emptyB, _ := types.ListValue(types.StringType, []attr.Value{})
+
+	assert.True(t, listsHaveSameContentIgnoringOrder(emptyA, emptyB), "two empty lists should be equal")
+
+	nonEmpty, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+	})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(emptyA, nonEmpty), "empty and non-empty lists should not be equal")
+}
+
+// TestListsHaveSameContentIgnoringOrder_NonListTypes tests that non-list types return false
+func TestListsHaveSameContentIgnoringOrder_NonListTypes(t *testing.T) {
+	stringVal := types.StringValue("test")
+	intVal := types.Int64Value(123)
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(stringVal, intVal), "non-list types should return false")
+
+	listVal, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+	})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(stringVal, listVal), "comparing list to non-list should return false")
+	assert.False(t, listsHaveSameContentIgnoringOrder(listVal, stringVal), "comparing non-list to list should return false")
+}
+
+// TestListsHaveSameContentIgnoringOrder_NullAndUnknown tests null and unknown value handling
+func TestListsHaveSameContentIgnoringOrder_NullAndUnknown(t *testing.T) {
+	listA, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringNull(),
+	})
+	listB, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringNull(),
+		types.StringValue("a"),
+	})
+
+	assert.True(t, listsHaveSameContentIgnoringOrder(listA, listB), "lists with null values in different positions should be equal")
+
+	listC, _ := types.ListValue(types.StringType, []attr.Value{
+		types.StringValue("a"),
+		types.StringUnknown(),
+	})
+
+	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listC), "null and unknown should not be equal")
+}

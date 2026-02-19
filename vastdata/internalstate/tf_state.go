@@ -656,6 +656,18 @@ func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, in
 			}
 		}
 
+		// For PreserveOrderFields, check if the content is the same but order is different.
+		// If so, preserve the user's order to avoid perpetual drift.
+		if hints != nil && contains(hints.PreserveOrderFields, key) {
+			if existing, ok := s.Raw[key]; ok && !existing.IsNull() && !existing.IsUnknown() {
+				// Check if both values are lists with the same content (ignoring order)
+				if listsHaveSameContentIgnoringOrder(existing, val) {
+					// Content is identical, preserve user's order
+					continue
+				}
+			}
+		}
+
 		s.Raw[key] = val
 	}
 	return nil
@@ -1069,4 +1081,47 @@ func (s *TFState) GetCreateParams() vast_client.Params {
 	)
 	delete(createParams, "id") // Remove ID from update parameters, as it should not be set during creation.
 	return createParams
+}
+
+// listsHaveSameContentIgnoringOrder checks if two attr.Value instances are lists
+// with the same content, regardless of order. This is used to prevent drift when
+// the API returns list elements in a different order than the user's configuration.
+func listsHaveSameContentIgnoringOrder(a, b attr.Value) bool {
+	// Both must be lists
+	listA, okA := a.(types.List)
+	listB, okB := b.(types.List)
+	if !okA || !okB {
+		return false
+	}
+
+	// Must have the same length
+	elementsA := listA.Elements()
+	elementsB := listB.Elements()
+
+	if len(elementsA) != len(elementsB) {
+		return false
+	}
+
+	// Create a slice to track which elements in B have been matched
+	matchedB := make([]bool, len(elementsB))
+
+	// For each element in A, find a matching element in B (that hasn't been matched yet)
+	for _, elemA := range elementsA {
+		found := false
+		for j, elemB := range elementsB {
+			if matchedB[j] {
+				continue // Already matched
+			}
+			if elemA.Equal(elemB) {
+				matchedB[j] = true
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false // Element in A not found in B
+		}
+	}
+
+	return true
 }
