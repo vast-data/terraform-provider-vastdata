@@ -743,9 +743,72 @@ Examples:
         shutil.copytree(modules_src, modules_dst)
         log_info(f"Copied modules directory")
     
-    # Extract provider and terraform blocks from source .tf files
+    # Copy additional data files that might be referenced in locals (e.g., .yaml, .yml, .json files)
+    # These are commonly used with fileset(), yamldecode(), jsondecode(), etc.
+    data_file_extensions = ['.yaml', '.yml', '.json', '.txt', '.tpl', '.tmpl']
+    copied_data_files = 0
+    for root, dirs, files in os.walk(source_dir):
+        # Skip hidden directories and modules (already copied)
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'modules']
+        
+        for file in files:
+            if any(file.endswith(ext) for ext in data_file_extensions):
+                src_file = os.path.join(root, file)
+                # Preserve directory structure relative to source_dir
+                rel_path = os.path.relpath(src_file, source_dir)
+                dst_file = os.path.join(temp_dir, rel_path)
+                os.makedirs(os.path.dirname(dst_file), exist_ok=True)
+                shutil.copy2(src_file, dst_file)
+                copied_data_files += 1
+    
+    if copied_data_files > 0:
+        log_info(f"Copied {copied_data_files} data files (yaml, json, etc.)")
+    
+    # Extract provider, terraform, variable and locals blocks from source .tf files
     provider_blocks = []
     terraform_blocks = []
+    variable_blocks = []
+    locals_blocks = []
+    
+    def extract_block(content, block_type, start_pattern):
+        """Generic function to extract terraform blocks by matching braces"""
+        blocks = []
+        pos = 0
+        while True:
+            start = content.find(start_pattern, pos)
+            if start == -1:
+                break
+            
+            # Find the opening brace
+            brace_start = content.find('{', start)
+            if brace_start == -1:
+                break
+            
+            # Count braces to find matching closing brace
+            brace_count = 0
+            in_block = False
+            block_content = content[start:brace_start]  # Include block declaration
+            
+            for i in range(brace_start, len(content)):
+                block_content += content[i]
+                if content[i] == '{':
+                    brace_count += 1
+                    in_block = True
+                elif content[i] == '}':
+                    brace_count -= 1
+                    if brace_count == 0 and in_block:
+                        blocks.append(block_content)
+                        pos = start + len(block_content)
+                        break
+            
+            if brace_count != 0:
+                # Unmatched braces, skip this one
+                pos = start + 1
+            
+            if pos >= len(content):
+                break
+        
+        return blocks
     
     for file in os.listdir(source_dir):
         if file.endswith('.tf'):
@@ -753,42 +816,50 @@ Examples:
             with open(src_path, 'r') as f:
                 content = f.read()
                 
-                # Simple extraction of provider and terraform blocks
-                # This is a basic approach - we capture the blocks we need
+                # Extract provider blocks
                 if 'provider "' in content:
-                    # Extract provider block(s)
-                    providers = re.findall(r'provider\s+"[^"]+"\s+\{[^}]*\}', content, re.DOTALL)
+                    providers = extract_block(content, 'provider', 'provider "')
                     provider_blocks.extend(providers)
                 
-                if 'terraform {' in content or 'required_providers' in content:
-                    # Extract terraform block
-                    start = content.find('terraform {')
-                    if start != -1:
-                        brace_count = 0
-                        in_block = False
-                        block_content = ""
-                        for i, char in enumerate(content[start:]):
-                            block_content += char
-                            if char == '{':
-                                brace_count += 1
-                                in_block = True
-                            elif char == '}':
-                                brace_count -= 1
-                                if brace_count == 0 and in_block:
-                                    terraform_blocks.append(block_content)
-                                    break
+                # Extract terraform block
+                if 'terraform {' in content:
+                    terraform = extract_block(content, 'terraform', 'terraform {')
+                    terraform_blocks.extend(terraform)
+                
+                # Extract variable blocks
+                if 'variable "' in content:
+                    variables = extract_block(content, 'variable', 'variable "')
+                    variable_blocks.extend(variables)
+                
+                # Extract locals blocks
+                if 'locals {' in content:
+                    locals = extract_block(content, 'locals', 'locals {')
+                    locals_blocks.extend(locals)
     
     # Create a minimal provider.tf file in temp directory
     provider_tf_path = os.path.join(temp_dir, 'provider.tf')
     with open(provider_tf_path, 'w') as f:
-        f.write("# Auto-generated provider configuration for import\n\n")
+        f.write("# Auto-generated provider configuration for import\n")
+        f.write("# Includes: terraform, provider, variable, and locals blocks from source\n\n")
+        
         if terraform_blocks:
             f.write(terraform_blocks[0] + "\n\n")
+        
         if provider_blocks:
             for provider in provider_blocks:
                 f.write(provider + "\n\n")
+        
+        if variable_blocks:
+            f.write("# Variable definitions from source configuration\n")
+            for variable in variable_blocks:
+                f.write(variable + "\n\n")
+        
+        if locals_blocks:
+            f.write("# Locals definitions from source configuration\n")
+            for local_block in locals_blocks:
+                f.write(local_block + "\n\n")
     
-    log_info("Created minimal provider configuration (resource definitions excluded)")
+    log_info(f"Created provider configuration with {len(variable_blocks)} variables and {len(locals_blocks)} locals blocks")
     
     # Get state file
     if args.s3_bucket:
@@ -919,14 +990,22 @@ Examples:
                     # Use the original module block but fix the source path
                     module_block = original_module_blocks[module_name]
                     
-                    # Replace the source path to use local ./modules/ directory
-                    # Handle various source path formats:
-                    # source = "../something/modules/name" -> source = "./modules/name"
-                    # source = "./modules/name" -> source = "./modules/name" (no change)
-                    # source = "path/to/module" -> source = "./modules/name"
+                    # Extract the original source path to get the actual directory name
+                    source_match = re.search(r'source\s*=\s*"([^"]*)"', module_block)
+                    if source_match:
+                        original_source = source_match.group(1)
+                        # Extract the last component of the path (the actual directory name)
+                        # E.g., "./modules/vast_view" -> "vast_view", "../build/modules/views" -> "views"
+                        dir_name = original_source.rstrip('/').split('/')[-1]
+                        new_source = f'./modules/{dir_name}'
+                    else:
+                        # Fallback to using module name if can't extract
+                        new_source = f'./modules/{module_name}'
+                    
+                    # Replace the source path
                     module_block = re.sub(
                         r'source\s*=\s*"[^"]*"',
-                        f'source = "./modules/{module_name}"',
+                        f'source = "{new_source}"',
                         module_block
                     )
                     
