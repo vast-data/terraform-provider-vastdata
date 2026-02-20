@@ -258,13 +258,14 @@ func TestClientConfiguration(t *testing.T) {
 	password := "testpass"
 	apiToken := "test-token"
 	sslVerify := false
+	tenant := "tenant"
 	pluginVer := "2.1.0"
 	timeout := time.Minute * 5
 
 	// This test mainly verifies that our NewRest function constructs
 	// the VMSConfig correctly. The actual client creation might fail
 	// due to network issues, which is expected in unit tests.
-	client, err := NewRest(host, port, username, password, apiToken, sslVerify, pluginVer, timeout)
+	client, err := NewRest(host, port, username, password, apiToken, tenant, sslVerify, pluginVer, timeout)
 
 	// In unit tests, we might get a network error, which is fine
 	if err != nil {
@@ -319,6 +320,7 @@ func TestClientErrorScenarios(t *testing.T) {
 			"user",
 			"pass",
 			"",
+			"",
 			true,
 			"1.0.0",
 			time.Minute*2,
@@ -337,6 +339,7 @@ func TestClientErrorScenarios(t *testing.T) {
 			443,
 			"user",
 			"pass",
+			"",
 			"",
 			true,
 			"1.0.0",

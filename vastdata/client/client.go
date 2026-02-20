@@ -11,7 +11,7 @@ import (
 func NewRest(
 	host string,
 	port int64,
-	username, password, apiToken string,
+	username, password, apiToken, tenant string,
 	sslVerify bool,
 	pluginVer string,
 	timeout time.Duration,
@@ -23,6 +23,7 @@ func NewRest(
 		Username:     username,
 		Password:     password,
 		ApiToken:     apiToken,
+		Tenant:       tenant,
 		SslVerify:    sslVerify,
 		UserAgent:    getUserAgent(pluginVer),
 		Timeout:      &timeout,

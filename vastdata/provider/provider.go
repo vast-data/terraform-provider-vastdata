@@ -29,6 +29,7 @@ type VastProviderModel struct {
 	Username              types.String `tfsdk:"username"`
 	Password              types.String `tfsdk:"password"`
 	ApiToken              types.String `tfsdk:"api_token"`
+	Tenant                types.String `tfsdk:"tenant"`
 	VersionValidationMode types.String `tfsdk:"version_validation_mode"`
 }
 
@@ -77,6 +78,10 @@ func (p *VastProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp 
 				Sensitive:           true,
 				MarkdownDescription: "VastData Cluster API token (conflicts with username/password).",
 			},
+			"tenant": schema.StringAttribute{
+				Optional:            true,
+				MarkdownDescription: "Tenant name for tenant-scoped authentication (tenant admin). If environment variable VASTDATA_TENANT exists it will be used. This is passed via the X-Tenant-Name header during login.",
+			},
 			"version_validation_mode": schema.StringAttribute{
 				Optional:            true,
 				MarkdownDescription: "Version validation mode: 'strict' or 'warn'.",
@@ -109,6 +114,7 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	username := getenvOr(config.Username, "VASTDATA_CLUSTER_USERNAME")
 	password := getenvOr(config.Password, "VASTDATA_CLUSTER_PASSWORD")
 	apiToken := getenvOr(config.ApiToken, "VASTDATA_API_TOKEN")
+	tenant := getenvOr(config.Tenant, "VASTDATA_TENANT")
 	validationMode := getenvOr(config.VersionValidationMode, "VERSION_VALIDATION_MODE")
 	if validationMode == "" {
 		validationMode = "warn"
@@ -116,7 +122,7 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 	// Generic timeout. Should be enough for all API operations.
 	restTimeout := time.Minute * 4
-	vmsRest, err := client.NewRest(host, port, username, password, apiToken, !skipSSL, p.version, restTimeout)
+	vmsRest, err := client.NewRest(host, port, username, password, apiToken, tenant, !skipSSL, p.version, restTimeout)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to Create VAST API Client",
