@@ -1,506 +1,555 @@
 #!/usr/bin/env python3
 # Copyright (c) HashiCorp, Inc.
 """
-Tests for parallel import and mixed provider state migration features
+Tests for mixed-provider state migration scenarios.
+
+Focuses on realistic end-to-end scenarios where the customer's .tfstate
+contains resources from VastData alongside AWS, GCP, Azure, etc.  The new
+state_migration.py must strip only the VastData resources and keep the rest.
 """
 
-import pytest
 import json
-import tempfile
 import os
 import sys
 from pathlib import Path
-import shutil
 from unittest.mock import patch, MagicMock
+
+import pytest
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from state_migration import (
+    parse_tfstate,
     separate_vast_resources,
-    extract_state_resources_raw,
-    merge_non_vast_resources_to_state,
-    import_single_resource,
-    run_parallel_imports,
-    extract_resources
+    strip_vast_resources,
+    write_state,
+    main,
 )
 
 
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _make_state(resources, *, version=4, serial=5, lineage="mixed-test"):
+    return {
+        "version": version,
+        "terraform_version": "1.5.0",
+        "serial": serial,
+        "lineage": lineage,
+        "outputs": {},
+        "resources": resources,
+    }
+
+
+def _managed(rtype, name, attrs, *, provider=None, module=None):
+    entry = {
+        "mode": "managed",
+        "type": rtype,
+        "name": name,
+        "instances": [{"schema_version": 0, "attributes": attrs}],
+    }
+    if provider:
+        entry["provider"] = provider
+    if module:
+        entry["module"] = module
+    return entry
+
+
+def _data(rtype, name, attrs, *, provider=None):
+    entry = {
+        "mode": "data",
+        "type": rtype,
+        "name": name,
+        "instances": [{"schema_version": 0, "attributes": attrs}],
+    }
+    if provider:
+        entry["provider"] = provider
+    return entry
+
+
+def _write(path, obj):
+    with open(path, "w") as fh:
+        json.dump(obj, fh, indent=2)
+
+
+# ---------------------------------------------------------------------------
+# Separation tests
+# ---------------------------------------------------------------------------
+
 class TestSeparateVastResources:
-    """Test separation of VAST and non-VAST resources"""
-    
-    def test_separate_all_vast(self):
-        """Test with only VAST resources"""
+    """Test the resource-splitting logic with various provider mixes."""
+
+    def test_all_vast(self):
         resources = [
-            {'type': 'vastdata_tenant', 'address': 'vastdata_tenant.test1', 'attributes': {}},
-            {'type': 'vastdata_view', 'address': 'vastdata_view.test2', 'attributes': {}},
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("vastdata_view", "v1", {"id": 2}),
         ]
-        
         vast, non_vast = separate_vast_resources(resources)
-        
         assert len(vast) == 2
         assert len(non_vast) == 0
-        assert all(r['type'].startswith('vastdata_') for r in vast)
-    
-    def test_separate_all_non_vast(self):
-        """Test with only non-VAST resources"""
+        assert all(r["type"].startswith("vastdata_") for r in vast)
+
+    def test_all_non_vast(self):
         resources = [
-            {'type': 'aws_s3_bucket', 'address': 'aws_s3_bucket.test1', 'attributes': {}},
-            {'type': 'google_storage_bucket', 'address': 'google_storage_bucket.test2', 'attributes': {}},
+            _managed("aws_s3_bucket", "b1", {"id": "bucket-1"}),
+            _managed("google_storage_bucket", "gs1", {"id": "gs-1"}),
         ]
-        
         vast, non_vast = separate_vast_resources(resources)
-        
         assert len(vast) == 0
         assert len(non_vast) == 2
-        assert all(not r['type'].startswith('vastdata_') for r in non_vast)
-    
-    def test_separate_mixed_providers(self):
-        """Test with mixed VAST and non-VAST resources"""
+
+    def test_mixed_aws_vastdata(self):
         resources = [
-            {'type': 'vastdata_tenant', 'address': 'vastdata_tenant.test1', 'attributes': {}},
-            {'type': 'aws_s3_bucket', 'address': 'aws_s3_bucket.test1', 'attributes': {}},
-            {'type': 'vastdata_view', 'address': 'vastdata_view.test2', 'attributes': {}},
-            {'type': 'google_compute_instance', 'address': 'google_compute_instance.vm1', 'attributes': {}},
-            {'type': 'vastdata_vip_pool', 'address': 'vastdata_vip_pool.pool1', 'attributes': {}},
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("aws_s3_bucket", "b1", {"id": "bucket"}),
+            _managed("vastdata_view", "v1", {"id": 2}),
+            _managed("aws_iam_role", "role1", {"id": "role-1"}),
+            _managed("vastdata_vip_pool", "pool1", {"id": 3}),
         ]
-        
         vast, non_vast = separate_vast_resources(resources)
-        
+
         assert len(vast) == 3
         assert len(non_vast) == 2
-        assert all(r['type'].startswith('vastdata_') for r in vast)
-        assert all(not r['type'].startswith('vastdata_') for r in non_vast)
-        
-        # Verify specific resources
-        vast_types = [r['type'] for r in vast]
-        assert 'vastdata_tenant' in vast_types
-        assert 'vastdata_view' in vast_types
-        assert 'vastdata_vip_pool' in vast_types
-        
-        non_vast_types = [r['type'] for r in non_vast]
-        assert 'aws_s3_bucket' in non_vast_types
-        assert 'google_compute_instance' in non_vast_types
-    
-    def test_separate_empty_list(self):
-        """Test with empty resource list"""
-        resources = []
-        
+
+        assert {r["type"] for r in vast} == {
+            "vastdata_tenant", "vastdata_view", "vastdata_vip_pool",
+        }
+        assert {r["type"] for r in non_vast} == {"aws_s3_bucket", "aws_iam_role"}
+
+    def test_mixed_gcp_vastdata(self):
+        resources = [
+            _managed("vastdata_quota", "q1", {"id": 1}),
+            _managed("google_compute_instance", "vm1", {"id": "vm-1"}),
+            _managed("google_storage_bucket", "gs1", {"id": "gs-1"}),
+        ]
         vast, non_vast = separate_vast_resources(resources)
-        
-        assert len(vast) == 0
-        assert len(non_vast) == 0
+        assert len(vast) == 1
+        assert len(non_vast) == 2
 
-
-class TestExtractStateResourcesRaw:
-    """Test extraction of raw state resources for preservation"""
-    
-    def test_extract_raw_resources_modern_format(self):
-        """Test with TF >= 0.12 format"""
-        state = {
-            "version": 4,
-            "resources": [
-                {
-                    "mode": "managed",
-                    "type": "vastdata_tenant",
-                    "name": "test",
-                    "instances": [{"attributes": {"id": 1}}]
-                },
-                {
-                    "mode": "managed",
-                    "type": "aws_s3_bucket",
-                    "name": "bucket",
-                    "instances": [{"attributes": {"id": "my-bucket"}}]
-                }
-            ]
-        }
-        
-        raw_resources = extract_state_resources_raw(state)
-        
-        assert len(raw_resources) == 2
-        assert raw_resources[0]['type'] == 'vastdata_tenant'
-        assert raw_resources[1]['type'] == 'aws_s3_bucket'
-    
-    def test_extract_raw_resources_with_data_sources(self):
-        """Test that data sources are included in raw extraction"""
-        state = {
-            "version": 4,
-            "resources": [
-                {
-                    "mode": "managed",
-                    "type": "vastdata_tenant",
-                    "name": "test",
-                    "instances": [{"attributes": {"id": 1}}]
-                },
-                {
-                    "mode": "data",
-                    "type": "aws_ami",
-                    "name": "ubuntu",
-                    "instances": [{"attributes": {"id": "ami-12345"}}]
-                }
-            ]
-        }
-        
-        raw_resources = extract_state_resources_raw(state)
-        
-        # Raw extraction should include both managed and data resources
-        assert len(raw_resources) == 2
-
-
-class TestMergeNonVastResources:
-    """Test merging non-VAST resources into migrated state"""
-    
-    @pytest.fixture
-    def temp_state_file(self, tmp_path):
-        """Create a temporary migrated state file"""
-        state = {
-            "version": 4,
-            "terraform_version": "1.5.0",
-            "serial": 1,
-            "lineage": "test-lineage",
-            "resources": [
-                {
-                    "mode": "managed",
-                    "type": "vastdata_tenant",
-                    "name": "migrated",
-                    "provider": "provider[\"registry.terraform.io/vast-data/vastdata\"]",
-                    "instances": [
-                        {
-                            "schema_version": 0,
-                            "attributes": {
-                                "id": 1,
-                                "name": "migrated-tenant"
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-        
-        state_file = tmp_path / "terraform.tfstate"
-        with open(state_file, 'w') as f:
-            json.dump(state, f)
-        
-        return str(state_file)
-    
-    def test_merge_non_vast_resources(self, temp_state_file):
-        """Test merging non-VAST resources into migrated state"""
-        non_vast_resources = [
-            {
-                "mode": "managed",
-                "type": "aws_s3_bucket",
-                "name": "data",
-                "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
-                "instances": [
-                    {
-                        "schema_version": 0,
-                        "attributes": {
-                            "id": "my-bucket",
-                            "bucket": "my-bucket"
-                        }
-                    }
-                ]
-            }
-        ]
-        
-        original_state = {"version": 4, "serial": 1}
-        
-        merge_non_vast_resources_to_state(temp_state_file, non_vast_resources, original_state)
-        
-        # Read merged state
-        with open(temp_state_file, 'r') as f:
-            merged_state = json.load(f)
-        
-        assert len(merged_state['resources']) == 2
-        assert merged_state['serial'] == 2  # Incremented
-        
-        # Verify both resources present
-        resource_types = [r['type'] for r in merged_state['resources']]
-        assert 'vastdata_tenant' in resource_types
-        assert 'aws_s3_bucket' in resource_types
-    
-    def test_merge_multiple_non_vast_resources(self, temp_state_file):
-        """Test merging multiple non-VAST resources"""
-        non_vast_resources = [
-            {
-                "mode": "managed",
-                "type": "aws_s3_bucket",
-                "name": "data",
-                "instances": [{"attributes": {"id": "bucket1"}}]
-            },
-            {
-                "mode": "managed",
-                "type": "google_storage_bucket",
-                "name": "backup",
-                "instances": [{"attributes": {"id": "bucket2"}}]
-            },
-            {
-                "mode": "data",
-                "type": "aws_ami",
-                "name": "ubuntu",
-                "instances": [{"attributes": {"id": "ami-123"}}]
-            }
-        ]
-        
-        original_state = {"version": 4, "serial": 1}
-        
-        merge_non_vast_resources_to_state(temp_state_file, non_vast_resources, original_state)
-        
-        with open(temp_state_file, 'r') as f:
-            merged_state = json.load(f)
-        
-        # 1 original VAST + 3 non-VAST = 4 total
-        assert len(merged_state['resources']) == 4
-    
-    def test_merge_empty_list(self, temp_state_file):
-        """Test merging empty non-VAST resource list"""
-        with open(temp_state_file, 'r') as f:
-            original_state_content = json.load(f)
-        
-        original_count = len(original_state_content['resources'])
-        
-        merge_non_vast_resources_to_state(temp_state_file, [], {})
-        
-        with open(temp_state_file, 'r') as f:
-            merged_state = json.load(f)
-        
-        # Should remain unchanged
-        assert len(merged_state['resources']) == original_count
-
-
-class TestImportSingleResource:
-    """Test single resource import with mocking"""
-    
-    @patch('subprocess.run')
-    def test_successful_import(self, mock_run):
-        """Test successful resource import"""
-        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-        
-        resource = {
-            'type': 'vastdata_tenant',
-            'address': 'vastdata_tenant.test',
-            'attributes': {'id': 1}
-        }
-        
-        import threading
-        lock = threading.Lock()
-        
-        success, address, error = import_single_resource(resource, '/tmp/terraform', lock)
-        
-        assert success is True
-        assert address == 'vastdata_tenant.test'
-        assert error == ""
-        mock_run.assert_called_once()
-    
-    @patch('subprocess.run')
-    def test_failed_import(self, mock_run):
-        """Test failed resource import"""
-        mock_run.return_value = MagicMock(
-            returncode=1,
-            stdout="",
-            stderr="Error: resource not found"
-        )
-        
-        resource = {
-            'type': 'vastdata_view',
-            'address': 'vastdata_view.missing',
-            'attributes': {'id': 999}
-        }
-        
-        import threading
-        lock = threading.Lock()
-        
-        success, address, error = import_single_resource(resource, '/tmp/terraform', lock)
-        
-        assert success is False
-        assert address == 'vastdata_view.missing'
-        assert "Error:" in error or "not found" in error.lower()
-    
-    @patch('subprocess.run')
-    def test_import_with_resource_name_translation(self, mock_run):
-        """Test import with v1 to v3 resource name translation"""
-        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-        
-        resource = {
-            'type': 'vastdata_administators_managers',  # v1 name
-            'address': 'vastdata_administators_managers.admin1',
-            'attributes': {'id': 5}
-        }
-        
-        import threading
-        lock = threading.Lock()
-        
-        success, address, error = import_single_resource(resource, '/tmp/terraform', lock)
-        
-        assert success is True
-        # Should translate to v3 name
-        assert address == 'vastdata_administrator_manager.admin1'
-        
-        # Verify terraform import was called with translated name
-        call_args = mock_run.call_args[0][0]
-        assert 'vastdata_administrator_manager.admin1' in call_args
-
-
-class TestRunParallelImports:
-    """Test parallel import execution"""
-    
-    @patch('state_migration.import_single_resource')
-    def test_parallel_import_all_success(self, mock_import):
-        """Test parallel import with all resources succeeding"""
-        # Mock successful imports
-        mock_import.return_value = (True, "vastdata_tenant.test", "")
-        
+    def test_mixed_azure_vastdata(self):
         resources = [
-            {'type': 'vastdata_tenant', 'address': f'vastdata_tenant.test{i}', 'attributes': {'id': i}}
-            for i in range(10)
+            _managed("vastdata_snapshot", "snap1", {"id": 1}),
+            _managed("azurerm_resource_group", "rg1", {"id": "rg-1"}),
+            _managed("azurerm_virtual_network", "vnet1", {"id": "vnet-1"}),
         ]
-        
-        success_count, failed_count, failed_resources = run_parallel_imports(
-            resources, '/tmp/terraform', max_workers=3
-        )
-        
-        assert success_count == 10
-        assert failed_count == 0
-        assert len(failed_resources) == 0
-        assert mock_import.call_count == 10
-    
-    @patch('state_migration.import_single_resource')
-    def test_parallel_import_some_failures(self, mock_import):
-        """Test parallel import with some failures"""
-        # Mock: first 7 succeed, last 3 fail
-        def side_effect(resource, terraform_dir, lock):
-            resource_id = int(resource['address'].split('test')[1])
-            if resource_id < 7:
-                return (True, resource['address'], "")
-            else:
-                return (False, resource['address'], "Import failed")
-        
-        mock_import.side_effect = side_effect
-        
-        resources = [
-            {'type': 'vastdata_view', 'address': f'vastdata_view.test{i}', 'attributes': {'id': i}}
-            for i in range(10)
-        ]
-        
-        success_count, failed_count, failed_resources = run_parallel_imports(
-            resources, '/tmp/terraform', max_workers=5
-        )
-        
-        assert success_count == 7
-        assert failed_count == 3
-        assert len(failed_resources) == 3
-    
-    @patch('state_migration.import_single_resource')
-    def test_parallel_import_respects_max_workers(self, mock_import):
-        """Test that parallel import respects max_workers setting"""
-        import threading
-        import time
-        
-        active_workers = []
-        max_concurrent = 0
-        lock = threading.Lock()
-        
-        def slow_import(resource, terraform_dir, state_lock):
-            nonlocal max_concurrent
-            with lock:
-                active_workers.append(1)
-                current = len(active_workers)
-                if current > max_concurrent:
-                    max_concurrent = current
-            
-            time.sleep(0.01)  # Simulate work
-            
-            with lock:
-                active_workers.pop()
-            
-            return (True, resource['address'], "")
-        
-        mock_import.side_effect = slow_import
-        
-        resources = [
-            {'type': 'vastdata_tenant', 'address': f'vastdata_tenant.test{i}', 'attributes': {'id': i}}
-            for i in range(20)
-        ]
-        
-        success_count, failed_count, failed_resources = run_parallel_imports(
-            resources, '/tmp/terraform', max_workers=3
-        )
-        
-        assert success_count == 20
-        assert failed_count == 0
-        # Max concurrent should not exceed max_workers
-        assert max_concurrent <= 3
+        vast, non_vast = separate_vast_resources(resources)
+        assert len(vast) == 1
+        assert len(non_vast) == 2
 
+    def test_mixed_multiple_clouds(self):
+        """Realistic: AWS + GCP + Azure + VastData."""
+        resources = [
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("vastdata_view", "v1", {"id": 2}),
+            _managed("vastdata_view_policy", "vp1", {"id": 3}),
+            _managed("aws_s3_bucket", "b1", {"id": "b-1"}),
+            _managed("aws_iam_role", "role1", {"id": "r-1"}),
+            _managed("google_compute_instance", "vm1", {"id": "vm-1"}),
+            _managed("azurerm_resource_group", "rg1", {"id": "rg-1"}),
+            _managed("kubernetes_deployment", "k1", {"id": "deploy-1"}),
+        ]
+        vast, non_vast = separate_vast_resources(resources)
+        assert len(vast) == 3
+        assert len(non_vast) == 5
+
+    def test_empty_list(self):
+        vast, non_vast = separate_vast_resources([])
+        assert vast == []
+        assert non_vast == []
+
+    def test_data_sources_mixed(self):
+        resources = [
+            _data("vastdata_vip_pool", "pool", {"id": 1}),
+            _data("aws_ami", "ubuntu", {"id": "ami-123"}),
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("aws_s3_bucket", "b1", {"id": "bucket"}),
+        ]
+        vast, non_vast = separate_vast_resources(resources)
+        assert len(vast) == 2   # data + managed
+        assert len(non_vast) == 2
+
+    def test_v1_legacy_names_still_classified_as_vast(self):
+        """Old v1/v2 resource names like vastdata_administators_managers."""
+        resources = [
+            _managed("vastdata_administators_managers", "admin", {"id": 1}),
+            _managed("vastdata_kafka_brokers", "broker", {"id": 2}),
+            _managed("vastdata_non_local_user", "user", {"username": "x", "context": "ldap", "tenant_id": 1}),
+            _managed("vastdata_blockhost", "host", {"id": 3}),
+            _managed("aws_s3_bucket", "b1", {"id": "bucket"}),
+        ]
+        vast, non_vast = separate_vast_resources(resources)
+        assert len(vast) == 4
+        assert len(non_vast) == 1
+
+
+# ---------------------------------------------------------------------------
+# Strip tests with mixed providers
+# ---------------------------------------------------------------------------
+
+class TestStripMixedProviders:
+    """Test strip_vast_resources with multi-provider state."""
+
+    def test_strips_vast_preserves_aws(self):
+        state = _make_state([
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("vastdata_view", "v1", {"id": 2}),
+            _managed("aws_s3_bucket", "b1", {"id": "bucket-1"}),
+            _managed("aws_iam_role", "role1", {"id": "role-1"}),
+        ], serial=10)
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        assert vc == 2
+        assert nvc == 2
+        assert len(cleaned["resources"]) == 2
+        assert all(r["type"].startswith("aws_") for r in cleaned["resources"])
+        assert cleaned["serial"] == 11
+
+    def test_strips_vast_preserves_gcp_and_azure(self):
+        state = _make_state([
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("google_compute_instance", "vm", {"id": "vm-1"}),
+            _managed("azurerm_resource_group", "rg", {"id": "rg-1"}),
+        ])
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        assert vc == 1
+        assert nvc == 2
+        types = {r["type"] for r in cleaned["resources"]}
+        assert types == {"google_compute_instance", "azurerm_resource_group"}
+
+    def test_preserves_data_sources_of_other_providers(self):
+        state = _make_state([
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _data("aws_ami", "ubuntu", {"id": "ami-123"}),
+            _data("vastdata_vip_pool", "pool", {"id": 1}),
+            _managed("aws_s3_bucket", "b1", {"id": "bucket"}),
+        ])
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        # vast: tenant (managed) + vip_pool (data) = 2
+        assert vc == 2
+        # non-vast: ami (data) + s3 (managed) = 2
+        assert nvc == 2
+        types = {r["type"] for r in cleaned["resources"]}
+        assert types == {"aws_ami", "aws_s3_bucket"}
+
+    def test_preserves_resource_attributes_intact(self):
+        """Non-vast resource attributes must survive stripping untouched."""
+        aws_attrs = {
+            "id": "my-bucket",
+            "bucket": "my-bucket",
+            "acl": "private",
+            "tags": {"env": "prod", "team": "infra"},
+            "versioning": [{"enabled": True}],
+        }
+        state = _make_state([
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("aws_s3_bucket", "data_bucket", aws_attrs,
+                     provider='provider["registry.terraform.io/hashicorp/aws"]'),
+        ])
+
+        cleaned, _, _ = strip_vast_resources(state)
+
+        preserved = cleaned["resources"][0]
+        assert preserved["type"] == "aws_s3_bucket"
+        assert preserved["name"] == "data_bucket"
+        assert preserved["instances"][0]["attributes"] == aws_attrs
+        assert preserved["provider"] == 'provider["registry.terraform.io/hashicorp/aws"]'
+
+    def test_preserves_module_non_vast_resources(self):
+        state = _make_state([
+            _managed("vastdata_view", "v1", {"id": 1}),
+            _managed("aws_s3_bucket", "b1", {"id": "b"}, module="module.storage"),
+            _managed("vastdata_tenant", "t1", {"id": 2}, module="module.vast"),
+        ])
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        assert vc == 2
+        assert nvc == 1
+        assert cleaned["resources"][0]["module"] == "module.storage"
+
+    def test_preserves_outputs(self):
+        state = _make_state([
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+        ])
+        state["outputs"] = {
+            "bucket_arn": {"value": "arn:aws:s3:::my-bucket", "type": "string"},
+        }
+
+        cleaned, _, _ = strip_vast_resources(state)
+
+        assert cleaned["outputs"]["bucket_arn"]["value"] == "arn:aws:s3:::my-bucket"
+
+
+# ---------------------------------------------------------------------------
+# End-to-end mixed-provider CLI tests
+# ---------------------------------------------------------------------------
 
 class TestEndToEndMixedProviders:
-    """End-to-end tests for mixed provider migration"""
-    
-    @pytest.fixture
-    def mixed_state_file(self, tmp_path):
-        """Create a state file with mixed providers"""
-        state = {
-            "version": 4,
-            "terraform_version": "1.5.0",
-            "serial": 5,
-            "lineage": "mixed-providers",
-            "resources": [
-                {
-                    "mode": "managed",
-                    "type": "vastdata_tenant",
-                    "name": "vast1",
-                    "provider": "provider[\"registry.terraform.io/vast-data/vastdata\"]",
-                    "instances": [{"schema_version": 0, "attributes": {"id": 1, "name": "vast1"}}]
-                },
-                {
-                    "mode": "managed",
-                    "type": "aws_s3_bucket",
-                    "name": "data",
-                    "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
-                    "instances": [{"schema_version": 0, "attributes": {"id": "my-bucket"}}]
-                },
-                {
-                    "mode": "managed",
-                    "type": "vastdata_view",
-                    "name": "view1",
-                    "provider": "provider[\"registry.terraform.io/vast-data/vastdata\"]",
-                    "instances": [{"schema_version": 0, "attributes": {"id": 10, "path": "/view1"}}]
-                },
-                {
-                    "mode": "managed",
-                    "type": "google_storage_bucket",
-                    "name": "backup",
-                    "provider": "provider[\"registry.terraform.io/hashicorp/google\"]",
-                    "instances": [{"schema_version": 0, "attributes": {"id": "backup-bucket"}}]
-                }
-            ]
+    """Integration tests using main() with multi-provider states."""
+
+    def _create_workspace(self, tmp_path, state_resources, *, serial=5):
+        workdir = tmp_path / "workdir"
+        workdir.mkdir()
+        (workdir / "main.tf").write_text(
+            'resource "vastdata_tenant" "t" { name = "x" }\n'
+            'resource "aws_s3_bucket" "b" { bucket = "b" }\n'
+        )
+        state = _make_state(state_resources, serial=serial)
+        state_file = tmp_path / "original.tfstate"
+        _write(state_file, state)
+        return workdir, state_file
+
+    @patch("state_migration.run_terraform_apply_migrate")
+    @patch("state_migration.verify_migrate_mode_support")
+    @patch("state_migration.run_terraform_init")
+    def test_mixed_state_strips_vast_keeps_aws(self, mock_init, mock_verify, mock_apply, tmp_path, monkeypatch):
+        workdir, state_file = self._create_workspace(tmp_path, [
+            _managed("vastdata_tenant", "t1", {"id": 1, "name": "prod"}),
+            _managed("vastdata_view", "v1", {"id": 2, "path": "/data"}),
+            _managed("aws_s3_bucket", "data", {"id": "data-bucket", "bucket": "data-bucket"}),
+            _managed("aws_iam_role", "role", {"id": "role-1", "name": "terraform-role"}),
+        ], serial=15)
+
+        monkeypatch.chdir(workdir)
+        monkeypatch.setattr("sys.argv", ["state_migration.py", str(state_file)])
+
+        main()
+
+        # Verify cleaned state
+        dest = workdir / "terraform.tfstate"
+        with open(dest) as fh:
+            cleaned = json.load(fh)
+
+        assert len(cleaned["resources"]) == 2
+        types = {r["type"] for r in cleaned["resources"]}
+        assert types == {"aws_s3_bucket", "aws_iam_role"}
+        assert cleaned["serial"] == 16
+
+        mock_init.assert_called_once()
+        mock_verify.assert_called_once()
+        mock_apply.assert_called_once()
+
+    @patch("state_migration.run_terraform_apply_migrate")
+    @patch("state_migration.verify_migrate_mode_support")
+    @patch("state_migration.run_terraform_init")
+    def test_all_vast_state_produces_empty_resources(self, mock_init, mock_verify, mock_apply, tmp_path, monkeypatch):
+        workdir, state_file = self._create_workspace(tmp_path, [
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("vastdata_view", "v1", {"id": 2}),
+            _managed("vastdata_quota", "q1", {"id": 3}),
+        ])
+
+        monkeypatch.chdir(workdir)
+        monkeypatch.setattr("sys.argv", ["state_migration.py", str(state_file)])
+
+        main()
+
+        dest = workdir / "terraform.tfstate"
+        with open(dest) as fh:
+            cleaned = json.load(fh)
+
+        assert cleaned["resources"] == []
+
+    @patch("state_migration.run_terraform_apply_migrate")
+    @patch("state_migration.run_terraform_init")
+    def test_dry_run_mixed_state(self, mock_init, mock_apply, tmp_path, monkeypatch):
+        workdir, state_file = self._create_workspace(tmp_path, [
+            _managed("vastdata_tenant", "t1", {"id": 1}),
+            _managed("aws_s3_bucket", "b1", {"id": "bucket"}),
+        ])
+
+        monkeypatch.chdir(workdir)
+        monkeypatch.setattr("sys.argv", ["state_migration.py", str(state_file), "--dry-run"])
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+        assert exc_info.value.code == 0
+        mock_init.assert_not_called()
+        mock_apply.assert_not_called()
+
+        # State should still be written
+        dest = workdir / "terraform.tfstate"
+        with open(dest) as fh:
+            cleaned = json.load(fh)
+        assert len(cleaned["resources"]) == 1
+        assert cleaned["resources"][0]["type"] == "aws_s3_bucket"
+
+    @patch("state_migration.run_terraform_apply_migrate")
+    @patch("state_migration.run_terraform_init")
+    def test_no_vast_in_mixed_state(self, mock_init, mock_apply, tmp_path, monkeypatch):
+        """State has only non-vast resources → nothing to migrate."""
+        workdir, state_file = self._create_workspace(tmp_path, [
+            _managed("aws_s3_bucket", "b1", {"id": "bucket"}),
+            _managed("google_compute_instance", "vm1", {"id": "vm"}),
+        ])
+
+        monkeypatch.chdir(workdir)
+        monkeypatch.setattr("sys.argv", ["state_migration.py", str(state_file)])
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+
+        assert exc_info.value.code == 0
+        mock_init.assert_not_called()
+        mock_apply.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# Realistic production-like scenarios
+# ---------------------------------------------------------------------------
+
+class TestRealisticScenarios:
+    """Simulate real customer environments."""
+
+    def test_customer_with_aws_gcp_vastdata(self):
+        """
+        Customer has:
+          - 10 VastData resources (tenants, views, quotas, policies)
+          - 15 AWS resources (S3 buckets, IAM roles, EC2 instances)
+          - 5  GCP resources (storage buckets, compute instances)
+        """
+        resources = []
+
+        # VastData
+        for i in range(3):
+            resources.append(_managed("vastdata_tenant", f"tenant_{i}", {"id": i}))
+        for i in range(4):
+            resources.append(_managed("vastdata_view", f"view_{i}", {"id": 10 + i}))
+        for i in range(2):
+            resources.append(_managed("vastdata_quota", f"quota_{i}", {"id": 20 + i}))
+        resources.append(_managed("vastdata_view_policy", "policy_0", {"id": 30}))
+
+        # AWS
+        for i in range(5):
+            resources.append(_managed("aws_s3_bucket", f"bucket_{i}", {"id": f"b-{i}"}))
+        for i in range(5):
+            resources.append(_managed("aws_iam_role", f"role_{i}", {"id": f"r-{i}"}))
+        for i in range(5):
+            resources.append(_managed("aws_instance", f"ec2_{i}", {"id": f"i-{i}"}))
+
+        # GCP
+        for i in range(3):
+            resources.append(_managed("google_storage_bucket", f"gs_{i}", {"id": f"gs-{i}"}))
+        for i in range(2):
+            resources.append(_managed("google_compute_instance", f"gce_{i}", {"id": f"gce-{i}"}))
+
+        state = _make_state(resources, serial=100)
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        assert vc == 10
+        assert nvc == 20
+        assert len(cleaned["resources"]) == 20
+        assert cleaned["serial"] == 101
+
+        # None of the remaining should be vastdata
+        assert all(
+            not r["type"].startswith("vastdata_")
+            for r in cleaned["resources"]
+        )
+
+    def test_customer_with_for_each_vastdata_and_aws(self):
+        """Resources with for_each instances."""
+        vast_resource = {
+            "mode": "managed",
+            "type": "vastdata_view",
+            "name": "views",
+            "instances": [
+                {"index_key": "prod", "schema_version": 0, "attributes": {"id": 1}},
+                {"index_key": "staging", "schema_version": 0, "attributes": {"id": 2}},
+                {"index_key": "dev", "schema_version": 0, "attributes": {"id": 3}},
+            ],
         }
-        
-        state_file = tmp_path / "terraform.tfstate"
-        with open(state_file, 'w') as f:
-            json.dump(state, f)
-        
-        return state_file
-    
-    def test_extract_and_separate_mixed_state(self, mixed_state_file):
-        """Test extraction and separation of mixed provider state"""
-        from state_migration import parse_tfstate
-        
-        state = parse_tfstate(str(mixed_state_file))
-        resources = extract_resources(state)
-        
-        assert len(resources) == 4
-        
-        vast, non_vast = separate_vast_resources(resources)
-        
-        assert len(vast) == 2  # vastdata_tenant and vastdata_view
-        assert len(non_vast) == 2  # aws_s3_bucket and google_storage_bucket
-        
-        vast_types = {r['type'] for r in vast}
-        assert vast_types == {'vastdata_tenant', 'vastdata_view'}
-        
-        non_vast_types = {r['type'] for r in non_vast}
-        assert non_vast_types == {'aws_s3_bucket', 'google_storage_bucket'}
+        aws_resource = {
+            "mode": "managed",
+            "type": "aws_s3_bucket",
+            "name": "buckets",
+            "instances": [
+                {"index_key": "logs", "schema_version": 0, "attributes": {"id": "logs-bucket"}},
+                {"index_key": "data", "schema_version": 0, "attributes": {"id": "data-bucket"}},
+            ],
+        }
+
+        state = _make_state([vast_resource, aws_resource])
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        assert vc == 1   # 1 resource entry (with 3 instances)
+        assert nvc == 1  # 1 resource entry (with 2 instances)
+        assert len(cleaned["resources"]) == 1
+        # AWS instances should be intact
+        assert len(cleaned["resources"][0]["instances"]) == 2
+
+    def test_customer_with_modules_mixed(self):
+        """Resources inside modules from different providers."""
+        resources = [
+            _managed("vastdata_tenant", "t", {"id": 1}, module="module.vast_infra"),
+            _managed("vastdata_view", "v", {"id": 2}, module="module.vast_infra"),
+            _managed("aws_s3_bucket", "b", {"id": "bucket"}, module="module.aws_storage"),
+            _managed("aws_iam_role", "r", {"id": "role"}, module="module.aws_iam"),
+            _managed("google_compute_instance", "vm", {"id": "vm"}, module="module.gcp_compute"),
+        ]
+
+        state = _make_state(resources)
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        assert vc == 2
+        assert nvc == 3
+
+        # Verify modules are preserved
+        modules = {r["module"] for r in cleaned["resources"]}
+        assert "module.aws_storage" in modules
+        assert "module.aws_iam" in modules
+        assert "module.gcp_compute" in modules
+
+    def test_customer_state_with_sensitive_attrs(self):
+        """Non-vast resources may have sensitive_attributes — must be preserved."""
+        aws_resource = {
+            "mode": "managed",
+            "type": "aws_iam_access_key",
+            "name": "key",
+            "instances": [
+                {
+                    "schema_version": 0,
+                    "attributes": {
+                        "id": "AKIA...",
+                        "secret": "s3cr3t",
+                    },
+                    "sensitive_attributes": [
+                        [{"type": "get_attr", "value": "secret"}],
+                    ],
+                    "private": "base64data==",
+                }
+            ],
+        }
+
+        state = _make_state([
+            _managed("vastdata_tenant", "t", {"id": 1}),
+            aws_resource,
+        ])
+
+        cleaned, vc, nvc = strip_vast_resources(state)
+
+        assert vc == 1
+        assert nvc == 1
+
+        preserved = cleaned["resources"][0]
+        assert preserved["type"] == "aws_iam_access_key"
+        inst = preserved["instances"][0]
+        assert inst["sensitive_attributes"] == [
+            [{"type": "get_attr", "value": "secret"}],
+        ]
+        assert inst["private"] == "base64data=="
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

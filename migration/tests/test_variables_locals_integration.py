@@ -23,7 +23,7 @@ class TestVariablesLocalsIntegration:
     
     def test_full_migration_with_variables_and_locals(self, tmp_path):
         """Test complete migration preserving variables, locals, and data files"""
-        from state_migration import parse_tfstate, extract_resources
+        from state_migration import parse_tfstate, strip_vast_resources
         
         # Create source directory structure
         source_dir = tmp_path / "source"
@@ -117,11 +117,11 @@ provider "vastdata" {
         assert state is not None
         assert "resources" in state
         
-        # Test extracting resources
-        resources = extract_resources(state)
-        assert len(resources) == 1
-        assert resources[0]["type"] == "vastdata_tenant"
-        assert resources[0]["name"] == "test_tenant"
+        # Test stripping vast resources
+        cleaned, vast_count, non_vast_count = strip_vast_resources(state)
+        assert vast_count == 1
+        assert non_vast_count == 0
+        assert cleaned["resources"] == []
         
         # Verify all source files exist
         assert main_tf.exists()
@@ -156,7 +156,7 @@ provider "vastdata" {
     
     def test_multiple_locals_blocks_preserved(self, tmp_path):
         """Test that multiple locals blocks from different files are all preserved"""
-        from state_migration import parse_tfstate, extract_resources
+        from state_migration import parse_tfstate, strip_vast_resources
         
         # Create source directory
         source_dir = tmp_path / "source"

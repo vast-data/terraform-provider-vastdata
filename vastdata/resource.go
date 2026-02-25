@@ -123,7 +123,11 @@ func (r *Resource) ImportState(ctx context.Context, req resource.ImportStateRequ
 
 func (r *Resource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	withContext(ctx, OpCreate, r.managerName, func(ctx context.Context) {
-		r.createImpl(ctx, req, resp)
+		if r.providerData != nil && r.providerData.MigrateMode {
+			r.createMigrateImpl(ctx, req, resp)
+		} else {
+			r.createImpl(ctx, req, resp)
+		}
 	})
 }
 
@@ -135,12 +139,32 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	withContext(ctx, OpUpdate, r.managerName, func(ctx context.Context) {
+		if r.providerData != nil && r.providerData.MigrateMode {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("MigrateMode[%s]: update operation blocked.", r.managerName),
+				"VASTDATA_MIGRATE_MODE is intended for populating an EMPTY state from existing infrastructure. "+
+					"An update was triggered, which means the state already contains this resource. "+
+					"Please start with an empty state (remove terraform.tfstate) and run again, "+
+					"or unset VASTDATA_MIGRATE_MODE to operate normally.",
+			)
+			return
+		}
 		r.updateImpl(ctx, req, resp)
 	})
 }
 
 func (r *Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	withContext(ctx, OpDelete, r.managerName, func(ctx context.Context) {
+		if r.providerData != nil && r.providerData.MigrateMode {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("MigrateMode[%s]: delete operation blocked.", r.managerName),
+				"VASTDATA_MIGRATE_MODE is intended for populating an EMPTY state from existing infrastructure. "+
+					"A delete was triggered, which means the state already contains this resource. "+
+					"Please start with an empty state (remove terraform.tfstate) and run again, "+
+					"or unset VASTDATA_MIGRATE_MODE to operate normally.",
+			)
+			return
+		}
 		r.deleteImpl(ctx, req, resp)
 	})
 }
@@ -557,6 +581,102 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		)
 		return
 	}
+}
+
+// createMigrateImpl handles resource "creation" in migrate mode.
+// Instead of creating the resource on the VAST cluster, it reads the existing resource
+// by its search parameters (name, id, etc.) and populates the Terraform state.
+// This allows users to populate a new state file from existing infrastructure by running
+// `VASTDATA_MIGRATE_MODE=1 terraform apply` with their .tf configuration files.
+func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var (
+		rest        = r.providerData.Client
+		manager     = r.NewManager(req.Plan)
+		managerName = r.managerName
+		tfState     = manager.TfState()
+		record      DisplayableRecord
+		err         error
+	)
+
+	tflog.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: reading existing resource instead of creating.", managerName))
+
+	// Prepare read hooks (same as in readImpl/importStateImpl)
+	if prep, ok := manager.(PrepareReadResource); ok {
+		tflog.Debug(ctx, fmt.Sprintf("MigrateMode/PrepareReadResource[%s]: do.", managerName))
+		if err = prep.PrepareReadResource(ctx, rest); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("MigrateMode/PrepareReadResource[%q]", managerName),
+				err.Error(),
+			)
+			return
+		}
+	}
+
+	// Read the resource using the same logic as import
+	if reader, ok := manager.(ReadResource); ok {
+		tflog.Debug(ctx, fmt.Sprintf("MigrateMode[%s]: using custom ReadResource.", managerName))
+		record, err = reader.ReadResource(ctx, rest)
+	} else {
+		tflog.Debug(ctx, fmt.Sprintf("MigrateMode[%s]: using default read by search params.", managerName))
+		record, err = r.getRecordBySearchParams(ctx, manager, nil, "MigrateCreate")
+	}
+
+	if err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("MigrateMode[%s]: failed to read existing resource from cluster.", managerName),
+			fmt.Sprintf("Ensure the resource exists on the VAST cluster. Error: %s", err.Error()),
+		)
+		return
+	}
+
+	if record != nil {
+		// Transform response if needed
+		if transformer, ok := manager.(TransformResponseRecord); ok {
+			tflog.Debug(ctx, fmt.Sprintf("MigrateMode/TransformResponseRecord[%s]: do.", managerName))
+			record = transformer.TransformResponseRecord(record.(Record))
+		}
+
+		// Populate _id fields from nested objects (same as import)
+		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
+
+		// Fill state from the record (using import-style fill which populates computed + required)
+		if err = tfState.FillFromRecordForImport(record.(Record)); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("MigrateMode[%s]: error filling state from cluster record.", managerName),
+				err.Error(),
+			)
+			return
+		}
+	} else {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("MigrateMode[%s]: resource not found on cluster.", managerName),
+			"The resource was not found on the VAST cluster. Ensure the resource configuration matches an existing resource.",
+		)
+		return
+	}
+
+	// After read hook
+	if aft, ok := manager.(AfterReadResource); ok {
+		tflog.Debug(ctx, fmt.Sprintf("MigrateMode/AfterReadResource[%s]: do.", managerName))
+		if err = aft.AfterReadResource(ctx, rest); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("MigrateMode/AfterReadResource[%q]", managerName),
+				err.Error(),
+			)
+			return
+		}
+	}
+
+	// Persist state
+	if err = tfState.SetState(ctx, &resp.State); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("MigrateMode[%s]: failed to set state.", managerName),
+			err.Error(),
+		)
+		return
+	}
+
+	tflog.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: successfully populated state from existing cluster resource.", managerName))
 }
 
 func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
