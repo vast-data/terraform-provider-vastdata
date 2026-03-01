@@ -33,7 +33,6 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 			ImportFields:          []string{"path", "tenant_name"},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
-				"alias":                    ValidatorPathStartsWithSlash,
 				"max_retention_period":     ValidatorRetentionFormat,
 				"min_retention_period":     ValidatorRetentionFormat,
 				"default_retention_period": ValidatorRetentionFormat,
