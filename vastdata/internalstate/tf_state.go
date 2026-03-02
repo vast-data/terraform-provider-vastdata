@@ -644,26 +644,40 @@ func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, in
 			)
 		}
 
-		// For user-configurable fields (Optional or Required), preserve the user's declared value
-		// if it exists and is known. Computed-only fields should always come from API.
-		if existing, ok := s.Raw[key]; ok && !existing.IsNull() && !existing.IsUnknown() {
-			isUserConfigurable := s.IsOptional(key) || s.IsRequired(key)
-			if isUserConfigurable {
-				if hints != nil && contains(hints.PreserveUserValueFields, key) {
-					// Preserve the user-declared value
-					continue
-				}
-			}
-		}
-
-		// For PreserveOrderFields, check if the content is the same but order is different.
-		// If so, preserve the user's order to avoid perpetual drift.
-		if hints != nil && contains(hints.PreserveOrderFields, key) {
+		if hints != nil {
 			if existing, ok := s.Raw[key]; ok && !existing.IsNull() && !existing.IsUnknown() {
-				// Check if both values are lists with the same content (ignoring order)
-				if listsHaveSameContentIgnoringOrder(existing, val) {
-					// Content is identical, preserve user's order
-					continue
+				// For user-configurable fields (Optional or Required), preserve the user's declared value
+				// according to provided hint flags. Computed-only fields should always come from API.
+				if s.IsOptional(key) || s.IsRequired(key) {
+					// PreserveUserValueFields — immutable: once a user sets a value
+					// in the .tf config, it is NEVER overwritten by the API response.
+					if contains(hints.PreserveUserValueFields, key) {
+						continue
+					}
+
+					// PreserveUserValueFieldsWhenApiReturnsNull — protect from null:
+					// the user's value CAN be updated when the API returns a real,
+					// non-null value that differs.  But if the API returned
+					// null/unknown we refuse to reset the field — keep the user's
+					// declared value.
+					if contains(hints.PreserveUserValueFieldsWhenApiReturnsNull, key) {
+						// a nil attr.Value.  Treat a Go-nil val the same as a
+						// logical null — preserve the user value.
+						if val == nil || val.IsNull() || val.IsUnknown() {
+							continue
+						}
+						// Non-null API value → let it fall through to s.Raw[key] = val
+					}
+				}
+
+				// For PreserveOrderFields, check if the content is the same but order is different.
+				// If so, preserve the user's order to avoid perpetual drift.
+				if contains(hints.PreserveOrderFields, key) {
+					// Check if both values are lists with the same content (ignoring order)
+					if listsHaveSameContentIgnoringOrder(existing, val) {
+						// Content is identical, preserve user's order
+						continue
+					}
 				}
 			}
 		}
@@ -868,6 +882,7 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		exclude = append(exclude, s.Hints.EditOnlyFields...)                                   // Edit only fields should not be set on creation.
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyBodyFields))...)  // Delete only fields should not be set on creation.
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyParamFields))...) // Delete only fields should not be set on creation.
+		exclude = append(exclude, s.Hints.SensitiveFields...)                                  // Sensitive fields must never appear in URL query params.
 	}
 
 	searchParams := make(vast_client.Params)
@@ -914,6 +929,13 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 	}
 
 	searchParams.Update(s.GetReadOnlySearchParams(), false)
+
+	// Sensitive fields must never appear in URL query parameters.
+	if s.Hints != nil {
+		for _, field := range s.Hints.SensitiveFields {
+			delete(searchParams, field)
+		}
+	}
 
 	return searchParams
 
