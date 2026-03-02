@@ -60,5 +60,6 @@ provider "vastdata" {
 - `password` (String, Sensitive) VastData Cluster password (conflicts with api_token).
 - `port` (Number) The server API port (Default is 443) ,if environment variable VASTDATA_PORT exists it will be used
 - `skip_ssl_verify` (Boolean) Whether to skip SSL certificate verification.
+- `tenant` (String) Tenant name for tenant-scoped authentication (tenant admin). If environment variable VASTDATA_TENANT exists it will be used. This is passed via the X-Tenant-Name header during login.
 - `username` (String, Sensitive) VastData Cluster username (conflicts with api_token).
 - `version_validation_mode` (String) Version validation mode: 'strict' or 'warn'.
