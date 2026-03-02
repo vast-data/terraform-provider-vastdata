@@ -40,7 +40,8 @@ var notImportable = false
 
 // ProviderData contains the client and configuration passed from the provider
 type ProviderData struct {
-	Client *VMSRest
+	Client      *VMSRest
+	MigrateMode bool // When true, Create reads from cluster instead of creating, Delete is no-op
 }
 
 // Rest Client

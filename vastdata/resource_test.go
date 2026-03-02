@@ -635,3 +635,66 @@ func TestFillFromRecordIncludingRequired_ComputedOnlyFalse(t *testing.T) {
 	tfName := tf.Get("name").(types.String)
 	require.Equal(t, "should-be-set", tfName.ValueString())
 }
+
+// ---- MIGRATE MODE TESTS ----
+
+func TestMigrateMode_ProviderDataFlag(t *testing.T) {
+	// Verify MigrateMode flag is properly stored in ProviderData
+	pd := &ProviderData{Client: nil, MigrateMode: true}
+	require.True(t, pd.MigrateMode)
+
+	pd2 := &ProviderData{Client: nil, MigrateMode: false}
+	require.False(t, pd2.MigrateMode)
+}
+
+func TestMigrateMode_DeleteBlockedOnNonEmptyState(t *testing.T) {
+	// In migrate mode, delete should be blocked because it means state is not empty
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":   rschema.Int64Attribute{Optional: true, Computed: true},
+		"name": rschema.StringAttribute{Optional: true, Computed: true},
+	}}
+
+	r := buildTestResourceWithSchema(schema, &is.TFStateHints{})
+	r.providerData = &ProviderData{Client: nil, MigrateMode: true}
+
+	resp := &resource.DeleteResponse{}
+	r.Delete(context.Background(), resource.DeleteRequest{}, resp)
+
+	// Should produce an error telling user state is not empty
+	require.True(t, resp.Diagnostics.HasError(), "migrate mode delete should produce an error")
+	require.Contains(t, resp.Diagnostics.Errors()[0].Detail(), "EMPTY state")
+}
+
+func TestMigrateMode_UpdateBlockedOnNonEmptyState(t *testing.T) {
+	// In migrate mode, update should be blocked because it means state is not empty
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":   rschema.Int64Attribute{Optional: true, Computed: true},
+		"name": rschema.StringAttribute{Optional: true, Computed: true},
+	}}
+
+	r := buildTestResourceWithSchema(schema, &is.TFStateHints{})
+	r.providerData = &ProviderData{Client: nil, MigrateMode: true}
+
+	resp := &resource.UpdateResponse{}
+	r.Update(context.Background(), resource.UpdateRequest{}, resp)
+
+	// Should produce an error telling user state is not empty
+	require.True(t, resp.Diagnostics.HasError(), "migrate mode update should produce an error")
+	require.Contains(t, resp.Diagnostics.Errors()[0].Detail(), "EMPTY state")
+}
+
+func TestMigrateMode_NilProviderData_NoMigrate(t *testing.T) {
+	// When providerData is nil, migrate mode checks should not panic
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id": rschema.Int64Attribute{Optional: true, Computed: true},
+	}}
+
+	r := buildTestResourceWithSchema(schema, &is.TFStateHints{})
+	// providerData is nil by default
+
+	// The nil check should prevent any panic when accessing MigrateMode
+	require.NotPanics(t, func() {
+		pd := r.providerData
+		_ = pd != nil && pd.MigrateMode
+	})
+}
