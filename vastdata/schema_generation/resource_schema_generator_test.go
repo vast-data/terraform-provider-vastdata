@@ -320,7 +320,7 @@ func Test_injectModifiers_ComputedOnlyGetsUseState(t *testing.T) {
 	require.True(t, containsUseStateForUnknown(mod.PlanModifiers), "Expected UseStateForUnknown for computed-only attribute")
 }
 
-func Test_injectModifiers_OptionalDoesNotGetUseState(t *testing.T) {
+func Test_injectModifiers_OptionalComputedGetsUseState(t *testing.T) {
 	att := rschema.StringAttribute{
 		Optional: true,
 		Computed: true,
@@ -329,7 +329,7 @@ func Test_injectModifiers_OptionalDoesNotGetUseState(t *testing.T) {
 	modified := injectModifiers(att, "name", &TFStateHints{})
 	mod, ok := modified.(rschema.StringAttribute)
 	require.True(t, ok)
-	require.False(t, containsUseStateForUnknown(mod.PlanModifiers), "Should not apply UseStateForUnknown to optional+computed field")
+	require.True(t, containsUseStateForUnknown(mod.PlanModifiers), "Should apply UseStateForUnknown to optional+computed field to prevent 'known after apply' noise")
 }
 
 func Test_injectModifiers_FromHints(t *testing.T) {
