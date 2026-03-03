@@ -295,6 +295,7 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `protection_policy_id` (String) Specifies whcih protection policy to use
 - `remote_target_id` (Number) Remote target ID for streams with global namespace or synchronous replication capability.
 - `remote_tenant_guid` (String) Tenant GUID of the remote peer tenant to which to replicate
+- `remote_tenant_name` (String) remote tenant name
 - `source_member_capabilities` (String) Stream capabilities for the source member
 - `sync_disconnect_time` (Number) A period of time, in seconds, without communication between sync replication peers, after which the peers are disconnected.
 - `sync_interval` (Number) Replication group sync interval
@@ -329,7 +330,6 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `physical_size` (Number)
 - `progress` (String)
 - `protection_policy_name` (String) protection policy name
-- `remote_tenant_name` (String) remote tenant name
 - `replication_policy` (String) replication policy id
 - `replication_target_name` (String)
 - `restore_task` (String) link to restore task
