@@ -77,6 +77,13 @@ type TFStateHints struct {
 	// Typical use case: optional fields that should not be overwritten even if the API returns different values.
 	PreserveUserValueFields []string
 
+	// PreserveUserValueFieldsWhenApiReturnsNull lists fields whose user-declared values should be preserved
+	// It is similar to PreserveUserValueFields:
+	// PreserveUserValueFields - means once set value in tf state it will never be changed!
+	// PreserveUserValueFieldsWhenApiReturnsNull - once set value can be changed
+	// but only if API returns value which is logically not nil value
+	PreserveUserValueFieldsWhenApiReturnsNull []string
+
 	// DeleteOnlyBodyFields maps Terraform attribute names to API body field names
 	// for fields that are only allowed to be sent in DELETE request bodies.
 	// Key: Terraform schema field name; Value: API body field name.

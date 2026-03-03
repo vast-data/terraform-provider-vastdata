@@ -27,6 +27,7 @@ func (m *AdministratorManager) NewResourceManager(raw map[string]attr.Value, sch
 		&is.TFStateHints{
 			SchemaRef:       AdministratorManagerSchemaRef,
 			SensitiveFields: []string{"password"},
+			PreserveUserValueFieldsWhenApiReturnsNull: []string{"password"},
 		},
 	)}
 }
