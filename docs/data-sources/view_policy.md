@@ -89,6 +89,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `smb_file_mode` (Number) Default unix type permissions on new file
 - `smb_file_mode_padded` (String) Default unix type permissions on new file
 - `smb_is_ca` (Boolean) When enabled, the SMB share exposed by the view is set as continuously available, which allows SMB3 clients to request use of persistent file handles and keep their connections to this share in case of a failover event.
+- `smb_recursive_change_notify` (Boolean) Whether SMB Recursive Change Notify is enabled
 - `sync` (String) Synchronization state with leader
 - `sync_time` (String) Synchronization time with leader
 - `tenant_id` (Number) Tenant ID
