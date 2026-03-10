@@ -31,6 +31,9 @@ func (m *QosPolicy) NewResourceManager(raw map[string]attr.Value, schema any) Re
 				"capacity_limits",
 				"static_total_limits",
 			},
+			PreserveUserValueFieldsWhenApiReturnsNull: []string{
+				"is_default",
+			},
 			SchemaRef: QosPolicySchemaRef,
 		},
 	)}
