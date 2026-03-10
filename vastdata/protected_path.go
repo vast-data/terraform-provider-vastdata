@@ -28,6 +28,10 @@ func (m *ProtectedPath) NewResourceManager(raw map[string]attr.Value, schema any
 		&is.TFStateHints{
 			SchemaRef:            ProtectedPathSchemaRef,
 			ExcludedSchemaFields: []string{"members_info"},
+			PreserveUserValueFields: []string{
+				"role",
+				"target_exported_dir",
+			},
 			AdditionalSchemaAttributes: map[string]any{
 				// TERF-186
 				"estimated_read_only_time": rschema.StringAttribute{
