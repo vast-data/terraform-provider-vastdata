@@ -104,10 +104,18 @@ func updateCnodeBgpConfig(ctx context.Context, cnodeId int64, params map[string]
 	if cnodeId == 0 {
 		return nil, fmt.Errorf("failed to get cnode ID: cnode ID is empty")
 	}
-
-	err := rest.Cnodes.CnodeBgpconfigWithContext_PATCH(ctx, cnodeId, params)
-	if err != nil {
-		return nil, err
+	deleteZeroValues(params, []string{
+		"self_asn",
+		"port1_peer_address",
+		"port2_peer_address",
+		"port1_self_address",
+		"port2_self_address",
+	})
+	if len(params) > 0 {
+		err := rest.Cnodes.CnodeBgpconfigWithContext_PATCH(ctx, cnodeId, params)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// Return the updated config
 	return rest.Cnodes.CnodeBgpconfigWithContext_GET(ctx, cnodeId)
