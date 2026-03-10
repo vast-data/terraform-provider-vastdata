@@ -422,10 +422,6 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		}
 	)
 
-	if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
-		return
-	}
-
 	if imp, ok := manager.(PrepareCreateResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("PrepareCreateResource[%s]: do.", managerName))
 		if err = imp.PrepareCreateResource(ctx, rest); err != nil {
@@ -448,6 +444,11 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 	} else {
 		// Delegate to the default create implementation
 		tflog.Debug(ctx, fmt.Sprintf("Create[%s]: use default implementation.", managerName))
+
+		if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
+			return
+		}
+
 		// Get all params required + optional for creation.
 		createParams := tfState.GetCreateParams()
 		if transformer, ok := manager.(TransformRequestBody); ok {
@@ -705,14 +706,14 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 		fmt.Sprintf("Read[%q] - state:\n%s\n", managerName, tfState.Pretty()),
 	)
 
-	if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
-		return
-	}
-
 	if imp, ok := manager.(ReadResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("ReadResource[%s]: do.", managerName))
 		record, err = imp.ReadResource(ctx, rest)
 	} else {
+		if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
+			return
+		}
+
 		// Check if we should skip API calls and use current tfstate
 		if tfState.Hints.SkipRefreshAPICall {
 			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: skip API call, using current tfstate as record.", managerName))
@@ -816,16 +817,17 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		fmt.Sprintf("Update[%q] - plan:\n%s\n", managerName, planTfState.Pretty()),
 	)
 
-	if !r.checkNonEmptyFields(ctx, planManager, &resp.Diagnostics) {
-		return
-	}
-
 	if imp, ok := stateManger.(UpdateResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("UpdateResource[%s]: do.", managerName))
 		record, err = imp.UpdateResource(ctx, planManager.(UpdateResource), rest)
 	} else {
 		// Delegate to the default update implementation
 		tflog.Debug(ctx, fmt.Sprintf("Update[%s]: use default implementation.", managerName))
+
+		if !r.checkNonEmptyFields(ctx, planManager, &resp.Diagnostics) {
+			return
+		}
+
 		record, err = r.getRecordBySearchParams(ctx, stateManger, planManager, "Update")
 		if err != nil {
 			resp.Diagnostics.AddError(
@@ -983,16 +985,17 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 		fmt.Sprintf("Delete[%q] - state:\n%s\n", managerName, tfState.Pretty()),
 	)
 
-	if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
-		return
-	}
-
 	if imp, ok := manager.(DeleteResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("DeleteResource[%s]: do.", managerName))
 		err = imp.DeleteResource(ctx, rest)
 	} else {
 		// Delegate to the default delete implementation
 		tflog.Debug(ctx, fmt.Sprintf("Delete[%s]: use default implementation.", managerName))
+
+		if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
+			return
+		}
+
 		record, err := r.deleteRecordBySearchParams(ctx, manager, "Delete")
 		if err == nil && record != nil {
 			// In case record is AsyncTask
