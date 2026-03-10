@@ -17,6 +17,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -149,7 +150,10 @@ const (
 	ValidatorRetentionFormat         = schema_generation.ValidatorRetentionFormat
 )
 
+// ----------------------------------
 // MISC
+// ----------------------------------
+
 func withContext(ctx context.Context, method string, managerName string, fn func(ctx context.Context)) {
 	ctx = client.ContextWithRequestID(ctx)
 	tflog.Debug(ctx, fmt.Sprintf("◉ %s[%s] start", method, managerName))
@@ -165,6 +169,26 @@ func safeDeepEqual(expected, actual any) (diff []string, panicked bool) {
 	}()
 	diff = deep.Equal(expected, actual, deep.FLAG_IGNORE_SLICE_ORDER)
 	return diff, false
+}
+
+// isZeroValue reports whether v is the zero value for its type
+// (e.g. "" for strings, 0 for numbers, false for bools, nil pointer, empty slice/map).
+func isZeroValue(v any) bool {
+	if v == nil {
+		return true
+	}
+	return reflect.ValueOf(v).IsZero()
+}
+
+// deleteZeroValues removes entries from params whose keys are listed in
+// fields and whose values are the zero/empty value for their type
+// (e.g. "" for strings, 0 for numbers, false for bools, empty slices/maps).
+func deleteZeroValues(params map[string]any, fields []string) {
+	for _, key := range fields {
+		if val, ok := params[key]; ok && isZeroValue(val) {
+			delete(params, key)
+		}
+	}
 }
 
 // ----------------------------------
