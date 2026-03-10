@@ -46,3 +46,7 @@ data "vastdata_s3_life_cycle_rule" "vastdb_s3_life_cycle_rule_by_guid" {
 - `view__id` (String)
 - `view_id` (Number) The ID of a view, when the rule applies to all objects in a view (bucket)
 - `view_path` (String) The path of a view, when the rule applies to all objects in a view (bucket)
+
+### Read-Only
+
+- `tags` (Map of String)

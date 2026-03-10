@@ -1,3 +1,16 @@
+## 3.1.0
+
+ENHANCEMENTS:
+
+* Added `UseStateForUnknown` plan modifier for all computed fields to reduce noise during field updates.
+* Added support for `X-Tenant-Name` header in login flow (TERF-86).
+* Embedded migration mode in the Terraform provider via the `VASTDATA_MIGRATE_MODE` environment variable. See the [How Migrate Mode Works](migration/README.md).
+* **vastdata_kafkabroker**: Added `guid` field.
+* **vastdata_ldap**: Added `netgroup_searchbase` field.
+* **vastdata_s3_lifecycle_rule**: Added `tags` field.
+* **vastdata_tenant**: Added `list_open_handles_task` field.
+* **vastdata_view_policy**: Added `smb_recursive_change_notify` field.
+
 ## 3.0.7
 
 BUG FIXES:

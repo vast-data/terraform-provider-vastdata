@@ -35,8 +35,18 @@ description: |-
 
 Read-Only:
 
-- `client_id` (Number)
+- `client_id` (Number) Tenant ID
 - `delegation_stateid` (Number)
 - `delegation_type` (String)
+- `list_open_handles_task` (Attributes) (see [below for nested schema](#nestedatt--delegate_info--list_open_handles_task))
 - `revoke_in_progress` (Boolean)
 - `vip_addr` (String)
+
+<a id="nestedatt--delegate_info--list_open_handles_task"></a>
+### Nested Schema for `delegate_info.list_open_handles_task`
+
+Read-Only:
+
+- `id` (Number) Task ID
+- `start_time` (String) Task start time
+- `state` (String) Task state

@@ -27,6 +27,7 @@ data "vastdata_kafka_broker" "vastdb_kafka_broker_by_name" {
 
 ### Optional
 
+- `guid` (String)
 - `id` (Number) Kafka broker configuration ID
 - `name` (String) Name of the Kafka broker configuration
 - `tenant_id` (Number) Tenant ID. If missing, accessed by all tenants

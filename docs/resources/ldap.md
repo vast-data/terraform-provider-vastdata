@@ -107,6 +107,7 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `match_user` (String) The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.
 - `method` (String) The authentication method configured on the LDAP server for authenticating clients.
 - `monitor_action` (String) The type of periodic health check that VAST Cluster performs for the Active Directory provider. PING (default, less overhead and impact on the provider) = pings the provider. BIND = binds to the provider.
+- `netgroup_searchbase` (String) Base DN for netgroup queries.
 - `port` (Number) The port of the remote LDAP server. Typical values: 389, 636.
 - `posix_account` (String) The object class that defines a user entry on the LDAP server, if different from 'posixAccount'. When binding VAST Cluster to AD, set this parameter to 'user' in order for authorization to work properly.
 - `posix_attributes_source` (String) Defines which domains POSIX attributes will be supported from.

@@ -84,6 +84,7 @@ resource "vastdata_s3_life_cycle_rule" "vastdb_s3_lifecycle_rule" {
 - `noncurrent_days` (Number) A number of days after which to permanently delete non-current versions of objects. The number of days is timed from when the object becomes non-current, which is when a versioned object is deleted or overwritten.
 - `object_age_attr` (String) Defines which time to use for expiration. Default - M_TIME.
 - `prefix` (String) A path prefix. The rule will be restricted to objects with the specified prefix. If not specified, the rule will apply to all objects in the bucket.
+- `tags` (Map of String)
 
 ### Read-Only
 
