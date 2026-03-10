@@ -49,3 +49,18 @@ func (m *S3Policy) TfState() *is.TFState {
 func (m *S3Policy) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.S3Policies
 }
+
+// TransformResponseRecord deduplicates the "users" and "groups" list fields
+// in the backend response.  The API may return duplicate entries (e.g. multiple
+// empty strings) which cause Terraform to reject the state with
+// "Duplicate Set Element" errors.
+func (m *S3Policy) TransformResponseRecord(record Record) Record {
+	for _, field := range []string{"users", "groups"} {
+		if val, ok := record[field]; ok {
+			if list, ok := val.([]any); ok {
+				record[field] = deleteDuplicates(list)
+			}
+		}
+	}
+	return record
+}
