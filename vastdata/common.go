@@ -609,6 +609,21 @@ func parseImportId(importID string, tfState *is.TFState) error {
 	return nil
 }
 
+// deleteDuplicates removes duplicate elements from a slice, preserving order.
+// Works with any comparable type (string, int, float64, etc.).
+func deleteDuplicates[T comparable](s []T) []T {
+	seen := make(map[T]struct{}, len(s))
+	result := make([]T, 0, len(s))
+	for _, v := range s {
+		if _, ok := seen[v]; ok {
+			continue
+		}
+		seen[v] = struct{}{}
+		result = append(result, v)
+	}
+	return result
+}
+
 // ----------------------------------
 // Async tasks
 // ----------------------------------
