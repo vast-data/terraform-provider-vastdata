@@ -1,5 +1,15 @@
 ## 3.1.0
 
+BUG FIXES:
+
+* **vastdata_cnode_bgp_config**: Fixed PATCH request failing with 400 "This field may not be blank" when BGP address fields (`port1_self_address`, `port1_peer_address`, `port2_self_address`, `port2_peer_address`, `self_asn`) are empty strings. (TERF-218)
+* **vastdata_protected_path**: Fixed update failing with 400 "Can't modify exported path for protected path" when a linked `protection_policy` is modified. The API returns `target_exported_dir: null` after creation, causing Terraform to detect drift and attempt to PATCH the immutable field. (TERF-220)
+* **vastdata_protected_path**: Fixed `remote_tenant_name` being read-only, preventing edits on the Protected Path resource. (TERF-213)
+* **vastdata_qos_policy**: Fixed perpetual drift after creating a `VIEW`-type QoS policy. The API returns `is_default: null` instead of the submitted `false`, causing Terraform to detect a change on every plan. (TERF-221)
+* **vastdata_view**: Fixed Terraform not detecting `share_acl` changes made outside of Terraform (e.g., via the GUI). When `share_acl` permissions were modified through the VAST management UI, `terraform plan` incorrectly reported "No changes" instead of detecting the drift and reverting to the declared configuration. (TERF-210)
+* **vastdata_administrator_manager**: Fixed false drift detection on the `password` field. `terraform plan` reported changes on the `password` attribute even when no modifications were made, because the sensitive field was being compared against the API response. (TERF-214)
+* **vastdata_view**: Fixed validation error when importing a BLOCK view whose `alias` does not start with `/`. The "must start with '/'" validator was incorrectly applied to the `alias` field, which does not require a leading slash for BLOCK protocol views. (TERF-211)
+
 ENHANCEMENTS:
 
 * Added `UseStateForUnknown` plan modifier for all computed fields to reduce noise during field updates.
@@ -10,6 +20,10 @@ ENHANCEMENTS:
 * **vastdata_s3_lifecycle_rule**: Added `tags` field.
 * **vastdata_tenant**: Added `list_open_handles_task` field.
 * **vastdata_view_policy**: Added `smb_recursive_change_notify` field.
+
+KNOWN ISSUES:
+
+* **vastdata_view**: `share_acl.acl[].fqdn` may reset from `"All"` to `""` (empty string) after view creation for the bucket owner's ACL entry (TERF-222). The VAST API returns a modified value for `fqdn` on subsequent GET requests, causing `terraform plan` to show perpetual drift.
 
 ## 3.0.7
 
