@@ -387,58 +387,30 @@ type TransformResponseRecord interface {
 }
 ```
 
-## Generate OpenAPI Tarball
+## OpenAPI Schema & Terraform Schema Generation
 
-The updated OpenAPI schema must be saved as api.tar.gz and placed in the following path:
+The OpenAPI schema (`api.tar.gz`) is maintained in the [go-vast-client](https://github.com/vast-data/go-vast-client) library.
+The Terraform provider imports it via the `openapi_schema` package from `go-vast-client` and generates
+Terraform resource/data-source schemas at runtime.
 
-- `vastdata/client/api/api.tar.gz`
+Schema generation logic lives in `vastdata/schema_generation/`.
 
-Assuming you have Orion cloned locally, run:
+##### Verify schemas parse correctly
 
-Execute:
+After updating `go-vast-client` (or changing schema generation code), verify that all resources and data sources can be parsed:
+
 ```bash
-make gen-openapi-tar [orion base path]/management/api/vast_doc.yaml
+make show r   # resources
+make show d   # data sources
 ```
 
+##### Update schemas documentation
 
-NOTE: you need to install `ruamel.yaml` using command `pip install ruamel.yaml`
-
-After running this command, you should see the following two files in your current working directory:
-- api.json
-- api.tar.gz
-
-We only need api.tar.gz.
-Move it to: `vastdata/client/api/api.tar.gz`
-
-##### Make sure newly generated shema can be parsed properly
-
-After new schema generation execute two commands
-
-To verify all resources can be parsed properly:
-```bash
-make show r
-```
-
-To verify all data-sources can be parsed properly:
-```bash
-make show d
-```
-
-#### Update schemas documentation
-
-If fields were added, renamed, or removed in the new schema, regenerate the Terraform documentation:
+If fields were added, renamed, or removed, regenerate the Terraform documentation:
 
 ```bash
 make generate-docs
 ```
 
-After that go to `docs/data-sources` and `docs/resources` to verify all uncommited changes in terraform schemas.
-Pay close attention to any added or removed fields.
-If you're expecting specific changes, verify that the updated documentation reflects them.
-
-
-
-
-
-
-
+Then review `docs/data-sources/` and `docs/resources/` for any uncommitted changes.
+Pay close attention to added or removed fields and verify the documentation reflects the expected changes.

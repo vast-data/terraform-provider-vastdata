@@ -1,3 +1,9 @@
+## 3.1.1
+
+BUG FIXES:
+
+* **vastdata_s3_policy**: Fixed `ImportState` and `Read` failing with "Duplicate Set Element" error when the cluster API returns empty-string principals. (TERF-223)
+
 ## 3.1.0
 
 BUG FIXES:
