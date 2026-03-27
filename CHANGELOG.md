@@ -1,8 +1,13 @@
-## 3.1.2
+## 3.2
 
 BUG FIXES:
 
 * **vastdata_topic**: Fixed compatibility issue with older VAST versions where the Topics API returns 404 instead of 400 for missing topics. (TERF-224)
+
+NEW RESOURCES:
+
+* **vastdata_webhook**: Manage VAST cluster configuration
+
 
 ## 3.1.1
 
