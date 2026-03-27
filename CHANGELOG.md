@@ -3,6 +3,7 @@
 BUG FIXES:
 
 * **vastdata_s3_policy**: Fixed `ImportState` and `Read` failing with "Duplicate Set Element" error when the cluster API returns empty-string principals. (TERF-223)
+* **vastdata_view**:  removing Computed 'qos_policy' field allows Terraform to plan a change when the user sets them to null. (TERF-225)'
 
 ## 3.1.0
 
