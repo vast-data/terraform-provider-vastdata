@@ -82,6 +82,7 @@ var allTFComponents = []TFManager{
 	&VastDbVips{},
 	&TenantNfs4Delegation{},
 	&SupportedDrives{},
+	&Webhook{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
