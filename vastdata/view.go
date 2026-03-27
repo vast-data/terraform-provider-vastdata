@@ -31,6 +31,9 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 			DeleteOnlyBodyFields:  map[string]string{"delete_dir": ""},
 			DeleteOnlyParamFields: map[string]string{"force": "force"},
 			ImportFields:          []string{"path", "tenant_name"},
+			// qos_policy: removing Computed allows Terraform
+			// to plan a change when the user sets them to null. (TERF-225)
+			NotComputedSchemaFields: []string{"qos_policy"},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
 				"max_retention_period":     ValidatorRetentionFormat,

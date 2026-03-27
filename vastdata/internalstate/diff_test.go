@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
 )
@@ -208,4 +209,128 @@ func TestDiffMap_Empty(t *testing.T) {
 
 	diff := DiffMap(map1, map2)
 	require.Empty(t, diff)
+}
+
+// ---------------------------------------------------------------------------
+// DiffFields tests
+// ---------------------------------------------------------------------------
+
+// buildSimpleOptionalSchema returns a schema with the given optional string fields.
+func buildSimpleOptionalSchema(fields ...string) rschema.Schema {
+	attrs := make(map[string]rschema.Attribute, len(fields))
+	for _, f := range fields {
+		attrs[f] = rschema.StringAttribute{Optional: true}
+	}
+	return rschema.Schema{Attributes: attrs}
+}
+
+func TestDiffFields_NonNullToNull_IncludedAsNil(t *testing.T) {
+	// Regression test for: setting an optional field to null should produce a
+	// nil entry in the diff so the PATCH body sends `"qos_policy": null` and
+	// the API clears the field.
+	schema := buildSimpleOptionalSchema("name", "qos_policy")
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringValue("my_qos_policy"),
+	}, schema, nil)
+
+	planState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringNull(), // user sets qos_policy = null
+	}, schema, nil)
+
+	diff := planState.DiffFields(currentState, FilterOr, nil, SearchOptional)
+
+	require.Contains(t, diff, "qos_policy", "cleared field must appear in diff")
+	require.Nil(t, diff["qos_policy"], "cleared field value must be nil so it serialises as JSON null")
+	require.NotContains(t, diff, "name", "unchanged field must not appear in diff")
+}
+
+func TestDiffFields_NullToNull_NotIncluded(t *testing.T) {
+	// A field that is null in both plan and current state must not appear in the diff.
+	schema := buildSimpleOptionalSchema("name", "qos_policy")
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringNull(),
+	}, schema, nil)
+
+	planState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringNull(),
+	}, schema, nil)
+
+	diff := planState.DiffFields(currentState, FilterOr, nil, SearchOptional)
+
+	require.NotContains(t, diff, "qos_policy", "field null in both states must not appear in diff")
+	require.Empty(t, diff)
+}
+
+func TestDiffFields_NullToValue_Included(t *testing.T) {
+	// A field transitioning from null to a concrete value must appear in the diff.
+	schema := buildSimpleOptionalSchema("name", "qos_policy")
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringNull(),
+	}, schema, nil)
+
+	planState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringValue("new_policy"),
+	}, schema, nil)
+
+	diff := planState.DiffFields(currentState, FilterOr, nil, SearchOptional)
+
+	require.Contains(t, diff, "qos_policy")
+	require.Equal(t, "new_policy", diff["qos_policy"])
+}
+
+func TestDiffFields_ValueToValue_Changed_Included(t *testing.T) {
+	// A field changing from one non-null value to another must appear in the diff.
+	schema := buildSimpleOptionalSchema("name", "qos_policy")
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringValue("old_policy"),
+	}, schema, nil)
+
+	planState := NewTFStateMust(map[string]attr.Value{
+		"name":       types.StringValue("my_view"),
+		"qos_policy": types.StringValue("new_policy"),
+	}, schema, nil)
+
+	diff := planState.DiffFields(currentState, FilterOr, nil, SearchOptional)
+
+	require.Contains(t, diff, "qos_policy")
+	require.Equal(t, "new_policy", diff["qos_policy"])
+	require.NotContains(t, diff, "name")
+}
+
+func TestDiffFields_ComputedField_ClearedNotIncluded(t *testing.T) {
+	// A computed-only field set to null in the plan must NOT appear in the diff
+	// because computed fields are managed by the provider/API, not the user.
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"name":   rschema.StringAttribute{Optional: true},
+		"id":     rschema.Int64Attribute{Computed: true},
+		"qos_id": rschema.Int64Attribute{Computed: true},
+	}}
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"name":   types.StringValue("my_view"),
+		"id":     types.Int64Value(1),
+		"qos_id": types.Int64Value(42),
+	}, schema, nil)
+
+	planState := NewTFStateMust(map[string]attr.Value{
+		"name":   types.StringValue("my_view"),
+		"id":     types.Int64Null(), // computed - null in plan is normal
+		"qos_id": types.Int64Null(), // computed - null in plan is normal
+	}, schema, nil)
+
+	diff := planState.DiffFields(currentState, FilterOr, nil, SearchOptional)
+
+	require.NotContains(t, diff, "id", "computed field must not be included in update diff")
+	require.NotContains(t, diff, "qos_id", "computed field must not be included in update diff")
 }

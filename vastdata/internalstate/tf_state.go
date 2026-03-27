@@ -835,6 +835,11 @@ func (s *TFState) DiffFields(
 	}
 
 	diff := make(map[string]any)
+	// clearedFields collects fields explicitly set to null in the plan that previously
+	// had a non-null value in the current state. These must be sent as JSON null in the
+	// PATCH body so the API removes the value; they are merged back after RemoveNilValues
+	// so they are not accidentally dropped.
+	clearedFields := make(map[string]any)
 
 	for k, v := range s.Raw {
 		if fields != nil {
@@ -847,16 +852,13 @@ func (s *TFState) DiffFields(
 		meta, ok := s.Meta[k]
 
 		if v.IsNull() || v.IsUnknown() {
-			continue // skip null or unknown values
-		}
-
-		if v.IsNull() || v.IsUnknown() {
-			if !searchEmpty {
-				continue
-			} else {
-				diff[k] = ConvertAttrValueToRaw(v, valType)
-				continue
+			if !searchEmpty && ok && meta.satisfyFieldFilterFlag(comb, flags...) {
+				// Detect a non-null → null transition: the plan clears this field.
+				if otherVal, exists := other.Raw[k]; exists && !otherVal.IsNull() && !otherVal.IsUnknown() {
+					clearedFields[k] = nil
+				}
 			}
+			continue
 		}
 
 		if !ok || !meta.satisfyFieldFilterFlag(comb, flags...) {
@@ -871,6 +873,11 @@ func (s *TFState) DiffFields(
 	if !searchEmpty {
 		diff = RemoveNilValues(diff).(map[string]any)
 	}
+	// Merge cleared fields last so RemoveNilValues does not strip the intentional nulls.
+	for k, v := range clearedFields {
+		diff[k] = v
+	}
+
 	return diff
 }
 
