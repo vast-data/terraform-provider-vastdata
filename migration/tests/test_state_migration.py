@@ -32,6 +32,7 @@ from state_migration import (
     run_terraform_init,
     run_terraform_apply_migrate,
     verify_migrate_mode_support,
+    get_vastdata_provider_version,
     main,
 )
 
@@ -461,79 +462,189 @@ class TestRunTerraformApplyMigrate:
 
 
 # ---------------------------------------------------------------------------
+# TestGetVastdataProviderVersion
+# ---------------------------------------------------------------------------
+
+class TestGetVastdataProviderVersion:
+    """Tests for get_vastdata_provider_version()."""
+
+    @patch("subprocess.run")
+    def test_returns_version_from_provider_selections(self, mock_run):
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout=json.dumps({
+                "terraform_version": "1.14.7",
+                "provider_selections": {
+                    "registry.terraform.io/vast-data/vastdata": "3.1.1",
+                    "registry.terraform.io/hashicorp/null": "3.2.4",
+                },
+            }),
+        )
+        assert get_vastdata_provider_version("/some/dir") == "3.1.1"
+
+    @patch("subprocess.run")
+    def test_returns_empty_string_when_no_vastdata_provider(self, mock_run):
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout=json.dumps({
+                "terraform_version": "1.14.7",
+                "provider_selections": {
+                    "registry.terraform.io/hashicorp/null": "3.2.4",
+                },
+            }),
+        )
+        assert get_vastdata_provider_version("/some/dir") == ""
+
+    @patch("subprocess.run")
+    def test_returns_empty_string_on_command_failure(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=1, stdout="", stderr="error")
+        assert get_vastdata_provider_version("/some/dir") == ""
+
+    @patch("subprocess.run")
+    def test_returns_empty_string_on_invalid_json(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=0, stdout="not-json")
+        assert get_vastdata_provider_version("/some/dir") == ""
+
+    @patch("subprocess.run")
+    def test_matches_vastdata_case_insensitively(self, mock_run):
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout=json.dumps({
+                "provider_selections": {
+                    "registry.terraform.io/VAST-DATA/VastData": "3.0.0",
+                },
+            }),
+        )
+        assert get_vastdata_provider_version("/some/dir") == "3.0.0"
+
+
+# ---------------------------------------------------------------------------
 # TestVerifyMigrateModeSupport
 # ---------------------------------------------------------------------------
+
+def _version_mock(version_str: str):
+    """Return a mock for `terraform version -json` with the given vastdata version."""
+    return MagicMock(
+        returncode=0,
+        stdout=json.dumps({
+            "terraform_version": "1.14.7",
+            "provider_selections": {
+                "registry.terraform.io/vast-data/vastdata": version_str,
+            },
+        }),
+    )
+
+
+def _version_mock_empty():
+    """Return a mock for `terraform version -json` that reports no vastdata provider."""
+    return MagicMock(
+        returncode=0,
+        stdout=json.dumps({
+            "terraform_version": "1.14.7",
+            "provider_selections": {},
+        }),
+    )
+
 
 class TestVerifyMigrateModeSupport:
     """Tests for verify_migrate_mode_support()."""
 
     @patch("subprocess.run")
-    def test_provider_supports_migrate_mode(self, mock_run):
-        """Provider that emits the banner → verification passes."""
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout="",
-            stderr=(
-                "2026-03-01T10:00:00.000Z [WARN] provider: "
-                "╔══════════════════════════════════════════════════════════════════╗\n"
-                "║  VASTDATA MIGRATE MODE ENABLED                                  ║\n"
-                "╚══════════════════════════════════════════════════════════════════╝\n"
-            ),
-        )
+    def test_v3_provider_passes_without_plan(self, mock_run):
+        """v3.x detected via terraform version -json → passes immediately, no plan run."""
+        mock_run.return_value = _version_mock("3.1.1")
 
-        # Should NOT raise
         verify_migrate_mode_support("/some/dir")
 
-        # Verify it ran terraform plan with correct env
-        args, kwargs = mock_run.call_args
-        assert args[0] == ["terraform", "plan", "-input=false"]
-        assert kwargs["env"]["VASTDATA_MIGRATE_MODE"] == "1"
-        assert kwargs["env"]["TF_LOG"] == "WARN"
+        # Only one subprocess call (terraform version -json), no terraform plan
+        mock_run.assert_called_once()
+        args, _ = mock_run.call_args
+        assert args[0] == ["terraform", "version", "-json"]
 
     @patch("subprocess.run")
-    def test_old_provider_no_migrate_support(self, mock_run):
-        """Provider that does NOT emit the banner → abort."""
-        mock_run.return_value = MagicMock(
+    def test_v3_0_0_passes(self, mock_run):
+        """v3.0.0 is the minimum supported version."""
+        mock_run.return_value = _version_mock("3.0.0")
+        verify_migrate_mode_support("/some/dir")
+        mock_run.assert_called_once()
+
+    @patch("subprocess.run")
+    def test_old_provider_v2_exits(self, mock_run):
+        """v2.x detected via terraform version -json → exits immediately, no plan run."""
+        mock_run.return_value = _version_mock("2.9.9")
+
+        with pytest.raises(SystemExit):
+            verify_migrate_mode_support("/some/dir")
+
+        mock_run.assert_called_once()
+
+    @patch("subprocess.run")
+    def test_version_not_available_falls_back_to_banner(self, mock_run):
+        """When terraform version -json returns no vastdata entry, fall back to plan banner."""
+        plan_mock = MagicMock(
             returncode=0,
-            stdout="No changes. Your infrastructure matches the configuration.\n",
+            stdout="",
+            stderr="VASTDATA MIGRATE MODE ENABLED\n",
+        )
+        mock_run.side_effect = [_version_mock_empty(), plan_mock]
+
+        verify_migrate_mode_support("/some/dir")
+
+        assert mock_run.call_count == 2
+        plan_call_args, plan_call_kwargs = mock_run.call_args
+        assert plan_call_args[0] == ["terraform", "plan", "-input=false"]
+        assert plan_call_kwargs["env"]["VASTDATA_MIGRATE_MODE"] == "1"
+        assert plan_call_kwargs["env"]["TF_LOG"] == "WARN"
+
+    @patch("subprocess.run")
+    def test_version_command_fails_falls_back_to_banner(self, mock_run):
+        """When terraform version -json fails, fall back to plan banner check."""
+        version_fail = MagicMock(returncode=1, stdout="", stderr="error")
+        plan_mock = MagicMock(
+            returncode=0,
+            stdout="VASTDATA MIGRATE MODE ENABLED",
             stderr="",
         )
+        mock_run.side_effect = [version_fail, plan_mock]
+
+        verify_migrate_mode_support("/some/dir")
+
+        assert mock_run.call_count == 2
+
+    @patch("subprocess.run")
+    def test_fallback_banner_absent_exits(self, mock_run):
+        """Fallback: no banner in plan output → abort."""
+        plan_mock = MagicMock(
+            returncode=0,
+            stdout="No changes.\n",
+            stderr="",
+        )
+        mock_run.side_effect = [_version_mock_empty(), plan_mock]
 
         with pytest.raises(SystemExit):
             verify_migrate_mode_support("/some/dir")
 
     @patch("subprocess.run")
-    def test_banner_in_stdout(self, mock_run):
-        """Banner might appear in stdout depending on TF_LOG sink."""
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout="VASTDATA MIGRATE MODE ENABLED",
-            stderr="",
-        )
-
-        # Should NOT raise
-        verify_migrate_mode_support("/some/dir")
-
-    @patch("subprocess.run")
-    def test_plan_fails_but_banner_present(self, mock_run):
-        """Even if plan exits non-zero, if the banner is there the provider is OK."""
-        mock_run.return_value = MagicMock(
+    def test_fallback_plan_fails_but_banner_present(self, mock_run):
+        """Fallback: plan exits non-zero but banner is present → provider is OK."""
+        plan_mock = MagicMock(
             returncode=1,
             stdout="",
             stderr="VASTDATA MIGRATE MODE ENABLED\nError: something else\n",
         )
+        mock_run.side_effect = [_version_mock_empty(), plan_mock]
 
-        # Banner found → should NOT raise (provider is new enough)
         verify_migrate_mode_support("/some/dir")
 
     @patch("subprocess.run")
-    def test_plan_fails_no_banner(self, mock_run):
-        """Plan fails and no banner → old provider → abort."""
-        mock_run.return_value = MagicMock(
+    def test_fallback_plan_fails_no_banner_exits(self, mock_run):
+        """Fallback: plan fails and no banner → old provider → abort."""
+        plan_mock = MagicMock(
             returncode=1,
             stdout="",
             stderr="Error: something went wrong\n",
         )
+        mock_run.side_effect = [_version_mock_empty(), plan_mock]
 
         with pytest.raises(SystemExit):
             verify_migrate_mode_support("/some/dir")

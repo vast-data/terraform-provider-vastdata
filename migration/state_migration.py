@@ -176,16 +176,90 @@ def run_terraform_init(workdir: str) -> None:
     log_success("terraform init completed.")
 
 
-def verify_migrate_mode_support(workdir: str) -> None:
-    """Run a quick ``terraform plan`` with VASTDATA_MIGRATE_MODE=1 and
-    TF_LOG=WARN to verify the provider actually recognises the flag.
+def get_vastdata_provider_version(workdir: str) -> str:
+    """Return the installed VastData provider version string, or '' on failure.
 
-    The v3.0+ provider emits a warning banner containing
-    ``VASTDATA MIGRATE MODE ENABLED`` during Configure().  If that string
-    is absent from the log output the provider is too old, and running
-    ``terraform apply`` without migrate-mode support could be destructive.
+    Reads ``terraform version -json`` which parses the lock file and does
+    not require a live cluster connection.
+
+    Example ``provider_selections`` payload::
+
+        {
+          "registry.terraform.io/vast-data/vastdata": "3.1.1",
+          ...
+        }
+    """
+    result = subprocess.run(
+        ['terraform', 'version', '-json'],
+        cwd=workdir,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return ''
+    try:
+        data = json.loads(result.stdout)
+        selections = data.get('provider_selections', {})
+        for key, ver in selections.items():
+            if 'vastdata' in key.lower():
+                return str(ver)
+    except (json.JSONDecodeError, AttributeError, KeyError):
+        pass
+    return ''
+
+
+def verify_migrate_mode_support(workdir: str) -> None:
+    """Verify that the installed VastData provider supports VASTDATA_MIGRATE_MODE.
+
+    Primary check: inspect the provider version via ``terraform version -json``.
+    The feature was introduced in v3.0, so any v3.0+ provider is safe.
+
+    Fallback check: run ``terraform plan`` with VASTDATA_MIGRATE_MODE=1 and
+    TF_LOG=WARN and look for the banner the provider emits in Configure().
+    This fallback is retained for dev-override / unusual install scenarios, but
+    is NOT used as the primary gate because Configure() only runs after a
+    successful cluster connection — an unreachable cluster would cause a false
+    negative even with the correct provider version installed.
     """
     log_info("Verifying that the VastData provider supports VASTDATA_MIGRATE_MODE …")
+
+    # --- Primary: version-based check (no cluster connection required) ---
+    provider_version = get_vastdata_provider_version(workdir)
+    if provider_version:
+        log_info(f"Detected VastData provider version: {provider_version}")
+        try:
+            major = int(provider_version.split('.')[0])
+        except (ValueError, IndexError):
+            major = -1
+
+        if major >= 3:
+            log_success(
+                f"Provider v{provider_version} supports VASTDATA_MIGRATE_MODE — safe to proceed."
+            )
+            return
+
+        if major >= 0:
+            # Version parsed successfully but it is too old.
+            log_error(
+                f"VastData provider v{provider_version} does NOT support VASTDATA_MIGRATE_MODE.\n"
+                "Running 'terraform apply' with this provider could CREATE or DESTROY\n"
+                "real resources — this is NOT safe for migration.\n\n"
+                "Please upgrade the VastData Terraform provider to v3.0+ and try again."
+            )
+            sys.exit(1)
+
+        log_warning(
+            f"Could not parse provider version '{provider_version}' — "
+            "falling back to banner detection."
+        )
+    else:
+        log_warning(
+            "Could not determine the installed provider version from "
+            "'terraform version -json' — falling back to banner detection."
+        )
+
+    # --- Fallback: banner detection via terraform plan ---
+    log_info("Running 'terraform plan' with VASTDATA_MIGRATE_MODE=1 to detect banner …")
     env = os.environ.copy()
     env['VASTDATA_MIGRATE_MODE'] = '1'
     env['TF_LOG'] = 'WARN'
