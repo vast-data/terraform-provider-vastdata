@@ -58,6 +58,9 @@ func (m *Topic) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableR
 			return nil, nil
 		}
 	}
+	if expectStatusCodes(err, http.StatusNotFound) {
+		return nil, nil
+	}
 	return record, err
 }
 
