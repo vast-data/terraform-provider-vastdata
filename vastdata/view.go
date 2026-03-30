@@ -33,7 +33,7 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 			ImportFields:          []string{"path", "tenant_name"},
 			// qos_policy: removing Computed allows Terraform
 			// to plan a change when the user sets them to null. (TERF-225)
-			NotComputedSchemaFields: []string{"qos_policy"},
+			NotComputedSchemaFields: []string{"qos_policy", "qos_policy_id"},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
 				"max_retention_period":     ValidatorRetentionFormat,
