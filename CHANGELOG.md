@@ -3,6 +3,7 @@
 BUG FIXES:
 
 * **vastdata_topic**: Fixed compatibility issue with older VAST versions where the Topics API returns 404 instead of 400 for missing topics. (TERF-224)
+* **vastdata_cnode_bgp_config**: Fixed drift after import. (TERF-228)
 
 NEW RESOURCES:
 
