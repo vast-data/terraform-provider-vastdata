@@ -52,7 +52,7 @@ data "vastdata_ldap" "vastdb_ldap_by_name" {
 - `match_user` (String)
 - `method` (String) Bind Authentication Method
 - `monitor_action` (String) The type of periodic health check that VAST Cluster performs for the LDAP provider. PING (default, less overhead and impact on the provider) = pings the provider. BIND = binds to the provider.
-- `name` (String)
+- `name` (String) Name of the LDAP configuration
 - `netgroup_searchbase` (String) Base DN for netgroup queries.
 - `port` (Number) LDAP server port. 389 (LDAP)  636 (LDAPS)
 - `posix_account` (String)

@@ -35,3 +35,7 @@ data "vastdata_webhook" "vastdb_webhook_by_name" {
 - `method` (String) Webhook compress_method
 - `name` (String) Name of the webhook
 - `url` (String) Webhook URL
+
+### Read-Only
+
+- `headers` (Map of String)
