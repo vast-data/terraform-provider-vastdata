@@ -34,6 +34,7 @@ resource "vastdata_webhook" "vastdb_webhook" {
 - `certificate_id` (Number) ID of certificate used to secure the webhook. Use the /certificates/ endpoint to manage webhook certificates.
 - `data` (String) Webhook data
 - `enabled` (Boolean) Webhook is enabled
+- `headers` (Map of String)
 - `method` (String) The method used by the webhook
 - `name` (String) Webhook name
 
