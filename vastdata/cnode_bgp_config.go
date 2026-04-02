@@ -71,8 +71,16 @@ func (m *CnodeBgpConfig) ReadDatasource(ctx context.Context, rest *VMSRest) (Dis
 func (m *CnodeBgpConfig) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	record, err := m.ReadDatasource(ctx, rest)
 	if err != nil {
-		return nil, fmt.Errorf("error reading cnode: %w", err)
+		return nil, fmt.Errorf("error reading cnode bgp config: %w", err)
 	}
+	rec := record.(Record)
+	m.tfstate.Set("enabled", rec["enabled"])
+	m.tfstate.Set("subnet_bits", rec["subnet_bits"])
+	m.tfstate.Set("self_asn", rec["self_asn"])
+	m.tfstate.Set("port1_self_address", rec["port1_self_address"])
+	m.tfstate.Set("port2_self_address", rec["port2_self_address"])
+	m.tfstate.Set("port1_peer_address", rec["port1_peer_address"])
+	m.tfstate.Set("port2_peer_address", rec["port2_peer_address"])
 	return record, nil
 }
 
