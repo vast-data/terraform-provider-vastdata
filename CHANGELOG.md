@@ -2,6 +2,7 @@
 
 BUG FIXES:
 
+* **migration script**: Fixed `verify_migrate_mode_support` incorrectly reporting the provider as too old when the cluster is unreachable.
 * **vastdata_topic**: Fixed compatibility issue with older VAST versions where the Topics API returns 404 instead of 400 for missing topics. (TERF-224)
 * **vastdata_cnode_bgp_config**: Fixed drift after import. (TERF-228)
 
