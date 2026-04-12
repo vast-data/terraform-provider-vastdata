@@ -85,48 +85,76 @@ def parse_tfstate(state_file: str) -> Dict:
         sys.exit(1)
 
 
-def separate_vast_resources(resources: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
-    """Separate VastData resources from other-provider resources.
+# Resource types that cannot be re-imported from the cluster in MigrateMode
+# because they have no stable cluster-side identity to search by.
+# These are preserved in state verbatim rather than stripped and re-adopted.
+NON_IMPORTABLE_RESOURCE_TYPES = {
+    "vastdata_user_key",
+}
+
+
+def separate_vast_resources(resources: List[Dict]) -> Tuple[List[Dict], List[Dict], List[Dict]]:
+    """Separate resources into three buckets:
+
+    - vast_importable:     vastdata_* resources that MigrateMode will re-adopt
+                           from the cluster.
+    - vast_preserved:      vastdata_* resources that cannot be re-imported
+                           (e.g. vastdata_user_key) and are carried over verbatim.
+    - non_vast:            resources belonging to other providers (AWS, GCP, …)
+                           that are kept untouched.
 
     Returns:
-        (vast_resources, non_vast_resources)
+        (vast_importable, vast_preserved, non_vast)
     """
-    vast_resources: List[Dict] = []
-    non_vast_resources: List[Dict] = []
+    vast_importable: List[Dict] = []
+    vast_preserved: List[Dict] = []
+    non_vast: List[Dict] = []
 
     for resource in resources:
         resource_type = resource.get('type', '')
-        if resource_type.startswith('vastdata_'):
-            vast_resources.append(resource)
+        if not resource_type.startswith('vastdata_'):
+            non_vast.append(resource)
+        elif resource_type in NON_IMPORTABLE_RESOURCE_TYPES:
+            log_info(
+                f"Preserving non-importable VastData resource "
+                f"'{resource.get('name', '?')}' (type: {resource_type}) "
+                f"— cannot be re-adopted from cluster."
+            )
+            vast_preserved.append(resource)
         else:
-            non_vast_resources.append(resource)
+            vast_importable.append(resource)
 
     log_info(
-        f"Separated resources: {len(vast_resources)} VastData, "
-        f"{len(non_vast_resources)} non-VastData"
+        f"Classified resources: "
+        f"{len(vast_importable)} VastData to re-import, "
+        f"{len(vast_preserved)} VastData preserved (non-importable), "
+        f"{len(non_vast)} non-VastData kept as-is"
     )
-    return vast_resources, non_vast_resources
+    return vast_importable, vast_preserved, non_vast
 
 
-def strip_vast_resources(state: Dict) -> Tuple[Dict, int, int]:
-    """Remove all VastData resources from a state dict.
+def strip_vast_resources(state: Dict) -> Tuple[Dict, int, int, int]:
+    """Remove importable VastData resources from state; preserve the rest.
+
+    Non-importable VastData resources and non-VastData resources are both
+    written into the cleaned state so they survive the migration untouched.
 
     Returns:
-        (cleaned_state, vast_count, non_vast_count)
+        (cleaned_state, vast_importable_count, vast_preserved_count, non_vast_count)
     """
     if 'resources' not in state:
         log_warning("State file has no 'resources' key — nothing to strip.")
-        return state, 0, 0
+        return state, 0, 0, 0
 
     all_resources = state['resources']
-    vast, non_vast = separate_vast_resources(all_resources)
+    vast_importable, vast_preserved, non_vast = separate_vast_resources(all_resources)
 
     cleaned = dict(state)
-    cleaned['resources'] = non_vast
+    cleaned['resources'] = vast_preserved + non_vast
     # Bump the serial so Terraform sees this as a newer state.
     cleaned['serial'] = cleaned.get('serial', 0) + 1
 
-    return cleaned, len(vast), len(non_vast)
+    return cleaned, len(vast_importable), len(vast_preserved), len(non_vast)
 
 
 def write_state(state: Dict, path: str) -> None:
@@ -379,14 +407,15 @@ Examples:
     state = parse_tfstate(state_file)
 
     # Step 2: Strip VastData resources
-    cleaned_state, vast_count, non_vast_count = strip_vast_resources(state)
+    cleaned_state, vast_importable_count, vast_preserved_count, non_vast_count = strip_vast_resources(state)
 
-    if vast_count == 0:
+    if vast_importable_count == 0 and vast_preserved_count == 0:
         log_warning("No VastData resources found in the state file — nothing to migrate.")
         sys.exit(0)
 
-    log_info(f"Removed {vast_count} VastData resource(s) from state.")
-    log_info(f"Preserved {non_vast_count} non-VastData resource(s).")
+    log_info(f"Removed {vast_importable_count} VastData resource(s) for re-import.")
+    log_info(f"Preserved {vast_preserved_count} VastData resource(s) (non-importable, carried over verbatim).")
+    log_info(f"Preserved {non_vast_count} non-VastData resource(s) (other providers).")
 
     # Step 3: Write cleaned state into workdir
     dest_state = os.path.join(workdir, 'terraform.tfstate')
@@ -422,9 +451,10 @@ Examples:
     log_success("=" * 70)
     log_success("State migration completed successfully!")
     log_success("=" * 70)
-    log_info(f"  VastData resources re-imported : {vast_count}")
-    log_info(f"  Non-VastData resources kept    : {non_vast_count}")
-    log_info(f"  New state file                 : {dest_state}")
+    log_info(f"  VastData resources re-imported          : {vast_importable_count}")
+    log_info(f"  VastData resources preserved (non-importable) : {vast_preserved_count}")
+    log_info(f"  Non-VastData resources kept             : {non_vast_count}")
+    log_info(f"  New state file                          : {dest_state}")
     print()
     log_info("Next steps:")
     log_info("  1. Verify: terraform plan   (should show no changes)")

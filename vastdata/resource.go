@@ -145,14 +145,23 @@ func (r *Resource) Read(ctx context.Context, req resource.ReadRequest, resp *res
 func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	withContext(ctx, OpUpdate, r.managerName, func(ctx context.Context) {
 		if r.providerData != nil && r.providerData.MigrateMode {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("MigrateMode[%s]: update operation blocked.", r.managerName),
-				"VASTDATA_MIGRATE_MODE is intended for populating an EMPTY state from existing infrastructure. "+
-					"An update was triggered, which means the state already contains this resource. "+
-					"Please start with an empty state (remove terraform.tfstate) and run again, "+
-					"or unset VASTDATA_MIGRATE_MODE to operate normally.",
-			)
-			return
+			// Non-importable resources (e.g. vastdata_user_key) are preserved
+			// from the old state verbatim.  Their schema may differ from the new
+			// provider, causing a schema-reconciliation update.  Resources that
+			// implement MigrateModePassThroughUpdate opt in to allowing that
+			// update instead of being blocked.
+			manager := r.NewManager(req.Plan)
+			if _, ok := manager.(MigrateModePassThroughUpdate); !ok {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("MigrateMode[%s]: update operation blocked.", r.managerName),
+					"VASTDATA_MIGRATE_MODE is intended for populating an EMPTY state from existing infrastructure. "+
+						"An update was triggered, which means the state already contains this resource. "+
+						"Please start with an empty state (remove terraform.tfstate) and run again, "+
+						"or unset VASTDATA_MIGRATE_MODE to operate normally.",
+				)
+				return
+			}
+			tflog.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: allowing schema-reconciliation update for non-importable resource.", r.managerName))
 		}
 		r.updateImpl(ctx, req, resp)
 	})

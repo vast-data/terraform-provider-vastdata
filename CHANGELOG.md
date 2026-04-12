@@ -1,7 +1,9 @@
 ## 3.2.1
 
-* **vastdata_replication_peer**: Retry on `HANDSHAKE_IN_PROGRESS` error (TERF-232)
+BUG FIXES:
 
+* **vastdata_replication_peer**: Retry on `HANDSHAKE_IN_PROGRESS` error (TERF-232)
+* **vastdata_view_policy**: Fixed drift of nfs_no_squash, nfs_read_write (TERF-233)
 
 ## 3.2.0
 
