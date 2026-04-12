@@ -1,4 +1,9 @@
-## 3.2
+## 3.2.1
+
+* **vastdata_replication_peer**: Retry on `HANDSHAKE_IN_PROGRESS` error (TERF-232)
+
+
+## 3.2.0
 
 BUG FIXES:
 
