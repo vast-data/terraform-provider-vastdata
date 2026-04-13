@@ -67,6 +67,11 @@ func (m *UserKey) TfState() *is.TFState {
 	return m.tfstate
 }
 
+// MigrateModePassThroughUpdate allows schema-reconciliation updates during
+// VASTDATA_MIGRATE_MODE.  UserKey is non-importable and carried over from
+// the old state verbatim, so it may need a schema update on first apply.
+func (m *UserKey) MigrateModePassThroughUpdate() {}
+
 func (m *UserKey) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Users
 }

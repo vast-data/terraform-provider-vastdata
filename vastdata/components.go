@@ -247,6 +247,24 @@ type ValidateResourceConfig interface {
 }
 
 // -----------------
+// MigrateMode interfaces
+// -----------------
+
+// MigrateModePassThroughUpdate is implemented by resource managers that must
+// allow updates during VASTDATA_MIGRATE_MODE.  Normally all updates are
+// blocked in migrate mode because an update implies the resource is already
+// in state — which is unexpected when migrating from an empty state.
+//
+// Non-importable resources (e.g. vastdata_user_key) are intentionally
+// carried over from the old state verbatim.  When the new provider schema
+// differs from the old one, Terraform plans a schema-reconciliation update.
+// Implementing this interface allows that update to proceed instead of
+// failing with "update operation blocked".
+type MigrateModePassThroughUpdate interface {
+	MigrateModePassThroughUpdate()
+}
+
+// -----------------
 // Transform interfaces
 // -----------------
 
