@@ -36,6 +36,11 @@ const (
 	OpValidateConfig = "ValidateConfig"
 )
 
+const (
+	defaultRetryTimes        = 5
+	defaultRetrySleepSeconds = 10
+)
+
 type Resource struct {
 	newManager   ResourceFactoryFn
 	providerData *ProviderData
@@ -438,9 +443,17 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		fmt.Sprintf("Create[%q] - plan:\n%s\n", managerName, tfState.Pretty()),
 	)
 
+	var retryOn *is.RetryExpression
+	if tfState.Hints != nil {
+		retryOn = tfState.Hints.RetryOn
+	}
 	if imp, ok := manager.(CreateResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("CreateResource[%s]: do.", managerName))
-		record, err = imp.CreateResource(ctx, rest)
+		createFn := imp.CreateResource
+		if retryOn != nil {
+			createFn = WithRetry(retryOn, managerName, imp.CreateResource)
+		}
+		record, err = createFn(ctx, rest)
 	} else {
 		// Delegate to the default create implementation
 		tflog.Debug(ctx, fmt.Sprintf("Create[%s]: use default implementation.", managerName))
@@ -471,7 +484,13 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				)
 
 				defer transactionDelete()
-				if record, err = api.CreateWithContext(ctx, createParams); err == nil {
+				defaultCreate := func(ctx context.Context, _ *VMSRest) (DisplayableRecord, error) {
+					return api.CreateWithContext(ctx, createParams)
+				}
+				if retryOn != nil {
+					defaultCreate = WithRetry(retryOn, managerName, defaultCreate)
+				}
+				if record, err = defaultCreate(ctx, rest); err == nil {
 					r.checkIntegrity(ctx, record.(Record), createParams)
 				}
 			}
@@ -1240,4 +1259,84 @@ func (r *Resource) checkIntegrity(
 			"Record integrity check passed.",
 		)
 	}
+}
+
+// WithRetry wraps a CreateResource-compatible callback with retry logic driven by a
+// RetryExpression. The returned function has the same signature as the original and
+// can be used as a drop-in replacement wherever CreateResource is called.
+//
+// A retry is attempted when:
+//  1. The call returns an *ApiError whose StatusCode is listed in expr.StatusCodes, AND
+//  2. If expr.BodyContains is non-empty, at least one substring is present in the response body.
+//
+// Any other error type is returned immediately without retrying.
+func WithRetry(
+	expr *is.RetryExpression,
+	managerName string,
+	fn func(context.Context, *VMSRest) (DisplayableRecord, error),
+) func(context.Context, *VMSRest) (DisplayableRecord, error) {
+	maxAttempts := expr.Times
+	if maxAttempts <= 0 {
+		maxAttempts = defaultRetryTimes
+	}
+	sleepSecs := expr.SleepSeconds
+	if sleepSecs <= 0 {
+		sleepSecs = defaultRetrySleepSeconds
+	}
+
+	return func(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+		var lastErr error
+		for attempt := 1; attempt <= maxAttempts; attempt++ {
+			record, err := fn(ctx, rest)
+			if err == nil {
+				if attempt > 1 {
+					tflog.Info(ctx, fmt.Sprintf(
+						"CreateResource[%s]: succeeded on attempt %d/%d.",
+						managerName, attempt, maxAttempts,
+					))
+				}
+				return record, nil
+			}
+
+			lastErr = err
+			if !shouldRetry(expr, err) {
+				return nil, err
+			}
+
+			tflog.Warn(ctx, fmt.Sprintf(
+				"CreateResource[%s]: attempt %d/%d failed (%s), retrying in %ds...",
+				managerName, attempt, maxAttempts, err.Error(), sleepSecs,
+			))
+
+			if attempt < maxAttempts {
+				time.Sleep(time.Duration(sleepSecs) * time.Second)
+			}
+		}
+
+		return nil, fmt.Errorf(
+			"CreateResource[%s]: all %d attempts failed, last error: %w",
+			managerName, maxAttempts, lastErr,
+		)
+	}
+}
+
+// shouldRetry returns true when err satisfies the retry conditions defined in expr.
+func shouldRetry(expr *is.RetryExpression, err error) bool {
+	if !expectStatusCodes(err, expr.StatusCodes...) {
+		return false
+	}
+
+	if len(expr.BodyContains) == 0 {
+		return true
+	}
+	var apiErr *ApiError
+	if !errors.As(err, &apiErr) {
+		return true
+	}
+	for _, pattern := range expr.BodyContains {
+		if strings.Contains(apiErr.Body, pattern) {
+			return true
+		}
+	}
+	return false
 }

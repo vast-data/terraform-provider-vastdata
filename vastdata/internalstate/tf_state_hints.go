@@ -137,6 +137,32 @@ type TFStateHints struct {
 	// Skip API calls during refresh and use current tfstate instead.
 	// Useful for offline or performance-critical scenarios. Default is false.
 	SkipRefreshAPICall bool
+
+	// RetryOn configures retry behaviour for resource creation requests.
+	// When set, failed create calls are retried according to the expression rules.
+	RetryOn *RetryExpression
+}
+
+// RetryExpression defines the conditions and parameters for retrying a failed create request.
+// Retries are triggered when the API returns one of the configured StatusCodes and, if
+// BodyContains is non-empty, at least one of the listed substrings is found in the response body.
+type RetryExpression struct {
+	// StatusCodes lists the HTTP response status codes that should trigger a retry.
+	// At least one code must match for a retry to occur.
+	StatusCodes []int
+
+	// BodyContains is an optional list of substrings to search for in the response body.
+	// When non-empty, at least one substring must be present in the response body for
+	// a retry to be triggered (in addition to the status code check).
+	BodyContains []string
+
+	// Times is the maximum number of create attempts (including the first).
+	// Defaults to 5 when zero or negative.
+	Times int
+
+	// SleepSeconds is the number of seconds to sleep between retry attempts.
+	// Defaults to 10 when zero or negative.
+	SleepSeconds int
 }
 
 // SchemaReference encapsulates both create and read endpoints for a resource.
