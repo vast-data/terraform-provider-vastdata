@@ -4,6 +4,8 @@ BUG FIXES:
 
 * **vastdata_replication_peer**: Retry on `HANDSHAKE_IN_PROGRESS` error (TERF-232)
 * **vastdata_view_policy**: Fixed drift of nfs_no_squash, nfs_read_write (TERF-233)
+* **vastdata_tenant**:  Normalized vippools tuples from All-Tenants API response (TERF-229)
+
 
 ## 3.2.0
 

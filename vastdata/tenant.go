@@ -2,6 +2,7 @@
 package provider
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -56,4 +57,33 @@ func (m *Tenant) TfState() *is.TFState {
 
 func (m *Tenant) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Tenants
+}
+
+// TransformResponseRecord normalizes the "vippools" field in the tenant API response.
+// When a VIP pool has tenant_id=null (shared across all tenants), the VAST API returns
+// each entry as a tuple ["name", id] instead of an object {"name": ..., "id": ...}.
+// This converts any such tuples to the proper map form before deserialization.
+func (m *Tenant) TransformResponseRecord(record Record) Record {
+	raw, ok := record["vippools"]
+	if !ok {
+		return record
+	}
+	list, ok := raw.([]any)
+	if !ok {
+		return record
+	}
+	normalized := make([]any, 0, len(list))
+	for _, item := range list {
+		tuple, ok := item.([]any)
+		if !ok || len(tuple) != 2 {
+			normalized = append(normalized, item)
+			continue
+		}
+		normalized = append(normalized, map[string]any{
+			"name": fmt.Sprintf("%v", tuple[0]),
+			"id":   tuple[1],
+		})
+	}
+	record["vippools"] = normalized
+	return record
 }
