@@ -2,9 +2,10 @@
 package provider
 
 import (
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"net/http"
 )
 
 var ReplicationPeersSchemaRef = is.NewSchemaReference(
@@ -28,6 +29,7 @@ func (m *ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema a
 			// two peers are created concurrently. Retry until the handshake completes.
 			RetryOn: &is.RetryExpression{
 				StatusCodes: []int{503},
+				Times:       10,
 			},
 		},
 	)}

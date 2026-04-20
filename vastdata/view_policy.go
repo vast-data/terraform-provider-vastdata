@@ -25,19 +25,16 @@ func (m *ViewPolicy) NewResourceManager(raw map[string]attr.Value, schema any) R
 		schema,
 		&is.TFStateHints{
 			SchemaRef: ViewPolicySchemaRef,
-			// The VAST backend runs collapse_addresses (Python ipaddress module) on NFS
-			// IP allow-list fields when a policy is saved, consolidating adjacent host IPs
-			// into the minimal CIDR set.  PreserveUserValueFields keeps the user's declared
-			// list intact in state (only when the field is non-null, i.e. the user set it),
-			// so the API's rewritten CIDRs never cause spurious drift.  Fields the user
-			// leaves unset remain null in plan and are still populated from the API normally.
-			PreserveUserValueFields: []string{
-				"protocols_audit",
+			// avoid spurious drift (TERF-233)
+			IPSetEquivalenceFields: []string{
 				"nfs_read_write",
 				"nfs_read_only",
 				"nfs_no_squash",
 				"nfs_root_squash",
 				"nfs_all_squash",
+			},
+			PreserveUserValueFields: []string{
+				"protocols_audit",
 			},
 			ReadOnlyFields: []string{"serves_tenant"},
 			ImportFields:   []string{"name", "tenant_name"},
