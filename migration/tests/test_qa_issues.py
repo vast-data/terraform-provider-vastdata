@@ -446,3 +446,107 @@ data "vastdata_blockhost" "existing_host" {
         assert 'vastdata_blockhost' not in result
         assert 'vastdata_kafka_brokers' not in result
         assert 'vastdata_s3_lifecycle_rule ' not in result  # Old name (without underscores) should be gone
+
+
+class TestStackAVScenario:
+    """Regression tests for StackAV customer migration issues (reported May 2026)."""
+
+    def test_protected_path_target_id_renamed(self):
+        """Issue 2: target_id → remote_target_id in vastdata_protected_path."""
+        terraform_content = '''resource "vastdata_protected_path" "backup_to_venus" {
+  name                 = "my-path-to-venus"
+  source_dir           = vastdata_view.this.path
+  tenant_id            = vastdata_view.this.tenant_id
+  target_exported_dir  = "/backups/bucket"
+  protection_policy_id = data.vastdata_protection_policy.policy.id
+  target_id            = var.remote_target_id
+  capabilities         = "ASYNC_REPLICATION"
+  enabled              = true
+}'''
+        lines = terraform_content.splitlines()
+        result, consumed = transform_resource_block(lines, 0)
+
+        assert result is not None
+        assert 'remote_target_id =' in result, "target_id should be renamed to remote_target_id"
+        # The old bare assignment must be gone (comments may still say "target_id").
+        import re as _re
+        assert not _re.search(r'^\s*target_id\s*=', result, _re.MULTILINE), \
+            "old target_id assignment must not remain in output"
+
+    def test_view_policy_vip_pools_removed_with_comment(self):
+        """Issue 5: vip_pools removed from vastdata_view_policy, TODO comment inserted."""
+        terraform_content = '''resource "vastdata_view_policy" "this" {
+  name      = "dev-s3-policy"
+  flavor    = "S3_NATIVE"
+  vip_pools = [vastdata_vip_pool.pool1.id]
+}'''
+        lines = terraform_content.splitlines()
+        result, consumed = transform_resource_block(lines, 0)
+
+        assert result is not None
+        # The assignment must be gone; the word may still appear in the TODO comment.
+        assert 'vip_pools =' not in result and 'vip_pools=' not in result, \
+            "vip_pools assignment must be removed from vastdata_view_policy output"
+        assert 'permission_per_vip_pool' in result or 'TODO' in result, \
+            "A TODO comment about permission_per_vip_pool should be inserted"
+
+    def test_vip_pools_preserved_for_other_resources(self):
+        """vip_pools on a non-view_policy resource must not be removed."""
+        terraform_content = '''resource "vastdata_some_other_resource" "x" {
+  name      = "example"
+  vip_pools = [1, 2, 3]
+}'''
+        lines = terraform_content.splitlines()
+        result, consumed = transform_resource_block(lines, 0)
+
+        assert result is not None
+        assert 'vip_pools' in result, \
+            "vip_pools on non-view_policy resources should not be removed"
+
+    def test_bucket_logging_block_to_attribute(self):
+        """Issue 1 (config side): bucket_logging block → attribute object."""
+        terraform_content = '''resource "vastdata_view" "this" {
+  path         = "/my-bucket"
+  bucket       = "my-bucket"
+  bucket_owner = "alice"
+  policy_id    = 1
+  bucket_logging {
+    destination_id = 42
+    prefix         = "logs/"
+  }
+}'''
+        lines = terraform_content.splitlines()
+        result, consumed = transform_resource_block(lines, 0)
+
+        assert result is not None
+        assert 'bucket_logging = {' in result, \
+            "bucket_logging block should be converted to attribute object syntax"
+        assert 'destination_id = 42' in result
+        assert 'prefix = "logs/"' in result
+
+    def test_stackav_conf_file_migrates_successfully(self, tmp_path):
+        """Full-file migration of the StackAV reproduction fixture completes without error."""
+        conf_file = Path(__file__).parent / "conf" / "resource_stackav_scenario.tf"
+        assert conf_file.exists(), f"Fixture not found: {conf_file}"
+
+        output_file = tmp_path / "resource_stackav_scenario_converted.tf"
+        transform_file(conf_file, output_file)
+
+        content = output_file.read_text()
+        assert len(content.strip()) > 0, "Output file should not be empty"
+
+        import re as _re
+        # target_id assignment renamed to remote_target_id
+        assert _re.search(r'^\s*remote_target_id\s*=', content, _re.MULTILINE), \
+            "target_id should be renamed to remote_target_id in the output"
+        assert not _re.search(r'^\s*target_id\s*=', content, _re.MULTILINE), \
+            "bare target_id assignment must not remain in output"
+
+        # vip_pools assignment removed (non-comment lines); TODO comment present
+        assert not _re.search(r'^\s*vip_pools\s*=', content, _re.MULTILINE), \
+            "vip_pools assignment must be removed from vastdata_view_policy"
+        assert 'TODO' in content, \
+            "TODO comment about permission_per_vip_pool should be present"
+
+        # bucket_logging converted to object syntax
+        assert 'bucket_logging = {' in content

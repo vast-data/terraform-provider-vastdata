@@ -135,17 +135,6 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 	// Generic timeout. Should be enough for all API operations.
 	restTimeout := time.Minute * 4
-	vmsRest, err := client.NewRest(host, port, username, password, apiToken, tenant, !skipSSL, p.version, restTimeout)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to Create VAST API Client",
-			"An unexpected error occurred when creating the VAST API client. "+
-				"If the error is not clear, please contact the provider developers.\n\n"+
-				"VAST Client Error: "+err.Error(),
-		)
-		return
-	}
-
 	migrateMode := os.Getenv("VASTDATA_MIGRATE_MODE")
 	isMigrateMode := migrateMode == "1" || migrateMode == "true" || migrateMode == "TRUE"
 	if isMigrateMode {
@@ -155,6 +144,17 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		tflog.Warn(ctx, "║  Update and Delete operations will be BLOCKED (empty state only) ║")
 		tflog.Warn(ctx, "║  Use this mode to populate state from existing infrastructure    ║")
 		tflog.Warn(ctx, "╚══════════════════════════════════════════════════════════════════╝")
+	}
+
+	vmsRest, err := client.NewRest(host, port, username, password, apiToken, tenant, !skipSSL, p.version, restTimeout)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unable to Create VAST API Client",
+			"An unexpected error occurred when creating the VAST API client. "+
+				"If the error is not clear, please contact the provider developers.\n\n"+
+				"VAST Client Error: "+err.Error(),
+		)
+		return
 	}
 
 	providerData := &vsd.ProviderData{

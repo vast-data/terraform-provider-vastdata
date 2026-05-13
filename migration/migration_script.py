@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 import argparse
 
-VERSION = "1.2.1"
+VERSION = "1.2.3"
 
 # Resource type rename map (old → new)
 resource_type_rename_map = {
@@ -74,6 +74,44 @@ attributes_to_remove = {
     "data_read", 
     "cluster",
     "count_views",
+}
+
+# Per-resource-type attribute renames: {resource_type: {old_attr: new_attr}}
+# Applied in addition to (and after) the global attribute rename logic.
+resource_specific_renames = {
+    # target_id was renamed to remote_target_id in v3
+    "vastdata_protected_path": {
+        "target_id": "remote_target_id",
+    },
+}
+
+# Per-resource-type attributes to remove: {resource_type: set(attr_names)}
+# vip_pools was removed from vastdata_view_policy in v3 and replaced by
+# permission_per_vip_pool (Map of String: {pool_id: permission}).
+# The migration cannot infer permissions from pool IDs alone, so the attribute
+# is removed and a TODO comment is inserted so the user can add it manually.
+resource_specific_removals = {
+    "vastdata_view_policy": {"vip_pools"},
+}
+
+# Replacement comments inserted when a resource-specific attribute is removed.
+resource_specific_removal_comments = {
+    "vastdata_view_policy": {
+        "vip_pools": (
+            "# TODO: vip_pools was replaced by permission_per_vip_pool in v3.\n"
+            '# Add: permission_per_vip_pool = { "<pool_id>" = "RW" }'
+        ),
+    },
+}
+
+# Attributes to inject for specific resource types if not already present.
+# {resource_type: {attr_name: attr_value_as_hcl_string}}
+# local_provider_id became required in v3 for vastdata_user. Default to 1
+# (the built-in local LDAP provider that every VAST cluster ships with).
+resource_specific_additions = {
+    "vastdata_user": {
+        "local_provider_id": "1",
+    },
 }
 
 def get_group_for_key(key):
@@ -242,8 +280,20 @@ def transform_resource_block(lines, i):
             indent, attr_key, value_expr = assign.groups()
             original_attr_key = attr_key
             
-            # Skip attributes that should be removed entirely
+            # Skip attributes that should be removed entirely (global)
             if attr_key in attributes_to_remove:
+                j += 1
+                continue
+
+            # Skip attributes removed for this specific resource type, inserting a TODO comment
+            if current_resource_type in resource_specific_removals and \
+                    attr_key in resource_specific_removals[current_resource_type]:
+                comment = resource_specific_removal_comments.get(
+                    current_resource_type, {}
+                ).get(attr_key)
+                if comment:
+                    for comment_line in comment.splitlines():
+                        transformed.append(f"{indent}{comment_line}")
                 j += 1
                 continue
 
@@ -259,6 +309,11 @@ def transform_resource_block(lines, i):
                 # For administrator_role and other resources: permissions_list -> permissions
                 # Exception: administrator_manager keeps permissions_list
                 attr_key = "permissions"
+
+            # Apply resource-specific attribute renames
+            resource_renames = resource_specific_renames.get(current_resource_type, {})
+            if attr_key in resource_renames:
+                attr_key = resource_renames[attr_key]
 
             group = get_group_for_key(attr_key)
             if group == "List of Number --> String":
@@ -297,6 +352,17 @@ def transform_resource_block(lines, i):
         # No special case — just append line
         transformed.append(line.rstrip())
         j += 1
+
+    # Inject resource-specific additions that are not yet present.
+    additions = resource_specific_additions.get(current_resource_type, {})
+    for add_key, add_value in additions.items():
+        # Only inject if the attribute doesn't already appear in the transformed block.
+        already_present = any(
+            re.match(rf"\s*{re.escape(add_key)}\s*=", line)
+            for line in transformed
+        )
+        if not already_present:
+            transformed.append(f"  {add_key} = {add_value}")
 
     transformed.append(block[-1].rstrip())
     return ("\n".join(transformed) + "\n"), i - start
