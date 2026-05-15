@@ -122,6 +122,17 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		validationMode = "warn"
 	}
 
+	if username == "" && password == "" && apiToken == "" {
+		resp.Diagnostics.AddError(
+			"Missing VAST API credentials",
+			"The provider requires either a username+password pair or an api_token.\n\n"+
+				"Set one of the following (in the provider block or via environment variables):\n"+
+				"  • username / password  (or VASTDATA_CLUSTER_USERNAME / VASTDATA_CLUSTER_PASSWORD)\n"+
+				"  • api_token            (or VASTDATA_API_TOKEN)",
+		)
+		return
+	}
+
 	// Generic timeout. Should be enough for all API operations.
 	restTimeout := time.Minute * 4
 	vmsRest, err := client.NewRest(host, port, username, password, apiToken, tenant, !skipSSL, p.version, restTimeout)
