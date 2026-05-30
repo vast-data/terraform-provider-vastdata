@@ -29,6 +29,13 @@ type TFStateHints struct {
 	// when constructing lookup parameters (e.g., for API GET calls).
 	SearchableFields []string
 
+	// SearchFilterFields lists field names that are always appended to search
+	// query params as additional AND-filters when they are set (non-null).
+	// Unlike SearchableFields (which picks ONE field from a set of alternatives),
+	// every non-null field listed here is always included alongside the primary
+	// search key.
+	SearchFilterFields []string
+
 	// RequiredSchemaFields explicitly marks these fields as required in the
 	// Terraform schema, regardless of whether they are marked optional or read-only
 	// in the OpenAPI definition.

@@ -946,6 +946,17 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		}
 	}
 
+	// Always append SearchFilterFields when set — these narrow the search to the
+	// correct scope (AND semantics) regardless of which primary search branch fired.
+	if s.Hints != nil {
+		for _, field := range s.Hints.SearchFilterFields {
+			if val, ok := s.Raw[field]; ok && !val.IsNull() && !val.IsUnknown() {
+				tflog.Debug(ctx, fmt.Sprintf("++ 'search filter field %s'", field))
+				searchParams[field] = ConvertAttrValueToRaw(val, s.Type(field))
+			}
+		}
+	}
+
 	searchParams.Update(s.GetReadOnlySearchParams(), false)
 
 	// Sensitive fields must never appear in URL query parameters.
