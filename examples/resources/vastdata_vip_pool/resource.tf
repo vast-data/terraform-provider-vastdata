@@ -69,3 +69,38 @@ resource "vastdata_vip_pool" "vastdata_vip_pool_ipv6" {
 
 # --------------------
 
+# Allocate IPs automatically using ips_count (VAST 5.5+).
+resource "vastdata_vip_pool" "vastdb_vippool_allocated" {
+  name      = "vastdb_vippool_allocated"
+  role      = "PROTOCOLS"
+  ips_count = 3
+}
+
+# --------------------
+
+# Allocate IPs automatically with additional configuration options (VAST 5.5+).
+resource "vastdata_vip_pool" "vastdb_vippool_allocated" {
+  name                      = "vastdb_vippool_allocated"
+  role                      = "PROTOCOLS"
+  ips_count                 = 5
+  enable_weighted_balancing = true
+  domain_name               = "vastdb.example.com"
+  vms_preferred             = true
+}
+
+# --------------------
+
+# Auto-allocate IPs scoped to a specific tenant (VAST 5.5+).
+data "vastdata_tenant" "vastdb_tenant" {
+  name = "default"
+}
+
+resource "vastdata_vip_pool" "vastdb_vippool_allocated" {
+  name      = "vastdb_vippool_allocated"
+  role      = "PROTOCOLS"
+  ips_count = 4
+  tenant_id = data.vastdata_tenant.vastdb_tenant.id
+}
+
+# --------------------
+

@@ -58,5 +58,3 @@ require (
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/vast-data/go-vast-client => /home/fnn45/VastData/go-vast-client
