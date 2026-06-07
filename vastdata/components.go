@@ -180,6 +180,10 @@ type CreateResource interface {
 	CreateResource(context.Context, *VMSRest) (DisplayableRecord, error)
 }
 
+type LookupForCreate interface {
+	LookupForCreate(context.Context, *VMSRest) (DisplayableRecord, error)
+}
+
 type ReadResource interface {
 	ReadResource(context.Context, *VMSRest) (DisplayableRecord, error)
 }

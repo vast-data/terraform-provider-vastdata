@@ -478,7 +478,12 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			createParams = transformer.TransformRequestBody(createParams)
 		}
 
-		record, err = r.getRecordBySearchParams(ctx, manager, nil, "Create")
+		if lookup, ok := manager.(LookupForCreate); ok {
+			tflog.Debug(ctx, fmt.Sprintf("LookupForCreate[%s]: use custom lookup.", managerName))
+			record, err = lookup.LookupForCreate(ctx, rest)
+		} else {
+			record, err = r.getRecordBySearchParams(ctx, manager, nil, "Create")
+		}
 		if err != nil {
 			// Something not expected happened, we should not continue.
 			if !isNotFoundErr(err) {
