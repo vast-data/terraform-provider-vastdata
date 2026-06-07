@@ -1,6 +1,7 @@
 ## 3.2.2
 
 * **vastdata_quota**: Fixed hard_limit / soft_limit drift on zero values (TERF-234)
+* **lifecycle_rule**: Fixed search by view_id (TERF-236)
 
 
 BUG FIXES:
