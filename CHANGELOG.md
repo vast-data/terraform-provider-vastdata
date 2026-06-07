@@ -1,3 +1,10 @@
+## 3.2.2
+
+* **vastdata_quota**: Fixed hard_limit / soft_limit drift on zero values (TERF-234)
+
+
+BUG FIXES:
+
 ## 3.2.1
 
 BUG FIXES:

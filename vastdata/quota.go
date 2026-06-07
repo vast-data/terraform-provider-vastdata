@@ -31,6 +31,13 @@ func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 				"group_quotas",
 				"user_quotas",
 			},
+			// The VAST API stores 0 (no limit) as null.
+			PreserveUserValueFieldsWhenApiReturnsNull: []string{
+				"hard_limit",
+				"soft_limit",
+				"hard_limit_inodes",
+				"soft_limit_inodes",
+			},
 			SchemaRef: QuotaSchemaRef,
 		},
 	)}
