@@ -163,6 +163,15 @@ type PrepareCreateResource interface {
 	PrepareCreateResource(context.Context, *VMSRest) error
 }
 
+// GetSubResources fetches nested sub-endpoint data and returns it as a Record.
+// The framework merges the returned Record into the main resource record
+// (flat — all keys are merged directly) before FillFromRecord is called,
+// so state is populated in one pass without any manual tfstate manipulation.
+// Return nil Record (with nil error) to skip merging.
+type GetSubResources interface {
+	GetSubResources(ctx context.Context, rest *VMSRest, record Record) (Record, error)
+}
+
 type PrepareReadResource interface {
 	PrepareReadResource(context.Context, *VMSRest) error
 }

@@ -83,6 +83,7 @@ description: |-
 - `free_physical_space_wo_overhead_tb` (Number) Free Usable Space, in TB
 - `free_usable_capacity` (Number) The amount of usable capacity that is not in use, in bytes.
 - `free_usable_capacity_tb` (Number) The amount of usable capacity that is not in use, in bytes, in TB.
+- `get_s3_true_ip_config` (Boolean) When true, fetches "s3_true_ip_config" sub-resource data and populates its fields. Default is false.
 - `gn_max_inode_count` (String) Quota limit on the number of files and directories in the cluster's global namespace. The limit is shared between all global access source paths on the cluster.
 - `gn_max_size` (String) Quota capacity limit for the cluster's global namespace. The limit is shared between all global access source paths on the cluster.
 - `gn_used_inode_count` (Number) Number of files and directories in use in the cluster's global namespace. Summed across all global access source paths on the cluster.
@@ -254,6 +255,7 @@ description: |-
 - `read_access_users` (Set of String) Enter users here to grant them read access to all files in the audit directory. To make the audit directory accessible to clients, create a view on the directory.
 - `read_access_users_groups` (Set of String) Enter groups here to grant them read access to all files in the audit directory. To make the audit directory accessible to clients, create a view on the directory.
 - `rewrite_type` (Set of String) Current Rewrite types
+- `s3_true_ip_config` (Attributes) (see [below for nested schema](#nestedatt--s3_true_ip_config))
 - `upgrade_progress` (Attributes) (see [below for nested schema](#nestedatt--upgrade_progress))
 
 <a id="nestedatt--available_upgrade_version"></a>
@@ -296,6 +298,24 @@ Read-Only:
 
 <a id="nestedatt--qos"></a>
 ### Nested Schema for `qos`
+
+
+<a id="nestedatt--s3_true_ip_config"></a>
+### Nested Schema for `s3_true_ip_config`
+
+Read-Only:
+
+- `s3_included_addresses` (Attributes List) IP address ranges included in the S3 True IP configuration. (see [below for nested schema](#nestedatt--s3_true_ip_config--s3_included_addresses))
+- `s3_true_client_ip_header` (String) True client IP header value from the S3 True IP configuration.
+
+<a id="nestedatt--s3_true_ip_config--s3_included_addresses"></a>
+### Nested Schema for `s3_true_ip_config.s3_included_addresses`
+
+Read-Only:
+
+- `range` (Number) Number of addresses in the range.
+- `start_ip` (String) Starting IP address of the range.
+
 
 
 <a id="nestedatt--upgrade_progress"></a>

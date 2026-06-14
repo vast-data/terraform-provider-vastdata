@@ -111,6 +111,48 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 		}
 	}
 
+	// Inject schema attributes declared by SubResourceHints.
+	// FieldTrigger (when non-empty) is always injected as a top-level optional
+	// bool on the parent schema — it controls whether the sub-resource is fetched.
+	// SchemaKey == "" -> flatten sub-resource attributes directly into parent schema.
+	// SchemaKey != "" -> nest sub-resource attributes under a SingleNestedAttribute.
+	for _, sr := range hints.SubResources {
+		if sr.FieldTrigger != "" {
+			if _, exists := attrs[sr.FieldTrigger]; !exists {
+				attrs[sr.FieldTrigger] = dschema.BoolAttribute{
+					Optional: true,
+					Description: fmt.Sprintf(
+						"When true, fetches %q sub-resource data and populates its fields. Default is false.",
+						sr.SchemaKey,
+					),
+				}
+			}
+		}
+		if sr.SchemaKey == "" {
+			for k, v := range sr.SchemaAttributes {
+				att, ok := v.(dschema.Attribute)
+				if !ok {
+					return nil, fmt.Errorf("sub-resource (flat) schema attribute %q is not a valid dschema.Attribute (got %T)", k, v)
+				}
+				attrs[k] = att
+			}
+		} else {
+			nested := make(map[string]dschema.Attribute, len(sr.SchemaAttributes))
+			for k, v := range sr.SchemaAttributes {
+				att, ok := v.(dschema.Attribute)
+				if !ok {
+					return nil, fmt.Errorf("sub-resource %q schema attribute %q is not a valid dschema.Attribute (got %T)", sr.SchemaKey, k, v)
+				}
+				nested[k] = att
+			}
+			attrs[sr.SchemaKey] = dschema.SingleNestedAttribute{
+				Optional:   false,
+				Computed:   true,
+				Attributes: nested,
+			}
+		}
+	}
+
 	// Description fallback
 	var description, summary string
 	if readSchemaRef.Value != nil {

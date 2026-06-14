@@ -73,6 +73,7 @@ description: |-
 - `failing_components_enabled` (Boolean) Enable failing components feature
 - `failure_domains_support` (Boolean) Failure domains support
 - `format_drives` (Boolean) Format drives
+- `get_s3_true_ip_config` (Boolean) When true, fetches "s3_true_ip_config" sub-resource data and populates its fields. Default is false.
 - `half_system` (Boolean) Is half system
 - `ib_mode` (String) Mode of Infiniband network
 - `ipv6_gateway` (String) External ipv6 gateway
@@ -264,6 +265,7 @@ description: |-
 - `s3_certificate` (String) Certificate file content of the SSL certificate used to enable client connection to the S3 service over HTTPS.
 - `s3_enable_v2_authentication` (Boolean) If true, version 2 authentication is blocked for S3 client API requests. Disabled by default.
 - `s3_private_key` (String) Private file content of the SSL certificate used to enable client connection to the S3 service over HTTPS.
+- `s3_true_ip_config` (Attributes) (see [below for nested schema](#nestedatt--s3_true_ip_config))
 - `showmount_hide_slash` (Boolean) Suppress Linux showmount command output including "/"
 - `showmount_suppressed` (Boolean) Suppress Linux showmount command output on for NFSv3 users
 - `smb_administrators_group_name` (String) Optional custom group logon name. If set, the group name will replace local administrators group access. (deprecated since 4.6)
@@ -375,6 +377,24 @@ Required:
 - `max_reads_iops` (Number) Maximal amount of performance to provide when there is no resource contention
 - `max_writes_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
 - `max_writes_iops` (Number) Maximal amount of performance to provide when there is no resource contention
+
+
+
+<a id="nestedatt--s3_true_ip_config"></a>
+### Nested Schema for `s3_true_ip_config`
+
+Read-Only:
+
+- `s3_included_addresses` (Attributes List) IP address ranges included in the S3 True IP configuration. (see [below for nested schema](#nestedatt--s3_true_ip_config--s3_included_addresses))
+- `s3_true_client_ip_header` (String) True client IP header value from the S3 True IP configuration.
+
+<a id="nestedatt--s3_true_ip_config--s3_included_addresses"></a>
+### Nested Schema for `s3_true_ip_config.s3_included_addresses`
+
+Read-Only:
+
+- `range` (Number) Number of addresses in the range.
+- `start_ip` (String) Starting IP address of the range.
 
 
 

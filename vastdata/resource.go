@@ -362,6 +362,11 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		// e.g., extract local_provider_id from local_provider.id
 		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
 
+		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
+		}
+
 		// On import, populate computed and required fields (but NOT optional fields)
 		if err = tfState.FillFromRecordForImport(record.(Record)); err != nil {
 			resp.Diagnostics.AddError(
@@ -587,6 +592,11 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
 
+		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
+		}
+
 		// In particular scenarios we might want to populate all internalstate in custom handler.
 		// In this case we might want to return nil to avoid this population.
 		if err = tfState.FillFromRecord(record.(Record)); err != nil {
@@ -787,6 +797,11 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 		// e.g., extract local_provider_id from local_provider.id
 		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
 
+		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
+		}
+
 		// In particular scenarios we might want to populate all internalstate in custom handler.
 		// In this case we might want to return nil to avoid this population.
 		if err = tfState.FillFromRecordIncludingRequired(record.(Record), true); err != nil {
@@ -921,6 +936,13 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		if transformer, ok := stateManger.(TransformResponseRecord); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
+		}
+
+		// Merge sub-resources using plan manager so the trigger fields reflect
+		// the desired plan state, not the (potentially stale) current state.
+		if err = mergeSubResources(ctx, planManager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
 		}
 
 		// In particular scenarios we might want to populate all internalstate in custom handler.
@@ -1353,4 +1375,58 @@ func shouldRetry(expr *is.RetryExpression, err error) bool {
 		}
 	}
 	return false
+}
+
+// mergeSubResources calls GetSubResources (if implemented) and merges the
+// returned Record into the main record before FillFromRecord is called.
+// This keeps sub-resource data out of tfstate manipulation: the merged record
+// is the single source used to populate state.
+// manager may be a ResourceManager or a DataSourceManager — only the
+// GetSubResources interface is required.
+type hasTFState interface {
+	TfState() *is.TFState
+}
+
+func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record DisplayableRecord, managerName string) error {
+	if record == nil {
+		return nil
+	}
+
+	// Only proceed when the manager explicitly declares SubResources in its
+	// hints. This prevents calling GetSubResources on datasource managers that
+	// share the same struct type as a resource but don't configure sub-resources.
+	if hts, ok := manager.(hasTFState); ok {
+		hints := hts.TfState().Hints
+		if hints == nil || len(hints.SubResources) == 0 {
+			return nil
+		}
+	}
+
+	imp, ok := manager.(GetSubResources)
+	if !ok {
+		return nil
+	}
+	tflog.Debug(ctx, fmt.Sprintf("GetSubResources[%s]: do.", managerName))
+	sub, err := imp.GetSubResources(ctx, rest, record.(Record))
+	if err != nil {
+		return err
+	}
+	if sub != nil {
+		for k, v := range sub {
+			record.(Record)[k] = v
+		}
+		return nil
+	}
+
+	// GetSubResources returned nil — the trigger is off or fetch was skipped.
+	if rm, ok := manager.(ResourceManager); ok {
+		if hints := rm.TfState().Hints; hints != nil {
+			for _, sr := range hints.SubResources {
+				for k := range sr.SchemaAttributes {
+					record.(Record)[k] = nil
+				}
+			}
+		}
+	}
+	return nil
 }
