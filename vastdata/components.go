@@ -85,6 +85,7 @@ var allTFComponents = []TFManager{
 	&SupportedDrives{},
 	&Webhook{},
 	&QuotaGroup{},
+	&BlobExpansion{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
