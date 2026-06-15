@@ -81,6 +81,7 @@ var allTFComponents = []TFManager{
 	&Oidc{},
 	&VastDbVips{},
 	&TenantNfs4Delegation{},
+	&TenantMetricLabels{},
 	&SupportedDrives{},
 	&Webhook{},
 	&QuotaGroup{},
