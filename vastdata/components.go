@@ -24,6 +24,7 @@ var allTFComponents = []TFManager{
 	&Snapshot{},
 	&S3Policy{},
 	&S3LifeCycleRule{},
+	&TlsCertificate{},
 	&ReplicationPeer{},
 	&Quota{},
 	&QosPolicy{},

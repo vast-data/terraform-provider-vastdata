@@ -1,0 +1,44 @@
+# e2e: TLS certificate — CA + CRL revocation file + NFS protocol
+resource "vastdata_tls_certificate" "vastdb_tls_cert" {
+  ca_certificate_name = "vastdb-tls-cert-2"
+  revocations_name    = "vastdb-tls-crl-2"
+  protocols           = ["NFS"]
+  tenant_id           = 1
+
+  ca_certificate_file = <<-EOT
+    -----BEGIN CERTIFICATE-----
+    MIIDQzCCAiugAwIBAgIUFG8mE5/D+2PXS3YOxK0Sdf6dKPEwDQYJKoZIhvcNAQEL
+    BQAwMTEPMA0GA1UEAwwGVGVzdENBMREwDwYDVQQKDAhWYXN0VGVzdDELMAkGA1UE
+    BhMCVVMwHhcNMjYwNjE1MDAzMTIxWhcNMzYwNjEyMDAzMTIxWjAxMQ8wDQYDVQQD
+    DAZUZXN0Q0ExETAPBgNVBAoMCFZhc3RUZXN0MQswCQYDVQQGEwJVUzCCASIwDQYJ
+    KoZIhvcNAQEBBQADggEPADCCAQoCggEBAJIYYPnFX+ZIRjlREaguM5wibptdcZu9
+    dsqhsTcW1ajp4M8tbyqSN/2ipf795BEZg+v07HR3mTGjHLGeBoueNJWFvZF11wRh
+    KReueS3K2TTupvgqB6bS4M00YSZw5Nei95U8ZYEJhhkRllAQW2iu63H3MyW2P1qJ
+    T9PsfBVSh/A7M8VuldjYm2CT276nX3PW+PQ6WWVsKKGAd9ODrr/EpQ5jjFHnkOQM
+    5OxprnOUcbDqt59rdf2/P0jOGAez/DPGVnpaoTBZf/GyPAM8XcaLavB4bVk29C30
+    seBSOeqFw7sVuoe47Re731v1wWIgp22/KYw9dr6TPT3f3Kkd6xWFEhcCAwEAAaNT
+    MFEwHQYDVR0OBBYEFPnKjbEViHQaAuvBX3bwo89uhFtiMB8GA1UdIwQYMBaAFPnK
+    jbEViHQaAuvBX3bwo89uhFtiMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL
+    BQADggEBAG3xr23DEDQcLfbSX/uXyrRzT7FwfcPwU17F+0TIxNH5SeO5eRkxNbte
+    UhGeLibkhMpiM4ooBjajol20qHwBJq5CNM7UgRIvLrXD9mJxM95ygqmeENBw2Fj+
+    SU9LJEaC8WxEG70bX8K0qc8WdbI5fOSD+T7t5oWwW2Tt8tOsmqGA4KNDMRP6paun
+    CQU+P34G5memUtaP0copRDKgHYbwH1imcioN1IQD/SbgfYq1YlL36cGDn8hB9haR
+    vE5EvNGbsUFPa422yVvtZXqPdMi8XRYRFHGXxniT1UWZp8mRMzeoh5++bhjOwvd+
+    5sHVHxLrVo2TyWCLUpdWMAAam3W1SV0=
+    -----END CERTIFICATE-----
+  EOT
+
+  revocation_file = <<-EOT
+    -----BEGIN X509 CRL-----
+    MIIBiTBzAgEBMA0GCSqGSIb3DQEBCwUAMDExDzANBgNVBAMMBlRlc3RDQTERMA8G
+    A1UECgwIVmFzdFRlc3QxCzAJBgNVBAYTAlVTFw0yNjA2MTUwMDMxMzBaFw0zNjA2
+    MTIwMDMxMzBaoA4wDDAKBgNVHRQEAwIBATANBgkqhkiG9w0BAQsFAAOCAQEAMnSd
+    Xscd4YijW0CTEbxzbz0ydkR1chPxH+vhRU7sPbwqbd7cbdCRlLSENOqRM7LLkNf5
+    qoEfbNS7Mg5qogEHq5B4QIWGPyP7k/7QwNkKCWZPDIeE1rLEv6QPAYk5vDNhNtib
+    /qPha4Qcf7n0ATnqkO2P1qjL85gq5P80DSQn6X7pdKOsgN5kJEH2f3Eh+wlJZlnn
+    ySbujaUnMtS5VOK+sc2w2kaHwJNbnH1je9QM493ZAeoLbGFm5Fcwb3AJ3MUVXIVQ
+    odQ60yHv6qOXo4PBfJsCg3kJWTma9rElvkCy+ehJty/SKNssht9n3+ESVrwbQ3i/
+    o3psq/E13UObMncaAQ==
+    -----END X509 CRL-----
+  EOT
+}

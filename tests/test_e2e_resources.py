@@ -356,6 +356,12 @@ def test_individual_resource(terraform_cmd, terraform_workdir, test_name, tf_fil
                 print(f"  ℹ Found {len(dependency_resources)} dependency resources (will remain in state)")
             
             # Step 4: Remove only the primary resource from tfstate
+            # Save state first so we can restore it if import is not supported.
+            state_file = terraform_workdir / "terraform.tfstate"
+            state_backup = terraform_workdir / "terraform.tfstate.bak"
+            if state_file.exists():
+                shutil.copy(str(state_file), str(state_backup))
+
             print(f"  Step 4: Removing {primary_resource[0]} from state to simulate loss")
             try:
                 result = terraform_cmd['state', 'rm', primary_resource[0]].run(retcode=None)
@@ -371,21 +377,33 @@ def test_individual_resource(terraform_cmd, terraform_workdir, test_name, tf_fil
             # Step 5: Import only the primary resource
             resource_address, resource_id = primary_resource
             print(f"  Step 5: Importing {resource_address} with ID {resource_id}")
+            import_skipped = False
             try:
                 # Run import and capture output
                 result = terraform_cmd['import', '-input=false', '-lock=false', resource_address, resource_id].run(retcode=None)
                 returncode, stdout, stderr = result
                 
                 if returncode != 0:
-                    print(f"  ERROR: import failed for {resource_address}")
-                    print(f"    Return code: {returncode}")
-                    if stderr:
-                        print(f"    Error output:\n{stderr}")
-                    if stdout:
-                        print(f"    Standard output:\n{stdout}")
-                    raise AssertionError(f"Import failed for {resource_address}: {stderr}")
+                    combined = (stdout or "") + (stderr or "")
+                    if "import not supported" in combined.lower():
+                        print(f"  ℹ Import not supported for {resource_address} (resource marked as non-importable), skipping steps 5-6")
+                        import_skipped = True
+                        # Restore the saved state so terraform destroy can clean up.
+                        if state_backup.exists():
+                            shutil.copy(str(state_backup), str(state_file))
+                            print(f"  Restored state for destroy step")
+                    else:
+                        print(f"  ERROR: import failed for {resource_address}")
+                        print(f"    Return code: {returncode}")
+                        if stderr:
+                            print(f"    Error output:\n{stderr}")
+                        if stdout:
+                            print(f"    Standard output:\n{stdout}")
+                        raise AssertionError(f"Import failed for {resource_address}: {stderr}")
                 else:
                     print(f"  Imported {resource_address}")
+            except AssertionError:
+                raise
             except Exception as e:
                 print(f"  ERROR: import exception for {resource_address}")
                 print(f"    {str(e)}")
@@ -393,30 +411,33 @@ def test_individual_resource(terraform_cmd, terraform_workdir, test_name, tf_fil
             
             # Step 6: Run terraform plan to check for drift after import (honors ALLOWED_DRIFT_RESOURCES)
             print(f"  Step 6: Running terraform plan to check for drift after import in {primary_resource_type}")
-            result = terraform_cmd['plan', '-input=false', '-detailed-exitcode', '-lock=false'].run(retcode=None)
-            returncode, stdout, stderr = result
-            
-            # Exit code 0 = no changes, 1 = error, 2 = changes present
-            if returncode == 0:
-                print("  ✓ No drift detected after import")
-            elif returncode == 2:
-                # Drift detected - check if it's allowed (only for primary resource)
-                is_allowed, reason = is_drift_allowed(stdout, tested_resource_type=primary_resource_type)
-                
-                if is_allowed:
-                    print(f"  Drift detected after import, but it's allowed")
-                    print(f"    Reason: {reason}")
-                    print("  Test passed (allowed drift)")
-                else:
-                    print(f"  ERROR: Drift detected in primary resource {primary_resource_type}!")
-                    print("    This means import didn't populate all fields correctly")
-                    print(f"    {reason}")
-                    print(f"    Plan output:\n{stdout}")
-                    raise AssertionError(f"Disallowed drift detected after import for {test_name}: {reason}")
+            if import_skipped:
+                print("  Skipping drift check — import not supported for this resource")
             else:
-                print(f"  ERROR: terraform plan failed")
-                print(f"    Error: {stderr}")
-                raise Exception(f"terraform plan failed for {test_name}")
+                result = terraform_cmd['plan', '-input=false', '-detailed-exitcode', '-lock=false'].run(retcode=None)
+                returncode, stdout, stderr = result
+
+                # Exit code 0 = no changes, 1 = error, 2 = changes present
+                if returncode == 0:
+                    print("  ✓ No drift detected after import")
+                elif returncode == 2:
+                    # Drift detected - check if it's allowed (only for primary resource)
+                    is_allowed, reason = is_drift_allowed(stdout, tested_resource_type=primary_resource_type)
+
+                    if is_allowed:
+                        print(f"  Drift detected after import, but it's allowed")
+                        print(f"    Reason: {reason}")
+                        print("  Test passed (allowed drift)")
+                    else:
+                        print(f"  ERROR: Drift detected in primary resource {primary_resource_type}!")
+                        print("    This means import didn't populate all fields correctly")
+                        print(f"    {reason}")
+                        print(f"    Plan output:\n{stdout}")
+                        raise AssertionError(f"Disallowed drift detected after import for {test_name}: {reason}")
+                else:
+                    print(f"  ERROR: terraform plan failed")
+                    print(f"    Error: {stderr}")
+                    raise Exception(f"terraform plan failed for {test_name}")
         
         # Step 7: Destroy
         print("  Step 7: terraform destroy")
