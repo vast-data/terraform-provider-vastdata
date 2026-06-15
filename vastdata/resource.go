@@ -1392,9 +1392,6 @@ func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record D
 		return nil
 	}
 
-	// Only proceed when the manager explicitly declares SubResources in its
-	// hints. This prevents calling GetSubResources on datasource managers that
-	// share the same struct type as a resource but don't configure sub-resources.
 	if hts, ok := manager.(hasTFState); ok {
 		hints := hts.TfState().Hints
 		if hints == nil || len(hints.SubResources) == 0 {
@@ -1422,8 +1419,14 @@ func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record D
 	if rm, ok := manager.(ResourceManager); ok {
 		if hints := rm.TfState().Hints; hints != nil {
 			for _, sr := range hints.SubResources {
-				for k := range sr.SchemaAttributes {
-					record.(Record)[k] = nil
+				if sr.SchemaKey != "" {
+					// Nested sub-resource: null the top-level key.
+					record.(Record)[sr.SchemaKey] = nil
+				} else {
+					// Flat sub-resource: null each declared attribute individually.
+					for k := range sr.SchemaAttributes {
+						record.(Record)[k] = nil
+					}
 				}
 			}
 		}

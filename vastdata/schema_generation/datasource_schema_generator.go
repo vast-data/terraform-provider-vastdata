@@ -146,7 +146,7 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 				nested[k] = att
 			}
 			attrs[sr.SchemaKey] = dschema.SingleNestedAttribute{
-				Optional:   false,
+				Optional:   sr.Writable,
 				Computed:   true,
 				Attributes: nested,
 			}

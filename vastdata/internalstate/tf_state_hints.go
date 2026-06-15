@@ -185,6 +185,12 @@ type SubResourceHint struct {
 	// by this sub-resource (including the optional trigger field), flattened
 	// into the parent resource's schema.
 	SchemaAttributes map[string]any
+
+	// Writable indicates that the sub-resource supports write operations
+	// (e.g. POST / DELETE) managed via hooks (AfterCreateResource / AfterUpdateResource).
+	// When true and SchemaKey is non-empty, the generated nested SingleNestedAttribute
+	// is Optional+Computed instead of Computed-only, allowing users to configure it.
+	Writable bool
 }
 
 // RetryExpression defines the conditions and parameters for retrying a failed create request.

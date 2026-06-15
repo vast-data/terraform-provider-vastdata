@@ -294,7 +294,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 				nested[k] = injectModifiers(att, k, hints)
 			}
 			attrs[sr.SchemaKey] = rschema.SingleNestedAttribute{
-				Optional:   false,
+				Optional:   sr.Writable,
 				Computed:   true,
 				Attributes: nested,
 			}
