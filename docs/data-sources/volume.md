@@ -27,17 +27,23 @@ data "vastdata_volume" "vastdb_volume_by_name" {
 
 ### Optional
 
+- `block_hosts__id` (Number) Volume BlockHost ID to filter by.
 - `capacity` (Number) The amount of data written to the volume (deprecated as of 5.4).
 - `created` (String)
+- `full_path` (String) The full path of the volume (subsystem path joined with the volume name).
 - `id` (Number) Volume ID
 - `is_monitored` (Boolean) Is this volume live monitored (default - False).
 - `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
 - `mapped_block_hosts_preview` (String) Mapped block hosts preview.
+- `mapped_snapshot_id` (Number) Volumes explicitly mapped to the snapshot.
 - `name` (String) The path to the volume relative to the view path.
 - `namespace_id` (Number) Available for mapped volumes, the namespace ID as used by hosts to search the volume within the subsystem. Each namespace ID is unique within the subsystem. If a volume snapshot is mapped to any host(s), a snapshot volume is created with its own namespace ID.
 - `nguid` (String) The NGUID used by block hosts to access the volume.
+- `qos_policy__id` (Number) Volume QOS Policy ID to filter by.
 - `qos_policy_id` (Number) QOS Policy ID
 - `size` (Number) The size of the volume, (in GB)
+- `snapshot_id` (Number) Unmapped Volumes captured by snapshot — under snapshot’s path, created before the snapshot time.
+- `state` (String) Volume state
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 - `tenant_name` (String) The name of the tenant to which the volume belongs.
 - `uuid` (String) The UUID, used by hosts to search the volume in the subsystem.

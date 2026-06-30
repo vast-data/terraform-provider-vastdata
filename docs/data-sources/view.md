@@ -31,6 +31,16 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `alias` (String) Alias for NFS export, must start with '/' and only ASCII characters are allowed. If configured, this supersedes the exposed NFS export path
 - `allow_anonymous_access` (Boolean) Allow S3 anonymous access
 - `allow_s3_anonymous_access` (Boolean) Allow S3 anonymous access
+- `allowed_delegations` (String) Which types of NFSv4 file delegations are enabled for this view.
+- `NONE` means NFSv4 file delegations are disabled.
+- `READ` means read type NFSv4 file delegations can be granted to a client opening a file.
+- `WRITE` means write type NFSv4 file delegations can be granted to a client opening a file.
+- `READ_WRITE` means both read and write type NFSv4 file delegations
+  can be granted to a client opening a file.
+- `USE_TENANT_ALLOWED_DELEG` (default) means the view inherits the tenant’s `allowed_delegations`.
+
+**Important:** If the tenant has `DISABLED` delegations, this overrides the view entirely.
+The effective delegations value for this view is forced to `NONE`, regardless of the view’s setting.
 - `auto_commit` (String) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
 - `bucket` (String) S3 Bucket name
 - `bucket_owner` (String) S3 Bucket owner
@@ -45,10 +55,20 @@ data "vastdata_view" "vastdb_view_by_guid" {
 - `created` (String)
 - `default_retention_period` (String) Default retention period for objects in the bucket. Required if s3_locks_retention_mode is set to governance or compliance. Object versions that are placed in the bucket are automatically protected with the specified retention for the specified amount of time. Otherwise, by default, each object version has no automatic protection but can be configured with a retention period or legal hold. Specify as an integer followed by h for hours, d for days, m for months, or y for years. For example: 2d or 1y.
 - `directory` (Boolean) Create the directory if it does not exist
+- `effective_allowed_delegations` (String) The resolved NFSv4 delegation type that applies to the View.
+
+Resolution rules:
+- If the tenant's allowed delegations is `DISABLED`, the effective value is forced to `NONE`.
+- Otherwise, if `allowed_delegations` is `USE_TENANT_ALLOWED_DELEG`,
+  the value is inherited from the Tenant's `allowed_delegations`.
+- In all other cases, the effective value equals this object's own `allowed_delegations`.
+
+This field shows the final delegation behavior observed by clients.
 - `files_retention_mode` (String) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object.
 - `guid` (String)
 - `has_bucket_logging_destination` (Boolean) Has a destination bucket configured as a destination for S3 bucket logging
 - `has_bucket_logging_sources` (Boolean) Is referenced by other S3 bucket views as the destination bucket for S3 bucket logging.
+- `has_nfs4_triggers` (Boolean) Whether NFSv4 triggers are currently enabled for this view
 - `ignore_oos` (Boolean)
 - `indestructible_object_duration` (Number) Retention period for indestructible object mode, in days.
 - `internal` (Boolean)

@@ -55,6 +55,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `id` (Number) ID
 - `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting POSIX settings from the parent directory versus configured values.
 - `internal` (Boolean)
+- `is_block_default_policy` (Boolean) Specifies whether to make this View Policy default for BLOCK
 - `is_s3_default_policy` (Boolean) Specifies whether to make this View Policy default for S3
 - `log_deleted` (Boolean) Log deleted files/dirs from trash dir
 - `log_full_path` (Boolean) Log full path
@@ -62,6 +63,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `log_username` (Boolean) Log username
 - `name` (String) Name of the policy
 - `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
+- `nfs_enforce_mtls` (Boolean) Specifies whether we enforce mTLS authentication over NFS.
 - `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
 - `nfs_enforce_tls_relaxed` (Boolean) Whether to relax TLS enforcement by not requiring TLS for auxiliary NFSv3 sub-protocols | (MOUNT, NLM, NSM, RQUOTA, NFSACL)
 - `nfs_minimal_protection_level` (String) Minimal Protection Level for NFSv4 client mounts: 'KRB_AUTH_ONLY' allows client mounts with Kerberos authentication only (using the RPCSEC_GSS authentication service), 'SYSTEM' allows client mounts using either the AUTH_SYS RCP security flavor (the traditional default NFS authentication scheme) or with Kerberos authentication, 'NONE' (default) allows client mounts with the AUTH_NONE (anonymous access), or AUTH_SYS RCP security flavors, or with Kerberos authentication.
@@ -122,6 +124,7 @@ data "vastdata_view_policy" "vastdb_view_policy_by_guid" {
 - `smb_read_only` (Set of String) Hosts with SMB read only permissions
 - `smb_read_write` (Set of String) Hosts with SMB read/write permissions
 - `trash_access` (Set of String) Hosts with trash access permission
+- `vip_pools` (Set of Number) Comma separated vip pool ids. Restricts view access to specified VIP pools.
 
 <a id="nestedatt--protocols_audit"></a>
 ### Nested Schema for `protocols_audit`

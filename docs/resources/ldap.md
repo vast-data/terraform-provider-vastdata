@@ -102,6 +102,7 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `gid_number` (String) The attribute of a group entry on the LDAP server that contains the GID number of a group, if different from 'gidNumber'. When binding VAST Cluster to AD, you may need to set this to 'gidnumber' (case sensitive).
 - `group_login_name` (String) Specifies the attribute used to query Active Directory for the group login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
+- `is_abac_provider` (Boolean) is this Ldap used for ABAC
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `mail_property_name` (String) Specifies the attribute to use for the user's email address.
 - `match_user` (String) The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.

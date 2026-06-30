@@ -50,7 +50,8 @@ resource "vastdata_event_definition_config" "vastdb_event_definition_config" {
 - `smtp_user` (String) User for SMTP authentication
 - `syslog_host` (String) The syslog server's IP address, for sending event logs to a syslog server.
 - `syslog_ipmi_audit` (Boolean) CNode and DNode IPMI commands
-- `syslog_port` (String) The port number used by the syslog server to listen on for syslog requests.
+- `syslog_port` (Number) The port number used by the syslog server to listen on for syslog requests.
 - `syslog_protocol` (String) The protocol used for communicating with the remote syslog server.
+- `syslog_secure_audit` (Boolean) /var/log/secure logs audit
 - `syslog_shell_audit` (Boolean) CNode and DNode shell commands
 - `syslog_vms_audit` (Boolean) VMS audit

@@ -77,6 +77,8 @@ resource "vastdata_block_host_mapping" "vastdb_block_host_mapping" {
 ### Read-Only
 
 - `id` (Number) The ID of this resource.
+- `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
+- `mapped_block_hosts_preview` (String) Mapped block hosts preview.
 - `mapped_volume_count` (Number) How many Volumes are mapped to this block host.
 - `mapped_volumes_preview` (String) Mapped volumes preview.
 - `tenant_name` (String) The name of the tenant to which the block host belongs.

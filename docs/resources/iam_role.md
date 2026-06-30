@@ -69,6 +69,7 @@ EOT
 ### Optional
 
 - `description` (String)
+- `max_session_duration` (Number) Maximum session duration for temporary access keys (seconds). Default - 129600 (36 hours).
 - `revoke_access_keys` (Boolean) Indicates whether access keys should be revoked for this iam role.
 - `s3_policies` (Set of Number) List of Identity Policy IDs
 - `tenant_id` (Number)

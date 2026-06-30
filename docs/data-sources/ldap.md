@@ -47,6 +47,7 @@ data "vastdata_ldap" "vastdb_ldap_by_name" {
 - `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping. Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
 - `guid` (String)
+- `is_abac_provider` (Boolean) is this Ldap / Active Directory used for ABAC
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `mail_property_name` (String) The attribute to use for the user's email address.
 - `match_user` (String)

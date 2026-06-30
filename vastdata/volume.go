@@ -27,7 +27,7 @@ func (m *Volume) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 			SchemaRef:            VolumeSchemaRef,
 			OptionalSchemaFields: []string{"is_monitored"},
 			EditOnlyFields:       []string{"is_monitored"},
-			ReadOnlyFields:       []string{"tenant_id"},
+			ReadOnlyFields:       []string{"tenant_id", "snapshot_id", "mapped_snapshot_id"},
 		},
 	)}
 }

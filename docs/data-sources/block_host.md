@@ -31,6 +31,8 @@ data "vastdata_block_host" "vastdb_block_host_by_nqn" {
 
 ### Optional
 
+- `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
+- `mapped_block_hosts_preview` (String) Mapped block hosts preview.
 - `mapped_volume_count` (Number) How many Volumes are mapped to this block host.
 - `mapped_volumes_preview` (String) Mapped volumes preview.
 - `name` (String) The name of the block host, which is unique per tenant.

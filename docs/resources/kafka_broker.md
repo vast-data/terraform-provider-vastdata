@@ -38,6 +38,8 @@ resource "vastdata_kafka_broker" "vastdb_kafka_broker" {
 
 ### Optional
 
+- `certificate_set_id` (Number) Certificate Set ID
+- `hostname_verification_enabled` (Boolean) Hostname verification is enabled when mTLS certificate is used
 - `tenant_id` (Number) Tenant ID. If missing, accessed by all tenants
 
 <a id="nestedatt--addresses"></a>

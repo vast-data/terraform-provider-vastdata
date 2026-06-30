@@ -47,6 +47,7 @@ data "vastdata_dns" "vastdb_dns_by_name" {
 - `ttl` (Number) Specifies the TTL value for the DNS.
 - `url` (String) Endpoint URL for operations on the DNS server configuration
 - `vip` (String) Assigns an IP to the DNS service. DNS requests from your external DNS server must be delegated to this IP.
+- `vip_allocation` (String) VIP allocation type
 - `vip_gateway` (String) Specifies a gateway IP to external DNS server if on different subnet. Must be on same subnet as the IP and reachable from the relevant nework interface.
 - `vip_ipv6` (String) Assigns an IPv6 to the DNS service.
 - `vip_ipv6_gateway` (String) Specifies a gateway IPv6 to external DNS server if on different subnet.

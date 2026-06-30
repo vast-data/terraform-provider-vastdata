@@ -62,6 +62,7 @@ data "vastdata_vip_pool" "vastdb_vip_pool_by_guid" {
 - `title` (String) IP range of the VIP pool
 - `url` (String) The VIP Pool's endpoint URL for API operations
 - `vast_asn` (Number) The cluster's ASN. Applicable only if enable_l3 is true.
+- `vip_allocation` (String) VIP allocation type
 - `vlan` (Number) VIPPool VLAN, if the VIP pool is tagged with a specific VLAN. The VIP pool is exposed only to the specified VLAN on the client data network
 - `vms_preferred` (Boolean) If true, CNodes participating in the vip pool are preferred in VMS host election.
 

@@ -302,7 +302,9 @@ resource "vastdata_quota" "quota1" {
 - `hard_limit` (Number) Storage usage limit beyond which no writes will be allowed.
 - `hard_limit_inodes` (Number) Number of directories and unique files under the path beyond which no writes will be allowed. A file with multiple hardlinks is counted only once.
 - `inherit_acl` (Boolean) Indicates whether the directory should inherit ACLs from its parent directory
+- `is_physical_quota` (Boolean) Whether to limit by Physical Capacity. Default is Logical. Cannot be updated.
 - `is_user_quota` (Boolean) Set to true to enable user and group quotas. False by default. Cannot be disabled later.
+- `quota_groups_ids` (Set of Number)
 - `soft_limit` (Number) Storage usage limit at which warnings of exceeding the quota are issued.
 - `soft_limit_inodes` (Number) Number of directories and unique files under the path at which warnings of exceeding the quota will be issued. A file with multiple hardlinks is counted only once.
 - `tenant_id` (Number) Tenant ID

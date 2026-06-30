@@ -27,7 +27,9 @@ data "vastdata_kafka_broker" "vastdb_kafka_broker_by_name" {
 
 ### Optional
 
+- `certificate_set_id` (Number) Certificate Set ID
 - `guid` (String)
+- `hostname_verification_enabled` (Boolean) Hostname verification is enabled when mTLS certificate is used
 - `id` (Number) Kafka broker configuration ID
 - `name` (String) Name of the Kafka broker configuration
 - `tenant_id` (Number) Tenant ID. If missing, accessed by all tenants

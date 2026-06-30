@@ -56,8 +56,10 @@ resource "vastdata_volume" "vastdb_volume" {
 
 ### Optional
 
-- `is_monitored` (Boolean) Is this volume live monitored (default - False).
+- `is_monitored` (Boolean) Enables live monitoring on the volume.
+- `mapped_snapshot_id` (Number) Volumes explicitly mapped to the snapshot.
 - `qos_policy_id` (Number) QOS Policy ID
+- `snapshot_id` (Number) Unmapped Volumes captured by snapshot — under snapshot’s path, created before the snapshot time.
 - `tags` (Map of String)
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
 
@@ -65,6 +67,7 @@ resource "vastdata_volume" "vastdb_volume" {
 
 - `capacity` (Number) The amount of data written to the volume (deprecated as of 5.4).
 - `created` (String)
+- `full_path` (String) The full path of the volume (subsystem path joined with the volume name).
 - `id` (Number) Volume ID
 - `mapped_block_host_count` (Number) The number of block hosts mapped to the volume.
 - `mapped_block_hosts_preview` (String) Mapped block hosts preview.
@@ -72,6 +75,7 @@ resource "vastdata_volume" "vastdb_volume" {
 - `nguid` (String) The NGUID used by block hosts to access the volume.
 - `qos_policy` (Attributes) (see [below for nested schema](#nestedatt--qos_policy))
 - `snapshot_data` (Attributes) (see [below for nested schema](#nestedatt--snapshot_data))
+- `state` (String) Volume state
 - `tenant_name` (String) The name of the tenant to which the volume belongs.
 - `uuid` (String) The UUID, used by hosts to search the volume in the subsystem.
 
