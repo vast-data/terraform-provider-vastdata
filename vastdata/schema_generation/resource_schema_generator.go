@@ -267,12 +267,23 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	for _, sr := range hints.SubResources {
 		if sr.FieldTrigger != "" {
 			if _, exists := attrs[sr.FieldTrigger]; !exists {
-				attrs[sr.FieldTrigger] = rschema.BoolAttribute{
-					Optional: true,
-					Description: fmt.Sprintf(
-						"When true, fetches %q sub-resource data and populates its fields. Default is false.",
+				var desc string
+				if sr.MinVastVersion != nil {
+					desc = fmt.Sprintf(
+						"Controls fetching of the %q sub-resource (requires VAST >= %s). "+
+							"When unset or true the sub-resource is fetched automatically on supported clusters. "+
+							"Set to false to explicitly opt out.",
+						sr.SchemaKey, sr.MinVastVersion,
+					)
+				} else {
+					desc = fmt.Sprintf(
+						"When true, fetches %q sub-resource data and populates its fields.",
 						sr.SchemaKey,
-					),
+					)
+				}
+				attrs[sr.FieldTrigger] = rschema.BoolAttribute{
+					Optional:    true,
+					Description: desc,
 				}
 			}
 		}

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -1383,6 +1384,11 @@ func shouldRetry(expr *is.RetryExpression, err error) bool {
 // is the single source used to populate state.
 // manager may be a ResourceManager or a DataSourceManager — only the
 // GetSubResources interface is required.
+//
+// If at least one sub-resource hint declares MinVastVersion, the cluster version
+// is retrieved once (using the process-level cache) and passed to GetSubResources.
+// The implementation is then responsible for using clusterVersion to gate fetches.
+// When no hint uses MinVastVersion, nil is passed — implementations must tolerate nil.
 type hasTFState interface {
 	TfState() *is.TFState
 }
@@ -1392,8 +1398,9 @@ func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record D
 		return nil
 	}
 
+	var hints *is.TFStateHints
 	if hts, ok := manager.(hasTFState); ok {
-		hints := hts.TfState().Hints
+		hints = hts.TfState().Hints
 		if hints == nil || len(hints.SubResources) == 0 {
 			return nil
 		}
@@ -1403,8 +1410,30 @@ func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record D
 	if !ok {
 		return nil
 	}
+
+	// Fetch cluster version exactly once if any hint requires it.
+	// The result is passed into GetSubResources so implementations
+	// don't need to call GetCachedClusterVersion themselves.
+	var clusterVersion *version.Version
+	if hints != nil {
+		for _, sr := range hints.SubResources {
+			if sr.MinVastVersion != nil {
+				v, err := GetCachedClusterVersion(ctx, rest)
+				if err != nil {
+					tflog.Warn(ctx, fmt.Sprintf(
+						"mergeSubResources[%s]: cannot retrieve cluster version for MinVastVersion check: %v",
+						managerName, err,
+					))
+				} else {
+					clusterVersion = v
+				}
+				break
+			}
+		}
+	}
+
 	tflog.Debug(ctx, fmt.Sprintf("GetSubResources[%s]: do.", managerName))
-	sub, err := imp.GetSubResources(ctx, rest, record.(Record))
+	sub, err := imp.GetSubResources(ctx, rest, record.(Record), clusterVersion)
 	if err != nil {
 		return err
 	}
@@ -1417,8 +1446,8 @@ func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record D
 
 	// GetSubResources returned nil — the trigger is off or fetch was skipped.
 	if rm, ok := manager.(ResourceManager); ok {
-		if hints := rm.TfState().Hints; hints != nil {
-			for _, sr := range hints.SubResources {
+		if h := rm.TfState().Hints; h != nil {
+			for _, sr := range h.SubResources {
 				if sr.SchemaKey != "" {
 					// Nested sub-resource: null the top-level key.
 					record.(Record)[sr.SchemaKey] = nil

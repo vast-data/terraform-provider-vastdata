@@ -3,9 +3,11 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -20,9 +22,13 @@ var ViewSchemaRef = is.NewSchemaReference(
 )
 
 // viewS3CorsSubResource declares the nested writable sub-resource for /views/{id}/s3cors_configuration/.
+// Fetched automatically on VAST clusters running >= 5.5.0.
+// Set get_s3cors_configuration = false to explicitly opt out.
 var viewS3CorsSubResource = is.SubResourceHint{
-	SchemaKey: "s3cors_configuration",
-	Writable:  true,
+	MinVastVersion: VastVersion550,
+	FieldTrigger:   "get_s3cors_configuration",
+	SchemaKey:      "s3cors_configuration",
+	Writable:       true,
 	SchemaAttributes: map[string]any{
 		"cors_rules": rschema.ListNestedAttribute{
 			Optional:    true,
@@ -80,8 +86,7 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 			// to plan a change when the user sets them to null. (TERF-225)
 			NotComputedSchemaFields: []string{"qos_policy", "qos_policy_id"},
 			// s3cors_configuration is auto-excluded via SubResources hints.
-			EditOnlyFields: []string{"enable_nfs4_triggers"},
-			SubResources:   []is.SubResourceHint{viewS3CorsSubResource},
+			SubResources: []is.SubResourceHint{viewS3CorsSubResource},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
 				"max_retention_period":     ValidatorRetentionFormat,
@@ -100,11 +105,6 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 					Optional:    true,
 					Description: "Force View removal.",
 				},
-				"enable_nfs4_triggers": rschema.BoolAttribute{
-					Optional:    true,
-					Computed:    true,
-					Description: "When true, enables NFSv4 triggers for this view (/views/{id}/nfs4_triggers/).",
-				},
 			},
 		},
 	)}
@@ -115,7 +115,8 @@ func (m *View) NewDatasourceManager(raw map[string]attr.Value, schema any) DataS
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: ViewSchemaRef,
+			SchemaRef:    ViewSchemaRef,
+			SubResources: []is.SubResourceHint{viewS3CorsSubResource},
 		}),
 	}
 }
@@ -128,32 +129,22 @@ func (m *View) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Views
 }
 
-func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record) (Record, error) {
-	id, ok := record["id"]
-	if !ok || id == nil || id == "" {
+// GetSubResources fetches /views/{id}/s3cors_configuration/ on VAST clusters
+// running version >= 5.5.0. Set get_s3cors_configuration = false to opt out.
+func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error) {
+	if clusterVersion == nil || clusterVersion.LessThan(VastVersion550) {
+		return nil, nil
+	}
+	// User explicitly opted out.
+	if m.tfstate.IsKnownAndNotNull("get_s3cors_configuration") && !m.tfstate.Bool("get_s3cors_configuration") {
 		return nil, nil
 	}
 
+	id := record.RecordID()
 	result := Record{}
 
-	// --- nfs4_triggers ---
-	// Only applicable to NFS4 views;
-	if isNFS4View(record) {
-		nfs4Rec, err := rest.Views.ViewNfs4TriggersWithContext_GET(ctx, id)
-		if err = ignoreStatusCodes(err, http.StatusNotFound, http.StatusForbidden); err != nil {
-			return nil, err
-		}
-		if nfs4Rec != nil {
-			result["enable_nfs4_triggers"] = nfs4Rec["enabled"]
-		} else {
-			result["enable_nfs4_triggers"] = nil
-		}
-	} else {
-		result["enable_nfs4_triggers"] = nil
-	}
-
 	// --- s3cors_configuration ---
-	corsRec, err := rest.Views.ViewS3corsConfigurationWithContext_GET(ctx, id, params{})
+	corsRec, err := rest.Views.ViewS3corsConfigurationWithContext_GET(ctx, id, nil)
 	if err != nil && !isNotFoundErr(err) {
 		return nil, err
 	}
@@ -174,52 +165,75 @@ func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record
 	return result, nil
 }
 
-// AfterCreateResource enables nfs4_triggers and/or creates s3cors_configuration
-// when the user specifies those fields in the Terraform configuration.
-func (m *View) AfterCreateResource(ctx context.Context, rest *VMSRest, record Record) error {
-	id := record["id"]
-
-	if m.tfstate.IsKnownAndNotNull("enable_nfs4_triggers") && m.tfstate.Bool("enable_nfs4_triggers") {
-		if err := rest.Views.ViewNfs4TriggersWithContext_POST(ctx, id, params{"enabled": true}); err != nil {
-			return err
-		}
+// corsVersionCheck returns an error when the connected cluster does not support
+// s3cors_configuration (requires VAST >= 5.5.0).
+func corsVersionCheck(ctx context.Context, rest *VMSRest) error {
+	clusterVer, err := GetCachedClusterVersion(ctx, rest)
+	if err != nil {
+		return fmt.Errorf("s3cors_configuration: failed to retrieve cluster version: %w", err)
 	}
-
-	if body, ok := m.corsBody(); ok && body != nil {
-		if _, err := rest.Views.ViewS3corsConfigurationWithContext_POST(ctx, id, body); err != nil {
-			return err
-		}
+	if clusterVer.LessThan(VastVersion550) {
+		return fmt.Errorf(
+			"s3cors_configuration requires VAST cluster version >= %s, but cluster is running %s",
+			VastVersion550, clusterVer,
+		)
 	}
 	return nil
 }
 
-// AfterUpdateResource syncs nfs4_triggers and s3cors_configuration with the plan state.
-// If s3cors_configuration is removed from config, all CORS rules are deleted.
+// AfterCreateResource creates s3cors_configuration when the user specifies it.
+// Returns an error if the cluster version does not support this sub-resource.
+// Skipped entirely when get_s3cors_configuration is explicitly set to false.
+func (m *View) AfterCreateResource(ctx context.Context, rest *VMSRest, record Record) error {
+	if m.tfstate.IsKnownAndNotNull("get_s3cors_configuration") && !m.tfstate.Bool("get_s3cors_configuration") {
+		return nil
+	}
+	body, hasCors := m.corsBody()
+	if !hasCors || body == nil {
+		return nil
+	}
+	if err := corsVersionCheck(ctx, rest); err != nil {
+		return err
+	}
+	id := record.RecordID()
+	_, err := rest.Views.ViewS3corsConfigurationWithContext_POST(ctx, id, body)
+	return err
+}
+
+// AfterUpdateResource syncs s3cors_configuration with the plan state.
+// Returns an error if the user provides s3cors_configuration on an unsupported cluster.
+// If s3cors_configuration is removed from config, CORS rules are deleted (version permitting).
+// Skipped entirely when get_s3cors_configuration is explicitly set to false in the plan.
 // plan is the desired state (what the user configured); m is the prior state.
 func (m *View) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource, rest *VMSRest, record Record) error {
 	planView := plan.(*View)
-	id := record["id"]
+	id := record.RecordID()
 
-	// Sync enable_nfs4_triggers
-	if planView.tfstate.IsKnownAndNotNull("enable_nfs4_triggers") {
-		enabled := planView.tfstate.Bool("enable_nfs4_triggers")
-		if err := rest.Views.ViewNfs4TriggersWithContext_POST(ctx, id, params{"enabled": enabled}); err != nil {
-			return err
-		}
+	// Respect explicit opt-out on the plan side.
+	if planView.tfstate.IsKnownAndNotNull("get_s3cors_configuration") && !planView.tfstate.Bool("get_s3cors_configuration") {
+		return nil
 	}
 
-	// Sync s3cors_configuration
 	rawCors, hasCors := planView.tfstate.Raw["s3cors_configuration"]
 	if !hasCors || rawCors.IsNull() || rawCors.IsUnknown() {
-		// User removed s3cors_configuration — delete all CORS rules.
+		// s3cors_configuration removed from config — delete existing rules if the endpoint exists.
+		clusterVer, err := GetCachedClusterVersion(ctx, rest)
+		if err != nil || clusterVer.LessThan(VastVersion550) {
+			return nil // endpoint not available on this cluster, nothing to delete
+		}
 		if err := rest.Views.ViewS3corsConfigurationWithContext_DELETE(ctx, id); err != nil && !isNotFoundErr(err) {
 			return err
 		}
-	} else {
-		if body, ok := planView.corsBody(); ok && body != nil {
-			if _, err := rest.Views.ViewS3corsConfigurationWithContext_POST(ctx, id, body); err != nil {
-				return err
-			}
+		return nil
+	}
+
+	// User has s3cors_configuration block — enforce version requirement.
+	if err := corsVersionCheck(ctx, rest); err != nil {
+		return err
+	}
+	if body, ok := planView.corsBody(); ok && body != nil {
+		if _, err := rest.Views.ViewS3corsConfigurationWithContext_POST(ctx, id, body); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -293,24 +307,6 @@ func (m *View) corsBody() (params, bool) {
 		rules = append(rules, rule)
 	}
 	return params{"cors_rules": rules}, true
-}
-
-// isNFS4View returns true when the view record includes "NFS4" in its protocols list.
-func isNFS4View(record Record) bool {
-	raw, ok := record["protocols"]
-	if !ok || raw == nil {
-		return false
-	}
-	list, ok := raw.([]any)
-	if !ok {
-		return false
-	}
-	for _, p := range list {
-		if s, ok := p.(string); ok && s == "NFS4" {
-			return true
-		}
-	}
-	return false
 }
 
 func (m *View) PrepareDeleteResource(ctx context.Context, rest *VMSRest) error {

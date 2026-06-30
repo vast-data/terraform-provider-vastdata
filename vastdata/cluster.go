@@ -5,6 +5,7 @@ import (
 	"context"
 	"net/http"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -17,19 +18,21 @@ var ClusterSchemaRef = is.NewSchemaReference(
 	"clusters",
 )
 
-// clusterS3TrueIPSubResource declares the schema attributes for the
-// /clusters/{id}/s3_true_ip_config/ sub-endpoint.
+// clusterS3TrueIPSubResource declares the read-only sub-resource for the
+// /clusters/{id}/s3_true_ip_config/ endpoint (VAST >= 5.5.0, GET only).
+// Set get_s3_true_ip_config = false to explicitly opt out of fetching.
 var clusterS3TrueIPSubResource = is.SubResourceHint{
-	FieldTrigger: "get_s3_true_ip_config",
-	SchemaKey:    "s3_true_ip_config",
+	MinVastVersion: VastVersion550,
+	FieldTrigger:   "get_s3_true_ip_config",
+	SchemaKey:      "s3_true_ip_config",
 	SchemaAttributes: map[string]any{
 		"s3_true_client_ip_header": rschema.StringAttribute{
 			Computed:    true,
-			Description: "True client IP header value from the S3 True IP configuration.",
+			Description: "True-client-IP header name for S3 requests.",
 		},
 		"s3_included_addresses": rschema.ListNestedAttribute{
 			Computed:    true,
-			Description: "IP address ranges included in the S3 True IP configuration.",
+			Description: "IP address ranges included in the S3 True-IP configuration.",
 			NestedObject: rschema.NestedAttributeObject{
 				Attributes: map[string]rschema.Attribute{
 					"start_ip": rschema.StringAttribute{
@@ -80,17 +83,18 @@ func (m *Cluster) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Clusters
 }
 
-// GetSubResources fetches /clusters/{id}/s3_true_ip_config/ when
-// get_s3_true_ip_config is true and returns its fields as a flat Record.
-func (m *Cluster) GetSubResources(ctx context.Context, rest *VMSRest, record Record) (Record, error) {
-	if !m.tfstate.Bool("get_s3_true_ip_config") {
+// GetSubResources fetches /clusters/{id}/s3_true_ip_config/ on VAST clusters
+// running version >= 5.5.0. Set get_s3_true_ip_config = false to opt out.
+func (m *Cluster) GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error) {
+	if clusterVersion == nil || clusterVersion.LessThan(VastVersion550) {
+		return nil, nil
+	}
+	// User explicitly opted out.
+	if m.tfstate.IsKnownAndNotNull("get_s3_true_ip_config") && !m.tfstate.Bool("get_s3_true_ip_config") {
 		return nil, nil
 	}
 
-	id, _ := record["id"]
-	if id == nil || id == "" {
-		return nil, nil
-	}
+	id := record.RecordID()
 
 	rec, err := rest.Clusters.ClusterS3TrueIpConfigWithContext_GET(ctx, id)
 	if err != nil {

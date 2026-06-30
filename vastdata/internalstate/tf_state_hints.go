@@ -2,6 +2,8 @@
 
 package internalstate
 
+import version "github.com/hashicorp/go-version"
+
 // TFStateHints defines metadata and overrides used during schema generation for
 // Terraform resources and data sources. These hints allow customizing required,
 // optional, excluded, and searchable fields beyond what is defined in the OpenAPI schema.
@@ -172,8 +174,16 @@ type TFStateHints struct {
 type SubResourceHint struct {
 	// FieldTrigger is the name of a bool attribute on the parent resource.
 	// The sub-resource is fetched only when this field evaluates to true.
-	// When empty the sub-resource is always fetched.
+	// When empty (and MinVastVersion is also unset) the sub-resource is always fetched.
 	FieldTrigger string
+
+	// MinVastVersion is the minimum VAST cluster version from which this sub-resource
+	// was introduced. When set, the sub-resource is fetched only if the connected
+	// cluster's version is greater than or equal to MinVastVersion. This check is
+	// evaluated in addition to FieldTrigger (if both are set, both must pass).
+	// When MinVastVersion alone is set (FieldTrigger is empty), the sub-resource is
+	// fetched automatically whenever the cluster version meets the minimum.
+	MinVastVersion *version.Version
 
 	// SchemaKey is both the URL segment appended after the parent resource's
 	// base path and ID (e.g. "s3_true_ip_config" → GET /clusters/{id}/s3_true_ip_config/)
