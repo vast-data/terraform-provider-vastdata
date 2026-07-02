@@ -2,9 +2,11 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -16,6 +18,26 @@ var TenantSchemaRef = is.NewSchemaReference(
 	http.MethodGet,
 	"tenants",
 )
+
+// tenantViewsCountSubResource adds views_count as a flattened, trigger-gated sub-resource
+// on the tenant (VAST >= 5.5.0). Set get_views_count = false to opt out of fetching
+// GET /tenants/{id}/views_count/.
+var tenantViewsCountSubResource = is.SubResourceHint{
+	MinVastVersion: VastVersion550,
+	FieldTrigger:   "get_views_count",
+	SchemaAttributes: map[string]any{
+		"get_views_count": rschema.BoolAttribute{
+			Optional: true,
+			Description: "Controls fetching of tenant views count (requires VAST >= 5.5.0). " +
+				"When unset or true the count is fetched automatically on supported clusters. " +
+				"Set to false to explicitly opt out.",
+		},
+		"views_count": rschema.Int64Attribute{
+			Computed:    true,
+			Description: "The number of views currently present in this tenant. Populated automatically on VAST >= 5.5.0 unless get_views_count is false.",
+		},
+	},
+}
 
 type Tenant struct {
 	tfstate *is.TFState
@@ -29,6 +51,7 @@ func (m *Tenant) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 			SchemaRef:             TenantSchemaRef,
 			DeleteOnlyParamFields: map[string]string{"force_delete": "force"},
 			PreserveOrderFields:   []string{"client_ip_ranges"},
+			SubResources:          []is.SubResourceHint{tenantViewsCountSubResource},
 			AdditionalSchemaAttributes: map[string]any{
 				"force_delete": rschema.BoolAttribute{
 					Optional: true,
@@ -47,6 +70,7 @@ func (m *Tenant) NewDatasourceManager(raw map[string]attr.Value, schema any) Dat
 		&is.TFStateHints{
 			SchemaRef:           TenantSchemaRef,
 			PreserveOrderFields: []string{"client_ip_ranges"},
+			SubResources:        []is.SubResourceHint{tenantViewsCountSubResource},
 		}),
 	}
 }
@@ -57,6 +81,25 @@ func (m *Tenant) TfState() *is.TFState {
 
 func (m *Tenant) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Tenants
+}
+
+// GetSubResources fetches /tenants/{id}/views_count/ on VAST clusters running
+// version >= 5.5.0. Set get_views_count = false to opt out.
+func (m *Tenant) GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error) {
+	if clusterVersion == nil || clusterVersion.LessThan(VastVersion550) {
+		return nil, nil
+	}
+	if m.tfstate.IsKnownAndNotNull("get_views_count") && !m.tfstate.Bool("get_views_count") {
+		return nil, nil
+	}
+
+	id := record.RecordID()
+	rec, err := rest.Tenants.TenantViewsCountWithContext_GET(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch views_count for tenant %v: %w", id, err)
+	}
+
+	return Record{"views_count": rec["current_views_count"]}, nil
 }
 
 // TransformResponseRecord normalizes the "vippools" field in the tenant API response.

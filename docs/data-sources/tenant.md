@@ -42,6 +42,7 @@ data "vastdata_tenant" "vastdb_tenant_by_guid" {
 - `encryption_group` (String) Tenant's encryption group unique identifier
 - `encryption_group_id` (Number) Encryption Group ID
 - `encryption_group_state` (String) Tenant's encryption group state
+- `get_views_count` (Boolean) Controls fetching of tenant views count (requires VAST >= 5.5.0). When unset or true the count is fetched automatically on supported clusters. Set to false to explicitly opt out.
 - `grant_unrequested_delegations_by_default` (Boolean) When enabled, the server may grant delegations based on share access even if not explicitly requested by the client
 - `guid` (String) Tenant guid
 - `identity_provider_name` (String) Sets a configured SAML login provider to enable for the tenant.  When set, users defined on the specified SAML provider with relevant roles and user types can login to the tenant VMS.
@@ -88,6 +89,7 @@ data "vastdata_tenant" "vastdb_tenant_by_guid" {
 - `id` (Number) The ID of this resource.
 - `local_provider` (Attributes) (see [below for nested schema](#nestedatt--local_provider))
 - `qos` (Attributes) (see [below for nested schema](#nestedatt--qos))
+- `views_count` (Number) The number of views currently present in this tenant. Populated automatically on VAST >= 5.5.0 unless get_views_count is false.
 - `vippool_names` (Set of String) Array of VIP Pools that can be used with the tenant.
 - `vippools` (Attributes Set) Array of VIP Pools names and IDs that can be used with the tenant. (see [below for nested schema](#nestedatt--vippools))
 
