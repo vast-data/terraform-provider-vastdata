@@ -19,22 +19,21 @@ var TenantSchemaRef = is.NewSchemaReference(
 	"tenants",
 )
 
-// tenantViewsCountSubResource adds views_count as a flattened, trigger-gated sub-resource
-// on the tenant (VAST >= 5.5.0). Set get_views_count = false to opt out of fetching
-// GET /tenants/{id}/views_count/.
+// tenantViewsCountSubResource declares the read-only sub-resource for
+// GET /tenants/{id}/views_count/ (VAST >= 5.5.0).
+// Set get_views_count = false to explicitly opt out of fetching.
 var tenantViewsCountSubResource = is.SubResourceHint{
 	MinVastVersion: VastVersion550,
 	FieldTrigger:   "get_views_count",
+	SchemaKey:      "view_count",
 	SchemaAttributes: map[string]any{
-		"get_views_count": rschema.BoolAttribute{
-			Optional: true,
-			Description: "Controls fetching of tenant views count (requires VAST >= 5.5.0). " +
-				"When unset or true the count is fetched automatically on supported clusters. " +
-				"Set to false to explicitly opt out.",
-		},
-		"views_count": rschema.Int64Attribute{
+		"current_views_count": rschema.Int64Attribute{
 			Computed:    true,
-			Description: "The number of views currently present in this tenant. Populated automatically on VAST >= 5.5.0 unless get_views_count is false.",
+			Description: "The number of views currently present in this tenant.",
+		},
+		"max_views": rschema.Int64Attribute{
+			Computed:    true,
+			Description: "Maximum number of views allowed in this tenant.",
 		},
 	},
 }
@@ -99,7 +98,12 @@ func (m *Tenant) GetSubResources(ctx context.Context, rest *VMSRest, record Reco
 		return nil, fmt.Errorf("failed to fetch views_count for tenant %v: %w", id, err)
 	}
 
-	return Record{"views_count": rec["current_views_count"]}, nil
+	return Record{
+		"view_count": map[string]any{
+			"current_views_count": rec["current_views_count"],
+			"max_views":             rec["max_views"],
+		},
+	}, nil
 }
 
 // TransformResponseRecord normalizes the "vippools" field in the tenant API response.
