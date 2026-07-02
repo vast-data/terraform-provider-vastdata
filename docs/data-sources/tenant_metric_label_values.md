@@ -29,6 +29,7 @@ data "vastdata_tenant_metric_label_values" "env_label" {
 ### Optional
 
 - `created_at` (String) Timestamp when the metric label value was created.
+- `label_id` (Number) Filter results to the value associated with this metric label ID.
 - `value` (String) The value for this metric label for the tenant.
 
 ### Read-Only

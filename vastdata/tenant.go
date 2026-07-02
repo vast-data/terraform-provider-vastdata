@@ -101,7 +101,7 @@ func (m *Tenant) GetSubResources(ctx context.Context, rest *VMSRest, record Reco
 	return Record{
 		"view_count": map[string]any{
 			"current_views_count": rec["current_views_count"],
-			"max_views":             rec["max_views"],
+			"max_views":           rec["max_views"],
 		},
 	}, nil
 }

@@ -77,12 +77,12 @@ func (m *Dns) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRec
 		body := ts.GetCreateParams()
 		delete(body, "allocate")
 
-		asyncRecord, err := rest.Dns.DnsAllocateWithContext_POST(ctx, body)
+		asyncResult, err := rest.Dns.DnsAllocateWithContext_POST(ctx, body, 10*time.Minute)
 		if err != nil {
-			return nil, err
-		}
-		if err := handleMaybeAsyncTask(ctx, rest, asyncRecord, 10*time.Minute); err != nil {
 			return nil, fmt.Errorf("DNS allocate task failed: %w", err)
+		}
+		if asyncResult != nil && asyncResult.IsFailed() {
+			return nil, fmt.Errorf("DNS allocate task failed: %v", asyncResult.Err)
 		}
 
 		return rest.Dns.GetWithContext(ctx, ts.GetGenericSearchParams(ctx))

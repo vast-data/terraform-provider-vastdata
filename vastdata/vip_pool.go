@@ -78,7 +78,14 @@ func (m *VipPool) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 	ipsCount := createParams["ips_count"]
 	if ipsCount != nil {
 		delete(createParams, "ip_ranges")
-		return rest.VipPools.VipPoolAllocateWithContext_POST(ctx, createParams)
+		asyncResult, err := rest.VipPools.VipPoolAllocateWithContext_POST(ctx, createParams, vipPoolAllocateTimeout)
+		if err != nil {
+			return nil, err
+		}
+		if asyncResult != nil && asyncResult.IsFailed() {
+			return nil, fmt.Errorf("vippool allocate task failed: %v", asyncResult.Err)
+		}
+		return rest.VipPools.GetWithContext(ctx, ts.GetGenericSearchParams(ctx))
 	}
 
 	tflog.Debug(ctx, "VipPool.CreateResource: standard mode")

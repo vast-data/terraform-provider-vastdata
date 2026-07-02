@@ -56,6 +56,11 @@ func (m *TenantMetricLabelValues) NewDatasourceManager(raw map[string]attr.Value
 					Required:    true,
 					Description: "The ID of the tenant that owns this metric label value.",
 				},
+				"label_id": dschema.Int64Attribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "Filter results to the value associated with this metric label ID.",
+				},
 			},
 		},
 	)}
@@ -67,6 +72,20 @@ func (m *TenantMetricLabelValues) TfState() *is.TFState {
 
 func (m *TenantMetricLabelValues) API(rest *VMSRest) VastResourceAPIWithContext {
 	return nil
+}
+
+// normalizeLabelValueRecord converts the nested "label" object returned by
+// the API into a flat "label_id" integer expected by the TF schema.
+//
+// The API returns:  {"id":1, "label":{"id":5,"key":"environment"}, "value":"…"}
+// TF schema expects: {"id":1, "label_id":5, "value":"…"}
+func normalizeLabelValueRecord(r Record) Record {
+	if label, ok := r["label"].(map[string]any); ok {
+		if id, ok := labelIDAsInt64(label["id"]); ok {
+			r["label_id"] = id
+		}
+	}
+	return r
 }
 
 func tenantMetricLabelValuesCollectionPath(tenantID int64) string {
@@ -87,7 +106,11 @@ func (m *TenantMetricLabelValues) CreateResource(ctx context.Context, rest *VMSR
 	body := params{}
 	ts.SetToMapIfAvailable(body, "label_id", "value")
 	path := tenantMetricLabelValuesCollectionPath(tenantID)
-	return core.Request[Record](ctx, rest.Tenants, http.MethodPost, path, nil, body)
+	rec, err := core.Request[Record](ctx, rest.Tenants, http.MethodPost, path, nil, body)
+	if err != nil {
+		return nil, err
+	}
+	return normalizeLabelValueRecord(rec), nil
 }
 
 func (m *TenantMetricLabelValues) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -101,7 +124,11 @@ func (m *TenantMetricLabelValues) ReadResource(ctx context.Context, rest *VMSRes
 		return nil, fmt.Errorf("id is required for read")
 	}
 	path := tenantMetricLabelValueItemPath(tenantID, id)
-	return core.Request[Record](ctx, rest.Tenants, http.MethodGet, path, nil, nil)
+	rec, err := core.Request[Record](ctx, rest.Tenants, http.MethodGet, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return normalizeLabelValueRecord(rec), nil
 }
 
 func (m *TenantMetricLabelValues) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
@@ -112,7 +139,11 @@ func (m *TenantMetricLabelValues) UpdateResource(ctx context.Context, plan Updat
 	body := params{}
 	planTs.SetToMapIfAvailable(body, "value")
 	path := tenantMetricLabelValueItemPath(tenantID, id)
-	return core.Request[Record](ctx, rest.Tenants, http.MethodPatch, path, nil, body)
+	rec, err := core.Request[Record](ctx, rest.Tenants, http.MethodPatch, path, nil, body)
+	if err != nil {
+		return nil, err
+	}
+	return normalizeLabelValueRecord(rec), nil
 }
 
 func (m *TenantMetricLabelValues) DeleteResource(ctx context.Context, rest *VMSRest) error {
@@ -138,20 +169,33 @@ func (m *TenantMetricLabelValues) ReadDatasource(ctx context.Context, rest *VMSR
 	}
 
 	labelID := ts.Int64("label_id")
-	for _, record := range records {
-		if labelID != 0 {
+	if labelID != 0 {
+		// Filter to the specific label.
+		for _, record := range records {
 			label, _ := record["label"].(map[string]any)
 			if label == nil {
 				continue
 			}
 			recLabelID, ok := labelIDAsInt64(label["id"])
 			if ok && recLabelID == labelID {
-				return record, nil
+				return normalizeLabelValueRecord(record), nil
 			}
 		}
+		return nil, fmt.Errorf("no metric label value found for tenant %d with label_id %d", tenantID, labelID)
 	}
 
-	return nil, fmt.Errorf("no metric label value found for tenant %d with label_id %d", tenantID, labelID)
+	// No filter: return the single record when unambiguous.
+	switch len(records) {
+	case 0:
+		return nil, fmt.Errorf("no metric label values found for tenant %d", tenantID)
+	case 1:
+		return normalizeLabelValueRecord(records[0]), nil
+	default:
+		return nil, fmt.Errorf(
+			"tenant %d has %d metric label values; specify label_id to select one",
+			tenantID, len(records),
+		)
+	}
 }
 
 func labelIDAsInt64(v any) (int64, bool) {
