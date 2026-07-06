@@ -30,8 +30,8 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 		raw,
 		schema,
 		&is.TFStateHints{
-			Importable: &notImportable,
-			SchemaRef:  UserKeySchemaRef,
+			Importable:           &notImportable,
+			SchemaRef:            UserKeySchemaRef,
 			OptionalSchemaFields: []string{"access_key", "secret_key"},
 			AdditionalSchemaAttributes: map[string]any{
 				"user_id": rschema.Int64Attribute{
