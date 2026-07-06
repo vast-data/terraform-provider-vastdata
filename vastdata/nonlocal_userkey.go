@@ -30,14 +30,14 @@ func (m *NonlocalUserKey) NewResourceManager(raw map[string]attr.Value, schema a
 		raw,
 		schema,
 		&is.TFStateHints{
-			Importable:           &notImportable,
-			SchemaRef:            NonlocalUserKeySchemaRef,
-			OptionalSchemaFields: []string{"access_key", "secret_key"},
+			Importable:              &notImportable,
+			SchemaRef:               NonlocalUserKeySchemaRef,
+			OptionalSchemaFields:    []string{"access_key", "secret_key"},
 			PreserveUserValueFields: []string{"access_key", "secret_key"},
-			SensitiveFields:      []string{"secret_key"},
-			ExcludedSchemaFields: []string{"login_name"},
-			SearchableFields:     []string{"uid", "sid", "username"}, // User can be found by uid, sid, or username
-			ComputedSchemaFields: []string{"uid", "sid", "username"},
+			SensitiveFields:         []string{"secret_key"},
+			ExcludedSchemaFields:    []string{"login_name"},
+			SearchableFields:        []string{"uid", "sid", "username"}, // User can be found by uid, sid, or username
+			ComputedSchemaFields:    []string{"uid", "sid", "username"},
 			AdditionalSchemaAttributes: map[string]any{
 				"pgp_public_key": rschema.StringAttribute{
 					Optional:    true,
