@@ -32,6 +32,7 @@ func (m *NonlocalUserKey) NewResourceManager(raw map[string]attr.Value, schema a
 		&is.TFStateHints{
 			Importable:           &notImportable,
 			SchemaRef:            NonlocalUserKeySchemaRef,
+			OptionalSchemaFields: []string{"access_key", "secret_key"},
 			SensitiveFields:      []string{"secret_key"},
 			ExcludedSchemaFields: []string{"login_name"},
 			SearchableFields:     []string{"uid", "sid", "username"}, // User can be found by uid, sid, or username
@@ -86,15 +87,7 @@ func (m *NonlocalUserKey) ReadResource(ctx context.Context, rest *VMSRest) (Disp
 }
 
 func (m *NonlocalUserKey) PrepareCreateResource(_ context.Context, _ *VMSRest) error {
-	ts := m.tfstate
-	if ts.IsKnownAndNotNull("pgp_public_key") {
-		if _, err := helper.EncryptMessageArmored(
-			ts.String("pgp_public_key"), "######",
-		); err != nil {
-			return err
-		}
-	}
-	return nil
+	return validateCustomUserKeyPair(m.tfstate)
 }
 
 func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -113,22 +106,14 @@ func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (Di
 		return nil, errors.New("either uid or sid must be set")
 	}
 
-	ts.SetToMapIfAvailable(createParams, "tenant_id", "enabled")
+	ts.SetToMapIfAvailable(createParams, "tenant_id", "enabled", "access_key", "secret_key")
 	record, err := rest.Users.UserNonLocalKeysWithContext_POST(ctx, createParams)
 	if err != nil {
 		return nil, err
 	}
-	if ts.IsKnownAndNotNull("pgp_public_key") {
-		pgp := ts.String("pgp_public_key")
-		secretKey := record["secret_key"].(string)
-		encrypted, err := helper.EncryptMessageArmored(pgp, secretKey)
-		if err != nil {
-			return nil, err
-		}
-		record["encrypted_secret_key"] = encrypted
-		record["secret_key"] = types.StringNull()
-	} else {
-		record["encrypted_secret_key"] = types.StringNull()
+	record, err = finalizeUserKeyRecord(record, ts)
+	if err != nil {
+		return nil, err
 	}
 
 	// Preserve uid or sid in the record

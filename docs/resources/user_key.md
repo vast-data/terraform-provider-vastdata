@@ -99,14 +99,14 @@ resource "vastdata_user_key" "vastdb_user_key" {
 
 ### Optional
 
+- `access_key` (String) S3 access key. If omitted, VMS generates one automatically.
 - `enabled` (Boolean) Whether the key is enabled.
 - `pgp_public_key` (String, Sensitive) Optional PGP public key to encrypt the secret key.
+- `secret_key` (String, Sensitive) S3 secret key. If omitted, VMS generates one automatically and returns it on create.
 - `tenant_id` (Number) Tenant ID
 - `user_id` (Number) The ID of the user to which this key belongs. If not provided, it will be derived from the username.
 - `username` (String) The username of the user to which this key belongs.
 
 ### Read-Only
 
-- `access_key` (String) S3 access key, needed to authenticate S3 client requests
 - `encrypted_secret_key` (String) The encrypted secret key, returned if pgp_public_key is used
-- `secret_key` (String, Sensitive) S3 secret key, needed to authenticate S3 client requests

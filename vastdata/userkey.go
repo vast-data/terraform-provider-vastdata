@@ -32,6 +32,7 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 		&is.TFStateHints{
 			Importable: &notImportable,
 			SchemaRef:  UserKeySchemaRef,
+			OptionalSchemaFields: []string{"access_key", "secret_key"},
 			AdditionalSchemaAttributes: map[string]any{
 				"user_id": rschema.Int64Attribute{
 					Optional:    true,
@@ -88,8 +89,15 @@ func (m *UserKey) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableR
 	return nil, nil
 }
 
-func (m *UserKey) PrepareCreateResource(_ context.Context, _ *VMSRest) error {
-	ts := m.tfstate
+func validateCustomUserKeyPair(ts *is.TFState) error {
+	hasAccessKey := ts.IsKnownAndNotNull("access_key")
+	hasSecretKey := ts.IsKnownAndNotNull("secret_key")
+	if hasAccessKey != hasSecretKey {
+		return fmt.Errorf("access_key and secret_key must both be specified or both omitted")
+	}
+	if hasSecretKey && ts.IsKnownAndNotNull("pgp_public_key") {
+		return fmt.Errorf("pgp_public_key cannot be used when secret_key is specified")
+	}
 	if !ts.IsNull("pgp_public_key") {
 		if _, err := helper.EncryptMessageArmored(
 			ts.String("pgp_public_key"), "######",
@@ -98,6 +106,32 @@ func (m *UserKey) PrepareCreateResource(_ context.Context, _ *VMSRest) error {
 		}
 	}
 	return nil
+}
+
+func finalizeUserKeyRecord(record DisplayableRecord, ts *is.TFState) (DisplayableRecord, error) {
+	if ts.IsKnownAndNotNull("pgp_public_key") {
+		pgp := ts.String("pgp_public_key")
+		secretKey := record["secret_key"].(string)
+		encrypted, err := helper.EncryptMessageArmored(pgp, secretKey)
+		if err != nil {
+			return nil, err
+		}
+		record["encrypted_secret_key"] = encrypted
+		record["secret_key"] = types.StringNull()
+	} else {
+		record["encrypted_secret_key"] = types.StringNull()
+	}
+	if ts.IsKnownAndNotNull("access_key") {
+		record["access_key"] = ts.String("access_key")
+	}
+	if ts.IsKnownAndNotNull("secret_key") {
+		record["secret_key"] = ts.String("secret_key")
+	}
+	return record, nil
+}
+
+func (m *UserKey) PrepareCreateResource(_ context.Context, _ *VMSRest) error {
+	return validateCustomUserKeyPair(m.tfstate)
 }
 
 func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -121,23 +155,17 @@ func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 		}
 	}
 
+	ts.SetToMapIfAvailable(createParams, "access_key", "secret_key")
+
 	record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, createParams)
 	if err != nil {
 		return nil, err
 	}
 	record["user_id"] = userId
 	record["username"] = ts.String("username")
-	if ts.IsKnownAndNotNull("pgp_public_key") {
-		pgp := ts.String("pgp_public_key")
-		secretKey := record["secret_key"].(string)
-		encrypted, err := helper.EncryptMessageArmored(pgp, secretKey)
-		if err != nil {
-			return nil, err
-		}
-		record["encrypted_secret_key"] = encrypted
-		record["secret_key"] = types.StringNull()
-	} else {
-		record["encrypted_secret_key"] = types.StringNull()
+	record, err = finalizeUserKeyRecord(record, ts)
+	if err != nil {
+		return nil, err
 	}
 	if ts.IsKnownAndNotNull("enabled") && !ts.Bool("enabled") {
 		if err = rest.Users.UserAccessKeysWithContext_PATCH(ctx, userId, params{"access_key": record["access_key"].(string), "enabled": false}); err != nil {

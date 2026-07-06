@@ -77,5 +77,13 @@ resource "vastdata_user_key" "vastdb_user_key" {
   enabled   = false
 }
 
+# Create a key pair with user-specified access_key and secret_key (matching VMS GUI behavior).
+resource "vastdata_user_key" "vastdb_user_key_custom" {
+  user_id    = vastdata_user.vastdb_user.id
+  tenant_id  = vastdata_tenant.vastdb_tenant.id
+  access_key = "W21E6X5ZQEOODYB6J0UY"
+  secret_key = "fcESVNih9Ykb/bDSmKipQdinnHObrRyv9nre+nR1"
+}
+
 # --------------------
 
