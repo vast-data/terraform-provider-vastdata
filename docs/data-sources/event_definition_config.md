@@ -48,6 +48,7 @@ data "vastdata_event_definition_config" "vastdb_event_definition_config_by_id" {
 - `syslog_ipmi_audit` (Boolean) Enable CNode and DNode IPMI commands audit
 - `syslog_port` (Number) Syslog port for events logging
 - `syslog_protocol` (String) Syslog protocol for events logging. Default is UDP
+- `syslog_secure_audit` (Boolean) Enable /var/log/secure logs audit
 - `syslog_shell_audit` (Boolean) Enable login/logout (GUI/CLI/VMS/SSH/IPMI),shell, clush, sudo and docker commands audit for CNode and DNode
 - `syslog_vms_audit` (Boolean) Enable VMS audit
 

@@ -93,6 +93,7 @@ resource "vastdata_global_local_snapshot" "vastdb_local_snapshot" {
 - `state` (String)
 - `sync_progress` (Number)
 - `target_cluster` (String) Target cluster
+- `view_replication_enabled` (Boolean) Whether view replication is enabled
 
 <a id="nestedatt--loanee_tenant"></a>
 ### Nested Schema for `loanee_tenant`

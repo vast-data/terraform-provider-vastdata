@@ -91,6 +91,7 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
 - `guid` (String)
 - `id` (Number)
+- `is_abac_provider` (Boolean) is this Ldap / Active Directory used for ABAC
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `mail_property_name` (String) The attribute to use for the user's email address.
 - `match_user` (String)

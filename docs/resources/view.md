@@ -170,6 +170,16 @@ resource "vastdata_view" "vastdb_view" {
 - `alias` (String) Relevant if NFS is included in the protocols array. An alias for the mount path of an NFSv3 export. The alias must begin with a forward slash ('/') and must consist of only ASCII characters. If specified, the alias that can be used by NFSv3 clients to mount the view.
 - `allow_anonymous_access` (Boolean) not in use
 - `allow_s3_anonymous_access` (Boolean) Allow S3 anonymous access to S3 bucket. If true, anonymous requests are granted provided that the object ACL grants access to the All Users group (in S3 Native security flavor) or the permission mode bits on the requested file and directory path grant access permission to 'others' (in NFS security flavor).
+- `allowed_delegations` (String) Defines which types of NFSv4 file delegations are enabled for this view.
+- `NONE` means NFSv4 file delegations are disabled.
+- `READ` means read type NFSv4 file delegations can be granted to a client opening a file.
+- `WRITE` means write type NFSv4 file delegations can be granted to a client opening a file.
+- `READ_WRITE` means both read and write type NFSv4 file delegations
+  can be granted to a client opening a file.
+- `USE_TENANT_ALLOWED_DELEG` (default) means the view inherits the tenant’s `allowed_delegations`.
+
+**Important:** If the tenant has `DISABLED` delegations, this overrides the view entirely.
+The effective delegations value for this view is forced to `NONE`, regardless of the view’s setting.
 - `auto_commit` (String) Applicable if locking is enabled. Sets the auto-commit time for files that are locked automatically. These files are locked automatically after the auto-commit period elapses from the time the file is saved. Files locked automatically are locked for the default-retention-period, after which they are unlocked. Specify as an integer value followed by a letter for the unit (h - hours, d - days, y - years). Example: 2h (2 hours).
 - `bucket` (String) A name for the S3 bucket name. Must be specified if S3 bucket is specified in protocols.
 - `bucket_creators` (Set of String) For S3 endpoint views, specify a list of users, by user name, whose bucket create requests use this view. Any request to create an S3 bucket that is sent by S3 API by a specified user will use this S3 Endpoint view. Users should not be specified as bucket creators in more than one S3 Endpoint view. Naming a user as a bucket creator in two S3 Endpoint views will fail the creation of the view with an error.
@@ -230,9 +240,19 @@ resource "vastdata_view" "vastdb_view" {
 - `cluster` (String) Parent Cluster
 - `created` (String)
 - `directory` (Boolean) Create the directory if it does not exist
+- `effective_allowed_delegations` (String) The resolved NFSv4 delegation type that applies to the View.
+
+Resolution rules:
+- If the tenant's allowed delegations is `DISABLED`, the effective value is forced to `NONE`.
+- Otherwise, if `allowed_delegations` is `USE_TENANT_ALLOWED_DELEG`,
+  the value is inherited from the Tenant's `allowed_delegations`.
+- In all other cases, the effective value equals this object's own `allowed_delegations`.
+
+This field shows the final delegation behavior observed by clients.
 - `guid` (String)
 - `has_bucket_logging_destination` (Boolean) Has a destination bucket configured as a destination for S3 bucket logging
 - `has_bucket_logging_sources` (Boolean) Is referenced by other S3 bucket views as the destination bucket for S3 bucket logging.
+- `has_nfs4_triggers` (Boolean) Whether NFSv4 triggers are currently enabled for this view
 - `id` (Number) The ID of this resource.
 - `ignore_oos` (Boolean)
 - `internal` (Boolean)

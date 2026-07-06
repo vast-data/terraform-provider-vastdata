@@ -47,6 +47,7 @@ data "vastdata_global_snapshot" "vastdb_global_snapshot_by_guid" {
 - `state` (String)
 - `sync_progress` (Number)
 - `target_cluster` (String) Target cluster
+- `view_replication_enabled` (Boolean) Whether view replication is enabled
 
 ### Read-Only
 

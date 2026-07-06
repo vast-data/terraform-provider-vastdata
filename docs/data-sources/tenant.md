@@ -54,6 +54,7 @@ data "vastdata_tenant" "vastdb_tenant_by_guid" {
 - `local_provider_title` (String) The local provider associated with the tenant
 - `login_name_primary_provider` (String) Primary provider for the user's login name
 - `max_views` (Number) Max views we can create on this tenant (0:unlimted as default)
+- `mtls_identifier` (String) The mTLS identifier of the tenant
 - `name` (String)
 - `name__icontains` (String) Name to filter by
 - `nis_provider_id` (Number) NIS provider ID

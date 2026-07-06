@@ -292,6 +292,7 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `capabilities` (String) Indicates if the protected path supports global access streams ("STARED_GLOBAL_NAMESPACE") or async replication streams ("ASYNC_REPLICATION") or a single stream for synchronous replication ("SYNC_REPLICATION") or both global access and async replication ("REPLICATION_AND_GN").
 - `enabled` (Boolean) Enables/pauses the protected path
 - `lease_expiry_time` (Number) The lease expiry time, in seconds, for a global access protected path. This is the duration for which data that was already requested at the destination path can be read locally from cache without the destination peer requesting it from the source peer. When the lease expires, the cache is invalidated and the next read request for the data is requested again from the source peer.
+- `policy_id` (String) Protection policy ID
 - `protection_policy_id` (String) Specifies whcih protection policy to use
 - `remote_target_id` (Number) Remote target ID for streams with global namespace or synchronous replication capability.
 - `remote_tenant_guid` (String) Tenant GUID of the remote peer tenant to which to replicate
@@ -299,6 +300,7 @@ resource "vastdata_protected_path" "protected_path_view" {
 - `source_member_capabilities` (String) Stream capabilities for the source member
 - `sync_disconnect_time` (Number) A period of time, in seconds, without communication between sync replication peers, after which the peers are disconnected.
 - `sync_interval` (Number) Replication group sync interval
+- `view_replication_enabled` (Boolean) Manages view replication
 
 ### Read-Only
 

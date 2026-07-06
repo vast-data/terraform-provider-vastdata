@@ -40,6 +40,7 @@ data "vastdata_vms" "vastdb_vms_by_name" {
 - `degraded_reason` (String) The reason for VMS degraded state
 - `disable_mgmt_ha` (Boolean) True if management HA is disabled
 - `disable_vms_metrics` (Boolean) True if VMS metrics collection is disabled
+- `enable_idle_timeout` (Boolean) Enable GUI timeout based on inactivity
 - `guid` (String)
 - `id` (Number) The ID of the VMS object.
 - `ip` (String) The bond interface IP for the cluster's internal data network, on the current management CNode, the CNode hosting VMS

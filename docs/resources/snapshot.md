@@ -69,6 +69,7 @@ resource "vastdata_snapshot" "vastdb_snapshot" {
 - `guid` (String)
 - `id` (Number) The ID of this resource.
 - `policy` (String) Associated snapshot policy
+- `policy_id` (Number) Associated snapshot policy ID
 - `protection_policy` (String) Protection Policy Name
 - `protection_policy_id` (Number)
 - `state` (String) Snapshot stats

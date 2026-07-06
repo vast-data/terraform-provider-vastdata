@@ -33,6 +33,7 @@ data "vastdata_iam_role" "role_by_name" {
 
 - `description` (String)
 - `guid` (String)
+- `max_session_duration` (Number) Maximum session duration for temporary access keys (seconds). Default - 129600 (36 hours).
 - `name` (String)
 - `qos_policies__id` (String)
 - `trust_policy` (String)

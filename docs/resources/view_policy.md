@@ -67,9 +67,11 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `flavor` (String) Specifies the security flavor, which determines how file and directory permissions are applied in multiprotocol views.
 - `gid_inheritance` (String) Specifies how files receive their owning group when they are created.
 - `inherit_parent_mode_bits` (Boolean) Enable NFS behavior of inheriting POSIX settings from the parent directory versus configured values.
+- `is_block_default_policy` (Boolean) Specifies whether to make this View Policy default for BLOCK
 - `is_s3_default_policy` (Boolean) Specifies whether to make the view policy the default policy used for S3 endpoint views.
 - `nfs_all_squash` (Set of String) Specify which NFS client hosts have all squash. With all squash, all client users are mapped to nobody for all file and folder management operations on the export. Specify array of hosts separated by commas. Each host can be specified as an IP address, a netgroup key beginning with @, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address.
 - `nfs_case_insensitive` (Boolean) Force case insensitivity for NFSv3 and NFSv4
+- `nfs_enforce_mtls` (Boolean) Specifies whether we enforce mTLS authentication over NFS.
 - `nfs_enforce_tls` (Boolean) Accept NFSv3 and NFSv4 client mounts only if they are TLS-encrypted. Use only with Minimal Protection Level set to System or None.
 - `nfs_enforce_tls_relaxed` (Boolean) Whether to relax TLS enforcement by not requiring TLS for auxiliary NFSv3 sub-protocols | (MOUNT, NLM, NSM, RQUOTA, NFSACL)
 - `nfs_minimal_protection_level` (String) For a policy intended for use with NFSv4-enabled views, sets the Minimal Protection Level for NFSv4 client mounts: 'KRB_AUTH_ONLY' allows client mounts with Kerberos authentication only (using the RPCSEC_GSS authentication service), 'SYSTEM' allows client mounts using either the AUTH_SYS RCP security flavor (the traditional default NFS authentication scheme) or with Kerberos authentication, 'NONE' (default) allows client mounts with the AUTH_NONE (anonymous access), or AUTH_SYS RCP security flavors, or with Kerberos authentication.
@@ -103,6 +105,7 @@ resource "vastdata_view_policy" "vastdb_view_policy" {
 - `trash_access` (Set of String) Specify which NFS client hosts can access the trash folder. Specify array of hosts separated by commas. Each host can be specified as an IP address, a CIDR subnet or a range of IPs indicated by an IP address with a * as a wildcard in place of any of the 8-bit fields in the IP address. Trash folder access must also be enabled for the cluster.
 - `use_32bit_fileid` (Boolean) Sets the VAST Cluster's NFS server to use 32bit file IDs. This setting supports legacy 32-bit applications running over NFS.
 - `use_auth_provider` (Boolean) Not in use
+- `vip_pools` (Set of Number) Dedicate VIP Pools to the view policy. Specify VIP Pool IDs in a comma separated list.
 
 ### Read-Only
 

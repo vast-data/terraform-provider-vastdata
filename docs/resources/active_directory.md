@@ -137,6 +137,7 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `group_login_name` (String) The attribute used to query Active Directory for the group login name in NFS ID mapping.
 Applicable only with Active Directory and NFSv4.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
+- `is_abac_provider` (Boolean) is this Active Directory used for ABAC
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `ldap_id` (String) ID of the LDAP configuration for binding to the LDAP domain of the Active Directory server. This parameter is required unless domain_name is provided.
 - `ma_pwd_change_frequency` (String) Machine Account password change frequency.
@@ -146,6 +147,7 @@ Applicable only with Active Directory and NFSv4.
 - `match_user` (String) The attribute to use when querying a provider for a user that matches a user that was already retrieved from another provider. A user entry that contains a matching value in this attribute will be considered the same user as the user previously retrieved.
 - `method` (String) The authentication method configured on the LDAP server for authenticating clients.
 - `monitor_action` (String) The type of periodic health check that VAST Cluster performs for the Active Directory provider. PING (default, less overhead and impact on the provider) = pings the provider. BIND = binds to the provider.
+- `netgroup_searchbase` (String) Base DN for netgroup queries.
 - `ntlm_enabled` (Boolean) Manages support of NTLM authentication method for SMB protocol.
 - `organizational_unit` (String) A non default organizational unit (OU) in the Active Directory domain in which to create the machine object. If left empty, the machine object will be created in the default Computers OU.
 - `port` (Number) The port of the remote LDAP server. Typical values: 389, 636.
@@ -225,6 +227,7 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 - `group_searchbase` (String) Base DN for group queries within the joined domain only. When auto discovery is enabled, group queries outside the joined domain use auto-discovered Base DNs.
 - `guid` (String)
 - `id` (Number)
+- `is_abac_provider` (Boolean) is this Ldap / Active Directory used for ABAC
 - `is_vms_auth_provider` (Boolean) Enables use of the LDAP for VMS authentication. Two LDAP configurations per cluster can be used for VMS authentication: one with Active Directory and one without.
 - `mail_property_name` (String) The attribute to use for the user's email address.
 - `match_user` (String)

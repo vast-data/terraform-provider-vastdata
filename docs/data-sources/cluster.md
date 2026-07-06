@@ -23,10 +23,12 @@ description: |-
 - `auto_logout_timeout` (Number) Inactivity period for auto logout for VAST OS on all nodes (seconds)
 - `auxiliary_space_in_use` (Number) Physical Snapshot Space In Use
 - `auxiliary_space_in_use_tb` (Number) Physical Snapshot Space In Use (TB)
+- `block_ipmi` (Boolean) IPMI/BMC access is blocked on this system
 - `build` (String) Cluster build
 - `bw` (Number) Bandwidth
 - `bw_mb` (Number) Bandwidth
 - `cert_pass` (String) Provides the password that protects the private key of the replication certificate uploaded as cluster_private_key, if password protected. The password must be supplied when uploading cluster_private_key and must be re-entered when modifying the certificate.
+- `cloud_provider` (String) Cloud provider for VOC system, null for on-prem systems.
 - `cluster_certificate` (String) Certificate (public key) file content of a CA signed certificate for mTLS encryption of replication peer connections where secure mode is enabled in the replication peer configuration. A certificate and private key must be installed on each participating replication peer cluster, and the CA's root certificate must be installed on each peer.
 - `cluster_private_key` (String) Private Key file content of a CA signed certificate, used for mTLS encryption of replication peer connections where secure mode is enabled in the replication peer configuration.  A certificate and private key must be installed on each participating replication peer cluster, and the CA's root certificate must be installed on each peer.
 - `cnode_cores` (Number) Number of cnode cores
@@ -108,9 +110,11 @@ description: |-
 - `logical_space_tb` (Number) Total Estimated Logical Space
 - `loopback` (Boolean) Loopback (single node) installation
 - `max_audit_dir_size` (String) Maximum size of the audit directory. Specify the value with units of MB, GB, TB and so on. No default.
+- `max_cluster_read_bw_mb` (Number) Maximum cluster read bandwidth in MB/s
 - `max_cluster_write_bw_mb` (Number) Maximum cluster write bandwidth in MB/s
 - `max_file_size` (Number) Maximum audit file size for each CNode core
 - `max_handles_count` (Number) Maximum supported number of handles
+- `max_number_mtls_certs_per_ca` (Number) The maximum number of mTLS certificates per CA
 - `max_nvram_capacity_percent` (Number) Max NVRM capacity percent
 - `max_nvram_replication_factor` (Number) Max NVRAM replication factor
 - `max_retention_period` (Number) Max retention period for audit files
@@ -225,6 +229,7 @@ description: |-
 - `use_smb_privileged_group` (Boolean) If true, the privileged group is enabled. (deprecated since 4.6)
 - `use_smb_privileged_user` (Boolean) If true, the privileged user is enabled. (deprecated since 4.6)
 - `use_spdk` (Boolean) Should install spdk
+- `use_tenant_all_snapshots` (Boolean) Whether to use tenant all snapshots
 - `used_handles_count` (Number)
 - `used_handles_percent` (Number)
 - `vast_audit_log_state` (String) State of Vast Audit Log table

@@ -92,8 +92,10 @@ resource "vastdata_nonlocal_user_key" "vastdb_nonlocal_user_key" {
 
 ### Optional
 
+- `access_key` (String) S3 access key, needed to authenticate S3 client requests
 - `enabled` (Boolean) Whether the key is enabled.
 - `pgp_public_key` (String, Sensitive) Optional PGP public key to encrypt the secret key.
+- `secret_key` (String, Sensitive) S3 secret key, needed to authenticate S3 client requests
 - `sid` (String) User SID. Required if UID is not provided
 - `tenant_id` (Number) Tenant ID
 - `uid` (Number) NFS UID. Required if SID is not provided
@@ -101,6 +103,4 @@ resource "vastdata_nonlocal_user_key" "vastdb_nonlocal_user_key" {
 
 ### Read-Only
 
-- `access_key` (String) S3 access key, needed to authenticate S3 client requests
 - `encrypted_secret_key` (String) The encrypted secret key, returned if pgp_public_key is used
-- `secret_key` (String, Sensitive) S3 secret key, needed to authenticate S3 client requests

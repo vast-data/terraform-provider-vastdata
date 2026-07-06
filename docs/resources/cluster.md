@@ -30,6 +30,7 @@ description: |-
 - `cnode_cores` (Number) Number of cnode cores
 - `cnode_ips` (Set of String) The list of cnode ips, optional
 - `cnode_ipv6_pool` (Set of String) The list of cnode ipv6 addresses, optional
+- `composite_table_enable` (Boolean) Enable composite table configuration during system format
 - `dbox_ha_support` (Boolean) DBox HA support
 - `deep_stripe` (Boolean) Is deep stripe system
 - `default_others_share_level_perm` (String) Default Share level permissions for Others. (deprecated since 4.6)
@@ -43,6 +44,7 @@ description: |-
 - `disable_mgmt_ha` (Boolean) Disable management HA
 - `disable_restrict_user` (Boolean) Ignore user restriction on raider clusters
 - `dmsetup` (Boolean) Mock NVMeoF devices with dmsetup devices
+- `dnode_cores` (Number) Number of dnode cores
 - `dnode_ips` (Set of String) The list of D-Boxes
 - `dnode_ipv6_pool` (Set of String) The list of dnode ipv6 addresses, optional
 - `double_value_micro_shards` (Boolean) Set the micro shards values to double the mega shards values
@@ -66,6 +68,7 @@ description: |-
 - `enable_similarity` (Boolean) Enable similarity
 - `enable_smb` (Boolean) Enable support for SMB
 - `encryption_type` (String) Encryption type. INTERNAL = keys are managed internally. CIPHER_TRUST_KMIP=Keys are stored and managed on Thales Group CipherTrust Data Security Platform, FORTANIX_KMIP=Keys are stored and managed on Fortanix DSM, HASHICORP_KMIP=Keys are stored and managed on HashiCorp Vault Enterprise.
+- `external_managed_dpu` (Boolean) Cluster has externally managed DPUs. Default: False
 - `failing_components_cnodes_failure_to_fail_percentage` (Number) Percentage of all CNodes that are allowed to fail
 - `failing_components_enabled` (Boolean) Enable failing components feature
 - `failure_domains_support` (Boolean) Failure domains support
@@ -93,6 +96,7 @@ description: |-
 - `micro_dr_wb_shards` (Number) Number of DR write buffer shards
 - `micro_shards` (Number) Number of shards
 - `micro_stripe_groups` (Number) Number of stripe groups
+- `mixed_media` (Boolean) Flag for mixed media systems (NVRAMs and SSDs on same device), default: False
 - `mock_raider_gui_availability` (Boolean) Creates mock for HPE Raider GUI availability, default is False
 - `nb_eth_mtu` (Number) Ethernet Northbound MTU, optional
 - `nb_ib_mtu` (Number) Infiniband Northbound MTU, optional
@@ -128,9 +132,11 @@ description: |-
 - `auxiliary_space_in_use` (Number) Physical Snapshot Space In Use
 - `auxiliary_space_in_use_tb` (Number) Physical Snapshot Space In Use (TB)
 - `available_upgrade_version` (Attributes) Details of an upgrade package that has been uploaded and is available. Empty if there is no upgrade package uploaded. (see [below for nested schema](#nestedatt--available_upgrade_version))
+- `block_ipmi` (Boolean) IPMI/BMC access is blocked on this system
 - `bw` (Number) Bandwidth
 - `bw_mb` (Number) Bandwidth
 - `cert_pass` (String) Provides the password that protects the private key of the replication certificate uploaded as cluster_private_key, if password protected. The password must be supplied when uploading cluster_private_key and must be re-entered when modifying the certificate.
+- `cloud_provider` (String) Cloud provider for VOC system, null for on-prem systems.
 - `cluster_certificate` (String) Certificate (public key) file content of a CA signed certificate for mTLS encryption of replication peer connections where secure mode is enabled in the replication peer configuration. A certificate and private key must be installed on each participating replication peer cluster, and the CA's root certificate must be installed on each peer.
 - `cluster_private_key` (String) Private Key file content of a CA signed certificate, used for mTLS encryption of replication peer connections where secure mode is enabled in the replication peer configuration.  A certificate and private key must be installed on each participating replication peer cluster, and the CA's root certificate must be installed on each peer.
 - `cnode_metrics` (Boolean) Enable cnode-level metrics collection
@@ -184,8 +190,10 @@ description: |-
 - `logical_space_in_use_tb` (Number) Logical Space In Use
 - `logical_space_tb` (Number) Total Estimated Logical Space
 - `max_audit_dir_size` (String) Maximum size of the audit directory. Specify the value with units of MB, GB, TB and so on. No default.
+- `max_cluster_read_bw_mb` (Number) Maximum cluster read bandwidth in MB/s
 - `max_cluster_write_bw_mb` (Number) Maximum cluster write bandwidth in MB/s
 - `max_handles_count` (Number) Maximum supported number of handles
+- `max_number_mtls_certs_per_ca` (Number) The maximum number of mTLS certificates per CA
 - `max_performance` (Attributes) (see [below for nested schema](#nestedatt--max_performance))
 - `max_performance_metrics` (Map of Number)
 - `md_iops` (Number) Meta-data IOPS
@@ -283,6 +291,7 @@ description: |-
 - `use_flash_write_buffers` (Boolean) Whether to use Write Buffers on Flash (Spillover)
 - `use_smb_privileged_group` (Boolean) If true, the privileged group is enabled. (deprecated since 4.6)
 - `use_smb_privileged_user` (Boolean) If true, the privileged user is enabled. (deprecated since 4.6)
+- `use_tenant_all_snapshots` (Boolean) Whether to use tenant all snapshots
 - `used_handles_count` (Number)
 - `used_handles_percent` (Number)
 - `vast_audit_log_state` (String) State of Vast Audit Log table

@@ -84,6 +84,7 @@ resource "vastdata_tenant" "vastdb_tenant" {
 - `local_provider_id` (Number) The ID of a local provider configured on the cluster. Connects the specified provider to the tenant.
 - `login_name_primary_provider` (String) Login name primary provider type
 - `max_views` (Number) Max views we can create on this tenant (0:unlimted as default)
+- `mtls_identifier` (String) The mTLS identifier of the tenant
 - `nis_provider_id` (Number) The ID of a NIS provider configured on the cluster. Enables the specified provider for the tenant.
 - `oidc_provider_id` (Number) OIDC provider ID
 - `posix_primary_provider` (String) Specifies which provider takes precedence over other providers in case of any conflicts between attribute values when user information is retrieved from the providers. Relevant only if more than one provider is enabled for the tenant.
