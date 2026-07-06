@@ -19,6 +19,11 @@ VASTDATA_USERNAME = os.environ.get('VASTDATA_USERNAME', 'admin')
 VASTDATA_PASSWORD = os.environ.get('VASTDATA_PASSWORD', '123456')
 VASTDATA_PORT = os.environ.get('VASTDATA_PORT', '443')
 
+# Optional elevated credentials used for tests marked with "# requires: root".
+# Falls back to the default credentials when not set.
+VASTDATA_ROOT_USERNAME = os.environ.get('VASTDATA_ROOT_USERNAME', VASTDATA_USERNAME)
+VASTDATA_ROOT_PASSWORD = os.environ.get('VASTDATA_ROOT_PASSWORD', VASTDATA_PASSWORD)
+
 # Path to provider binary (built locally)
 PROVIDER_BINARY_PATH = Path(__file__).parent.parent / "build" / "linux_amd64" / "terraform-provider-vastdata"
 
@@ -105,8 +110,27 @@ def install_provider(install_terraform):
 
 
 @pytest.fixture
-def terraform_workdir():
-    """Create a temporary working directory for Terraform operations."""
+def terraform_workdir(request):
+    """Create a temporary working directory for Terraform operations.
+
+    If the parametrized tf_file contains ``# requires: root`` in its first
+    10 lines the fixture uses VASTDATA_ROOT_USERNAME / VASTDATA_ROOT_PASSWORD
+    instead of the default credentials.
+    """
+    username = VASTDATA_USERNAME
+    password = VASTDATA_PASSWORD
+
+    try:
+        tf_file = request.node.callspec.params.get('tf_file')
+        if tf_file:
+            first_lines = '\n'.join(Path(tf_file).read_text().split('\n')[:10])
+            if '# requires: root' in first_lines:
+                username = VASTDATA_ROOT_USERNAME
+                password = VASTDATA_ROOT_PASSWORD
+                print(f"\n  [credentials] Using root credentials for {Path(tf_file).name}")
+    except (AttributeError, KeyError):
+        pass
+
     with tempfile.TemporaryDirectory() as tmpdir:
         workdir = local.path(tmpdir)
         
@@ -121,9 +145,9 @@ terraform {{
 }}
 
 provider vastdata {{
-  username = "{VASTDATA_USERNAME}"
+  username = "{username}"
   port = "{VASTDATA_PORT}"
-  password = "{VASTDATA_PASSWORD}"
+  password = "{password}"
   host = "{VASTDATA_HOST}"
   skip_ssl_verify = true
   version_validation_mode = "warn"

@@ -65,6 +65,7 @@ Resolution rules:
 
 This field shows the final delegation behavior observed by clients.
 - `files_retention_mode` (String) Applicable if locking is enabled. The retention mode for new files. For views enabled for NFSv3 or SMB, if locking is enabled, files_retention_mode must be set to GOVERNANCE or COMPLIANCE. If the view is enabled for S3 and not for NFSv3 or SMB, files_retention_mode can be set to NONE. If GOVERNANCE, locked files cannot be deleted or changed. The Retention settings can be shortened or extended by users with sufficient permissions. If COMPLIANCE, locked files cannot be deleted or changed. Retention settings can be extended, but not shortened, by users with sufficient permissions. If NONE (S3 only), the retention mode is not set for the view; it is set individually for each object.
+- `get_s3cors_configuration` (Boolean) Controls fetching of the "s3cors_configuration" sub-resource (requires VAST >= 5.5.0). When unset or true the sub-resource is fetched automatically on supported clusters. Set to false to explicitly opt out.
 - `guid` (String)
 - `has_bucket_logging_destination` (Boolean) Has a destination bucket configured as a destination for S3 bucket logging
 - `has_bucket_logging_sources` (Boolean) Is referenced by other S3 bucket views as the destination bucket for S3 bucket logging.
@@ -102,6 +103,7 @@ This field shows the final delegation behavior observed by clients.
 - `s3_object_ownership_rule` (String)
 - `s3_unverified_lookup` (Boolean) S3 Unverified Lookup
 - `s3_versioning` (Boolean) S3 Versioning enabled on S3 bucket.
+- `s3cors_configuration` (Attributes) (see [below for nested schema](#nestedatt--s3cors_configuration))
 - `select_for_live_monitoring` (Boolean) True when the view has live monitoring enabled.  Views that have live monitoring enabled are polled for metrics every ten seconds. Otherwise, views are polled every five minutes.
 - `share` (String) Name of the SMB share. Must not include certain special characters.
 - `smb_encryption_state` (String) Defines the encryption level for SMB
@@ -126,6 +128,29 @@ This field shows the final delegation behavior observed by clients.
 - `protocols` (Set of String) Protocols enabled for access to the view. 'NFS' enables access from NFS version 3, 'NFS4' enables access from NFS version 4.1 and 4.2, S3' creates an S3 bucket on the view, 'ENDPOINT' creates an S3 endpoint, used as template for views created via S3 RPCs, DATABASE exposes the view as a VAST database. KAFKA enables events related to elements on the view path to be published to the VAST Event Broker. BLOCK exposes the view as a block storage subsystem."
 - `share_acl` (Attributes) Share-level ACL details (see [below for nested schema](#nestedatt--share_acl))
 - `user_impersonation` (Attributes) (see [below for nested schema](#nestedatt--user_impersonation))
+
+<a id="nestedatt--s3cors_configuration"></a>
+### Nested Schema for `s3cors_configuration`
+
+Optional:
+
+- `cors_rules` (Attributes List) S3 CORS rules for this view. (see [below for nested schema](#nestedatt--s3cors_configuration--cors_rules))
+
+<a id="nestedatt--s3cors_configuration--cors_rules"></a>
+### Nested Schema for `s3cors_configuration.cors_rules`
+
+Required:
+
+- `allowed_methods` (List of String) CORS allowed HTTP methods (e.g. GET, POST).
+- `allowed_origins` (List of String) CORS allowed origins.
+
+Optional:
+
+- `allowed_headers` (List of String) CORS allowed request headers.
+- `expose_headers` (List of String) Headers the browser may expose to the client-side script.
+- `max_age_seconds` (Number) Time in seconds to cache the CORS preflight response.
+
+
 
 <a id="nestedatt--bucket_logging"></a>
 ### Nested Schema for `bucket_logging`

@@ -1048,6 +1048,7 @@ func (s *TFState) GetUpdateParams(otherState *TFState) vast_client.Params {
 		exclude = append(exclude, s.Hints.EditOnlyFields...)                                   // Edit only fields should be updated separately
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyBodyFields))...)  // Delete only fields should not be in update
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyParamFields))...) // Delete only fields should not be in update
+		exclude = append(exclude, s.subResourceKeys()...)                                      // Sub-resource fields are managed via hooks, not the main API.
 	}
 
 	// Get all changed params
@@ -1112,6 +1113,30 @@ func (s *TFState) GetDeleteOnlyQueryParams() vast_client.Params {
 	return searchParams
 }
 
+// subResourceKeys returns the top-level field names contributed by all declared
+// SubResources hints. These fields are managed exclusively via lifecycle hooks
+// (AfterCreateResource / AfterUpdateResource) and must never appear in the
+// main resource create or update body sent to the API.
+func (s *TFState) subResourceKeys() []string {
+	if s.Hints == nil {
+		return nil
+	}
+	var keys []string
+	for _, sr := range s.Hints.SubResources {
+		if sr.FieldTrigger != "" {
+			keys = append(keys, sr.FieldTrigger)
+		}
+		if sr.SchemaKey != "" {
+			keys = append(keys, sr.SchemaKey)
+		} else {
+			for k := range sr.SchemaAttributes {
+				keys = append(keys, k)
+			}
+		}
+	}
+	return keys
+}
+
 // GetCreateParams returns a map of parameters used for resource creation
 func (s *TFState) GetCreateParams() vast_client.Params {
 	// Get all params required + optional for creation.
@@ -1120,6 +1145,7 @@ func (s *TFState) GetCreateParams() vast_client.Params {
 		exclude = append(exclude, s.Hints.EditOnlyFields...)                                   // Edit only fields should not be set on creation.
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyBodyFields))...)  // Delete only fields should not be set on creation.
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyParamFields))...) // Delete only fields should not be set on creation.
+		exclude = append(exclude, s.subResourceKeys()...)                                      // Sub-resource fields are managed via hooks, not the main API.
 	}
 
 	createParams := s.GetFilteredValues(

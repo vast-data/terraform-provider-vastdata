@@ -2,6 +2,8 @@
 
 package internalstate
 
+import version "github.com/hashicorp/go-version"
+
 // TFStateHints defines metadata and overrides used during schema generation for
 // Terraform resources and data sources. These hints allow customizing required,
 // optional, excluded, and searchable fields beyond what is defined in the OpenAPI schema.
@@ -158,6 +160,47 @@ type TFStateHints struct {
 	// RetryOn configures retry behaviour for resource creation requests.
 	// When set, failed create calls are retried according to the expression rules.
 	RetryOn *RetryExpression
+
+	// SubResources declares nested API endpoints whose responses are fetched
+	// and merged (flattened) into the parent resource's Terraform state.
+	// Schema attributes from each SubResourceHint are automatically injected
+	// into the parent schema alongside AdditionalSchemaAttributes.
+	SubResources []SubResourceHint
+}
+
+// SubResourceHint declares a nested sub-endpoint that is fetched after the
+// parent resource is read/created/updated and whose response fields are
+// flattened into the parent resource's Terraform state.
+type SubResourceHint struct {
+	// FieldTrigger is the name of a bool attribute on the parent resource.
+	// The sub-resource is fetched only when this field evaluates to true.
+	// When empty (and MinVastVersion is also unset) the sub-resource is always fetched.
+	FieldTrigger string
+
+	// MinVastVersion is the minimum VAST cluster version from which this sub-resource
+	// was introduced. When set, the sub-resource is fetched only if the connected
+	// cluster's version is greater than or equal to MinVastVersion. This check is
+	// evaluated in addition to FieldTrigger (if both are set, both must pass).
+	// When MinVastVersion alone is set (FieldTrigger is empty), the sub-resource is
+	// fetched automatically whenever the cluster version meets the minimum.
+	MinVastVersion *version.Version
+
+	// SchemaKey is both the URL segment appended after the parent resource's
+	// base path and ID (e.g. "s3_true_ip_config" → GET /clusters/{id}/s3_true_ip_config/)
+	// and the key used when embedding the sub-record into the parent record.
+	// When empty the sub-record is flattened directly into the parent.
+	SchemaKey string
+
+	// SchemaAttributes defines the Terraform schema attributes contributed
+	// by this sub-resource (including the optional trigger field), flattened
+	// into the parent resource's schema.
+	SchemaAttributes map[string]any
+
+	// Writable indicates that the sub-resource supports write operations
+	// (e.g. POST / DELETE) managed via hooks (AfterCreateResource / AfterUpdateResource).
+	// When true and SchemaKey is non-empty, the generated nested SingleNestedAttribute
+	// is Optional+Computed instead of Computed-only, allowing users to configure it.
+	Writable bool
 }
 
 // RetryExpression defines the conditions and parameters for retrying a failed create request.

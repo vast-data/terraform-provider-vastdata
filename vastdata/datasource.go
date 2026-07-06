@@ -180,6 +180,11 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 		// e.g., extract local_provider_id from local_provider.id
 		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
 
+		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
+		}
+
 		if err = tfState.FillFromRecord(record.(Record)); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("Read[%s]: error filling datasource.", managerName),

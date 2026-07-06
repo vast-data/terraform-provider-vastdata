@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -24,6 +25,7 @@ var allTFComponents = []TFManager{
 	&Snapshot{},
 	&S3Policy{},
 	&S3LifeCycleRule{},
+	&TlsCertificate{},
 	&ReplicationPeer{},
 	&Quota{},
 	&QosPolicy{},
@@ -68,6 +70,8 @@ var allTFComponents = []TFManager{
 	&KerberosKeytab{},
 	&Cluster{},
 	&ClusterEkm{},
+	&ComputeCluster{},
+	&ComputeClusterControl{},
 	&Cnode{},
 	&CnodeBgpConfig{},
 	&Rack{},
@@ -81,8 +85,14 @@ var allTFComponents = []TFManager{
 	&Oidc{},
 	&VastDbVips{},
 	&TenantNfs4Delegation{},
+	&TenantMetricLabels{},
+	&TenantMetricLabelValues{},
 	&SupportedDrives{},
+	&SupportBundlesQueue{},
 	&Webhook{},
+	&QuotaGroup{},
+	&BlobExpansion{},
+	&Certificate{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
@@ -158,6 +168,20 @@ type PrepareImportResourceState interface {
 
 type PrepareCreateResource interface {
 	PrepareCreateResource(context.Context, *VMSRest) error
+}
+
+// GetSubResources fetches nested sub-endpoint data and returns it as a Record.
+// The framework merges the returned Record into the main resource record
+// (flat — all keys are merged directly) before FillFromRecord is called,
+// so state is populated in one pass without any manual tfstate manipulation.
+// Return nil Record (with nil error) to skip merging.
+// GetSubResources is implemented by resources that expose nested sub-endpoints.
+// clusterVersion is the connected cluster's version (from GetCachedClusterVersion),
+// or nil when no sub-resource hint declares MinVastVersion.
+// Implementations should use clusterVersion (when non-nil) to gate fetches rather
+// than calling GetCachedClusterVersion themselves.
+type GetSubResources interface {
+	GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error)
 }
 
 type PrepareReadResource interface {

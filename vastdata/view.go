@@ -3,11 +3,14 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -17,6 +20,54 @@ var ViewSchemaRef = is.NewSchemaReference(
 	http.MethodGet,
 	"views",
 )
+
+// viewS3CorsSubResource declares the nested writable sub-resource for /views/{id}/s3cors_configuration/.
+// Fetched automatically on VAST clusters running >= 5.5.0.
+// Set get_s3cors_configuration = false to explicitly opt out.
+var viewS3CorsSubResource = is.SubResourceHint{
+	MinVastVersion: VastVersion550,
+	FieldTrigger:   "get_s3cors_configuration",
+	SchemaKey:      "s3cors_configuration",
+	Writable:       true,
+	SchemaAttributes: map[string]any{
+		"cors_rules": rschema.ListNestedAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "S3 CORS rules for this view.",
+			NestedObject: rschema.NestedAttributeObject{
+				Attributes: map[string]rschema.Attribute{
+					"allowed_methods": rschema.ListAttribute{
+						Required:    true,
+						ElementType: types.StringType,
+						Description: "CORS allowed HTTP methods (e.g. GET, POST).",
+					},
+					"allowed_origins": rschema.ListAttribute{
+						Required:    true,
+						ElementType: types.StringType,
+						Description: "CORS allowed origins.",
+					},
+					"allowed_headers": rschema.ListAttribute{
+						Optional:    true,
+						Computed:    true,
+						ElementType: types.StringType,
+						Description: "CORS allowed request headers.",
+					},
+					"expose_headers": rschema.ListAttribute{
+						Optional:    true,
+						Computed:    true,
+						ElementType: types.StringType,
+						Description: "Headers the browser may expose to the client-side script.",
+					},
+					"max_age_seconds": rschema.Int64Attribute{
+						Optional:    true,
+						Computed:    true,
+						Description: "Time in seconds to cache the CORS preflight response.",
+					},
+				},
+			},
+		},
+	},
+}
 
 type View struct {
 	tfstate *is.TFState
@@ -34,6 +85,8 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 			// qos_policy: removing Computed allows Terraform
 			// to plan a change when the user sets them to null. (TERF-225)
 			NotComputedSchemaFields: []string{"qos_policy", "qos_policy_id"},
+			// s3cors_configuration is auto-excluded via SubResources hints.
+			SubResources: []is.SubResourceHint{viewS3CorsSubResource},
 			CommonValidatorsMapping: map[string]string{
 				"path":                     ValidatorPathStartsWithSlash,
 				"max_retention_period":     ValidatorRetentionFormat,
@@ -62,7 +115,8 @@ func (m *View) NewDatasourceManager(raw map[string]attr.Value, schema any) DataS
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: ViewSchemaRef,
+			SchemaRef:    ViewSchemaRef,
+			SubResources: []is.SubResourceHint{viewS3CorsSubResource},
 		}),
 	}
 }
@@ -73,6 +127,186 @@ func (m *View) TfState() *is.TFState {
 
 func (m *View) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Views
+}
+
+// GetSubResources fetches /views/{id}/s3cors_configuration/ on VAST clusters
+// running version >= 5.5.0. Set get_s3cors_configuration = false to opt out.
+func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error) {
+	if clusterVersion == nil || clusterVersion.LessThan(VastVersion550) {
+		return nil, nil
+	}
+	// User explicitly opted out.
+	if m.tfstate.IsKnownAndNotNull("get_s3cors_configuration") && !m.tfstate.Bool("get_s3cors_configuration") {
+		return nil, nil
+	}
+
+	id := record.RecordID()
+	result := Record{}
+
+	// --- s3cors_configuration ---
+	corsRec, err := rest.Views.ViewS3corsConfigurationWithContext_GET(ctx, id, nil)
+	if err != nil && !isNotFoundErr(err) {
+		return nil, err
+	}
+	if corsRec != nil {
+		if rules, ok := corsRec["cors_rules"]; ok {
+			if items, isSlice := rules.([]any); isSlice && len(items) > 0 {
+				result["s3cors_configuration"] = map[string]any{"cors_rules": rules}
+			} else {
+				result["s3cors_configuration"] = nil
+			}
+		} else {
+			result["s3cors_configuration"] = nil
+		}
+	} else {
+		result["s3cors_configuration"] = nil
+	}
+
+	return result, nil
+}
+
+// corsVersionCheck returns an error when the connected cluster does not support
+// s3cors_configuration (requires VAST >= 5.5.0).
+func corsVersionCheck(ctx context.Context, rest *VMSRest) error {
+	clusterVer, err := GetCachedClusterVersion(ctx, rest)
+	if err != nil {
+		return fmt.Errorf("s3cors_configuration: failed to retrieve cluster version: %w", err)
+	}
+	if clusterVer.LessThan(VastVersion550) {
+		return fmt.Errorf(
+			"s3cors_configuration requires VAST cluster version >= %s, but cluster is running %s",
+			VastVersion550, clusterVer,
+		)
+	}
+	return nil
+}
+
+// AfterCreateResource creates s3cors_configuration when the user specifies it.
+// Returns an error if the cluster version does not support this sub-resource.
+// Skipped entirely when get_s3cors_configuration is explicitly set to false.
+func (m *View) AfterCreateResource(ctx context.Context, rest *VMSRest, record Record) error {
+	if m.tfstate.IsKnownAndNotNull("get_s3cors_configuration") && !m.tfstate.Bool("get_s3cors_configuration") {
+		return nil
+	}
+	body, hasCors := m.corsBody()
+	if !hasCors || body == nil {
+		return nil
+	}
+	if err := corsVersionCheck(ctx, rest); err != nil {
+		return err
+	}
+	id := record.RecordID()
+	_, err := rest.Views.ViewS3corsConfigurationWithContext_POST(ctx, id, body)
+	return err
+}
+
+// AfterUpdateResource syncs s3cors_configuration with the plan state.
+// Returns an error if the user provides s3cors_configuration on an unsupported cluster.
+// If s3cors_configuration is removed from config, CORS rules are deleted (version permitting).
+// Skipped entirely when get_s3cors_configuration is explicitly set to false in the plan.
+// plan is the desired state (what the user configured); m is the prior state.
+func (m *View) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource, rest *VMSRest, record Record) error {
+	planView := plan.(*View)
+	id := record.RecordID()
+
+	// Respect explicit opt-out on the plan side.
+	if planView.tfstate.IsKnownAndNotNull("get_s3cors_configuration") && !planView.tfstate.Bool("get_s3cors_configuration") {
+		return nil
+	}
+
+	rawCors, hasCors := planView.tfstate.Raw["s3cors_configuration"]
+	if !hasCors || rawCors.IsNull() || rawCors.IsUnknown() {
+		// s3cors_configuration removed from config — delete existing rules if the endpoint exists.
+		clusterVer, err := GetCachedClusterVersion(ctx, rest)
+		if err != nil || clusterVer.LessThan(VastVersion550) {
+			return nil // endpoint not available on this cluster, nothing to delete
+		}
+		if err := rest.Views.ViewS3corsConfigurationWithContext_DELETE(ctx, id); err != nil && !isNotFoundErr(err) {
+			return err
+		}
+		return nil
+	}
+
+	// User has s3cors_configuration block — enforce version requirement.
+	if err := corsVersionCheck(ctx, rest); err != nil {
+		return err
+	}
+	if body, ok := planView.corsBody(); ok && body != nil {
+		if _, err := rest.Views.ViewS3corsConfigurationWithContext_POST(ctx, id, body); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// corsBody converts the s3cors_configuration from tfstate into a params map
+// suitable for POST /views/{id}/s3cors_configuration/.
+// Returns (nil, false) when s3cors_configuration is absent/null,
+// (nil, true) when present but has no rules, and (body, true) otherwise.
+func (m *View) corsBody() (params, bool) {
+	rawCors, hasCors := m.tfstate.Raw["s3cors_configuration"]
+	if !hasCors || rawCors.IsNull() || rawCors.IsUnknown() {
+		return nil, false
+	}
+	corsObj, ok := rawCors.(types.Object)
+	if !ok {
+		return nil, false
+	}
+	corsAttrs := corsObj.Attributes()
+	rawRules, hasRules := corsAttrs["cors_rules"]
+	if !hasRules || rawRules.IsNull() || rawRules.IsUnknown() {
+		return nil, true
+	}
+	rulesList, ok := rawRules.(types.List)
+	if !ok || len(rulesList.Elements()) == 0 {
+		return nil, true
+	}
+
+	extractStringList := func(obj types.Object, key string) []string {
+		v, ok := obj.Attributes()[key]
+		if !ok || v.IsNull() || v.IsUnknown() {
+			return nil
+		}
+		list, ok := v.(types.List)
+		if !ok {
+			return nil
+		}
+		result := make([]string, 0, len(list.Elements()))
+		for _, e := range list.Elements() {
+			if s, ok := e.(types.String); ok {
+				result = append(result, s.ValueString())
+			}
+		}
+		return result
+	}
+
+	rules := make([]any, 0, len(rulesList.Elements()))
+	for _, elem := range rulesList.Elements() {
+		obj, ok := elem.(types.Object)
+		if !ok {
+			continue
+		}
+		rule := make(map[string]any)
+		if v := extractStringList(obj, "allowed_methods"); v != nil {
+			rule["allowed_methods"] = v
+		}
+		if v := extractStringList(obj, "allowed_origins"); v != nil {
+			rule["allowed_origins"] = v
+		}
+		if v := extractStringList(obj, "allowed_headers"); v != nil {
+			rule["allowed_headers"] = v
+		}
+		if v := extractStringList(obj, "expose_headers"); v != nil {
+			rule["expose_headers"] = v
+		}
+		if v, ok := obj.Attributes()["max_age_seconds"]; ok && !v.IsNull() && !v.IsUnknown() {
+			if i, ok := v.(types.Int64); ok && i.ValueInt64() != 0 {
+				rule["max_age_seconds"] = i.ValueInt64()
+			}
+		}
+		rules = append(rules, rule)
+	}
+	return params{"cors_rules": rules}, true
 }
 
 func (m *View) PrepareDeleteResource(ctx context.Context, rest *VMSRest) error {

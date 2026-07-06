@@ -24,6 +24,7 @@ resource "vastdata_dns" "vastdb_dns" {
 
 ### Optional
 
+- `allocate` (Boolean) When true, use POST /dns/allocate/ to create the DNS entry with an auto-assigned VIP instead of requiring an explicit vip.
 - `bgp_config_id` (Number) The ID of the BGP configuration to use for layer 3 connectivity configuration
 - `cnode_ids` (Set of Number) To dedicate a specific group of CNodes to the DNS, list the IDs of the CNodes.
 - `domain_suffix` (String) A suffix for domain names. Requests for domain names with this suffix are resolved to the VIPs configured on the cluster.
@@ -35,7 +36,7 @@ resource "vastdata_dns" "vastdb_dns" {
 - `net_type` (String)
 - `port` (Number) Specifies a port for the DNS
 - `ttl` (Number) Specifies the TTL value for the DNS.
-- `vip` (String) A virtual IP to assign to the DNS service. DNS requests from your external DNS server must be delegated to this IP.
+- `vip` (String) The VIP assigned to the DNS server. Auto-assigned when allocate is true.
 - `vip_gateway` (String) If the external DNS server doesn't reside on the same subnet as the DNS VIP, enter the IP of a gateway through which to connect to the DNS server.
 - `vip_ipv6` (String) Assigns an IPv6 to the DNS service.
 - `vip_ipv6_gateway` (String) Specifies a gateway IPv6 to external DNS server if on different subnet.
