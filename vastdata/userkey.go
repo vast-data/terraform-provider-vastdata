@@ -108,7 +108,7 @@ func validateCustomUserKeyPair(ts *is.TFState) error {
 	return nil
 }
 
-func finalizeUserKeyRecord(record DisplayableRecord, ts *is.TFState) (DisplayableRecord, error) {
+func finalizeUserKeyRecord(record Record, ts *is.TFState) (Record, error) {
 	if ts.IsKnownAndNotNull("pgp_public_key") {
 		pgp := ts.String("pgp_public_key")
 		secretKey := record["secret_key"].(string)
