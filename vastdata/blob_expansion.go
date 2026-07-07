@@ -4,8 +4,10 @@ package provider
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
@@ -34,10 +36,10 @@ func blobExpansionHints() *is.TFStateHints {
 			"flatten_path":        schema_generation.ModifierForceNew,
 			"flatten_delimiter":   schema_generation.ModifierForceNew,
 		},
-		ExcludedSchemaFields: []string{"columns"},
-		PreserveOrderFields:  []string{"arrow_schema"},
-		PreserveUserValueFields: []string{"arrow_schema"},
-		ReadOnlyFields:       []string{"tenant_id"},
+		ExcludedSchemaFields:      []string{"columns"},
+		PreserveOrderFields:       []string{"arrow_schema"},
+		PreserveUserValueFields:   []string{"arrow_schema"},
+		ReadOnlyFields:            []string{"tenant_id"},
 	}
 }
 
@@ -62,13 +64,37 @@ func (m *BlobExpansion) blobExpansionSearchParams() params {
 	return searchParams
 }
 
+// normalizeBlobExpansionRecord converts the API's fully-qualified
+// target_table_name path (e.g. "/default/db/schema/table") to just the bare
+// table name so that the TF state stays consistent with what the user
+// configured.
+func normalizeBlobExpansionRecord(record DisplayableRecord) DisplayableRecord {
+	if record == nil {
+		return nil
+	}
+	rec, ok := record.(core.Record)
+	if !ok {
+		return record
+	}
+	if full, ok := rec["target_table_name"].(string); ok && strings.Contains(full, "/") {
+		parts := strings.Split(full, "/")
+		rec["target_table_name"] = parts[len(parts)-1]
+	}
+	return rec
+}
+
 func (m *BlobExpansion) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := m.blobExpansionSearchParams()
 	record, err := rest.BlobExpansions.BlobExpansionShowWithContext_GET(ctx, searchParams)
+	if isApiError(err) {
+		if strings.Contains(err.(*ApiError).Body, "Invalid blob expansion configuration") {
+			return nil, nil
+		}
+	}
 	if expectStatusCodes(err, http.StatusNotFound) {
 		return nil, nil
 	}
-	return record, err
+	return normalizeBlobExpansionRecord(record), err
 }
 
 func (m *BlobExpansion) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -228,11 +254,11 @@ func patchBlobExpansionFlags(ctx context.Context, rest *VMSRest, hierarchy param
 	return nil
 }
 
-func boolFromState(ts *is.TFState, field string) bool {
-	v, ok := ts.GetAllValues()[field].(bool)
+func boolFromState(ts *is.TFState, boolField string) bool {
+	v, ok := ts.GetAllValues()[boolField].(bool)
 	return ok && v
 }
 
-func boolChanged(stateTs, planTs *is.TFState, field string) bool {
-	return boolFromState(stateTs, field) != boolFromState(planTs, field)
+func boolChanged(stateTs, planTs *is.TFState, boolField string) bool {
+	return boolFromState(stateTs, boolField) != boolFromState(planTs, boolField)
 }

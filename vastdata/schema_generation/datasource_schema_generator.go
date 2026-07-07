@@ -111,6 +111,59 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 		}
 	}
 
+	// Inject schema attributes declared by SubResourceHints.
+	// FieldTrigger (when non-empty) is always injected as a top-level optional
+	// bool on the parent schema — it controls whether the sub-resource is fetched.
+	// SchemaKey == "" -> flatten sub-resource attributes directly into parent schema.
+	// SchemaKey != "" -> nest sub-resource attributes under a SingleNestedAttribute.
+	for _, sr := range hints.SubResources {
+		if sr.FieldTrigger != "" {
+			if _, exists := attrs[sr.FieldTrigger]; !exists {
+				var desc string
+				if sr.MinVastVersion != nil {
+					desc = fmt.Sprintf(
+						"Controls fetching of the %q sub-resource (requires VAST >= %s). "+
+							"When unset or true the sub-resource is fetched automatically on supported clusters. "+
+							"Set to false to explicitly opt out.",
+						sr.SchemaKey, sr.MinVastVersion,
+					)
+				} else {
+					desc = fmt.Sprintf(
+						"When true, fetches %q sub-resource data and populates its fields.",
+						sr.SchemaKey,
+					)
+				}
+				attrs[sr.FieldTrigger] = dschema.BoolAttribute{
+					Optional:    true,
+					Description: desc,
+				}
+			}
+		}
+		if sr.SchemaKey == "" {
+			for k, v := range sr.SchemaAttributes {
+				att, ok := v.(dschema.Attribute)
+				if !ok {
+					return nil, fmt.Errorf("sub-resource (flat) schema attribute %q is not a valid dschema.Attribute (got %T)", k, v)
+				}
+				attrs[k] = att
+			}
+		} else {
+			nested := make(map[string]dschema.Attribute, len(sr.SchemaAttributes))
+			for k, v := range sr.SchemaAttributes {
+				att, ok := v.(dschema.Attribute)
+				if !ok {
+					return nil, fmt.Errorf("sub-resource %q schema attribute %q is not a valid dschema.Attribute (got %T)", sr.SchemaKey, k, v)
+				}
+				nested[k] = att
+			}
+			attrs[sr.SchemaKey] = dschema.SingleNestedAttribute{
+				Optional:   sr.Writable,
+				Computed:   true,
+				Attributes: nested,
+			}
+		}
+	}
+
 	// Description fallback
 	var description, summary string
 	if readSchemaRef.Value != nil {

@@ -150,6 +150,11 @@ const (
 	ValidatorRetentionFormat         = schema_generation.ValidatorRetentionFormat
 )
 
+// Common modifiers
+const (
+	ModifierForceNew = schema_generation.ModifierForceNew
+)
+
 // ----------------------------------
 // MISC
 // ----------------------------------

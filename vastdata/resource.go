@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -362,6 +363,11 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		// e.g., extract local_provider_id from local_provider.id
 		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
 
+		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
+		}
+
 		// On import, populate computed and required fields (but NOT optional fields)
 		if err = tfState.FillFromRecordForImport(record.(Record)); err != nil {
 			resp.Diagnostics.AddError(
@@ -587,6 +593,11 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
 
+		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
+		}
+
 		// In particular scenarios we might want to populate all internalstate in custom handler.
 		// In this case we might want to return nil to avoid this population.
 		if err = tfState.FillFromRecord(record.(Record)); err != nil {
@@ -787,6 +798,11 @@ func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp 
 		// e.g., extract local_provider_id from local_provider.id
 		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
 
+		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
+		}
+
 		// In particular scenarios we might want to populate all internalstate in custom handler.
 		// In this case we might want to return nil to avoid this population.
 		if err = tfState.FillFromRecordIncludingRequired(record.(Record), true); err != nil {
@@ -921,6 +937,13 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		if transformer, ok := stateManger.(TransformResponseRecord); ok {
 			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
+		}
+
+		// Merge sub-resources using plan manager so the trigger fields reflect
+		// the desired plan state, not the (potentially stale) current state.
+		if err = mergeSubResources(ctx, planManager, rest, record, managerName); err != nil {
+			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
+			return
 		}
 
 		// In particular scenarios we might want to populate all internalstate in custom handler.
@@ -1353,4 +1376,89 @@ func shouldRetry(expr *is.RetryExpression, err error) bool {
 		}
 	}
 	return false
+}
+
+// mergeSubResources calls GetSubResources (if implemented) and merges the
+// returned Record into the main record before FillFromRecord is called.
+// This keeps sub-resource data out of tfstate manipulation: the merged record
+// is the single source used to populate state.
+// manager may be a ResourceManager or a DataSourceManager — only the
+// GetSubResources interface is required.
+//
+// If at least one sub-resource hint declares MinVastVersion, the cluster version
+// is retrieved once (using the process-level cache) and passed to GetSubResources.
+// The implementation is then responsible for using clusterVersion to gate fetches.
+// When no hint uses MinVastVersion, nil is passed — implementations must tolerate nil.
+type hasTFState interface {
+	TfState() *is.TFState
+}
+
+func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record DisplayableRecord, managerName string) error {
+	if record == nil {
+		return nil
+	}
+
+	var hints *is.TFStateHints
+	if hts, ok := manager.(hasTFState); ok {
+		hints = hts.TfState().Hints
+		if hints == nil || len(hints.SubResources) == 0 {
+			return nil
+		}
+	}
+
+	imp, ok := manager.(GetSubResources)
+	if !ok {
+		return nil
+	}
+
+	// Fetch cluster version exactly once if any hint requires it.
+	// The result is passed into GetSubResources so implementations
+	// don't need to call GetCachedClusterVersion themselves.
+	var clusterVersion *version.Version
+	if hints != nil {
+		for _, sr := range hints.SubResources {
+			if sr.MinVastVersion != nil {
+				v, err := GetCachedClusterVersion(ctx, rest)
+				if err != nil {
+					tflog.Warn(ctx, fmt.Sprintf(
+						"mergeSubResources[%s]: cannot retrieve cluster version for MinVastVersion check: %v",
+						managerName, err,
+					))
+				} else {
+					clusterVersion = v
+				}
+				break
+			}
+		}
+	}
+
+	tflog.Debug(ctx, fmt.Sprintf("GetSubResources[%s]: do.", managerName))
+	sub, err := imp.GetSubResources(ctx, rest, record.(Record), clusterVersion)
+	if err != nil {
+		return err
+	}
+	if sub != nil {
+		for k, v := range sub {
+			record.(Record)[k] = v
+		}
+		return nil
+	}
+
+	// GetSubResources returned nil — the trigger is off or fetch was skipped.
+	if rm, ok := manager.(ResourceManager); ok {
+		if h := rm.TfState().Hints; h != nil {
+			for _, sr := range h.SubResources {
+				if sr.SchemaKey != "" {
+					// Nested sub-resource: null the top-level key.
+					record.(Record)[sr.SchemaKey] = nil
+				} else {
+					// Flat sub-resource: null each declared attribute individually.
+					for k := range sr.SchemaAttributes {
+						record.(Record)[k] = nil
+					}
+				}
+			}
+		}
+	}
+	return nil
 }

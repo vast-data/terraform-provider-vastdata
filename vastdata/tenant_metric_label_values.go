@@ -1,0 +1,211 @@
+// Copyright (c) HashiCorp, Inc.
+package provider
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/vast-data/go-vast-client/core"
+	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+)
+
+// TenantMetricLabelValuesSchemaRef uses the per-tenant metric label value endpoints.
+var TenantMetricLabelValuesSchemaRef = is.NewSchemaReference(
+	http.MethodPost,
+	"tenants/{tenant_id}/metric_label_values",
+	http.MethodGet,
+	"tenants/{tenant_id}/metric_label_values",
+)
+
+type TenantMetricLabelValues struct {
+	tfstate *is.TFState
+}
+
+func (m *TenantMetricLabelValues) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
+	return &TenantMetricLabelValues{tfstate: is.NewTFStateMust(
+		raw,
+		schema,
+		&is.TFStateHints{
+			SchemaRef: TenantMetricLabelValuesSchemaRef,
+			AdditionalSchemaAttributes: map[string]any{
+				"tenant_id": rschema.Int64Attribute{
+					Required:    true,
+					Description: "The ID of the tenant that owns this metric label value.",
+				},
+			},
+			CommonModifiersMapping: map[string]string{
+				"tenant_id": ModifierForceNew,
+				"label_id":  ModifierForceNew,
+			},
+		},
+	)}
+}
+
+func (m *TenantMetricLabelValues) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
+	return &TenantMetricLabelValues{tfstate: is.NewTFStateMust(
+		raw,
+		schema,
+		&is.TFStateHints{
+			SchemaRef: TenantMetricLabelValuesSchemaRef,
+			AdditionalSchemaAttributes: map[string]any{
+				"tenant_id": dschema.Int64Attribute{
+					Required:    true,
+					Description: "The ID of the tenant that owns this metric label value.",
+				},
+				"label_id": dschema.Int64Attribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "Filter results to the value associated with this metric label ID.",
+				},
+			},
+		},
+	)}
+}
+
+func (m *TenantMetricLabelValues) TfState() *is.TFState {
+	return m.tfstate
+}
+
+func (m *TenantMetricLabelValues) API(rest *VMSRest) VastResourceAPIWithContext {
+	return nil
+}
+
+// normalizeLabelValueRecord converts the nested "label" object returned by
+// the API into a flat "label_id" integer expected by the TF schema.
+//
+// The API returns:  {"id":1, "label":{"id":5,"key":"environment"}, "value":"…"}
+// TF schema expects: {"id":1, "label_id":5, "value":"…"}
+func normalizeLabelValueRecord(r Record) Record {
+	if label, ok := r["label"].(map[string]any); ok {
+		if id, ok := labelIDAsInt64(label["id"]); ok {
+			r["label_id"] = id
+		}
+	}
+	return r
+}
+
+func tenantMetricLabelValuesCollectionPath(tenantID int64) string {
+	return core.BuildResourcePathWithID("tenants", tenantID, "metric_label_values")
+}
+
+func tenantMetricLabelValueItemPath(tenantID, valueID int64) string {
+	return core.BuildResourcePathWithID(tenantMetricLabelValuesCollectionPath(tenantID), valueID)
+}
+
+func (m *TenantMetricLabelValues) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	ts := m.tfstate
+	tenantID := ts.Int64("tenant_id")
+	if tenantID == 0 {
+		return nil, fmt.Errorf("tenant_id is required")
+	}
+
+	body := params{}
+	ts.SetToMapIfAvailable(body, "label_id", "value")
+	path := tenantMetricLabelValuesCollectionPath(tenantID)
+	rec, err := core.Request[Record](ctx, rest.Tenants, http.MethodPost, path, nil, body)
+	if err != nil {
+		return nil, err
+	}
+	return normalizeLabelValueRecord(rec), nil
+}
+
+func (m *TenantMetricLabelValues) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	ts := m.tfstate
+	tenantID := ts.Int64("tenant_id")
+	if tenantID == 0 {
+		return nil, fmt.Errorf("tenant_id is required")
+	}
+	id := ts.Int64("id")
+	if id == 0 {
+		return nil, fmt.Errorf("id is required for read")
+	}
+	path := tenantMetricLabelValueItemPath(tenantID, id)
+	rec, err := core.Request[Record](ctx, rest.Tenants, http.MethodGet, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+	return normalizeLabelValueRecord(rec), nil
+}
+
+func (m *TenantMetricLabelValues) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
+	planTs := plan.(*TenantMetricLabelValues).TfState()
+	tenantID := planTs.Int64("tenant_id")
+	id := m.tfstate.Int64("id")
+
+	body := params{}
+	planTs.SetToMapIfAvailable(body, "value")
+	path := tenantMetricLabelValueItemPath(tenantID, id)
+	rec, err := core.Request[Record](ctx, rest.Tenants, http.MethodPatch, path, nil, body)
+	if err != nil {
+		return nil, err
+	}
+	return normalizeLabelValueRecord(rec), nil
+}
+
+func (m *TenantMetricLabelValues) DeleteResource(ctx context.Context, rest *VMSRest) error {
+	ts := m.tfstate
+	tenantID := ts.Int64("tenant_id")
+	id := ts.Int64("id")
+	path := tenantMetricLabelValueItemPath(tenantID, id)
+	_, err := core.Request[Record](ctx, rest.Tenants, http.MethodDelete, path, nil, nil)
+	return err
+}
+
+func (m *TenantMetricLabelValues) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	ts := m.tfstate
+	tenantID := ts.Int64("tenant_id")
+	if tenantID == 0 {
+		return nil, fmt.Errorf("tenant_id is required")
+	}
+
+	path := tenantMetricLabelValuesCollectionPath(tenantID)
+	records, err := core.Request[RecordSet](ctx, rest.Tenants, http.MethodGet, path, nil, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list metric label values for tenant %d: %w", tenantID, err)
+	}
+
+	labelID := ts.Int64("label_id")
+	if labelID != 0 {
+		// Filter to the specific label.
+		for _, record := range records {
+			label, _ := record["label"].(map[string]any)
+			if label == nil {
+				continue
+			}
+			recLabelID, ok := labelIDAsInt64(label["id"])
+			if ok && recLabelID == labelID {
+				return normalizeLabelValueRecord(record), nil
+			}
+		}
+		return nil, fmt.Errorf("no metric label value found for tenant %d with label_id %d", tenantID, labelID)
+	}
+
+	// No filter: return the single record when unambiguous.
+	switch len(records) {
+	case 0:
+		return nil, fmt.Errorf("no metric label values found for tenant %d", tenantID)
+	case 1:
+		return normalizeLabelValueRecord(records[0]), nil
+	default:
+		return nil, fmt.Errorf(
+			"tenant %d has %d metric label values; specify label_id to select one",
+			tenantID, len(records),
+		)
+	}
+}
+
+func labelIDAsInt64(v any) (int64, bool) {
+	switch val := v.(type) {
+	case int64:
+		return val, true
+	case float64:
+		return int64(val), true
+	case int:
+		return int64(val), true
+	}
+	return 0, false
+}
