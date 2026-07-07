@@ -36,10 +36,10 @@ func blobExpansionHints() *is.TFStateHints {
 			"flatten_path":        schema_generation.ModifierForceNew,
 			"flatten_delimiter":   schema_generation.ModifierForceNew,
 		},
-		ExcludedSchemaFields:      []string{"columns"},
-		PreserveOrderFields:       []string{"arrow_schema"},
-		PreserveUserValueFields:   []string{"arrow_schema"},
-		ReadOnlyFields:            []string{"tenant_id"},
+		ExcludedSchemaFields:    []string{"columns"},
+		PreserveOrderFields:     []string{"arrow_schema"},
+		PreserveUserValueFields: []string{"arrow_schema"},
+		ReadOnlyFields:          []string{"tenant_id"},
 	}
 }
 
