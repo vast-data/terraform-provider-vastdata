@@ -76,6 +76,7 @@ var allTFComponents = []TFManager{
 	&ManagerAuthorizedStatus{},
 	&ManagerPassword{},
 	&Topic{},
+	&BlobExpansion{},
 	&IamRole{},
 	&IamRoleCredentials{},
 	&Oidc{},
