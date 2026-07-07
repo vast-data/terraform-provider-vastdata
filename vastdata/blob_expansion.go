@@ -3,6 +3,7 @@ package provider
 
 import (
 	"context"
+	"maps"
 	"net/http"
 	"strings"
 
@@ -27,14 +28,16 @@ func blobExpansionHints() *is.TFStateHints {
 	return &is.TFStateHints{
 		SchemaRef: BlobExpansionSchemaRef,
 		CommonModifiersMapping: map[string]string{
-			"database_name":       schema_generation.ModifierForceNew,
-			"table_name":          schema_generation.ModifierForceNew,
-			"source_column_name":  schema_generation.ModifierForceNew,
-			"target_table_name":   schema_generation.ModifierForceNew,
-			"expansion_format":    schema_generation.ModifierForceNew,
-			"target_table_schema": schema_generation.ModifierForceNew,
-			"flatten_path":        schema_generation.ModifierForceNew,
-			"flatten_delimiter":   schema_generation.ModifierForceNew,
+			"database_name":             schema_generation.ModifierForceNew,
+			"table_name":                schema_generation.ModifierForceNew,
+			"source_column_name":        schema_generation.ModifierForceNew,
+			"target_table_name":         schema_generation.ModifierForceNew,
+			"expansion_format":          schema_generation.ModifierForceNew,
+			"target_table_schema":       schema_generation.ModifierForceNew,
+			"flatten_path":              schema_generation.ModifierForceNew,
+			"flatten_delimiter":         schema_generation.ModifierForceNew,
+			"add_missing_values_output":   schema_generation.ModifierForceNew,
+			"add_excessive_values_output": schema_generation.ModifierForceNew,
 		},
 		ExcludedSchemaFields:    []string{"columns"},
 		PreserveOrderFields:     []string{"arrow_schema"},
@@ -43,12 +46,19 @@ func blobExpansionHints() *is.TFStateHints {
 	}
 }
 
+func blobExpansionDatasourceHints() *is.TFStateHints {
+	return &is.TFStateHints{
+		SchemaRef:            BlobExpansionSchemaRef,
+		ExcludedSchemaFields: []string{"columns"},
+	}
+}
+
 func (m *BlobExpansion) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &BlobExpansion{tfstate: is.NewTFStateMust(raw, schema, blobExpansionHints())}
 }
 
 func (m *BlobExpansion) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &BlobExpansion{tfstate: is.NewTFStateMust(raw, schema, blobExpansionHints())}
+	return &BlobExpansion{tfstate: is.NewTFStateMust(raw, schema, blobExpansionDatasourceHints())}
 }
 
 func (m *BlobExpansion) TfState() *is.TFState {
@@ -110,7 +120,7 @@ func (m *BlobExpansion) CreateResource(ctx context.Context, rest *VMSRest) (Disp
 		return record, nil
 	}
 	createParams := m.tfstate.GetCreateParams()
-	if _, err := rest.BlobExpansions.CreateWithContext(ctx, createParams); err != nil {
+	if _, err := core.Request[core.Record](ctx, rest.BlobExpansions, http.MethodPost, "/blobexpansions/", nil, createParams); err != nil {
 		return nil, err
 	}
 	return m.ReadDatasource(ctx, rest)
@@ -122,28 +132,42 @@ func (m *BlobExpansion) UpdateResource(ctx context.Context, plan UpdateResource,
 
 	hierarchy, _ := stateTs.SetIfAvailable("database_name", "table_name", "source_column_name", "tenant_id")
 
-	stateSchema := arrowSchemaFromState(stateTs)
-	planSchema := arrowSchemaFromState(planTs)
+	stateSchema := stateTs.ToSlice("arrow_schema")
+	planSchema := planTs.ToSlice("arrow_schema")
 	added, removed := diffArrowSchema(stateSchema, planSchema)
 
-	if len(added) > 0 {
-		body := copyParams(hierarchy)
-		body["arrow_schema"] = added
-		applyBlobExpansionAddFlags(body, stateTs, planTs)
-		if err := rest.BlobExpansions.BlobExpansionAddColumnsWithContext_PATCH(ctx, body); err != nil {
-			return nil, err
+	addBody := maps.Clone(hierarchy)
+	dropBody := maps.Clone(hierarchy)
+	hasAddFlags, hasDropFlags := false, false
+	for _, spec := range blobExpansionFlags {
+		if !boolChanged(stateTs, planTs, spec.field) {
+			continue
 		}
+		if boolFromState(planTs, spec.field) {
+			addBody[spec.addFlag] = true
+			hasAddFlags = true
+		} else {
+			dropBody[spec.dropFlag] = true
+			hasDropFlags = true
+		}
+	}
+	if len(added) > 0 {
+		addBody["arrow_schema"] = added
+	} else if hasAddFlags {
+		addBody["arrow_schema"] = []any{}
 	}
 	if len(removed) > 0 {
-		body := copyParams(hierarchy)
-		body["arrow_schema"] = removed
-		applyBlobExpansionDropFlags(body, stateTs, planTs)
-		if err := rest.BlobExpansions.BlobExpansionDropColumnsWithContext_PATCH(ctx, body); err != nil {
+		dropBody["arrow_schema"] = removed
+	} else if hasDropFlags {
+		dropBody["arrow_schema"] = []any{}
+	}
+	if len(added) > 0 || hasAddFlags {
+		if err := rest.BlobExpansions.BlobExpansionAddColumnsWithContext_PATCH(ctx, addBody); err != nil {
 			return nil, err
 		}
 	}
-	if len(added) == 0 && len(removed) == 0 {
-		if err := patchBlobExpansionFlags(ctx, rest, hierarchy, stateTs, planTs); err != nil {
+	if len(removed) > 0 || hasDropFlags {
+		if err := rest.BlobExpansions.BlobExpansionDropColumnsWithContext_PATCH(ctx, dropBody); err != nil {
 			return nil, err
 		}
 	}
@@ -155,14 +179,6 @@ func (m *BlobExpansion) DeleteResource(ctx context.Context, rest *VMSRest) error
 	deleteParams := m.blobExpansionSearchParams()
 	err := rest.BlobExpansions.BlobExpansionDeleteWithContext_DELETE(ctx, deleteParams)
 	return ignoreStatusCodes(err, http.StatusNotFound)
-}
-
-func arrowSchemaFromState(ts *is.TFState) []any {
-	raw, ok := ts.GetAllValues()["arrow_schema"].([]any)
-	if !ok {
-		return nil
-	}
-	return raw
 }
 
 func diffArrowSchema(state, plan []any) (added, removed []any) {
@@ -197,61 +213,8 @@ func indexArrowSchemaByName(cols []any) map[string]any {
 	return out
 }
 
-func copyParams(in params) params {
-	out := make(params, len(in))
-	for k, v := range in {
-		out[k] = v
-	}
-	return out
-}
-
-func applyBlobExpansionAddFlags(body params, stateTs, planTs *is.TFState) {
-	if boolChanged(stateTs, planTs, "copy_source_column") && boolFromState(planTs, "copy_source_column") {
-		body["add_copy_source_column"] = true
-	}
-	if boolChanged(stateTs, planTs, "add_missing_values_output") && boolFromState(planTs, "add_missing_values_output") {
-		body["add_missing_values_output"] = true
-	}
-	if boolChanged(stateTs, planTs, "add_excessive_values_output") && boolFromState(planTs, "add_excessive_values_output") {
-		body["add_excessive_values_output"] = true
-	}
-}
-
-func applyBlobExpansionDropFlags(body params, stateTs, planTs *is.TFState) {
-	if boolChanged(stateTs, planTs, "copy_source_column") && !boolFromState(planTs, "copy_source_column") {
-		body["remove_copy_source_column"] = true
-	}
-	if boolChanged(stateTs, planTs, "add_missing_values_output") && !boolFromState(planTs, "add_missing_values_output") {
-		body["remove_missing_values_output"] = true
-	}
-	if boolChanged(stateTs, planTs, "add_excessive_values_output") && !boolFromState(planTs, "add_excessive_values_output") {
-		body["remove_excessive_values_output"] = true
-	}
-}
-
-func patchBlobExpansionFlags(ctx context.Context, rest *VMSRest, hierarchy params, stateTs, planTs *is.TFState) error {
-	needsAdd := (boolChanged(stateTs, planTs, "copy_source_column") && boolFromState(planTs, "copy_source_column")) ||
-		(boolChanged(stateTs, planTs, "add_missing_values_output") && boolFromState(planTs, "add_missing_values_output")) ||
-		(boolChanged(stateTs, planTs, "add_excessive_values_output") && boolFromState(planTs, "add_excessive_values_output"))
-	needsDrop := (boolChanged(stateTs, planTs, "copy_source_column") && !boolFromState(planTs, "copy_source_column")) ||
-		(boolChanged(stateTs, planTs, "add_missing_values_output") && !boolFromState(planTs, "add_missing_values_output")) ||
-		(boolChanged(stateTs, planTs, "add_excessive_values_output") && !boolFromState(planTs, "add_excessive_values_output"))
-
-	if needsAdd {
-		body := copyParams(hierarchy)
-		applyBlobExpansionAddFlags(body, stateTs, planTs)
-		if err := rest.BlobExpansions.BlobExpansionAddColumnsWithContext_PATCH(ctx, body); err != nil {
-			return err
-		}
-	}
-	if needsDrop {
-		body := copyParams(hierarchy)
-		applyBlobExpansionDropFlags(body, stateTs, planTs)
-		if err := rest.BlobExpansions.BlobExpansionDropColumnsWithContext_PATCH(ctx, body); err != nil {
-			return err
-		}
-	}
-	return nil
+var blobExpansionFlags = []struct{ field, addFlag, dropFlag string }{
+	{"copy_source_column", "add_copy_source_column", "remove_copy_source_column"},
 }
 
 func boolFromState(ts *is.TFState, boolField string) bool {
