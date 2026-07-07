@@ -179,7 +179,7 @@ func appendCleaned(builder *strings.Builder, path string) (bool, error) {
 			continue
 		}
 
-		content.WriteString(line + "\n")
+		content.WriteString(strings.TrimRight(line, " \t") + "\n")
 		if trimmed != "" {
 			hasContent = true
 		}
