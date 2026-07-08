@@ -101,19 +101,19 @@ func (m *Cluster) GetSubResources(ctx context.Context, rest *VMSRest, record Rec
 		return nil, err
 	}
 
-	result := Record{
+	config := map[string]any{
 		"s3_true_client_ip_header": rec["true_client_ip_header"],
 	}
 
 	raw, ok := rec["included_addresses"]
 	if !ok || raw == nil {
-		result["s3_included_addresses"] = nil
-		return result, nil
+		config["s3_included_addresses"] = nil
+		return Record{"s3_true_ip_config": config}, nil
 	}
 	items, ok := raw.([]any)
 	if !ok || len(items) == 0 {
-		result["s3_included_addresses"] = nil
-		return result, nil
+		config["s3_included_addresses"] = nil
+		return Record{"s3_true_ip_config": config}, nil
 	}
 
 	addrs := make([]map[string]any, 0, len(items))
@@ -127,6 +127,6 @@ func (m *Cluster) GetSubResources(ctx context.Context, rest *VMSRest, record Rec
 			"range":    entry["range"],
 		})
 	}
-	result["s3_included_addresses"] = addrs
-	return result, nil
+	config["s3_included_addresses"] = addrs
+	return Record{"s3_true_ip_config": config}, nil
 }
