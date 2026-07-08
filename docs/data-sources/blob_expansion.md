@@ -14,7 +14,9 @@ description: |-
 
 ```terraform
 data "vastdata_blob_expansion" "example" {
-  id = 1
+  database_name      = "tfmild-bucket"
+  table_name         = "tfcautious-kowari"
+  source_column_name = "value"
 }
 ```
 
@@ -35,18 +37,3 @@ data "vastdata_blob_expansion" "example" {
 - `source_column_name` (String) Source column name
 - `target_table_name` (String) Target table name for expanded data
 - `tenant_id` (Number) Filter by tenant. Specify tenant ID.
-
-### Read-Only
-
-- `columns` (Attributes Set) List of expanded columns (see [below for nested schema](#nestedatt--columns))
-
-<a id="nestedatt--columns"></a>
-### Nested Schema for `columns`
-
-Required:
-
-- `database_name` (String) Name of the Database
-- `name` (String) Name of the object
-- `raw_field` (String) Raw description of column type
-- `schema_name` (String) Name of the Schema
-- `table_name` (String) Name of the Table

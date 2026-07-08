@@ -45,7 +45,7 @@ resource "vastdata_blob_expansion" "blob_exp" {
 
 ### Required
 
-- `arrow_schema` (Attributes Set) Schema of the columns to parse from the blob (see [below for nested schema](#nestedatt--arrow_schema))
+- `arrow_schema` (Attributes List) Schema of the columns to parse from the blob (see [below for nested schema](#nestedatt--arrow_schema))
 - `database_name` (String) Kafka bucket name containing the source topic
 - `expansion_format` (String) Expansion format
 - `table_name` (String) Source Kafka topic name
@@ -61,10 +61,6 @@ resource "vastdata_blob_expansion" "blob_exp" {
 - `source_column_name` (String) Source column name (defaults to "value" for Kafka topics)
 - `target_table_schema` (String) Target table schema (defaults to source table's schema)
 - `tenant_id` (Number) Tenant ID
-
-### Read-Only
-
-- `columns` (Attributes Set) List of expanded columns (see [below for nested schema](#nestedatt--columns))
 
 <a id="nestedatt--arrow_schema"></a>
 ### Nested Schema for `arrow_schema`
@@ -97,17 +93,3 @@ Optional:
 Optional:
 
 - `column_type` (String) The type of the value (e.g., "string", "bool")
-
-
-
-
-<a id="nestedatt--columns"></a>
-### Nested Schema for `columns`
-
-Required:
-
-- `database_name` (String) Name of the Database
-- `name` (String) Name of the object
-- `raw_field` (String) Raw description of column type
-- `schema_name` (String) Name of the Schema
-- `table_name` (String) Name of the Table

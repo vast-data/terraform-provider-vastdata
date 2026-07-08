@@ -1,3 +1,5 @@
 data "vastdata_blob_expansion" "example" {
-  id = 1
+  database_name      = "tfmild-bucket"
+  table_name         = "tfcautious-kowari"
+  source_column_name = "value"
 }

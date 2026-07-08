@@ -7,4 +7,4 @@ resource "vastdata_tenant_client_metrics" "vastdb_tenant_client_metrics" {
     bucket_owner       = "admin"
     bucket_name        = "client-metrics-bucket"
   }
-} 
+}
