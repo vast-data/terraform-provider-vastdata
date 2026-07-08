@@ -328,7 +328,7 @@ func getResourceSchemaForCustom(hints *TFStateHints) (*rschema.Schema, error) {
 	attrs := make(map[string]rschema.Attribute)
 	for k, v := range customHints.SchemaAttributes {
 		if att, ok := v.(rschema.Attribute); ok {
-			attrs[k] = att
+			attrs[k] = injectModifiers(att, k, hints)
 		} else {
 			return nil, fmt.Errorf("additional schema attribute %q is not a valid schema.Attribute (got %T)", k, v)
 		}

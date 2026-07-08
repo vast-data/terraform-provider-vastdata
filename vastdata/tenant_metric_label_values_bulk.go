@@ -9,11 +9,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
 type TenantMetricLabelValuesBulk struct {
@@ -24,9 +23,6 @@ var tenantMetricLabelValuesBulkSchemaAttributes = map[string]any{
 	"tenant_id": rschema.Int64Attribute{
 		Required:    true,
 		Description: "The ID of the tenant whose metric label values are managed.",
-		PlanModifiers: []planmodifiers.Int64{
-			int64planmodifier.RequiresReplace(),
-		},
 	},
 	"values": rschema.MapAttribute{
 		ElementType: types.StringType,
@@ -56,6 +52,9 @@ func (m *TenantMetricLabelValuesBulk) NewResourceManager(raw map[string]attr.Val
 		raw,
 		schema,
 		&is.TFStateHints{
+			CommonModifiersMapping: map[string]string{
+				"tenant_id": schema_generation.ModifierForceNew,
+			},
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
 				Description:      "Bulk management of tenant metric label values. This resource replaces all metric label values for a tenant with the provided dictionary.",
 				SchemaAttributes: tenantMetricLabelValuesBulkSchemaAttributes,
@@ -99,72 +98,89 @@ func (m *TenantMetricLabelValuesBulk) bulkPost(ctx context.Context, rest *VMSRes
 	return core.Request[Record](ctx, rest.Tenants, http.MethodPost, path, nil, body)
 }
 
-func recordToStringMap(r Record) map[string]any {
+func normalizeBulkLabelValuesRecord(r Record) (map[string]any, error) {
 	if r == nil {
-		return map[string]any{}
+		return map[string]any{}, nil
 	}
+
 	out := make(map[string]any, len(r))
-	for k, v := range r {
-		out[k] = fmt.Sprint(v)
+	for key, value := range r {
+		str, err := metricLabelScalarString(key, value)
+		if err != nil {
+			return nil, err
+		}
+		out[key] = str
 	}
-	return out
+	return out, nil
 }
 
-func (m *TenantMetricLabelValuesBulk) applyBulkResponse(tenantID int64, rec Record) {
+// metricLabelScalarString enforces the TenantMetricLabelValues contract:
+// a flat dictionary of label keys to string values (additionalProperties: string).
+func metricLabelScalarString(key string, value any) (string, error) {
+	s, ok := value.(string)
+	if !ok {
+		return "", fmt.Errorf(
+			"metric label %q: expected string value, got %T (%v)",
+			key, value, value,
+		)
+	}
+	return s, nil
+}
+
+func (m *TenantMetricLabelValuesBulk) applyBulkResponse(tenantID int64, rec Record) error {
+	values, err := normalizeBulkLabelValuesRecord(rec)
+	if err != nil {
+		return fmt.Errorf("invalid bulk metric label values response: %w", err)
+	}
 	m.tfstate.Set("id", tenantID)
-	m.tfstate.Set("values", recordToStringMap(rec))
+	m.tfstate.Set("values", values)
+	return nil
 }
 
 func (m *TenantMetricLabelValuesBulk) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	tenantID := m.tfstate.Int64("tenant_id")
-	if tenantID == 0 {
-		return nil, fmt.Errorf("tenant_id is required")
-	}
-
-	body := params(m.tfstate.ToMap("values"))
-	rec, err := m.bulkPost(ctx, rest, tenantID, body)
-	if err != nil {
-		return nil, err
-	}
-	m.applyBulkResponse(tenantID, rec)
-	return nil, nil
+	ts := m.tfstate
+	return ensureTenantMetricLabelValuesBulkUpdatedWith(ctx, m, ts, ts, rest)
 }
 
 func (m *TenantMetricLabelValuesBulk) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantID := m.tfstate.Int64("tenant_id")
-	if tenantID == 0 {
-		return nil, fmt.Errorf("tenant_id is required")
-	}
 
 	rec, err := m.bulkGet(ctx, rest, tenantID)
 	if err != nil {
 		return nil, err
 	}
-	m.applyBulkResponse(tenantID, rec)
+	if err := m.applyBulkResponse(tenantID, rec); err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 
 func (m *TenantMetricLabelValuesBulk) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
+	stateTs := m.tfstate
 	planTs := plan.(*TenantMetricLabelValuesBulk).TfState()
-	tenantID := planTs.Int64("tenant_id")
-	if tenantID == 0 {
-		return nil, fmt.Errorf("tenant_id is required")
-	}
+	return ensureTenantMetricLabelValuesBulkUpdatedWith(ctx, m, stateTs, planTs, rest)
+}
 
-	body := params(planTs.ToMap("values"))
+func ensureTenantMetricLabelValuesBulkUpdatedWith(
+	ctx context.Context,
+	m *TenantMetricLabelValuesBulk,
+	stateTs, fieldsTs *is.TFState,
+	rest *VMSRest,
+) (DisplayableRecord, error) {
+	tenantID := stateTs.Int64("tenant_id")
+	body := params(fieldsTs.ToMap("values"))
 	rec, err := m.bulkPost(ctx, rest, tenantID, body)
 	if err != nil {
 		return nil, err
 	}
-	m.applyBulkResponse(tenantID, rec)
+	if err := m.applyBulkResponse(tenantID, rec); err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 
 func (m *TenantMetricLabelValuesBulk) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	tenantID := m.tfstate.Int64("tenant_id")
-	if tenantID == 0 {
-		return fmt.Errorf("tenant_id is required")
-	}
 
 	_, err := m.bulkPost(ctx, rest, tenantID, params{})
 	return err
@@ -172,14 +188,15 @@ func (m *TenantMetricLabelValuesBulk) DeleteResource(ctx context.Context, rest *
 
 func (m *TenantMetricLabelValuesBulk) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantID := m.tfstate.Int64("tenant_id")
-	if tenantID == 0 {
-		return nil, fmt.Errorf("tenant_id is required")
-	}
 
 	rec, err := m.bulkGet(ctx, rest, tenantID)
 	if err != nil {
 		return nil, err
 	}
-	m.tfstate.Set("values", recordToStringMap(rec))
+	values, err := normalizeBulkLabelValuesRecord(rec)
+	if err != nil {
+		return nil, fmt.Errorf("invalid bulk metric label values response: %w", err)
+	}
+	m.tfstate.Set("values", values)
 	return nil, nil
 }
