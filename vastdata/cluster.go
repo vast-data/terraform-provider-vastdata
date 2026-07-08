@@ -108,12 +108,12 @@ func (m *Cluster) GetSubResources(ctx context.Context, rest *VMSRest, record Rec
 	return Record{clusterS3TrueIPSubResource.SchemaKey: config}, nil
 }
 
-func parseIncludedAddresses(raw any) []map[string]any {
+func parseIncludedAddresses(raw any) []any {
 	items, ok := raw.([]any)
 	if !ok || len(items) == 0 {
 		return nil // preserve null, not []
 	}
-	addrs := make([]map[string]any, 0, len(items))
+	addrs := make([]any, 0, len(items))
 	for _, item := range items {
 		entry, ok := item.(map[string]any)
 		if !ok {
