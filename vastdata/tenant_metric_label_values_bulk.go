@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -105,6 +106,9 @@ func normalizeBulkLabelValuesRecord(r Record) (map[string]any, error) {
 
 	out := make(map[string]any, len(r))
 	for key, value := range r {
+		if strings.HasPrefix(key, "@") {
+			continue // go-vast-client internal metadata (e.g. @resourceType)
+		}
 		str, err := metricLabelScalarString(key, value)
 		if err != nil {
 			return nil, err
