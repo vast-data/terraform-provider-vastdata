@@ -103,30 +103,23 @@ func (m *Cluster) GetSubResources(ctx context.Context, rest *VMSRest, record Rec
 
 	config := map[string]any{
 		"s3_true_client_ip_header": rec["true_client_ip_header"],
+		"s3_included_addresses":    parseIncludedAddresses(rec["included_addresses"]),
 	}
+	return Record{clusterS3TrueIPSubResource.SchemaKey: config}, nil
+}
 
-	raw, ok := rec["included_addresses"]
-	if !ok || raw == nil {
-		config["s3_included_addresses"] = nil
-		return Record{"s3_true_ip_config": config}, nil
-	}
+func parseIncludedAddresses(raw any) []map[string]any {
 	items, ok := raw.([]any)
 	if !ok || len(items) == 0 {
-		config["s3_included_addresses"] = nil
-		return Record{"s3_true_ip_config": config}, nil
+		return nil // preserve null, not []
 	}
-
 	addrs := make([]map[string]any, 0, len(items))
 	for _, item := range items {
 		entry, ok := item.(map[string]any)
 		if !ok {
 			continue
 		}
-		addrs = append(addrs, map[string]any{
-			"start_ip": entry["start_ip"],
-			"range":    entry["range"],
-		})
+		addrs = append(addrs, map[string]any{"start_ip": entry["start_ip"], "range": entry["range"]})
 	}
-	config["s3_included_addresses"] = addrs
-	return Record{"s3_true_ip_config": config}, nil
+	return addrs
 }
