@@ -65,7 +65,7 @@ func (m *SupportBundlesQueue) CreateResource(ctx context.Context, rest *VMSRest)
 	if err != nil {
 		return nil, fmt.Errorf("could not find support bundle queue entry: %w", err)
 	}
-	return record, nil
+	return m.moveToPositionIfNeeded(ctx, rest, record, m.tfstate.Int64("position"))
 }
 
 // UpdateResource calls PATCH /supportbundlesqueue/{id}/move/ when position changes.
@@ -79,7 +79,34 @@ func (m *SupportBundlesQueue) UpdateResource(ctx context.Context, plan UpdateRes
 	if position == 0 {
 		return nil, fmt.Errorf("position must be >= 1")
 	}
+	record := Record{"id": id}
+	return m.moveToPositionIfNeeded(ctx, rest, record, position)
+}
+
+func (m *SupportBundlesQueue) moveToPositionIfNeeded(ctx context.Context, rest *VMSRest, record DisplayableRecord, position int64) (DisplayableRecord, error) {
+	if position == 0 {
+		return record, nil
+	}
+	if current, ok := positionInQueueFromRecord(record); ok && current == position {
+		return record, nil
+	}
+	id := record.(Record).RecordID()
+	if id == 0 {
+		return nil, fmt.Errorf("support bundle queue entry id is not set")
+	}
 	return rest.SupportBundlesQueue.SupportBundlesQueueMoveWithContext_PATCH(ctx, id, params{"position": position})
+}
+
+func positionInQueueFromRecord(record DisplayableRecord) (int64, bool) {
+	v, ok := record.(Record)["position_in_queue"]
+	if !ok {
+		return 0, false
+	}
+	pos, err := is.ToInt(v)
+	if err != nil {
+		return 0, false
+	}
+	return pos, true
 }
 
 // DeleteResource is a no-op — queue entries are managed by the support bundle
