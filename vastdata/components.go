@@ -61,6 +61,7 @@ var allTFComponents = []TFManager{
 	&S3PolicyAttachment{},
 	&TenantEncryptionGroupControl{},
 	&TenantClientMetrics{},
+	&TenantMetricLabelValuesBulk{},
 	&TenantConfiguredIdp{},
 	&S3ReplicationPeer{},
 	&SamlConfig{},
