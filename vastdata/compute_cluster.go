@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -212,6 +213,8 @@ var allComputeClusterSubResources = []is.SubResourceHint{
 	computeClusterDashboardSubResource,
 }
 
+var computeClusterAsyncTaskTimeout = 30 * time.Minute
+
 type ComputeCluster struct {
 	tfstate *is.TFState
 }
@@ -221,8 +224,9 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:    ComputeClusterSchemaRef,
-			SubResources: allComputeClusterSubResources,
+			SchemaRef:        ComputeClusterSchemaRef,
+			SubResources:     allComputeClusterSubResources,
+			AsyncTaskTimeout: &computeClusterAsyncTaskTimeout,
 		},
 	)}
 }

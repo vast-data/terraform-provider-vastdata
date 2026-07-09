@@ -633,8 +633,12 @@ func deleteDuplicates[T comparable](s []T) []T {
 // Async tasks
 // ----------------------------------
 
-func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout time.Duration) error {
-	asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, timeout)
+func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout *time.Duration) error {
+	waitTimeout := 10 * time.Minute
+	if timeout != nil {
+		waitTimeout = *timeout
+	}
+	asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, waitTimeout)
 	if err != nil {
 		return err
 	}

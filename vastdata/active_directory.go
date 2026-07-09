@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -218,7 +217,7 @@ func (m *ActiveDirectory) processADJoinLeave(ctx context.Context, stateTs, planT
 	if err != nil {
 		return err
 	}
-	if err := handleMaybeAsyncTask(ctx, rest, record, 10*time.Minute); err != nil {
+	if err := handleMaybeAsyncTask(ctx, rest, record, nil); err != nil {
 		return err
 	}
 	return nil

@@ -2,7 +2,11 @@
 
 package internalstate
 
-import version "github.com/hashicorp/go-version"
+import (
+	"time"
+
+	version "github.com/hashicorp/go-version"
+)
 
 // TFStateHints defines metadata and overrides used during schema generation for
 // Terraform resources and data sources. These hints allow customizing required,
@@ -160,6 +164,11 @@ type TFStateHints struct {
 	// RetryOn configures retry behaviour for resource creation requests.
 	// When set, failed create calls are retried according to the expression rules.
 	RetryOn *RetryExpression
+
+	// AsyncTaskTimeout overrides the default timeout used when waiting
+	// for asynchronous task completion after create/update operations.
+	// When nil, the provider uses the default timeout (10 minutes).
+	AsyncTaskTimeout *time.Duration
 
 	// SubResources declares nested API endpoints whose responses are fetched
 	// and merged (flattened) into the parent resource's Terraform state.
