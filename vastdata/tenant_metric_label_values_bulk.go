@@ -4,14 +4,12 @@ package provider
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
@@ -85,20 +83,6 @@ func (m *TenantMetricLabelValuesBulk) API(rest *VMSRest) VastResourceAPIWithCont
 	return nil
 }
 
-func tenantMetricLabelValuesBulkPath(tenantID int64) string {
-	return core.BuildResourcePathWithID("tenants", tenantID, "metric_label_values", "bulk")
-}
-
-func (m *TenantMetricLabelValuesBulk) bulkGet(ctx context.Context, rest *VMSRest, tenantID int64) (Record, error) {
-	path := tenantMetricLabelValuesBulkPath(tenantID)
-	return core.Request[Record](ctx, rest.Tenants, http.MethodGet, path, nil, nil)
-}
-
-func (m *TenantMetricLabelValuesBulk) bulkPost(ctx context.Context, rest *VMSRest, tenantID int64, body params) (Record, error) {
-	path := tenantMetricLabelValuesBulkPath(tenantID)
-	return core.Request[Record](ctx, rest.Tenants, http.MethodPost, path, nil, body)
-}
-
 func normalizeBulkLabelValuesRecord(r Record) (map[string]any, error) {
 	if r == nil {
 		return map[string]any{}, nil
@@ -149,7 +133,7 @@ func (m *TenantMetricLabelValuesBulk) CreateResource(ctx context.Context, rest *
 func (m *TenantMetricLabelValuesBulk) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantID := m.tfstate.Int64("tenant_id")
 
-	rec, err := m.bulkGet(ctx, rest, tenantID)
+	rec, err := rest.Tenants.TenantBulkWithContext_GET(ctx, tenantID)
 	if err != nil {
 		return nil, err
 	}
@@ -172,8 +156,8 @@ func ensureTenantMetricLabelValuesBulkUpdatedWith(
 	rest *VMSRest,
 ) (DisplayableRecord, error) {
 	tenantID := stateTs.Int64("tenant_id")
-	body := params(fieldsTs.ToMap("values"))
-	rec, err := m.bulkPost(ctx, rest, tenantID, body)
+	body := fieldsTs.ToMap("values")
+	rec, err := rest.Tenants.TenantBulkWithContext_POST(ctx, tenantID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -186,14 +170,14 @@ func ensureTenantMetricLabelValuesBulkUpdatedWith(
 func (m *TenantMetricLabelValuesBulk) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	tenantID := m.tfstate.Int64("tenant_id")
 
-	_, err := m.bulkPost(ctx, rest, tenantID, params{})
+	_, err := rest.Tenants.TenantBulkWithContext_POST(ctx, tenantID, nil)
 	return err
 }
 
 func (m *TenantMetricLabelValuesBulk) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantID := m.tfstate.Int64("tenant_id")
 
-	rec, err := m.bulkGet(ctx, rest, tenantID)
+	rec, err := rest.Tenants.TenantBulkWithContext_GET(ctx, tenantID)
 	if err != nil {
 		return nil, err
 	}
