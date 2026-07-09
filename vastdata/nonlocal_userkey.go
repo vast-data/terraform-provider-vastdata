@@ -86,37 +86,12 @@ func (m *NonlocalUserKey) ReadResource(ctx context.Context, rest *VMSRest) (Disp
 	return nil, nil
 }
 
-func rejectNonlocalCustomUserKeyPair(ts *is.TFState) error {
-	if ts.IsKnownAndNotNull("access_key") || ts.IsKnownAndNotNull("secret_key") {
-		return fmt.Errorf("custom access_key and secret_key are not supported for non-local users; omit both fields to have VMS generate keys automatically")
-	}
-	if !ts.IsNull("pgp_public_key") {
-		if _, err := helper.EncryptMessageArmored(
-			ts.String("pgp_public_key"), "######",
-		); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (m *NonlocalUserKey) PrepareCreateResource(_ context.Context, _ *VMSRest) error {
-	return rejectNonlocalCustomUserKeyPair(m.tfstate)
+	return validatePgpPublicKey(m.tfstate)
 }
 
 func (m *NonlocalUserKey) PrepareUpdateResource(_ context.Context, plan PrepareUpdateResource, _ *VMSRest) error {
-	planTs := plan.(*NonlocalUserKey).tfstate
-	if userKeyCredentialsChanged(planTs, m.tfstate) {
-		return fmt.Errorf("changing access_key or secret_key is not supported for non-local users")
-	}
-	if !planTs.IsNull("pgp_public_key") {
-		if _, err := helper.EncryptMessageArmored(
-			planTs.String("pgp_public_key"), "######",
-		); err != nil {
-			return err
-		}
-	}
-	return nil
+	return validatePgpPublicKey(plan.(*NonlocalUserKey).tfstate)
 }
 
 func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -140,6 +115,7 @@ func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (Di
 	if err != nil {
 		return nil, err
 	}
+	// finalizeUserKeyRecord is shared with vastdata_user_key; here it is only needed for PGP encryption — access_key/secret_key are VMS-generated (computed).
 	record, err = finalizeUserKeyRecord(record, ts)
 	if err != nil {
 		return nil, err
