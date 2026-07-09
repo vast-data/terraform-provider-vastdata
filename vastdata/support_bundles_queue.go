@@ -65,7 +65,7 @@ func (m *SupportBundlesQueue) CreateResource(ctx context.Context, rest *VMSRest)
 	if err != nil {
 		return nil, fmt.Errorf("could not find support bundle queue entry: %w", err)
 	}
-	return record, nil
+	return m.moveToPositionIfNeeded(ctx, rest, record, m.tfstate.Int64("position"))
 }
 
 // UpdateResource calls PATCH /supportbundlesqueue/{id}/move/ when position changes.
@@ -79,6 +79,21 @@ func (m *SupportBundlesQueue) UpdateResource(ctx context.Context, plan UpdateRes
 	if position == 0 {
 		return nil, fmt.Errorf("position must be >= 1")
 	}
+	record := Record{"id": id}
+	return m.moveToPositionIfNeeded(ctx, rest, record, position)
+}
+
+func (m *SupportBundlesQueue) moveToPositionIfNeeded(ctx context.Context, rest *VMSRest, record Record, position int64) (DisplayableRecord, error) {
+	if position == 0 {
+		return record, nil
+	}
+	// Create-only skip: Update passes Record{"id": id} (no position_in_queue), so it always PATCHes — which is fine because the framework only calls Update when position changed.
+	if v, ok := record["position_in_queue"]; ok {
+		if current, err := is.ToInt(v); err == nil && current == position {
+			return record, nil
+		}
+	}
+	id := record.RecordID()
 	return rest.SupportBundlesQueue.SupportBundlesQueueMoveWithContext_PATCH(ctx, id, params{"position": position})
 }
 
