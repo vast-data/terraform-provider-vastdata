@@ -32,12 +32,11 @@ func (m *NonlocalUserKey) NewResourceManager(raw map[string]attr.Value, schema a
 		&is.TFStateHints{
 			Importable:              &notImportable,
 			SchemaRef:               NonlocalUserKeySchemaRef,
-			OptionalSchemaFields:    []string{"access_key", "secret_key"},
-			PreserveUserValueFields: []string{"access_key", "secret_key"},
+			NotOptionalSchemaFields: []string{"access_key", "secret_key"},
+			ComputedSchemaFields:    []string{"access_key", "secret_key", "uid", "sid", "username"},
 			SensitiveFields:         []string{"secret_key"},
 			ExcludedSchemaFields:    []string{"login_name"},
-			SearchableFields:        []string{"uid", "sid", "username"}, // User can be found by uid, sid, or username
-			ComputedSchemaFields:    []string{"uid", "sid", "username"},
+			SearchableFields:        []string{"uid", "sid", "username"},
 			AdditionalSchemaAttributes: map[string]any{
 				"pgp_public_key": rschema.StringAttribute{
 					Optional:    true,
@@ -87,69 +86,12 @@ func (m *NonlocalUserKey) ReadResource(ctx context.Context, rest *VMSRest) (Disp
 	return nil, nil
 }
 
-func nonlocalUserKeyIdentityParams(ts *is.TFState) (params, error) {
-	identityParams := params{}
-	if ts.IsKnownAndNotNull("uid") {
-		identityParams["uid"] = ts.Int64("uid")
-	} else if ts.IsKnownAndNotNull("sid") {
-		identityParams["sid"] = ts.String("sid")
-	} else {
-		return nil, errors.New("either uid or sid must be set")
-	}
-	return identityParams, nil
-}
-
-func replaceNonlocalUserKeyCredentials(ctx context.Context, rest *VMSRest, stateTs, planTs *is.TFState) (Record, error) {
-	oldAccessKey := stateTs.String("access_key")
-	if oldAccessKey == "" {
-		return nil, errors.New("cannot update credentials: existing access_key is unknown in state")
-	}
-
-	deleteParams, err := nonlocalUserKeyIdentityParams(stateTs)
-	if err != nil {
-		return nil, err
-	}
-	deleteParams["access_key"] = oldAccessKey
-	if stateTs.IsKnownAndNotNull("tenant_id") {
-		deleteParams["tenant_id"] = stateTs.Int64("tenant_id")
-	}
-	if err := rest.Users.UserNonLocalKeysWithContext_DELETE(ctx, deleteParams); err != nil {
-		return nil, err
-	}
-
-	createParams, err := nonlocalUserKeyIdentityParams(planTs)
-	if err != nil {
-		createParams, err = nonlocalUserKeyIdentityParams(stateTs)
-		if err != nil {
-			return nil, err
-		}
-	}
-	planTs.SetToMapIfAvailable(createParams, "tenant_id", "enabled", "access_key", "secret_key")
-
-	record, err := rest.Users.UserNonLocalKeysWithContext_POST(ctx, createParams)
-	if err != nil {
-		return nil, err
-	}
-	return finalizeUserKeyRecord(record, planTs)
-}
-
 func (m *NonlocalUserKey) PrepareCreateResource(_ context.Context, _ *VMSRest) error {
-	return validateCustomUserKeyPair(m.tfstate)
+	return validatePgpPublicKey(m.tfstate)
 }
 
 func (m *NonlocalUserKey) PrepareUpdateResource(_ context.Context, plan PrepareUpdateResource, _ *VMSRest) error {
-	planTs := plan.(*NonlocalUserKey).tfstate
-	if userKeyCredentialsChanged(planTs, m.tfstate) {
-		return validateCustomUserKeyPair(planTs)
-	}
-	if !planTs.IsNull("pgp_public_key") {
-		if _, err := helper.EncryptMessageArmored(
-			planTs.String("pgp_public_key"), "######",
-		); err != nil {
-			return err
-		}
-	}
-	return nil
+	return validatePgpPublicKey(plan.(*NonlocalUserKey).tfstate)
 }
 
 func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -168,11 +110,12 @@ func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (Di
 		return nil, errors.New("either uid or sid must be set")
 	}
 
-	ts.SetToMapIfAvailable(createParams, "tenant_id", "enabled", "access_key", "secret_key")
+	ts.SetToMapIfAvailable(createParams, "tenant_id", "enabled")
 	record, err := rest.Users.UserNonLocalKeysWithContext_POST(ctx, createParams)
 	if err != nil {
 		return nil, err
 	}
+	// finalizeUserKeyRecord is shared with vastdata_user_key; here it is only needed for PGP encryption — access_key/secret_key are VMS-generated (computed).
 	record, err = finalizeUserKeyRecord(record, ts)
 	if err != nil {
 		return nil, err
@@ -190,30 +133,12 @@ func (m *NonlocalUserKey) CreateResource(ctx context.Context, rest *VMSRest) (Di
 }
 
 func (m *NonlocalUserKey) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
-	var (
-		ts          = m.tfstate
-		planManager = plan.(*NonlocalUserKey)
-		planTs      = planManager.tfstate
-		record      Record
-	)
-
-	if userKeyCredentialsChanged(planTs, ts) {
-		var err error
-		record, err = replaceNonlocalUserKeyCredentials(ctx, rest, ts, planTs)
-		if err != nil {
-			return nil, err
-		}
-	}
+	ts := m.tfstate
+	planTs := plan.(*NonlocalUserKey).tfstate
 
 	if planTs.IsKnownAndNotNull("enabled") {
-		accessKey := ts.String("access_key")
-		if record != nil {
-			if ak, ok := record["access_key"].(string); ok && ak != "" {
-				accessKey = ak
-			}
-		}
 		updateParams := params{
-			"access_key": accessKey,
+			"access_key": ts.String("access_key"),
 			"enabled":    planTs.Bool("enabled"),
 		}
 		if ts.IsKnownAndNotNull("uid") {
@@ -239,15 +164,6 @@ func (m *NonlocalUserKey) UpdateResource(ctx context.Context, plan UpdateResourc
 		}
 		ts.Set("encrypted_secret_key", encrypted)
 		ts.Set("secret_key", types.StringNull())
-	}
-	if record != nil {
-		if ts.IsKnownAndNotNull("uid") {
-			record["uid"] = ts.Int64("uid")
-		}
-		if ts.IsKnownAndNotNull("sid") {
-			record["sid"] = ts.String("sid")
-		}
-		return record, nil
 	}
 	return nil, nil
 }

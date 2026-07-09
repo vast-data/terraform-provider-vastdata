@@ -90,6 +90,14 @@ func (m *UserKey) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableR
 	return nil, nil
 }
 
+func validatePgpPublicKey(ts *is.TFState) error {
+	if ts.IsNull("pgp_public_key") {
+		return nil
+	}
+	_, err := helper.EncryptMessageArmored(ts.String("pgp_public_key"), "######")
+	return err
+}
+
 func validateCustomUserKeyPair(ts *is.TFState) error {
 	hasAccessKey := ts.IsKnownAndNotNull("access_key")
 	hasSecretKey := ts.IsKnownAndNotNull("secret_key")
@@ -99,14 +107,7 @@ func validateCustomUserKeyPair(ts *is.TFState) error {
 	if hasSecretKey && ts.IsKnownAndNotNull("pgp_public_key") {
 		return fmt.Errorf("pgp_public_key cannot be used when secret_key is specified")
 	}
-	if !ts.IsNull("pgp_public_key") {
-		if _, err := helper.EncryptMessageArmored(
-			ts.String("pgp_public_key"), "######",
-		); err != nil {
-			return err
-		}
-	}
-	return nil
+	return validatePgpPublicKey(ts)
 }
 
 func finalizeUserKeyRecord(record Record, ts *is.TFState) (Record, error) {
@@ -171,14 +172,7 @@ func (m *UserKey) PrepareUpdateResource(_ context.Context, plan PrepareUpdateRes
 	if userKeyCredentialsChanged(planTs, m.tfstate) {
 		return validateCustomUserKeyPair(planTs)
 	}
-	if !planTs.IsNull("pgp_public_key") {
-		if _, err := helper.EncryptMessageArmored(
-			planTs.String("pgp_public_key"), "######",
-		); err != nil {
-			return err
-		}
-	}
-	return nil
+	return validatePgpPublicKey(planTs)
 }
 
 func (m *UserKey) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
