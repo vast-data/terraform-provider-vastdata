@@ -28,8 +28,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
 	"github.com/vast-data/go-vast-client/resources/untyped"
-	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
+	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
