@@ -28,8 +28,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
 	"github.com/vast-data/go-vast-client/resources/untyped"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
@@ -633,8 +633,12 @@ func deleteDuplicates[T comparable](s []T) []T {
 // Async tasks
 // ----------------------------------
 
-func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout time.Duration) error {
-	asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, timeout)
+func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout *time.Duration) error {
+	waitTimeout := 10 * time.Minute
+	if timeout != nil {
+		waitTimeout = *timeout
+	}
+	asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, waitTimeout)
 	if err != nil {
 		return err
 	}

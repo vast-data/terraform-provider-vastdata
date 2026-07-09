@@ -553,7 +553,11 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 
 	if record != nil {
 		// In case record is AsyncTask
-		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), 10*time.Minute); err != nil {
+		var asyncTimeout *time.Duration
+		if tfState.Hints != nil {
+			asyncTimeout = tfState.Hints.AsyncTaskTimeout
+		}
+		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), asyncTimeout); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("AsyncTask - create[%s].", managerName),
 				err.Error(),
@@ -926,7 +930,11 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 
 	if record != nil {
 		// In case record is AsyncTask
-		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), 10*time.Minute); err != nil {
+		var asyncTimeout *time.Duration
+		if tfState.Hints != nil {
+			asyncTimeout = tfState.Hints.AsyncTaskTimeout
+		}
+		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), asyncTimeout); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("AsyncTask - update[%s].", managerName),
 				err.Error(),
@@ -1055,7 +1063,11 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 		record, err := r.deleteRecordBySearchParams(ctx, manager, "Delete")
 		if err == nil && record != nil {
 			// In case record is AsyncTask
-			if err := handleMaybeAsyncTask(ctx, rest, record, 10*time.Minute); err != nil {
+			var asyncTimeout *time.Duration
+			if tfState.Hints != nil {
+				asyncTimeout = tfState.Hints.AsyncTaskTimeout
+			}
+			if err := handleMaybeAsyncTask(ctx, rest, record, asyncTimeout); err != nil {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("AsyncTask - delete[%s].", managerName),
 					err.Error(),
