@@ -300,7 +300,7 @@ func (m *View) corsBody() (params, bool) {
 			rule["expose_headers"] = v
 		}
 		if v, ok := obj.Attributes()["max_age_seconds"]; ok && !v.IsNull() && !v.IsUnknown() {
-			if i, ok := v.(types.Int64); ok && i.ValueInt64() != 0 {
+			if i, ok := v.(types.Int64); ok {
 				rule["max_age_seconds"] = i.ValueInt64()
 			}
 		}
