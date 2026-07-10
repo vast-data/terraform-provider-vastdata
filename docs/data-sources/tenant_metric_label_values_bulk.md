@@ -13,8 +13,12 @@ Read all tenant metric label values as a dictionary of label keys to values.
 ## Example Usage
 
 ```terraform
+data "vastdata_tenant" "example" {
+  name = "default"
+}
+
 data "vastdata_tenant_metric_label_values_bulk" "example" {
-  tenant_id = vastdata_tenant.example.id
+  tenant_id = data.vastdata_tenant.example.id
 }
 ```
 
