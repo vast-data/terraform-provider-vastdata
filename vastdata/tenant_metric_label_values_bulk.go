@@ -4,10 +4,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -26,7 +28,7 @@ var tenantMetricLabelValuesBulkSchemaAttributes = map[string]any{
 	"values": rschema.MapAttribute{
 		ElementType: types.StringType,
 		Required:    true,
-		Description: "Dictionary of metric label keys to values. Replaces all existing values for the tenant on create and update.",
+		Description: "Dictionary of metric label keys to values. Keys must already exist as vastdata_tenant_metric_labels.",
 	},
 	"id": rschema.Int64Attribute{
 		Computed:    true,
@@ -115,6 +117,40 @@ func metricLabelScalarString(key string, value any) (string, error) {
 	return s, nil
 }
 
+func validateBulkMetricLabelKeys(ctx context.Context, rest *VMSRest, values map[string]any) error {
+	if len(values) == 0 {
+		return nil
+	}
+
+	labels, err := rest.Tenants.TenantMetricLabelsListWithContext_GET(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to list tenant metric labels: %w", err)
+	}
+
+	registered := make(map[string]struct{}, len(labels))
+	for _, label := range labels {
+		key, _ := label["key"].(string)
+		if key != "" {
+			registered[key] = struct{}{}
+		}
+	}
+
+	var unknown []string
+	for key := range values {
+		if _, ok := registered[key]; !ok {
+			unknown = append(unknown, key)
+		}
+	}
+	if len(unknown) == 0 {
+		return nil
+	}
+	sort.Strings(unknown)
+	return fmt.Errorf(
+		"values contains unregistered metric label keys %v: create vastdata_tenant_metric_labels resources for these keys first",
+		unknown,
+	)
+}
+
 func (m *TenantMetricLabelValuesBulk) applyBulkResponse(tenantID int64, rec Record) error {
 	values, err := normalizeBulkLabelValuesRecord(rec)
 	if err != nil {
@@ -132,6 +168,12 @@ func (m *TenantMetricLabelValuesBulk) CreateResource(ctx context.Context, rest *
 
 func (m *TenantMetricLabelValuesBulk) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	tenantID := m.tfstate.Int64("tenant_id")
+	if tenantID == 0 {
+		tenantID = m.tfstate.Int64("id")
+	}
+	if tenantID == 0 {
+		return nil, fmt.Errorf("tenant_id is required")
+	}
 
 	rec, err := rest.Tenants.TenantBulkWithContext_GET(ctx, tenantID)
 	if err != nil {
@@ -157,6 +199,9 @@ func ensureTenantMetricLabelValuesBulkUpdatedWith(
 ) (DisplayableRecord, error) {
 	tenantID := stateTs.Int64("tenant_id")
 	body := fieldsTs.ToMap("values")
+	if err := validateBulkMetricLabelKeys(ctx, rest, body); err != nil {
+		return nil, err
+	}
 	rec, err := rest.Tenants.TenantBulkWithContext_POST(ctx, tenantID, body)
 	if err != nil {
 		return nil, err
@@ -169,9 +214,27 @@ func ensureTenantMetricLabelValuesBulkUpdatedWith(
 
 func (m *TenantMetricLabelValuesBulk) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	tenantID := m.tfstate.Int64("tenant_id")
+	if tenantID == 0 {
+		tenantID = m.tfstate.Int64("id")
+	}
 
 	_, err := rest.Tenants.TenantBulkWithContext_POST(ctx, tenantID, nil)
 	return err
+}
+
+func (m *TenantMetricLabelValuesBulk) ImportResourceState(req resource.ImportStateRequest, ctx context.Context, rest *VMSRest) error {
+	if err := parseImportId(req.ID, m.tfstate); err != nil {
+		return err
+	}
+	tenantID := m.tfstate.Int64("id")
+	if tenantID == 0 {
+		return fmt.Errorf("import id must be a valid tenant id")
+	}
+	m.tfstate.Set("tenant_id", tenantID)
+	if _, err := m.ReadResource(ctx, rest); err != nil {
+		return err
+	}
+	return CustomImportOnly{}
 }
 
 func (m *TenantMetricLabelValuesBulk) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
