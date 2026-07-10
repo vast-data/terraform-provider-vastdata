@@ -6,10 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -333,6 +335,14 @@ func int64FromAny(v any) int64 {
 }
 
 func (m *ComputeCluster) GetSubResources(ctx context.Context, rest *VMSRest, record Record, _ *version.Version) (Record, error) {
+	if isComputeClusterK8sSubResourceFetchUnavailable(clusterStateFromRecord(record)) {
+		tflog.Debug(ctx, fmt.Sprintf(
+			"GetSubResources[compute_cluster]: cluster state %q — reusing sub-resources from tfstate",
+			record["state"],
+		))
+		return computeClusterSubResourcesFromTFState(m.tfstate), nil
+	}
+
 	id := record.RecordID()
 	result := Record{}
 
@@ -395,6 +405,45 @@ func (m *ComputeCluster) GetSubResources(ctx context.Context, rest *VMSRest, rec
 	}
 
 	return result, nil
+}
+
+func clusterStateFromRecord(record Record) string {
+	if record == nil {
+		return ""
+	}
+	state, _ := record["state"].(string)
+	return state
+}
+
+func isComputeClusterK8sSubResourceFetchUnavailable(state string) bool {
+	switch strings.ToUpper(strings.TrimSpace(state)) {
+	case "STOPPED", "STOPPING":
+		return true
+	default:
+		return false
+	}
+}
+
+func computeClusterSubResourcesFromTFState(tfstate *is.TFState) Record {
+	if tfstate == nil || tfstate.Hints == nil {
+		return Record{}
+	}
+	all := tfstate.GetAllValues()
+	result := Record{}
+	for _, sr := range tfstate.Hints.SubResources {
+		if sr.SchemaKey != "" {
+			if v, ok := all[sr.SchemaKey]; ok {
+				result[sr.SchemaKey] = v
+			}
+			continue
+		}
+		for k := range sr.SchemaAttributes {
+			if v, ok := all[k]; ok {
+				result[k] = v
+			}
+		}
+	}
+	return result
 }
 
 func withComputeClusterSubResourceRetry[T any](
