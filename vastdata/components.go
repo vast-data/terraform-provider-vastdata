@@ -323,3 +323,16 @@ type TransformRequestBody interface {
 type TransformResponseRecord interface {
 	TransformResponseRecord(response Record) Record
 }
+
+// NormalizeRecordForCreateAdopt allows a resource to normalize an existing API record
+// before adopt-on-create compares it to the user's create parameters.
+type NormalizeRecordForCreateAdopt interface {
+	NormalizeRecordForCreateAdopt(Record) Record
+}
+
+// ResolveRecordAfterAsyncTask allows a resource to replace the API response record
+// after an async task completes. Some endpoints return the async task body (with the
+// task id as record id) instead of the parent resource.
+type ResolveRecordAfterAsyncTask interface {
+	ResolveRecordAfterAsyncTask(context.Context, *VMSRest, Record) (Record, error)
+}

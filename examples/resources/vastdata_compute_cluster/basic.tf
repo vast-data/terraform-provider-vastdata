@@ -1,4 +1,3 @@
-# Requires at least 3 unassigned CNodes. Adjust IDs to match your cluster.
 
 data "vastdata_cnode" "vastdb_cnode_1" {
   id = 1
@@ -13,11 +12,11 @@ data "vastdata_cnode" "vastdb_cnode_3" {
 }
 
 resource "vastdata_compute_cluster" "vastdb_compute_cluster" {
-  name    = "vastdb-compute-cluster"
-  netmask = "24"
+  name    = "tf-test-cluster"
+  netmask = "255.255.255.0"
 
   static_ip_ranges = [
-    ["10.100.0.10", "10.100.0.20"],
+    ["172.21.87.50", "172.21.87.54"],
   ]
 
   cnodes = [
@@ -35,6 +34,11 @@ resource "vastdata_compute_cluster" "vastdb_compute_cluster" {
     },
   ]
 
-  description = "Example compute cluster managed by Terraform"
-  get_nodes   = true
+  get_nodes       = true
+  get_pods        = true
+  get_namespaces  = true
+  get_services    = true
+  get_deployments = true
+  get_tenants     = true
+  get_dashboard   = true
 }

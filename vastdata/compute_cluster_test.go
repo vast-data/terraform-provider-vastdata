@@ -118,3 +118,33 @@ func TestMergeComputeClusterRecords(t *testing.T) {
 	require.Equal(t, "tf-test-cluster", got["compute_cluster_name"])
 	require.Len(t, got["nodes"], 1)
 }
+
+func TestIsComputeClusterAsyncTaskRecord(t *testing.T) {
+	require.False(t, isComputeClusterAsyncTaskRecord(Record{"id": int64(2), "name": "tf-test-cluster"}))
+	require.True(t, isComputeClusterAsyncTaskRecord(Record{
+		"id":             int64(29),
+		"@resourceType":  "VTask",
+		"name":           "update_compute_cluster",
+		"info": map[string]any{
+			"kwargs": map[string]any{"compute_cluster_id": float64(2)},
+		},
+	}))
+	require.Equal(t, int64(2), computeClusterIDFromAsyncRecord(Record{
+		"id":            int64(31),
+		"@resourceType": "VTask",
+		"info": map[string]any{
+			"kwargs": map[string]any{"compute_cluster_id": float64(2)},
+		},
+	}))
+}
+
+func TestNormalizeRecordForCreateAdopt_Cnodes(t *testing.T) {
+	m := &ComputeCluster{}
+	got := m.NormalizeRecordForCreateAdopt(Record{
+		"cnodes": []any{
+			map[string]any{"id": int64(1), "resource_preset": "BALANCED", "ip": "172.21.87.50"},
+		},
+	})
+	cnodes := got["cnodes"].([]any)
+	require.Equal(t, map[string]any{"id": int64(1), "resource_preset": "BALANCED"}, cnodes[0])
+}

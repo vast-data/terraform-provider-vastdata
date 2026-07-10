@@ -520,6 +520,10 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 				record = transformer.TransformResponseRecord(record.(Record))
 			}
+			if normalizer, ok := manager.(NormalizeRecordForCreateAdopt); ok {
+				tflog.Debug(ctx, fmt.Sprintf("NormalizeRecordForCreateAdopt[%s]: do.", managerName))
+				record = normalizer.NormalizeRecordForCreateAdopt(record.(Record))
+			}
 			// !NOTE: default implementation works only for resources with 'id' field.
 			// For other resources please implement CreateResource to avoid entering this branch.
 			createParamsDiff := diffMap(createParams, record.(Record))
@@ -563,6 +567,16 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				err.Error(),
 			)
 			return
+		}
+
+		if resolved, resolveErr := resolveRecordAfterAsyncTask(ctx, manager, rest, record.(Record), managerName); resolveErr != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ResolveRecordAfterAsyncTask - create[%s].", managerName),
+				resolveErr.Error(),
+			)
+			return
+		} else {
+			record = resolved
 		}
 
 		// Handle AfterCreateResource hook
@@ -940,6 +954,16 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 				err.Error(),
 			)
 			return
+		}
+
+		if resolved, resolveErr := resolveRecordAfterAsyncTask(ctx, stateManger, rest, record.(Record), managerName); resolveErr != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ResolveRecordAfterAsyncTask - update[%s].", managerName),
+				resolveErr.Error(),
+			)
+			return
+		} else {
+			record = resolved
 		}
 
 		if transformer, ok := stateManger.(TransformResponseRecord); ok {

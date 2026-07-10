@@ -191,7 +191,7 @@ var allComputeClusterSubResources = []is.SubResourceHint{
 	computeClusterDashboardSubResource,
 }
 
-var computeClusterAsyncTaskTimeout = 30 * time.Minute
+var computeClusterAsyncTaskTimeout = 40 * time.Minute
 
 // 503 SERVICE_UNAVAILABLE is transient when VMS cannot reach the internal Kubernetes API.
 var computeClusterSubResourceRetryOn = &is.RetryExpression{
@@ -212,6 +212,7 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 			SubResources:     allComputeClusterSubResources,
 			AsyncTaskTimeout: &computeClusterAsyncTaskTimeout,
 			RetryOn:          computeClusterSubResourceRetryOn,
+			NotRequiredSchemaFields: []string{"cnodes"},
 		},
 	)}
 }
@@ -234,6 +235,101 @@ func (m *ComputeCluster) TfState() *is.TFState {
 
 func (m *ComputeCluster) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.ComputeClusters
+}
+
+func (m *ComputeCluster) NormalizeRecordForCreateAdopt(record Record) Record {
+	if record == nil {
+		return record
+	}
+	if cnodes, ok := record["cnodes"]; ok {
+		record["cnodes"] = normalizeComputeClusterCnodes(cnodes)
+	}
+	return record
+}
+
+func (m *ComputeCluster) ResolveRecordAfterAsyncTask(ctx context.Context, rest *VMSRest, record Record) (Record, error) {
+	if !isComputeClusterAsyncTaskRecord(record) {
+		return record, nil
+	}
+	clusterID := computeClusterIDFromAsyncRecord(record)
+	if clusterID == 0 && m.tfstate.IsKnownAndNotNull("id") {
+		clusterID = m.tfstate.Int64("id")
+	}
+	if clusterID == 0 {
+		return record, fmt.Errorf("compute cluster async task completed but cluster id is unknown")
+	}
+	return rest.ComputeClusters.GetByIdWithContext(ctx, clusterID)
+}
+
+func normalizeComputeClusterCnodes(raw any) any {
+	items, ok := raw.([]any)
+	if !ok {
+		return raw
+	}
+	out := make([]any, 0, len(items))
+	for _, item := range items {
+		cnode, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		normalized := map[string]any{"id": cnode["id"]}
+		if preset, ok := cnode["resource_preset"]; ok {
+			normalized["resource_preset"] = preset
+		}
+		out = append(out, normalized)
+	}
+	return out
+}
+
+func computeClusterIDFromAsyncRecord(record Record) int64 {
+	info, ok := record["info"].(map[string]any)
+	if !ok {
+		if asyncTask, ok := record["async_task"].(map[string]any); ok {
+			info, ok = asyncTask["info"].(map[string]any)
+		}
+		if !ok {
+			return 0
+		}
+	}
+	if id := int64FromAny(info["compute_cluster_id"]); id != 0 {
+		return id
+	}
+	if kwargs, ok := info["kwargs"].(map[string]any); ok {
+		return int64FromAny(kwargs["compute_cluster_id"])
+	}
+	return 0
+}
+
+func isComputeClusterAsyncTaskRecord(record Record) bool {
+	if record == nil || record.Empty() {
+		return false
+	}
+	if rt, ok := record["@resourceType"]; ok && fmt.Sprintf("%v", rt) == "VTask" {
+		return true
+	}
+	if _, ok := record["async_task"]; ok {
+		return true
+	}
+	return computeClusterIDFromAsyncRecord(record) != 0
+}
+
+func int64FromAny(v any) int64 {
+	switch n := v.(type) {
+	case int:
+		return int64(n)
+	case int32:
+		return int64(n)
+	case int64:
+		return n
+	case float64:
+		return int64(n)
+	case json.Number:
+		i, err := n.Int64()
+		if err == nil {
+			return i
+		}
+	}
+	return 0
 }
 
 func (m *ComputeCluster) GetSubResources(ctx context.Context, rest *VMSRest, record Record, _ *version.Version) (Record, error) {
