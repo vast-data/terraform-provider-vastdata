@@ -28,7 +28,7 @@ var tenantMetricLabelValuesBulkSchemaAttributes = map[string]any{
 	"values": rschema.MapAttribute{
 		ElementType: types.StringType,
 		Required:    true,
-		Description: "Dictionary of metric label keys to values. Keys must already exist as vastdata_tenant_metric_labels.",
+		Description: "Dictionary of metric label keys to values.",
 	},
 	"id": rschema.Int64Attribute{
 		Computed:    true,
