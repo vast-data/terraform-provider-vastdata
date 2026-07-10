@@ -4,6 +4,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -12,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -27,11 +31,15 @@ type ComputeClusterControl struct {
 	tfstate *is.TFState
 }
 
+// stop/start transitions can run up to ~35 minutes (VTask timeout_in_seconds: 2100).
+var computeClusterControlAsyncTaskTimeout = 40 * time.Minute
+
 func (m *ComputeClusterControl) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &ComputeClusterControl{tfstate: is.NewTFStateMust(
 		raw,
 		schema,
 		&is.TFStateHints{
+			AsyncTaskTimeout: &computeClusterControlAsyncTaskTimeout,
 			TFStateHintsForCustom: &is.TFStateHintsForCustom{
 				Description: "Trigger lifecycle actions on a Compute Cluster (start, stop, certificate rotation, etc.). " +
 					"Because Terraform is declarative, each distinct combination of compute_cluster_id + action represents " +
@@ -140,28 +148,47 @@ func (m *ComputeClusterControl) performAction(ctx context.Context, rest *VMSRest
 		return nil, fmt.Errorf("action must not be empty")
 	}
 
-	const noWait = time.Duration(0)
+	if action == "start" || action == "stop" {
+		cluster, err := rest.ComputeClusters.GetByIdWithContext(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		state, _ := cluster["state"].(string)
+		if computeClusterControlActionSatisfied(state, action) {
+			tflog.Debug(ctx, fmt.Sprintf(
+				"ComputeClusterControl: skipping %q on cluster %d — already %s",
+				action, id, state,
+			))
+			return nil, nil
+		}
+	}
 
+	clusters := rest.ComputeClusters
+
+	var (
+		record DisplayableRecord
+		err    error
+	)
 	switch action {
 	case "start":
-		_, err := rest.ComputeClusters.ComputeClusterStartWithContext_POST(ctx, id, nil, noWait)
-		return nil, err
+		record, err = core.Request[Record](ctx, clusters, http.MethodPost,
+			core.BuildResourcePathWithID("computeclusters", id, "start"), nil, nil)
 
 	case "stop":
-		_, err := rest.ComputeClusters.ComputeClusterStopWithContext_POST(ctx, id, nil, noWait)
-		return nil, err
+		record, err = core.Request[Record](ctx, clusters, http.MethodPost,
+			core.BuildResourcePathWithID("computeclusters", id, "stop"), nil, nil)
 
 	case "rotate_leaf_certificates":
-		_, err := rest.ComputeClusters.ComputeClusterRotateLeafCertificatesWithContext_POST(ctx, id, nil, noWait)
-		return nil, err
+		record, err = core.Request[Record](ctx, clusters, http.MethodPost,
+			core.BuildResourcePathWithID("computeclusters", id, "rotate_leaf_certificates"), nil, nil)
 
 	case "rotate_service_key":
-		_, err := rest.ComputeClusters.ComputeClusterRotateServiceKeyWithContext_POST(ctx, id, nil, noWait)
-		return nil, err
+		record, err = core.Request[Record](ctx, clusters, http.MethodPost,
+			core.BuildResourcePathWithID("computeclusters", id, "rotate_service_key"), nil, nil)
 
 	case "reconcile_create":
-		_, err := rest.ComputeClusters.ComputeClusterReconcileCreateWithContext_POST(ctx, id, nil, noWait)
-		return nil, err
+		record, err = core.Request[Record](ctx, clusters, http.MethodPost,
+			core.BuildResourcePathWithID("computeclusters", id, "reconcile_create"), nil, nil)
 
 	case "rotate_base_certificates":
 		queryParams := params{}
@@ -178,12 +205,12 @@ func (m *ComputeClusterControl) performAction(ctx context.Context, rest *VMSRest
 		if m.tfstate.IsKnownAndNotNull("root_certificate") {
 			body["root_certificate"] = m.tfstate.String("root_certificate")
 		}
-		_, err := rest.ComputeClusters.ComputeClusterRotateBaseCertificatesWithContext_POST(ctx, id, queryParams, body, noWait)
-		return nil, err
+		record, err = core.Request[Record](ctx, clusters, http.MethodPost,
+			core.BuildResourcePathWithID("computeclusters", id, "rotate_base_certificates"), queryParams, body)
 
 	case "metric_viewer_certificates":
-		_, err := rest.ComputeClusters.ComputeClusterMetricViewerCertificatesWithContext_POST(ctx, id, nil)
-		return nil, err
+		record, err = core.Request[Record](ctx, clusters, http.MethodPost,
+			core.BuildResourcePathWithID("computeclusters", id, "metric_viewer_certificates"), nil, nil)
 
 	default:
 		return nil, fmt.Errorf(
@@ -191,4 +218,41 @@ func (m *ComputeClusterControl) performAction(ctx context.Context, rest *VMSRest
 				"reconcile_create, rotate_base_certificates, metric_viewer_certificates", action,
 		)
 	}
+
+	if err != nil && isComputeClusterControlAlreadyAppliedError(err, action) {
+		tflog.Debug(ctx, fmt.Sprintf(
+			"ComputeClusterControl: treating %q on cluster %d as no-op — %v",
+			action, id, err,
+		))
+		return nil, nil
+	}
+	return record, err
+}
+
+func computeClusterControlActionSatisfied(state, action string) bool {
+	state = strings.ToUpper(strings.TrimSpace(state))
+	switch action {
+	case "start":
+		return state == "RUNNING" || state == "STARTING"
+	case "stop":
+		return state == "STOPPED" || state == "STOPPING"
+	default:
+		return false
+	}
+}
+
+func isComputeClusterControlAlreadyAppliedError(err error, action string) bool {
+	if !isApiError(err) {
+		return false
+	}
+	body := strings.ToLower(err.(*ApiError).Body)
+	if expectStatusCodes(err, http.StatusBadRequest) {
+		switch action {
+		case "start":
+			return strings.Contains(body, "only a stopped compute cluster can be started")
+		case "stop":
+			return strings.Contains(body, "only a running compute cluster can be stopped")
+		}
+	}
+	return false
 }

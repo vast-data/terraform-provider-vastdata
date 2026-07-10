@@ -647,3 +647,12 @@ func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, tim
 	}
 	return nil
 }
+
+func resolveRecordAfterAsyncTask(ctx context.Context, manager ResourceManager, rest *VMSRest, record Record, managerName string) (Record, error) {
+	resolver, ok := manager.(ResolveRecordAfterAsyncTask)
+	if !ok {
+		return record, nil
+	}
+	tflog.Debug(ctx, fmt.Sprintf("ResolveRecordAfterAsyncTask[%s]: do.", managerName))
+	return resolver.ResolveRecordAfterAsyncTask(ctx, rest, record)
+}

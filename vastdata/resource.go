@@ -229,16 +229,12 @@ func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureReques
 }
 
 func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var (
-		rest        = r.providerData.Client
-		manager, _  = r.ManagerWithSchemaOnly(ctx)
-		managerName = r.managerName
-		tfState     = manager.TfState()
-		hints       = tfState.Hints
-		err         error
-	)
+	manager, _ := r.ManagerWithSchemaOnly(ctx)
+	managerName := r.managerName
+	tfState := manager.TfState()
+	hints := tfState.Hints
 
-	// Check importable flag (defaults to true)
+	// Check importable flag (defaults to true) before touching provider/client.
 	if hints != nil && hints.Importable != nil && !*hints.Importable {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("ImportState[%q]: import not supported.", managerName),
@@ -246,6 +242,11 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		)
 		return
 	}
+
+	var (
+		rest = r.providerData.Client
+		err  error
+	)
 
 	importID := req.ID
 	if strings.TrimSpace(importID) == "" {
@@ -520,6 +521,10 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 				record = transformer.TransformResponseRecord(record.(Record))
 			}
+			if normalizer, ok := manager.(NormalizeRecordForCreateAdopt); ok {
+				tflog.Debug(ctx, fmt.Sprintf("NormalizeRecordForCreateAdopt[%s]: do.", managerName))
+				record = normalizer.NormalizeRecordForCreateAdopt(record.(Record))
+			}
 			// !NOTE: default implementation works only for resources with 'id' field.
 			// For other resources please implement CreateResource to avoid entering this branch.
 			createParamsDiff := diffMap(createParams, record.(Record))
@@ -563,6 +568,16 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				err.Error(),
 			)
 			return
+		}
+
+		if resolved, resolveErr := resolveRecordAfterAsyncTask(ctx, manager, rest, record.(Record), managerName); resolveErr != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ResolveRecordAfterAsyncTask - create[%s].", managerName),
+				resolveErr.Error(),
+			)
+			return
+		} else {
+			record = resolved
 		}
 
 		// Handle AfterCreateResource hook
@@ -940,6 +955,16 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 				err.Error(),
 			)
 			return
+		}
+
+		if resolved, resolveErr := resolveRecordAfterAsyncTask(ctx, stateManger, rest, record.(Record), managerName); resolveErr != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ResolveRecordAfterAsyncTask - update[%s].", managerName),
+				resolveErr.Error(),
+			)
+			return
+		} else {
+			record = resolved
 		}
 
 		if transformer, ok := stateManger.(TransformResponseRecord); ok {
@@ -1324,6 +1349,22 @@ func WithRetry(
 	managerName string,
 	fn func(context.Context, *VMSRest) (DisplayableRecord, error),
 ) func(context.Context, *VMSRest) (DisplayableRecord, error) {
+	return func(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+		return retryOnExpression(ctx, expr, "CreateResource", managerName, func() (DisplayableRecord, error) {
+			return fn(ctx, rest)
+		})
+	}
+}
+
+// retryOnExpression retries fn when it returns an error matching expr.
+func retryOnExpression[T any](
+	ctx context.Context,
+	expr *is.RetryExpression,
+	operation string,
+	scope string,
+	fn func() (T, error),
+) (T, error) {
+	var zero T
 	maxAttempts := expr.Times
 	if maxAttempts <= 0 {
 		maxAttempts = defaultRetryTimes
@@ -1333,40 +1374,38 @@ func WithRetry(
 		sleepSecs = defaultRetrySleepSeconds
 	}
 
-	return func(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-		var lastErr error
-		for attempt := 1; attempt <= maxAttempts; attempt++ {
-			record, err := fn(ctx, rest)
-			if err == nil {
-				if attempt > 1 {
-					tflog.Info(ctx, fmt.Sprintf(
-						"CreateResource[%s]: succeeded on attempt %d/%d.",
-						managerName, attempt, maxAttempts,
-					))
-				}
-				return record, nil
+	var lastErr error
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		result, err := fn()
+		if err == nil {
+			if attempt > 1 {
+				tflog.Info(ctx, fmt.Sprintf(
+					"%s[%s]: succeeded on attempt %d/%d.",
+					operation, scope, attempt, maxAttempts,
+				))
 			}
-
-			lastErr = err
-			if !shouldRetry(expr, err) {
-				return nil, err
-			}
-
-			tflog.Warn(ctx, fmt.Sprintf(
-				"CreateResource[%s]: attempt %d/%d failed (%s), retrying in %ds...",
-				managerName, attempt, maxAttempts, err.Error(), sleepSecs,
-			))
-
-			if attempt < maxAttempts {
-				time.Sleep(time.Duration(sleepSecs) * time.Second)
-			}
+			return result, nil
 		}
 
-		return nil, fmt.Errorf(
-			"CreateResource[%s]: all %d attempts failed, last error: %w",
-			managerName, maxAttempts, lastErr,
-		)
+		lastErr = err
+		if !shouldRetry(expr, err) {
+			return zero, err
+		}
+
+		tflog.Warn(ctx, fmt.Sprintf(
+			"%s[%s]: attempt %d/%d failed (%s), retrying in %ds...",
+			operation, scope, attempt, maxAttempts, err.Error(), sleepSecs,
+		))
+
+		if attempt < maxAttempts {
+			time.Sleep(time.Duration(sleepSecs) * time.Second)
+		}
 	}
+
+	return zero, fmt.Errorf(
+		"%s[%s]: all %d attempts failed, last error: %w",
+		operation, scope, maxAttempts, lastErr,
+	)
 }
 
 // shouldRetry returns true when err satisfies the retry conditions defined in expr.
