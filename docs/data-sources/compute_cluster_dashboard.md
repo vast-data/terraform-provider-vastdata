@@ -3,12 +3,12 @@
 page_title: "vastdata_compute_cluster_dashboard Data Source - vastdata"
 subcategory: ""
 description: |-
-  Aggregated dashboard statistics for compute clusters.
+  Dashboard statistics for a compute cluster.
 ---
 
 # vastdata_compute_cluster_dashboard (Data Source)
 
-Aggregated dashboard statistics for compute clusters.
+Dashboard statistics for a compute cluster.
 
 ## Example Usage
 
@@ -28,7 +28,7 @@ data "vastdata_compute_cluster_dashboard" "tf_test_cluster_dashboard" {
 
 ### Read-Only
 
-- `dashboard` (Attributes) Aggregated dashboard statistics across all compute clusters. (see [below for nested schema](#nestedatt--dashboard))
+- `dashboard` (Attributes) Dashboard statistics for the compute cluster. (see [below for nested schema](#nestedatt--dashboard))
 
 <a id="nestedatt--dashboard"></a>
 ### Nested Schema for `dashboard`
@@ -38,7 +38,7 @@ Read-Only:
 - `cnodes` (String) JSON map of cnode status → count.
 - `compute_clusters` (String) JSON map of compute cluster status → count.
 - `deployments` (String) JSON map of deployment status → count.
-- `namespace_counts` (Number) Total number of namespaces across all clusters.
+- `namespace_counts` (Number) Number of namespaces in the cluster.
 - `pods` (String) JSON map of pod status → count.
-- `service_counts` (Number) Total number of services across all clusters.
-- `tenant_counts` (Number) Total number of tenants attached to compute clusters.
+- `service_counts` (Number) Number of services in the cluster.
+- `tenant_counts` (Number) Number of tenants attached to the compute cluster.

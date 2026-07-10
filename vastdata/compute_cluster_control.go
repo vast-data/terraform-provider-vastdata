@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/vast-data/go-vast-client/core"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 

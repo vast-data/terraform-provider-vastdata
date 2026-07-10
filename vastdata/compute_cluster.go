@@ -11,10 +11,10 @@ import (
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -169,11 +169,11 @@ var computeClusterDashboardSubResource = is.SubResourceHint{
 	SchemaAttributes: map[string]any{
 		"dashboard": rschema.SingleNestedAttribute{
 			Computed:    true,
-			Description: "Aggregated dashboard statistics across all compute clusters. Populated when get_dashboard is true.",
+			Description: "Dashboard statistics for the compute cluster. Populated when get_dashboard is true.",
 			Attributes: map[string]rschema.Attribute{
-				"namespace_counts": rschema.Int64Attribute{Computed: true, Description: "Total number of namespaces across all clusters."},
-				"service_counts":   rschema.Int64Attribute{Computed: true, Description: "Total number of services across all clusters."},
-				"tenant_counts":    rschema.Int64Attribute{Computed: true, Description: "Total number of tenants attached to compute clusters."},
+				"namespace_counts": rschema.Int64Attribute{Computed: true, Description: "Number of namespaces in the cluster."},
+				"service_counts":   rschema.Int64Attribute{Computed: true, Description: "Number of services in the cluster."},
+				"tenant_counts":    rschema.Int64Attribute{Computed: true, Description: "Number of tenants attached to the compute cluster."},
 				"cnodes":           rschema.StringAttribute{Computed: true, Description: "JSON map of cnode status → count."},
 				"compute_clusters": rschema.StringAttribute{Computed: true, Description: "JSON map of compute cluster status → count."},
 				"deployments":      rschema.StringAttribute{Computed: true, Description: "JSON map of deployment status → count."},
@@ -210,10 +210,10 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:        ComputeClusterSchemaRef,
-			SubResources:     allComputeClusterSubResources,
-			AsyncTaskTimeout: &computeClusterAsyncTaskTimeout,
-			RetryOn:          computeClusterSubResourceRetryOn,
+			SchemaRef:               ComputeClusterSchemaRef,
+			SubResources:            allComputeClusterSubResources,
+			AsyncTaskTimeout:        &computeClusterAsyncTaskTimeout,
+			RetryOn:                 computeClusterSubResourceRetryOn,
 			NotRequiredSchemaFields: []string{"cnodes"},
 		},
 	)}
@@ -867,11 +867,11 @@ func computeClusterTenantsListSchema() dschema.ListNestedAttribute {
 func computeClusterDashboardObjectSchema() dschema.SingleNestedAttribute {
 	return dschema.SingleNestedAttribute{
 		Computed:    true,
-		Description: "Aggregated dashboard statistics across all compute clusters.",
+		Description: "Dashboard statistics for the compute cluster.",
 		Attributes: map[string]dschema.Attribute{
-			"namespace_counts": dschema.Int64Attribute{Computed: true, Description: "Total number of namespaces across all clusters."},
-			"service_counts":   dschema.Int64Attribute{Computed: true, Description: "Total number of services across all clusters."},
-			"tenant_counts":    dschema.Int64Attribute{Computed: true, Description: "Total number of tenants attached to compute clusters."},
+			"namespace_counts": dschema.Int64Attribute{Computed: true, Description: "Number of namespaces in the cluster."},
+			"service_counts":   dschema.Int64Attribute{Computed: true, Description: "Number of services in the cluster."},
+			"tenant_counts":    dschema.Int64Attribute{Computed: true, Description: "Number of tenants attached to the compute cluster."},
 			"cnodes":           dschema.StringAttribute{Computed: true, Description: "JSON map of cnode status → count."},
 			"compute_clusters": dschema.StringAttribute{Computed: true, Description: "JSON map of compute cluster status → count."},
 			"deployments":      dschema.StringAttribute{Computed: true, Description: "JSON map of deployment status → count."},
@@ -914,7 +914,9 @@ func (m *computeClusterSubresourceDatasource) lookupRecord(ctx context.Context, 
 	return base, nil
 }
 
-type ComputeClusterNodes struct{ computeClusterSubresourceDatasource }
+type ComputeClusterNodes struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterNodes) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterNodes{computeClusterSubresourceDatasource{
@@ -936,7 +938,9 @@ func (m *ComputeClusterNodes) ReadDatasource(ctx context.Context, rest *VMSRest)
 	return mergeComputeClusterRecords(base, Record{"nodes": nodes}), nil
 }
 
-type ComputeClusterPods struct{ computeClusterSubresourceDatasource }
+type ComputeClusterPods struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterPods) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterPods{computeClusterSubresourceDatasource{
@@ -969,7 +973,9 @@ func (m *ComputeClusterPods) ReadDatasource(ctx context.Context, rest *VMSRest) 
 	return mergeComputeClusterRecords(base, Record{"pods": pods}), nil
 }
 
-type ComputeClusterNamespaces struct{ computeClusterSubresourceDatasource }
+type ComputeClusterNamespaces struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterNamespaces) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterNamespaces{computeClusterSubresourceDatasource{
@@ -991,7 +997,9 @@ func (m *ComputeClusterNamespaces) ReadDatasource(ctx context.Context, rest *VMS
 	return mergeComputeClusterRecords(base, Record{"namespaces": namespaces}), nil
 }
 
-type ComputeClusterServices struct{ computeClusterSubresourceDatasource }
+type ComputeClusterServices struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterServices) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterServices{computeClusterSubresourceDatasource{
@@ -1013,7 +1021,9 @@ func (m *ComputeClusterServices) ReadDatasource(ctx context.Context, rest *VMSRe
 	return mergeComputeClusterRecords(base, Record{"services": services}), nil
 }
 
-type ComputeClusterDeployments struct{ computeClusterSubresourceDatasource }
+type ComputeClusterDeployments struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterDeployments) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterDeployments{computeClusterSubresourceDatasource{
@@ -1035,7 +1045,9 @@ func (m *ComputeClusterDeployments) ReadDatasource(ctx context.Context, rest *VM
 	return mergeComputeClusterRecords(base, Record{"deployments": deployments}), nil
 }
 
-type ComputeClusterTenants struct{ computeClusterSubresourceDatasource }
+type ComputeClusterTenants struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterTenants) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterTenants{computeClusterSubresourceDatasource{
@@ -1057,12 +1069,14 @@ func (m *ComputeClusterTenants) ReadDatasource(ctx context.Context, rest *VMSRes
 	return mergeComputeClusterRecords(base, Record{"cluster_tenants": tenants}), nil
 }
 
-type ComputeClusterDashboard struct{ computeClusterSubresourceDatasource }
+type ComputeClusterDashboard struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterDashboard) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterDashboard{computeClusterSubresourceDatasource{
 		tfstate: newComputeClusterSubresourceTFState(raw, schema,
-			"Aggregated dashboard statistics for compute clusters.",
+			"Dashboard statistics for a compute cluster.",
 			map[string]any{"dashboard": computeClusterDashboardObjectSchema()}),
 	}}
 }
@@ -1079,7 +1093,9 @@ func (m *ComputeClusterDashboard) ReadDatasource(ctx context.Context, rest *VMSR
 	return mergeComputeClusterRecords(base, Record{"dashboard": dashboard}), nil
 }
 
-type ComputeClusterReplicaSets struct{ computeClusterSubresourceDatasource }
+type ComputeClusterReplicaSets struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterReplicaSets) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterReplicaSets{computeClusterSubresourceDatasource{
@@ -1109,7 +1125,9 @@ func (m *ComputeClusterReplicaSets) ReadDatasource(ctx context.Context, rest *VM
 	return mergeComputeClusterRecords(base, Record{"replica_sets": replicaSets}), nil
 }
 
-type ComputeClusterEvents struct{ computeClusterSubresourceDatasource }
+type ComputeClusterEvents struct {
+	computeClusterSubresourceDatasource
+}
 
 func (m *ComputeClusterEvents) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterEvents{computeClusterSubresourceDatasource{

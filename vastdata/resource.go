@@ -229,16 +229,12 @@ func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureReques
 }
 
 func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	var (
-		rest        = r.providerData.Client
-		manager, _  = r.ManagerWithSchemaOnly(ctx)
-		managerName = r.managerName
-		tfState     = manager.TfState()
-		hints       = tfState.Hints
-		err         error
-	)
+	manager, _ := r.ManagerWithSchemaOnly(ctx)
+	managerName := r.managerName
+	tfState := manager.TfState()
+	hints := tfState.Hints
 
-	// Check importable flag (defaults to true)
+	// Check importable flag (defaults to true) before touching provider/client.
 	if hints != nil && hints.Importable != nil && !*hints.Importable {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("ImportState[%q]: import not supported.", managerName),
@@ -246,6 +242,11 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		)
 		return
 	}
+
+	var (
+		rest = r.providerData.Client
+		err  error
+	)
 
 	importID := req.ID
 	if strings.TrimSpace(importID) == "" {
