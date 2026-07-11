@@ -69,7 +69,7 @@ resource "vastdata_vip_pool" "vastdata_vip_pool_ipv6" {
 
 # --------------------
 
-# Allocate IPs automatically using ips_count (VAST 5.5+).
+# Allocate IPs automatically using ips_count (VAST 5.5+). VOC clusters only.
 resource "vastdata_vip_pool" "vastdb_vippool_allocated" {
   name      = "vastdb_vippool_allocated"
   role      = "PROTOCOLS"
@@ -78,7 +78,7 @@ resource "vastdata_vip_pool" "vastdb_vippool_allocated" {
 
 # --------------------
 
-# Allocate IPs automatically with additional configuration options (VAST 5.5+).
+# Allocate IPs automatically with additional configuration options (VAST 5.5+). VOC clusters only.
 resource "vastdata_vip_pool" "vastdb_vippool_allocated" {
   name                      = "vastdb_vippool_allocated"
   role                      = "PROTOCOLS"
@@ -90,7 +90,7 @@ resource "vastdata_vip_pool" "vastdb_vippool_allocated" {
 
 # --------------------
 
-# Auto-allocate IPs scoped to a specific tenant (VAST 5.5+).
+# Auto-allocate IPs scoped to a specific tenant (VAST 5.5+). VOC clusters only.
 data "vastdata_tenant" "vastdb_tenant" {
   name = "default"
 }

@@ -1,5 +1,5 @@
 # ignore:e2e
-# Auto-allocate IPs scoped to a specific tenant (VAST 5.5+).
+# Auto-allocate IPs scoped to a specific tenant (VAST 5.5+). VOC clusters only.
 data "vastdata_tenant" "vastdb_tenant" {
   name = "default"
 }

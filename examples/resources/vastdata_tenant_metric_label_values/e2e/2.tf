@@ -10,7 +10,7 @@ resource "vastdata_tenant_metric_labels" "vastdb_metric_label" {
 }
 
 resource "vastdata_tenant_metric_label_values" "vastdb_metric_label_val" {
-  tenant_id = vastdata_tenant.test.id
-  label_id  = vastdata_tenant_metric_labels.env.id
+  tenant_id = vastdata_tenant.vastdb_tenant.id
+  label_id  = vastdata_tenant_metric_labels.vastdb_metric_label.id
   value     = "production"
 }
