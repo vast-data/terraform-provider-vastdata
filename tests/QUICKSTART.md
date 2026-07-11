@@ -32,10 +32,14 @@ pip install -r requirements-test.txt
 
 ### Option A: Use the script
 
-```bash
-./run_tests.sh all
+```bash ./run_tests.sh e2e
 ```
 
+Stops at the first failure by default. To run the full suite:
+
+```bash
+./run_tests.sh --continue e2e
+```
 ### Option B: Use pytest directly
 
 ```bash
@@ -51,17 +55,11 @@ pytest test_e2e_resources.py::test_individual_resource -v
 ## Common Commands
 
 ```bash
-# Run all tests (one per resource)
-./run_tests.sh all
+# Run e2e tests (stop at first failure — default)
+./run_tests.sh e2e
 
-# Run all resources in one test (faster, but harder to debug)
-./run_tests.sh single
-
-# Run tests in parallel (fastest)
-./run_tests.sh parallel
-
-# Stop at first failure (useful for debugging)
-./run_tests.sh failfast
+# Run all e2e tests even if some fail
+./run_tests.sh --continue e2e
 
 # Run specific resource
 ./run_tests.sh resource vastdata_view/1.tf

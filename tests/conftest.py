@@ -5,6 +5,7 @@ Pytest configuration and fixtures for Terraform provider E2E tests.
 """
 
 import os
+import subprocess
 import tempfile
 import zipfile
 import shutil
@@ -24,8 +25,16 @@ VASTDATA_PORT = os.environ.get('VASTDATA_PORT', '443')
 VASTDATA_ROOT_USERNAME = os.environ.get('VASTDATA_ROOT_USERNAME', VASTDATA_USERNAME)
 VASTDATA_ROOT_PASSWORD = os.environ.get('VASTDATA_ROOT_PASSWORD', VASTDATA_PASSWORD)
 
-# Path to provider binary (built locally)
-PROVIDER_BINARY_PATH = Path(__file__).parent.parent / "build" / "linux_amd64" / "terraform-provider-vastdata"
+# Path to provider binary (built locally for current platform)
+def _go_env(name: str) -> str:
+    return subprocess.check_output(["go", "env", name], text=True).strip()
+
+
+GOOS = _go_env("GOOS")
+GOARCH = _go_env("GOARCH")
+PROVIDER_BINARY_PATH = (
+    Path(__file__).parent.parent / "build" / f"{GOOS}_{GOARCH}" / "terraform-provider-vastdata"
+)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -74,7 +83,7 @@ def install_terraform(terraform_version):
     
     # Install terraform if not found
     print(f"Terraform not found, installing version {terraform_version}...")
-    artifact = f'terraform_{terraform_version}_linux_amd64.zip'
+    artifact = f'terraform_{terraform_version}_{GOOS}_{GOARCH}.zip'
     
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = local.path(tmpdir)
