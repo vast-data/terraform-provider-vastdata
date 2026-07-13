@@ -72,7 +72,7 @@ resource "vastdata_vip_pool" "vastdb_vippool" {
     ],
   ]
   name            = "vastdb_vippool"
-  port_membership = "all"
+  port_membership = "ALL"
   role            = "PROTOCOLS"
   subnet_cidr     = 24
   tenant_id       = 1
