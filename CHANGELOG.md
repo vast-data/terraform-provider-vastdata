@@ -1,5 +1,9 @@
 ## 4.0.0
 
+NOTES:
+
+* New resources and data sources require **VAST 5.5.0+**.
+
 NEW RESOURCES:
 
 * **vastdata_blob_expansion**: Manage blob expansion pipelines for VAST Database tables
@@ -36,11 +40,11 @@ NEW DATA SOURCES:
 
 ENHANCEMENTS:
 
-* **vastdata_cluster**: Added `s3_true_ip_config` sub-resource for S3 true client IP configuration (TERF-253)
-* **vastdata_view**: Added `s3_cors_config` support for S3 bucket CORS rules
-* **vastdata_vip_pool**: Added automatic IP allocation via `ips_count` using allocate/reallocate APIs (TERF-247)
-* **vastdata_dns**: Added automatic VIP assignment via `allocate` flag (TERF-241)
-* **vastdata_tenant**: Added `get_views_count` / `view_count` sub-resource (TERF-243)
+* **vastdata_cluster**: Added `s3_true_ip_config` sub-resource for S3 true client IP configuration (TERF-253) — requires VAST 5.5.0+
+* **vastdata_view**: Added `s3_cors_config` support for S3 bucket CORS rules — requires VAST 5.5.0+
+* **vastdata_vip_pool**: Added automatic IP allocation via `ips_count` using allocate/reallocate APIs (TERF-247) — requires VAST 5.5.0+
+* **vastdata_dns**: Added automatic VIP assignment via `allocate` flag (TERF-241) — requires VAST 5.5.0+
+* **vastdata_tenant**: Added `get_views_count` / `view_count` sub-resource (TERF-243) — requires VAST 5.5.0+
 * **vastdata_user_key**: Added optional user-provided `access_key` and `secret_key` on create and update for local users; credential changes on update replace the key via delete and recreate (TERF-248)
 
 ## 3.2.2
