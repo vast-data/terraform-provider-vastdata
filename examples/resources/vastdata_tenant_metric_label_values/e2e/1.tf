@@ -5,7 +5,7 @@ resource "vastdata_tenant_metric_labels" "env" {
 }
 
 resource "vastdata_tenant" "vastdb_tenant" {
-  name         = "vastdb_test_mlv"
+  name         = "vastdb-test-mlv"
   force_delete = true
 }
 

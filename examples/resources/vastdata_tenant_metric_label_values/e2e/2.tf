@@ -1,5 +1,5 @@
 resource "vastdata_tenant" "vastdb_tenant" {
-  name         = "vastdb_tenant"
+  name         = "vastdb-test-mlv"
   force_delete = true
 }
 
