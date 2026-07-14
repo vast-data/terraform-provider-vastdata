@@ -70,9 +70,11 @@ Must provide enough IPs for all CNodes.
 
 ### Optional
 
+- `all_tenants` (Boolean) When true, all existing and newly created tenants are automatically assigned to this compute cluster
 - `backup_frequency` (Number) Backup frequency in minutes
 - `cluster_cidr` (String) Kubernetes cluster CIDR for pod networking (default is "10.42.0.0/16")
 - `cnodes` (Attributes Set) List of CNode assignments with resource presets (see [below for nested schema](#nestedatt--cnodes))
+- `default_gateway` (String) Default gateway IP address for the compute cluster network (e.g., "10.0.0.1"). Optional.
 - `description` (String) User-defined description for the compute cluster
 - `get_dashboard` (Boolean) When true, fetches "" sub-resource data and populates its fields.
 - `get_deployments` (Boolean) When true, fetches "" sub-resource data and populates its fields.
@@ -87,16 +89,15 @@ Must provide enough IPs for all CNodes.
 - `server_kube_vip_address` (String) Kubernetes VIP address for the API server
 - `service_cidr` (String) Kubernetes service CIDR for service networking (default is "10.43.0.0/16")
 - `tags` (Set of String) User-defined tags for the compute cluster
+- `vlan` (Number) VLAN ID for the compute cluster network (1-4095). Optional; omit or set to null to disable.
 
 ### Read-Only
 
-- `all_tenants` (Boolean) When true, all existing and newly created tenants are automatically assigned to this compute cluster
 - `certificate` (String) Cluster CA certificate for kubeconfig authentication
 - `client_certificate` (String) Client certificate for kubeconfig authentication
 - `client_key` (String) Client private key for kubeconfig authentication
 - `cluster_tenants` (Attributes List) List of tenants associated with the compute cluster. Populated when get_tenants is true. (see [below for nested schema](#nestedatt--cluster_tenants))
 - `dashboard` (Attributes) Dashboard statistics for the compute cluster. Populated when get_dashboard is true. (see [below for nested schema](#nestedatt--dashboard))
-- `default_gateway` (String) Default gateway IP address for the compute cluster network (e.g., "10.0.0.1"). Optional.
 - `deployments` (Attributes List) List of Kubernetes deployments in the compute cluster. Populated when get_deployments is true. (see [below for nested schema](#nestedatt--deployments))
 - `guid` (String)
 - `id` (Number) The ID of this resource.
@@ -106,7 +107,6 @@ Must provide enough IPs for all CNodes.
 - `resource_counts` (Attributes) Resource counts with state-based breakdowns for this cluster (see [below for nested schema](#nestedatt--resource_counts))
 - `services` (Attributes List) List of Kubernetes services in the compute cluster. Populated when get_services is true. (see [below for nested schema](#nestedatt--services))
 - `state` (String) Current state of the compute cluster
-- `vlan` (Number) VLAN ID for the compute cluster network (1-4095). Optional; omit or set to null to disable.
 
 <a id="nestedatt--cnodes"></a>
 ### Nested Schema for `cnodes`

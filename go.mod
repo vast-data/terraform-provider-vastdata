@@ -16,7 +16,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.27.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/stretchr/testify v1.10.0
-	github.com/vast-data/go-vast-client v0.152.0
+	github.com/vast-data/go-vast-client v0.153.0
 )
 
 require (
