@@ -39,7 +39,6 @@ ALLOWED_DRIFT_RESOURCES = {
     "vastdata_s3_policy",
     "vastdata_s3_replication_peer",
     "vastdata_tenant",
-    "vastdata_certificate",
 }
 
 

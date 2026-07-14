@@ -167,8 +167,10 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 				if diffReason, ok := compareSchemaValues(existing.Prop, ref.Value); ok {
 					if !existing.Required {
 						// Field is present in both POST and GET with identical schema.
-						// Normally mark as computed, unless explicitly overridden by hints.NotComputedSchemaFields.
-						if hints != nil && contains(hints.NotComputedSchemaFields, name) {
+						// Normally mark as computed, unless write-only or explicitly
+						// overridden by hints.NotComputedSchemaFields. Write-only
+						// attributes cannot be Computed (Terraform framework rule).
+						if existing.WriteOnly || (hints != nil && (contains(hints.NotComputedSchemaFields, name) || contains(hints.WriteOnlyFields, name))) {
 							existing.Computed = false
 						} else {
 							existing.Computed = true

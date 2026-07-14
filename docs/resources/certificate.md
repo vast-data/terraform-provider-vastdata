@@ -234,11 +234,13 @@ resource "vastdata_certificate" "kafka_mtls_pgp" {
 
 ### Optional
 
-- `ca_certificate` (String)
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `ca_certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments))
 - `cert_type` (String) Certificate type
-- `certificate` (String)
+- `certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments))
 - `pgp_public_key` (String, Sensitive) Optional PGP public key used to encrypt the private_key. When provided, private_key will be cleared from state and the encrypted value stored in encrypted_private_key.
-- `private_key` (String, Sensitive)
+- `private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments))
 - `validate` (Boolean) When true, calls POST /certificates/validate_compute_cluster_certificates/ with ca_certificate, certificate, and private_key before creating the certificate. Defaults to false.
 
 ### Read-Only
