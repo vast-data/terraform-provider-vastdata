@@ -65,7 +65,7 @@ resource "vastdata_compute_cluster" "vastdb_compute_cluster" {
 
 - `name` (String) Compute Cluster name
 - `netmask` (String) Network mask for the compute cluster network (e.g., "255.255.255.0" or "24")
-- `static_ip_ranges` (Set of Set of String) List of IP range pairs [[start1, end1], [start2, end2]] for static IP assignment to CNodes.
+- `static_ip_ranges` (List of List of String) List of IP range pairs [[start1, end1], [start2, end2]] for static IP assignment to CNodes.
 Must provide enough IPs for all CNodes.
 
 ### Optional
