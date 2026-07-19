@@ -215,6 +215,16 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 			RetryOn:                 computeClusterSubResourceRetryOn,
 			NotRequiredSchemaFields: []string{"cnodes"},
 			PreserveOrderFields:     []string{"static_ip_ranges"},
+			// Present in GET response but omitted from CreateParams OpenAPI schema,
+			// so generation would otherwise mark them computed-only.
+			OptionalSchemaFields: []string{"default_gateway", "vlan", "all_tenants"},
+			// all_tenants is only accepted on PATCH (ComputeClusterModifyParams).
+			EditOnlyFields: []string{"all_tenants"},
+			// Network identity fields are create-time only (not in ModifyParams).
+			CommonModifiersMapping: map[string]string{
+				"default_gateway": ModifierForceNew,
+				"vlan":            ModifierForceNew,
+			},
 		},
 	)}
 }

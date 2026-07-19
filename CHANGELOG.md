@@ -2,6 +2,7 @@
 
 BUG FIXES:
 
+* **vastdata_compute_cluster**: Fixed `default_gateway`, `vlan`, and `all_tenants` incorrectly marked as read-only. (TERF-261)
 * **vastdata_compute_cluster_dashboard**: Support cluster-wide `GET /computeclusters/dashboard/` when no id/name is set, and per-cluster `resource_counts` from `GET /computeclusters/{id}/` when id/name is set. (TERF-263)
 
 ## 4.0.0
