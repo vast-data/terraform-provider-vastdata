@@ -15,11 +15,16 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
+	"net"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/go-test/deep"
@@ -633,19 +638,116 @@ func deleteDuplicates[T comparable](s []T) []T {
 // Async tasks
 // ----------------------------------
 
+// isTransientAsyncPollError reports whether err is a temporary network / availability
+// failure while polling an async task. These are expected when VMS restarts mid-task
+// (e.g. compute cluster create that deactivates the VMS cnode).
+func isTransientAsyncPollError(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return false
+	}
+
+	msg := err.Error()
+	// Non-retryable outcomes from go-vast-client WaitAPICondition.
+	if strings.Contains(msg, "WaitAPICondition verification failed") ||
+		strings.Contains(msg, "WaitAPICondition timeout") ||
+		strings.Contains(msg, "WaitAPICondition cancelled") {
+		return false
+	}
+
+	var apiErr *ApiError
+	if errors.As(err, &apiErr) {
+		switch apiErr.StatusCode {
+		case 0, http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
+			return true
+		}
+		return false
+	}
+
+	var netErr net.Error
+	if errors.As(err, &netErr) {
+		return true
+	}
+	var opErr *net.OpError
+	if errors.As(err, &opErr) {
+		return true
+	}
+	var urlErr *url.Error
+	if errors.As(err, &urlErr) {
+		return isTransientAsyncPollError(urlErr.Err)
+	}
+	if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
+		return true
+	}
+	if errors.Is(err, syscall.ECONNRESET) ||
+		errors.Is(err, syscall.ECONNREFUSED) ||
+		errors.Is(err, syscall.EPIPE) ||
+		errors.Is(err, syscall.ETIMEDOUT) {
+		return true
+	}
+
+	lower := strings.ToLower(msg)
+	for _, s := range []string{
+		"connection reset by peer",
+		"connection refused",
+		"broken pipe",
+		"i/o timeout",
+		"tls: handshake timeout",
+		"server closed idle connection",
+		"use of closed network connection",
+		"http2: client connection force closed",
+		"http2: client connection lost",
+		"eof",
+	} {
+		if strings.Contains(lower, s) {
+			return true
+		}
+	}
+	return false
+}
+
 func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout *time.Duration) error {
 	waitTimeout := 10 * time.Minute
 	if timeout != nil {
 		waitTimeout = *timeout
 	}
-	asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, waitTimeout)
-	if err != nil {
-		return err
+	deadline := time.Now().Add(waitTimeout)
+
+	for {
+		remaining := time.Until(deadline)
+		if remaining <= 0 {
+			return fmt.Errorf("async task wait timed out after %v", waitTimeout)
+		}
+
+		asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, remaining)
+		if err == nil {
+			if asyncResult != nil {
+				return asyncResult.Err
+			}
+			return nil
+		}
+		if !isTransientAsyncPollError(err) {
+			return err
+		}
+
+		tflog.Warn(ctx, fmt.Sprintf(
+			"Async task poll hit transient network error; retrying until deadline: %v", err,
+		))
+
+		sleepFor := 5 * time.Second
+		if sleepFor > remaining {
+			sleepFor = remaining
+		}
+		timer := time.NewTimer(sleepFor)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
+		}
 	}
-	if asyncResult != nil {
-		return asyncResult.Err
-	}
-	return nil
 }
 
 func resolveRecordAfterAsyncTask(ctx context.Context, manager ResourceManager, rest *VMSRest, record Record, managerName string) (Record, error) {
