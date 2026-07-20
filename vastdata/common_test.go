@@ -4,6 +4,9 @@ package provider
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"io"
 	"reflect"
 	"testing"
 
@@ -349,4 +352,38 @@ func TestPopulateIDFieldsFromNestedObjects_NilInputs(t *testing.T) {
 		// Should not panic
 		PopulateIDFieldsFromNestedObjects(ctx, nil, nil)
 	})
+}
+
+func TestIsTransientAsyncPollError(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want bool
+	}{
+		{"nil", nil, false},
+		{"canceled", context.Canceled, false},
+		{"deadline", context.DeadlineExceeded, false},
+		{"verification failed", fmt.Errorf("WaitAPICondition verification failed: boom"), false},
+		{"timeout", fmt.Errorf("WaitAPICondition timeout after 10m0s"), false},
+		{"cancelled", fmt.Errorf("WaitAPICondition cancelled: %w", context.Canceled), false},
+		{"generic", errors.New("task failed"), false},
+		{"api 400", &ApiError{StatusCode: 400, Body: "bad"}, false},
+		{"api 503", &ApiError{StatusCode: 503, Body: "unavailable"}, true},
+		{"api unreachable", &ApiError{StatusCode: 0, Body: "unreachable"}, true},
+		{
+			"wrapped connection reset",
+			fmt.Errorf("WaitAPICondition API call failed: %w",
+				fmt.Errorf(`failed to perform GET request to https://v162:443/api/latest/vtasks/20/, error Get "https://v162:443/api/latest/vtasks/20/": read tcp 10.241.12.3:62794->10.141.200.162:443: connection reset by peer`)),
+			true,
+		},
+		{"eof", io.EOF, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isTransientAsyncPollError(tt.err); got != tt.want {
+				t.Errorf("isTransientAsyncPollError() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

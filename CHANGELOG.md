@@ -10,6 +10,10 @@ NOTES:
 
 * New resources and data sources require **VAST 5.5.0+**.
 
+BUG FIXES:
+
+* **Async task polling**: Retry transient network errors (e.g. `connection reset by peer`) and temporary API unavailability while waiting on async tasks, so long-running operations such as `vastdata_compute_cluster` create are not aborted by a single VMS blip (TERF-264).
+
 NEW RESOURCES:
 
 * **vastdata_blob_expansion**: Manage blob expansion pipelines for VAST Database tables
