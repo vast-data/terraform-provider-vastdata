@@ -60,7 +60,7 @@ data "vastdata_compute_cluster" "vastdb_compute_cluster_by_name" {
 ### Read-Only
 
 - `cluster_tenants` (Attributes List) List of tenants associated with the compute cluster. Populated when get_tenants is true. (see [below for nested schema](#nestedatt--cluster_tenants))
-- `dashboard` (Attributes) Dashboard statistics for the compute cluster. Populated when get_dashboard is true. (see [below for nested schema](#nestedatt--dashboard))
+- `dashboard` (Attributes) Per-cluster dashboard statistics from resource_counts on GET /computeclusters/{id}/. Populated when get_dashboard is true. (see [below for nested schema](#nestedatt--dashboard))
 - `deployments` (Attributes List) List of Kubernetes deployments in the compute cluster. Populated when get_deployments is true. (see [below for nested schema](#nestedatt--deployments))
 - `id` (Number) The ID of this resource.
 - `namespaces` (Attributes List) List of Kubernetes namespaces in the compute cluster. Populated when get_namespaces is true. (see [below for nested schema](#nestedatt--namespaces))
@@ -90,12 +90,12 @@ Read-Only:
 Read-Only:
 
 - `cnodes` (String) JSON map of cnode status → count.
-- `compute_clusters` (String) JSON map of compute cluster status → count.
+- `compute_clusters` (String) Present only for the cluster-wide dashboard data source; null for per-cluster resource_counts.
 - `deployments` (String) JSON map of deployment status → count.
-- `namespace_counts` (Number) Number of namespaces in the cluster.
+- `namespace_counts` (Number) Number of namespaces in this compute cluster.
 - `pods` (String) JSON map of pod status → count.
-- `service_counts` (Number) Number of services in the cluster.
-- `tenant_counts` (Number) Number of tenants attached to the compute cluster.
+- `service_counts` (Number) Number of services in this compute cluster.
+- `tenant_counts` (Number) Number of tenants attached to this compute cluster.
 
 
 <a id="nestedatt--deployments"></a>

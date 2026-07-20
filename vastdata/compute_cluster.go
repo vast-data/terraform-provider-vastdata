@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -169,13 +168,13 @@ var computeClusterDashboardSubResource = is.SubResourceHint{
 	SchemaAttributes: map[string]any{
 		"dashboard": rschema.SingleNestedAttribute{
 			Computed:    true,
-			Description: "Dashboard statistics for the compute cluster. Populated when get_dashboard is true.",
+			Description: "Per-cluster dashboard statistics from resource_counts on GET /computeclusters/{id}/. Populated when get_dashboard is true.",
 			Attributes: map[string]rschema.Attribute{
-				"namespace_counts": rschema.Int64Attribute{Computed: true, Description: "Number of namespaces in the cluster."},
-				"service_counts":   rschema.Int64Attribute{Computed: true, Description: "Number of services in the cluster."},
-				"tenant_counts":    rschema.Int64Attribute{Computed: true, Description: "Number of tenants attached to the compute cluster."},
+				"namespace_counts": rschema.Int64Attribute{Computed: true, Description: "Number of namespaces in this compute cluster."},
+				"service_counts":   rschema.Int64Attribute{Computed: true, Description: "Number of services in this compute cluster."},
+				"tenant_counts":    rschema.Int64Attribute{Computed: true, Description: "Number of tenants attached to this compute cluster."},
 				"cnodes":           rschema.StringAttribute{Computed: true, Description: "JSON map of cnode status → count."},
-				"compute_clusters": rschema.StringAttribute{Computed: true, Description: "JSON map of compute cluster status → count."},
+				"compute_clusters": rschema.StringAttribute{Computed: true, Description: "Present only for the cluster-wide dashboard data source; null for per-cluster resource_counts."},
 				"deployments":      rschema.StringAttribute{Computed: true, Description: "JSON map of deployment status → count."},
 				"pods":             rschema.StringAttribute{Computed: true, Description: "JSON map of pod status → count."},
 			},
@@ -395,13 +394,13 @@ func (m *ComputeCluster) GetSubResources(ctx context.Context, rest *VMSRest, rec
 	}
 
 	if m.tfstate.Bool("get_dashboard") {
-		dashboard, err := fetchComputeClusterDashboard(ctx, rest)
-		if err != nil {
-			return nil, err
+		// Per-cluster stats come from resource_counts on GET /computeclusters/{id}/,
+		// not from the cluster-wide GET /computeclusters/dashboard/ endpoint.
+		dashboard := dashboardFromResourceCounts(record["resource_counts"])
+		if dashboard == nil {
+			return nil, fmt.Errorf("compute cluster %d has no resource_counts in API response", id)
 		}
-		if dashboard != nil {
-			result["dashboard"] = dashboard
-		}
+		result["dashboard"] = dashboard
 	}
 
 	return result, nil
@@ -512,33 +511,46 @@ func computeClusterLookupSchemaAttributes() map[string]any {
 	}
 }
 
-func resolveComputeClusterContext(ctx context.Context, rest *VMSRest, tfstate *is.TFState) (int64, Record, error) {
+func lookupComputeCluster(ctx context.Context, rest *VMSRest, tfstate *is.TFState) (Record, error) {
 	if tfstate.IsKnownAndNotNull("compute_cluster_id") {
 		id := tfstate.Int64("compute_cluster_id")
 		if id != 0 {
-			record := Record{"compute_cluster_id": id}
-			if tfstate.IsKnownAndNotNull("compute_cluster_name") {
-				record["compute_cluster_name"] = tfstate.String("compute_cluster_name")
+			cluster, err := rest.ComputeClusters.GetByIdWithContext(ctx, id)
+			if err != nil {
+				return nil, fmt.Errorf("lookup compute cluster by id %d: %w", id, err)
 			}
-			return id, record, nil
+			return cluster, nil
 		}
 	}
 
 	name := tfstate.String("compute_cluster_name")
 	if name == "" {
-		return 0, nil, fmt.Errorf("either compute_cluster_id or compute_cluster_name must be set")
+		return nil, fmt.Errorf("either compute_cluster_id or compute_cluster_name must be set")
 	}
 
 	cluster, err := rest.ComputeClusters.GetWithContext(ctx, params{"name": name})
 	if err != nil {
-		return 0, nil, fmt.Errorf("lookup compute cluster by name %q: %w", name, err)
+		return nil, fmt.Errorf("lookup compute cluster by name %q: %w", name, err)
 	}
+	return cluster, nil
+}
 
+func computeClusterBaseFromRecord(cluster Record) (int64, Record) {
 	id := cluster.RecordID()
-	return id, Record{
-		"compute_cluster_id":   id,
-		"compute_cluster_name": name,
-	}, nil
+	base := Record{"compute_cluster_id": id}
+	if name, ok := cluster["name"].(string); ok && name != "" {
+		base["compute_cluster_name"] = name
+	}
+	return id, base
+}
+
+func resolveComputeClusterContext(ctx context.Context, rest *VMSRest, tfstate *is.TFState) (int64, Record, error) {
+	cluster, err := lookupComputeCluster(ctx, rest, tfstate)
+	if err != nil {
+		return 0, nil, err
+	}
+	id, base := computeClusterBaseFromRecord(cluster)
+	return id, base, nil
 }
 
 func mergeComputeClusterRecords(base Record, extra Record) Record {
@@ -730,20 +742,34 @@ func fetchComputeClusterDashboard(ctx context.Context, rest *VMSRest) (map[strin
 	if dash == nil {
 		return nil, nil
 	}
+	return normalizeComputeClusterDashboard(dash), nil
+}
+
+// dashboardFromResourceCounts maps GET /computeclusters/{id}/ resource_counts into the
+// dashboard attribute shape used by the provider.
+func dashboardFromResourceCounts(resourceCounts any) map[string]any {
+	rc, ok := resourceCounts.(map[string]any)
+	if !ok || rc == nil {
+		return nil
+	}
+	return normalizeComputeClusterDashboard(Record(rc))
+}
+
+func normalizeComputeClusterDashboard(dash map[string]any) map[string]any {
 	dashRecord := map[string]any{
 		"namespace_counts": dash["namespace_counts"],
 		"service_counts":   dash["service_counts"],
 		"tenant_counts":    dash["tenant_counts"],
 	}
 	for _, mapField := range []string{"cnodes", "compute_clusters", "deployments", "pods"} {
-		if v, ok := dash[mapField]; ok {
+		if v, ok := dash[mapField]; ok && v != nil {
 			raw, _ := json.Marshal(v)
 			dashRecord[mapField] = string(raw)
 		} else {
-			dashRecord[mapField] = types.StringNull().ValueString()
+			dashRecord[mapField] = nil
 		}
 	}
-	return dashRecord, nil
+	return dashRecord
 }
 
 func computeClusterPodConditionsSchema() dschema.ListNestedAttribute {
@@ -867,13 +893,13 @@ func computeClusterTenantsListSchema() dschema.ListNestedAttribute {
 func computeClusterDashboardObjectSchema() dschema.SingleNestedAttribute {
 	return dschema.SingleNestedAttribute{
 		Computed:    true,
-		Description: "Dashboard statistics for the compute cluster.",
+		Description: "Dashboard statistics. Cluster-wide when no id/name is set; per-cluster resource_counts when a cluster is specified.",
 		Attributes: map[string]dschema.Attribute{
-			"namespace_counts": dschema.Int64Attribute{Computed: true, Description: "Number of namespaces in the cluster."},
-			"service_counts":   dschema.Int64Attribute{Computed: true, Description: "Number of services in the cluster."},
-			"tenant_counts":    dschema.Int64Attribute{Computed: true, Description: "Number of tenants attached to the compute cluster."},
+			"namespace_counts": dschema.Int64Attribute{Computed: true, Description: "Namespace count (cluster-wide or for the selected compute cluster)."},
+			"service_counts":   dschema.Int64Attribute{Computed: true, Description: "Service count (cluster-wide or for the selected compute cluster)."},
+			"tenant_counts":    dschema.Int64Attribute{Computed: true, Description: "Tenant count (cluster-wide or for the selected compute cluster)."},
 			"cnodes":           dschema.StringAttribute{Computed: true, Description: "JSON map of cnode status → count."},
-			"compute_clusters": dschema.StringAttribute{Computed: true, Description: "JSON map of compute cluster status → count."},
+			"compute_clusters": dschema.StringAttribute{Computed: true, Description: "JSON map of compute cluster status → count (cluster-wide dashboard only)."},
 			"deployments":      dschema.StringAttribute{Computed: true, Description: "JSON map of deployment status → count."},
 			"pods":             dschema.StringAttribute{Computed: true, Description: "JSON map of pod status → count."},
 		},
@@ -1076,19 +1102,44 @@ type ComputeClusterDashboard struct {
 func (m *ComputeClusterDashboard) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return &ComputeClusterDashboard{computeClusterSubresourceDatasource{
 		tfstate: newComputeClusterSubresourceTFState(raw, schema,
-			"Dashboard statistics for a compute cluster.",
-			map[string]any{"dashboard": computeClusterDashboardObjectSchema()}),
+			"Compute cluster dashboard statistics. Omit compute_cluster_id/name to read GET /computeclusters/dashboard/ (all clusters). Set id or name to read resource_counts from GET /computeclusters/{id}/.",
+			map[string]any{
+				"compute_cluster_id": dschema.Int64Attribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "Optional. When set (or when compute_cluster_name is set), reads per-cluster resource_counts from GET /computeclusters/{id}/. Omit both id and name for the cluster-wide dashboard.",
+				},
+				"compute_cluster_name": dschema.StringAttribute{
+					Optional:    true,
+					Description: "Optional. Used to look up the cluster when compute_cluster_id is not set. Omit both id and name for the cluster-wide dashboard.",
+				},
+				"dashboard": computeClusterDashboardObjectSchema(),
+			}),
 	}}
 }
 
 func (m *ComputeClusterDashboard) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	base, err := m.lookupRecord(ctx, rest)
+	hasID := m.tfstate.IsKnownAndNotNull("compute_cluster_id") && m.tfstate.Int64("compute_cluster_id") != 0
+	hasName := m.tfstate.IsKnownAndNotNull("compute_cluster_name") && m.tfstate.String("compute_cluster_name") != ""
+
+	// No cluster selector → cluster-wide dashboard (vms.computeclusters.dashboard.get()).
+	if !hasID && !hasName {
+		dashboard, err := fetchComputeClusterDashboard(ctx, rest)
+		if err != nil {
+			return nil, err
+		}
+		return Record{"dashboard": dashboard}, nil
+	}
+
+	// Cluster selector → per-cluster resource_counts (vms.computeclusters[id].get()).
+	cluster, err := lookupComputeCluster(ctx, rest, m.tfstate)
 	if err != nil {
 		return nil, err
 	}
-	dashboard, err := fetchComputeClusterDashboard(ctx, rest)
-	if err != nil {
-		return nil, err
+	_, base := computeClusterBaseFromRecord(cluster)
+	dashboard := dashboardFromResourceCounts(cluster["resource_counts"])
+	if dashboard == nil {
+		return nil, fmt.Errorf("compute cluster %d has no resource_counts in API response", cluster.RecordID())
 	}
 	return mergeComputeClusterRecords(base, Record{"dashboard": dashboard}), nil
 }

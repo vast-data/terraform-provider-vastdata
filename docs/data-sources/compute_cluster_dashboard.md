@@ -3,12 +3,12 @@
 page_title: "vastdata_compute_cluster_dashboard Data Source - vastdata"
 subcategory: ""
 description: |-
-  Dashboard statistics for a compute cluster.
+  Compute cluster dashboard statistics. Omit compute_cluster_id/name to read GET /computeclusters/dashboard/ (all clusters). Set id or name to read resource_counts from GET /computeclusters/{id}/.
 ---
 
 # vastdata_compute_cluster_dashboard (Data Source)
 
-Dashboard statistics for a compute cluster.
+Compute cluster dashboard statistics. Omit compute_cluster_id/name to read GET /computeclusters/dashboard/ (all clusters). Set id or name to read resource_counts from GET /computeclusters/{id}/.
 
 ## Example Usage
 
@@ -23,12 +23,12 @@ data "vastdata_compute_cluster_dashboard" "tf_test_cluster_dashboard" {
 
 ### Optional
 
-- `compute_cluster_id` (Number) Compute cluster ID. Provide this or compute_cluster_name.
-- `compute_cluster_name` (String) Compute cluster name. Used to look up the cluster ID when compute_cluster_id is not set.
+- `compute_cluster_id` (Number) Optional. When set (or when compute_cluster_name is set), reads per-cluster resource_counts from GET /computeclusters/{id}/. Omit both id and name for the cluster-wide dashboard.
+- `compute_cluster_name` (String) Optional. Used to look up the cluster when compute_cluster_id is not set. Omit both id and name for the cluster-wide dashboard.
 
 ### Read-Only
 
-- `dashboard` (Attributes) Dashboard statistics for the compute cluster. (see [below for nested schema](#nestedatt--dashboard))
+- `dashboard` (Attributes) Dashboard statistics. Cluster-wide when no id/name is set; per-cluster resource_counts when a cluster is specified. (see [below for nested schema](#nestedatt--dashboard))
 
 <a id="nestedatt--dashboard"></a>
 ### Nested Schema for `dashboard`
@@ -36,9 +36,9 @@ data "vastdata_compute_cluster_dashboard" "tf_test_cluster_dashboard" {
 Read-Only:
 
 - `cnodes` (String) JSON map of cnode status → count.
-- `compute_clusters` (String) JSON map of compute cluster status → count.
+- `compute_clusters` (String) JSON map of compute cluster status → count (cluster-wide dashboard only).
 - `deployments` (String) JSON map of deployment status → count.
-- `namespace_counts` (Number) Number of namespaces in the cluster.
+- `namespace_counts` (Number) Namespace count (cluster-wide or for the selected compute cluster).
 - `pods` (String) JSON map of pod status → count.
-- `service_counts` (Number) Number of services in the cluster.
-- `tenant_counts` (Number) Number of tenants attached to the compute cluster.
+- `service_counts` (Number) Service count (cluster-wide or for the selected compute cluster).
+- `tenant_counts` (Number) Tenant count (cluster-wide or for the selected compute cluster).
