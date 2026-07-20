@@ -192,7 +192,7 @@ var allComputeClusterSubResources = []is.SubResourceHint{
 	computeClusterDashboardSubResource,
 }
 
-var computeClusterAsyncTaskTimeout = 40 * time.Minute
+var computeClusterAsyncTaskTimeout = 2 * time.Hour
 
 // 503 SERVICE_UNAVAILABLE is transient when VMS cannot reach the internal Kubernetes API.
 var computeClusterSubResourceRetryOn = &is.RetryExpression{
@@ -215,6 +215,11 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 			RetryOn:                 computeClusterSubResourceRetryOn,
 			NotRequiredSchemaFields: []string{"cnodes"},
 			PreserveOrderFields:     []string{"static_ip_ranges"},
+			// Present in GET response but omitted from CreateParams OpenAPI schema,
+			// so generation would otherwise mark them computed-only.
+			OptionalSchemaFields: []string{"default_gateway", "vlan", "all_tenants"},
+			// all_tenants is only accepted on PATCH (ComputeClusterModifyParams).
+			EditOnlyFields: []string{"all_tenants"},
 		},
 	)}
 }
