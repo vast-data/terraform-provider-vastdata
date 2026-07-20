@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -397,9 +396,11 @@ func (m *ComputeCluster) GetSubResources(ctx context.Context, rest *VMSRest, rec
 	if m.tfstate.Bool("get_dashboard") {
 		// Per-cluster stats come from resource_counts on GET /computeclusters/{id}/,
 		// not from the cluster-wide GET /computeclusters/dashboard/ endpoint.
-		if dashboard := dashboardFromResourceCounts(record["resource_counts"]); dashboard != nil {
-			result["dashboard"] = dashboard
+		dashboard := dashboardFromResourceCounts(record["resource_counts"])
+		if dashboard == nil {
+			return nil, fmt.Errorf("compute cluster %d has no resource_counts in API response", id)
 		}
+		result["dashboard"] = dashboard
 	}
 
 	return result, nil
@@ -765,7 +766,7 @@ func normalizeComputeClusterDashboard(dash map[string]any) map[string]any {
 			raw, _ := json.Marshal(v)
 			dashRecord[mapField] = string(raw)
 		} else {
-			dashRecord[mapField] = types.StringNull().ValueString()
+			dashRecord[mapField] = nil
 		}
 	}
 	return dashRecord
@@ -1102,7 +1103,18 @@ func (m *ComputeClusterDashboard) NewDatasourceManager(raw map[string]attr.Value
 	return &ComputeClusterDashboard{computeClusterSubresourceDatasource{
 		tfstate: newComputeClusterSubresourceTFState(raw, schema,
 			"Compute cluster dashboard statistics. Omit compute_cluster_id/name to read GET /computeclusters/dashboard/ (all clusters). Set id or name to read resource_counts from GET /computeclusters/{id}/.",
-			map[string]any{"dashboard": computeClusterDashboardObjectSchema()}),
+			map[string]any{
+				"compute_cluster_id": dschema.Int64Attribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "Optional. When set (or when compute_cluster_name is set), reads per-cluster resource_counts from GET /computeclusters/{id}/. Omit both id and name for the cluster-wide dashboard.",
+				},
+				"compute_cluster_name": dschema.StringAttribute{
+					Optional:    true,
+					Description: "Optional. Used to look up the cluster when compute_cluster_id is not set. Omit both id and name for the cluster-wide dashboard.",
+				},
+				"dashboard": computeClusterDashboardObjectSchema(),
+			}),
 	}}
 }
 

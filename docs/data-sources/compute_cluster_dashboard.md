@@ -23,8 +23,8 @@ data "vastdata_compute_cluster_dashboard" "tf_test_cluster_dashboard" {
 
 ### Optional
 
-- `compute_cluster_id` (Number) Compute cluster ID. Provide this or compute_cluster_name.
-- `compute_cluster_name` (String) Compute cluster name. Used to look up the cluster ID when compute_cluster_id is not set.
+- `compute_cluster_id` (Number) Optional. When set (or when compute_cluster_name is set), reads per-cluster resource_counts from GET /computeclusters/{id}/. Omit both id and name for the cluster-wide dashboard.
+- `compute_cluster_name` (String) Optional. Used to look up the cluster when compute_cluster_id is not set. Omit both id and name for the cluster-wide dashboard.
 
 ### Read-Only
 
