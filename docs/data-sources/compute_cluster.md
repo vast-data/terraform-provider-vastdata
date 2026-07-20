@@ -68,7 +68,7 @@ data "vastdata_compute_cluster" "vastdb_compute_cluster_by_name" {
 - `pods` (Attributes List) List of Kubernetes pods in the compute cluster. Populated when get_pods is true. (see [below for nested schema](#nestedatt--pods))
 - `resource_counts` (Attributes) Resource counts with state-based breakdowns for this cluster (see [below for nested schema](#nestedatt--resource_counts))
 - `services` (Attributes List) List of Kubernetes services in the compute cluster. Populated when get_services is true. (see [below for nested schema](#nestedatt--services))
-- `static_ip_ranges` (Set of Set of String) List of IP range pairs [[start1, end1], [start2, end2]] for static IP assignment to CNodes.
+- `static_ip_ranges` (List of List of String) List of IP range pairs [[start1, end1], [start2, end2]] for static IP assignment to CNodes.
 Must provide enough IPs for all CNodes.
 - `tags` (Set of String) User-defined tags for the compute cluster
 
