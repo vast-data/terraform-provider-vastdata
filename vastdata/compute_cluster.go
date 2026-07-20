@@ -192,7 +192,7 @@ var allComputeClusterSubResources = []is.SubResourceHint{
 	computeClusterDashboardSubResource,
 }
 
-var computeClusterAsyncTaskTimeout = 40 * time.Minute
+var computeClusterAsyncTaskTimeout = 2 * time.Hour
 
 // 503 SERVICE_UNAVAILABLE is transient when VMS cannot reach the internal Kubernetes API.
 var computeClusterSubResourceRetryOn = &is.RetryExpression{
@@ -220,11 +220,6 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 			OptionalSchemaFields: []string{"default_gateway", "vlan", "all_tenants"},
 			// all_tenants is only accepted on PATCH (ComputeClusterModifyParams).
 			EditOnlyFields: []string{"all_tenants"},
-			// Network identity fields are create-time only (not in ModifyParams).
-			CommonModifiersMapping: map[string]string{
-				"default_gateway": ModifierForceNew,
-				"vlan":            ModifierForceNew,
-			},
 		},
 	)}
 }
