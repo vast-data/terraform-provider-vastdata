@@ -1107,22 +1107,23 @@ type ComputeClusterDashboard struct {
 }
 
 func (m *ComputeClusterDashboard) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ComputeClusterDashboard{computeClusterSubresourceDatasource{
-		tfstate: newComputeClusterSubresourceTFState(raw, schema,
-			"Compute cluster dashboard statistics. Omit compute_cluster_id/name to read GET /computeclusters/dashboard/ (all clusters). Set id or name to read resource_counts from GET /computeclusters/{id}/.",
-			map[string]any{
-				"compute_cluster_id": dschema.Int64Attribute{
-					Optional:    true,
-					Computed:    true,
-					Description: "Optional. When set (or when compute_cluster_name is set), reads per-cluster resource_counts from GET /computeclusters/{id}/. Omit both id and name for the cluster-wide dashboard.",
-				},
-				"compute_cluster_name": dschema.StringAttribute{
-					Optional:    true,
-					Description: "Optional. Used to look up the cluster when compute_cluster_id is not set. Omit both id and name for the cluster-wide dashboard.",
-				},
-				"dashboard": computeClusterDashboardObjectSchema(),
-			}),
-	}}
+	tfstate := newComputeClusterSubresourceTFState(raw, schema,
+		"Compute cluster dashboard statistics. Omit compute_cluster_id/name to read GET /computeclusters/dashboard/ (all clusters). Set id or name to read resource_counts from GET /computeclusters/{id}/.",
+		map[string]any{
+			"compute_cluster_id": dschema.Int64Attribute{
+				Optional:    true,
+				Computed:    true,
+				Description: "Optional. When set (or when compute_cluster_name is set), reads per-cluster resource_counts from GET /computeclusters/{id}/. Omit both id and name for the cluster-wide dashboard.",
+			},
+			"compute_cluster_name": dschema.StringAttribute{
+				Optional:    true,
+				Description: "Optional. Used to look up the cluster when compute_cluster_id is not set. Omit both id and name for the cluster-wide dashboard.",
+			},
+			"dashboard": computeClusterDashboardObjectSchema(),
+		})
+	// Cluster-wide read is valid with no selector (GET /computeclusters/dashboard/).
+	tfstate.Hints.AllowEmptySearchParams = true
+	return &ComputeClusterDashboard{computeClusterSubresourceDatasource{tfstate: tfstate}}
 }
 
 func (m *ComputeClusterDashboard) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

@@ -235,6 +235,9 @@ func (d *Datasource) getRecordBySearchParams(ctx context.Context, manager DataSo
 func (d *Datasource) checkNonEmptyFields(ctx context.Context, manager DataSourceManager, dg *diag.Diagnostics) bool {
 	ok := true
 	tfState := manager.TfState()
+	if tfState.Hints != nil && tfState.Hints.AllowEmptySearchParams {
+		return true
+	}
 	searchParams := getSearchParams(ctx, tfState, nil)
 	if len(searchParams) == 0 {
 		ok = false

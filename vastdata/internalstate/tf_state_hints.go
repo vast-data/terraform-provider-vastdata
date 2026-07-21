@@ -35,6 +35,10 @@ type TFStateHints struct {
 	// when constructing lookup parameters (e.g., for API GET calls).
 	SearchableFields []string
 
+	// AllowEmptySearchParams skips the datasource "at least one search field" check.
+	// Use for reads that are valid with no selector (e.g. cluster-wide dashboard).
+	AllowEmptySearchParams bool
+
 	// SearchFilterFields lists field names that are always appended to search
 	// query params as additional AND-filters when they are set (non-null).
 	// Unlike SearchableFields (which picks ONE field from a set of alternatives),
