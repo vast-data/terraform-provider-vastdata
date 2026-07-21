@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -237,12 +238,42 @@ func (m *ComputeCluster) NewDatasourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *ComputeCluster) TfState() *is.TFState {
-	return m.tfstate
-}
-
 func (m *ComputeCluster) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.ComputeClusters
+}
+
+// TransformRequestBody normalizes cnodes (id type + stable order) so create-adopt
+// DiffMap matches GET /{id}/ after NormalizeRecordForCreateAdopt.
+func (m *ComputeCluster) TransformRequestBody(body Record) Record {
+	if body == nil {
+		return body
+	}
+	if cnodes, ok := body["cnodes"]; ok {
+		body["cnodes"] = normalizeComputeClusterCnodes(cnodes)
+	}
+	if v, ok := body["backup_frequency"]; ok {
+		body["backup_frequency"] = int64FromAny(v)
+	}
+	return body
+}
+
+// LookupForCreate finds an existing cluster by name, then re-fetches GET /{id}/.
+// Name search returns a list item without cnodes; without the detail GET, create-adopt
+// always diffs cnodes and PATCHes — which fails for PARTIALLY_PROVISIONED clusters.
+func (m *ComputeCluster) LookupForCreate(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
+	name := m.tfstate.String("name")
+	if name == "" {
+		return nil, fmt.Errorf("compute cluster name is required")
+	}
+	found, err := rest.ComputeClusters.GetWithContext(ctx, params{"name": name})
+	if err != nil {
+		return nil, err
+	}
+	return rest.ComputeClusters.GetByIdWithContext(ctx, found.RecordID())
+}
+
+func (m *ComputeCluster) TfState() *is.TFState {
+	return m.tfstate
 }
 
 func (m *ComputeCluster) NormalizeRecordForCreateAdopt(record Record) Record {
@@ -251,6 +282,14 @@ func (m *ComputeCluster) NormalizeRecordForCreateAdopt(record Record) Record {
 	}
 	if cnodes, ok := record["cnodes"]; ok {
 		record["cnodes"] = normalizeComputeClusterCnodes(cnodes)
+	}
+	// JSON decode uses float64; create params use int64 — without coercion DiffMap
+	// falsely diffs backup_frequency/cnode ids and PATCHes on adopt.
+	if v, ok := record["backup_frequency"]; ok {
+		record["backup_frequency"] = int64FromAny(v)
+	}
+	if v, ok := record["vlan"]; ok && v != nil {
+		record["vlan"] = int64FromAny(v)
 	}
 	return record
 }
@@ -280,12 +319,18 @@ func normalizeComputeClusterCnodes(raw any) any {
 		if !ok {
 			continue
 		}
-		normalized := map[string]any{"id": cnode["id"]}
+		normalized := map[string]any{"id": int64FromAny(cnode["id"])}
 		if preset, ok := cnode["resource_preset"]; ok {
 			normalized["resource_preset"] = preset
 		}
 		out = append(out, normalized)
 	}
+	// Stable order so DiffMap does not treat Set-vs-API order as a change.
+	sort.Slice(out, func(i, j int) bool {
+		ai, _ := out[i].(map[string]any)
+		aj, _ := out[j].(map[string]any)
+		return int64FromAny(ai["id"]) < int64FromAny(aj["id"])
+	})
 	return out
 }
 
