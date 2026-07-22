@@ -11,8 +11,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -697,4 +699,71 @@ func TestMigrateMode_NilProviderData_NoMigrate(t *testing.T) {
 		pd := r.providerData
 		_ = pd != nil && pd.MigrateMode
 	})
+}
+
+// TERF-268: write-only values are null in Plan and only present in Config.
+func TestOverlayWriteOnlyFromConfig_IncludedInCreateParams(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"name":        rschema.StringAttribute{Required: true},
+		"cert_type":   rschema.StringAttribute{Optional: true},
+		"certificate": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"private_key": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"ca_certificate": rschema.StringAttribute{
+			Optional:  true,
+			WriteOnly: true,
+			Sensitive: true,
+		},
+	}}
+	hints := &is.TFStateHints{
+		WriteOnlyFields: []string{"certificate", "private_key", "ca_certificate"},
+	}
+	r := buildTestResourceWithSchema(schema, hints)
+
+	objType := tftypes.Object{AttributeTypes: map[string]tftypes.Type{
+		"name":           tftypes.String,
+		"cert_type":      tftypes.String,
+		"certificate":    tftypes.String,
+		"private_key":    tftypes.String,
+		"ca_certificate": tftypes.String,
+	}}
+
+	// Plan: write-only attrs are null (Terraform behavior).
+	plan := tfsdk.Plan{
+		Schema: schema,
+		Raw: tftypes.NewValue(objType, map[string]tftypes.Value{
+			"name":           tftypes.NewValue(tftypes.String, "tf-cert"),
+			"cert_type":      tftypes.NewValue(tftypes.String, "WEBHOOK"),
+			"certificate":    tftypes.NewValue(tftypes.String, nil),
+			"private_key":    tftypes.NewValue(tftypes.String, nil),
+			"ca_certificate": tftypes.NewValue(tftypes.String, nil),
+		}),
+	}
+	// Config: write-only PEMs are present.
+	config := tfsdk.Config{
+		Schema: schema,
+		Raw: tftypes.NewValue(objType, map[string]tftypes.Value{
+			"name":           tftypes.NewValue(tftypes.String, "tf-cert"),
+			"cert_type":      tftypes.NewValue(tftypes.String, "WEBHOOK"),
+			"certificate":    tftypes.NewValue(tftypes.String, "CERT-PEM"),
+			"private_key":    tftypes.NewValue(tftypes.String, "KEY-PEM"),
+			"ca_certificate": tftypes.NewValue(tftypes.String, "CA-PEM"),
+		}),
+	}
+
+	manager := r.NewManager(plan)
+	paramsBefore := manager.TfState().GetCreateParams()
+	assert.NotContains(t, paramsBefore, "certificate")
+	assert.NotContains(t, paramsBefore, "private_key")
+	assert.NotContains(t, paramsBefore, "ca_certificate")
+	assert.Equal(t, "WEBHOOK", paramsBefore["cert_type"])
+
+	r.overlayWriteOnlyFromConfig(manager, config)
+	params := manager.TfState().GetCreateParams()
+	assert.Equal(t, "CERT-PEM", params["certificate"])
+	assert.Equal(t, "KEY-PEM", params["private_key"])
+	assert.Equal(t, "CA-PEM", params["ca_certificate"])
+	assert.Equal(t, "tf-cert", params["name"])
+	assert.Equal(t, "WEBHOOK", params["cert_type"])
 }
