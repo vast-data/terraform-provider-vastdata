@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -132,4 +133,122 @@ func TestView_corsBody_maxAgeSecondsZero_roundTrip(t *testing.T) {
 	rule, ok := rules[0].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, int64(0), rule["max_age_seconds"])
+}
+
+func viewCorsTestSchema() rschema.Schema {
+	return rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"get_s3cors_configuration": rschema.BoolAttribute{Optional: true},
+		"s3cors_configuration": rschema.SingleNestedAttribute{
+			Optional: true,
+			Attributes: map[string]rschema.Attribute{
+				"cors_rules": rschema.ListNestedAttribute{Optional: true},
+			},
+		},
+	}}
+}
+
+func TestIsS3View(t *testing.T) {
+	tests := []struct {
+		name     string
+		record   Record
+		expected bool
+	}{
+		{name: "nil record", record: nil, expected: false},
+		{name: "missing protocols", record: Record{"id": 1}, expected: false},
+		{name: "nil protocols", record: Record{"protocols": nil}, expected: false},
+		{name: "NFS only", record: Record{"protocols": []any{"NFS"}}, expected: false},
+		{name: "NFS and NFS4", record: Record{"protocols": []any{"NFS", "NFS4"}}, expected: false},
+		{name: "S3 only", record: Record{"protocols": []any{"S3"}}, expected: true},
+		{name: "S3 and NFS", record: Record{"protocols": []any{"NFS", "S3"}}, expected: true},
+		{name: "string slice S3", record: Record{"protocols": []string{"S3"}}, expected: true},
+		{name: "string slice NFS", record: Record{"protocols": []string{"NFS"}}, expected: false},
+		{name: "BLOCK only", record: Record{"protocols": []any{"BLOCK"}}, expected: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, isS3View(tt.record))
+		})
+	}
+}
+
+func TestView_hasCorsConfigured(t *testing.T) {
+	t.Parallel()
+	schema := viewCorsTestSchema()
+
+	t.Run("disabled", func(t *testing.T) {
+		t.Parallel()
+		view := &View{
+			tfstate: is.NewTFStateMust(map[string]attr.Value{}, nil, nil),
+		}
+		assert.False(t, view.hasCorsConfigured())
+	})
+
+	t.Run("null cors", func(t *testing.T) {
+		t.Parallel()
+		view := &View{
+			tfstate: is.NewTFStateMust(
+				map[string]attr.Value{
+					"s3cors_configuration": types.ObjectNull(map[string]attr.Type{
+						"cors_rules": types.ListType{ElemType: corsRuleObjectType},
+					}),
+				},
+				schema,
+				nil,
+			),
+		}
+		assert.False(t, view.hasCorsConfigured())
+	})
+
+	t.Run("with cors rules", func(t *testing.T) {
+		t.Parallel()
+		view := testViewWithCorsRules(t, testCorsRule(t, nil))
+		view.tfstate = is.NewTFStateMust(view.tfstate.Raw, schema, nil)
+		assert.True(t, view.hasCorsConfigured())
+	})
+}
+
+func TestView_AfterUpdateResource_SkipsCorsDeleteWhenNeverConfigured(t *testing.T) {
+	t.Parallel()
+
+	schema := viewCorsTestSchema()
+	nullCors := types.ObjectNull(map[string]attr.Type{
+		"cors_rules": types.ListType{ElemType: corsRuleObjectType},
+	})
+	raw := map[string]attr.Value{
+		"get_s3cors_configuration": types.BoolNull(),
+		"s3cors_configuration":     nullCors,
+	}
+
+	// NFS-style prior/plan: no CORS configured. Must not call DELETE (rest=nil would panic).
+	prior := &View{tfstate: is.NewTFStateMust(raw, schema, nil)}
+	plan := &View{tfstate: is.NewTFStateMust(raw, schema, nil)}
+
+	err := prior.AfterUpdateResource(t.Context(), plan, nil, Record{
+		"id":        int64(41),
+		"protocols": []any{"NFS"},
+	})
+	require.NoError(t, err)
+}
+
+func TestView_AfterUpdateResource_RejectsCorsOnNonS3View(t *testing.T) {
+	t.Parallel()
+
+	schema := viewCorsTestSchema()
+	planView := testViewWithCorsRules(t, testCorsRule(t, nil))
+	raw := planView.tfstate.Raw
+	raw["get_s3cors_configuration"] = types.BoolNull()
+	planView.tfstate = is.NewTFStateMust(raw, schema, nil)
+	prior := &View{tfstate: is.NewTFStateMust(map[string]attr.Value{
+		"get_s3cors_configuration": types.BoolNull(),
+		"s3cors_configuration": types.ObjectNull(map[string]attr.Type{
+			"cors_rules": types.ListType{ElemType: corsRuleObjectType},
+		}),
+	}, schema, nil)}
+
+	err := prior.AfterUpdateResource(t.Context(), planView, nil, Record{
+		"id":        int64(661),
+		"protocols": []any{"NFS"},
+	})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), `protocols to include "S3"`)
 }

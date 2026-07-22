@@ -7,6 +7,7 @@ NOTES:
 BUG FIXES:
 
 * **Async task polling**: Retry transient network errors (e.g. `connection reset by peer`) and temporary API unavailability while waiting on async tasks, so long-running operations such as `vastdata_compute_cluster` create are not aborted by a single VMS blip (TERF-264).
+* **vastdata_view**: Fixed update failing with 400 "View is not an S3 bucket" when syncing `s3cors_configuration` on non-S3 views. CORS DELETE is now skipped unless the view is an S3 bucket and prior state had CORS configured.
 
 NEW RESOURCES:
 

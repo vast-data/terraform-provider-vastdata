@@ -131,6 +131,7 @@ func (m *View) API(rest *VMSRest) VastResourceAPIWithContext {
 
 // GetSubResources fetches /views/{id}/s3cors_configuration/ on VAST clusters
 // running version >= 5.5.0. Set get_s3cors_configuration = false to opt out.
+// Only applicable to S3 bucket views; non-S3 views are skipped.
 func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error) {
 	if clusterVersion == nil || clusterVersion.LessThan(VastVersion550) {
 		return nil, nil
@@ -139,13 +140,18 @@ func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record
 	if m.tfstate.IsKnownAndNotNull("get_s3cors_configuration") && !m.tfstate.Bool("get_s3cors_configuration") {
 		return nil, nil
 	}
+	// S3 CORS is only valid for S3 bucket views.
+	if !isS3View(record) {
+		return nil, nil
+	}
 
 	id := record.RecordID()
 	result := Record{}
 
 	// --- s3cors_configuration ---
 	corsRec, err := rest.Views.ViewS3corsConfigurationWithContext_GET(ctx, id, nil)
-	if err != nil && !isNotFoundErr(err) {
+	// 404: no CORS config; 400: view is not an S3 bucket.
+	if err = ignoreStatusCodes(err, http.StatusNotFound, http.StatusBadRequest); err != nil {
 		return nil, err
 	}
 	if corsRec != nil {
@@ -192,6 +198,9 @@ func (m *View) AfterCreateResource(ctx context.Context, rest *VMSRest, record Re
 	if !hasCors || body == nil {
 		return nil
 	}
+	if !isS3View(record) {
+		return fmt.Errorf(`s3cors_configuration requires protocols to include "S3"`)
+	}
 	if err := corsVersionCheck(ctx, rest); err != nil {
 		return err
 	}
@@ -216,18 +225,24 @@ func (m *View) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource
 
 	rawCors, hasCors := planView.tfstate.Raw["s3cors_configuration"]
 	if !hasCors || rawCors.IsNull() || rawCors.IsUnknown() {
-		// s3cors_configuration removed from config — delete existing rules if the endpoint exists.
+		// Only delete when prior state actually had CORS configured.
+		// Otherwise every update of a view without CORS would hit DELETE
+		// (and non-S3 views return 400 "not an S3 bucket").
+		if !m.hasCorsConfigured() || !isS3View(record) {
+			return nil
+		}
 		clusterVer, err := GetCachedClusterVersion(ctx, rest)
 		if err != nil || clusterVer.LessThan(VastVersion550) {
 			return nil // endpoint not available on this cluster, nothing to delete
 		}
-		if err := rest.Views.ViewS3corsConfigurationWithContext_DELETE(ctx, id); err != nil && !isNotFoundErr(err) {
-			return err
-		}
-		return nil
+		err = rest.Views.ViewS3corsConfigurationWithContext_DELETE(ctx, id)
+		return ignoreStatusCodes(err, http.StatusNotFound, http.StatusBadRequest)
 	}
 
-	// User has s3cors_configuration block — enforce version requirement.
+	// User has s3cors_configuration block — only valid on S3 bucket views.
+	if !isS3View(record) {
+		return fmt.Errorf(`s3cors_configuration requires protocols to include "S3"`)
+	}
 	if err := corsVersionCheck(ctx, rest); err != nil {
 		return err
 	}
@@ -237,6 +252,34 @@ func (m *View) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource
 		}
 	}
 	return nil
+}
+
+// isS3View returns true when the view record includes "S3" in its protocols list.
+func isS3View(record Record) bool {
+	raw, ok := record["protocols"]
+	if !ok || raw == nil {
+		return false
+	}
+	switch list := raw.(type) {
+	case []any:
+		for _, p := range list {
+			if s, ok := p.(string); ok && s == "S3" {
+				return true
+			}
+		}
+	case []string:
+		for _, s := range list {
+			if s == "S3" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// hasCorsConfigured reports whether s3cors_configuration is present and non-null in tfstate.
+func (m *View) hasCorsConfigured() bool {
+	return m.tfstate != nil && m.tfstate.Enabled && m.tfstate.IsKnownAndNotNull("s3cors_configuration")
 }
 
 // corsBody converts the s3cors_configuration from tfstate into a params map
