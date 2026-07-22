@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -134,6 +135,18 @@ func TestView_corsBody_maxAgeSecondsZero_roundTrip(t *testing.T) {
 	assert.Equal(t, int64(0), rule["max_age_seconds"])
 }
 
+func viewCorsTestSchema() rschema.Schema {
+	return rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"get_s3cors_configuration": rschema.BoolAttribute{Optional: true},
+		"s3cors_configuration": rschema.SingleNestedAttribute{
+			Optional: true,
+			Attributes: map[string]rschema.Attribute{
+				"cors_rules": rschema.ListNestedAttribute{Optional: true},
+			},
+		},
+	}}
+}
+
 func TestIsS3View(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -159,7 +172,19 @@ func TestIsS3View(t *testing.T) {
 }
 
 func TestView_hasCorsConfigured(t *testing.T) {
+	t.Parallel()
+	schema := viewCorsTestSchema()
+
+	t.Run("disabled", func(t *testing.T) {
+		t.Parallel()
+		view := &View{
+			tfstate: is.NewTFStateMust(map[string]attr.Value{}, nil, nil),
+		}
+		assert.False(t, view.hasCorsConfigured())
+	})
+
 	t.Run("null cors", func(t *testing.T) {
+		t.Parallel()
 		view := &View{
 			tfstate: is.NewTFStateMust(
 				map[string]attr.Value{
@@ -167,7 +192,7 @@ func TestView_hasCorsConfigured(t *testing.T) {
 						"cors_rules": types.ListType{ElemType: corsRuleObjectType},
 					}),
 				},
-				nil,
+				schema,
 				nil,
 			),
 		}
@@ -175,14 +200,55 @@ func TestView_hasCorsConfigured(t *testing.T) {
 	})
 
 	t.Run("with cors rules", func(t *testing.T) {
+		t.Parallel()
 		view := testViewWithCorsRules(t, testCorsRule(t, nil))
+		view.tfstate = is.NewTFStateMust(view.tfstate.Raw, schema, nil)
 		assert.True(t, view.hasCorsConfigured())
 	})
+}
 
-	t.Run("missing key", func(t *testing.T) {
-		view := &View{
-			tfstate: is.NewTFStateMust(map[string]attr.Value{}, nil, nil),
-		}
-		assert.False(t, view.hasCorsConfigured())
+func TestView_AfterUpdateResource_SkipsCorsDeleteWhenNeverConfigured(t *testing.T) {
+	t.Parallel()
+
+	schema := viewCorsTestSchema()
+	nullCors := types.ObjectNull(map[string]attr.Type{
+		"cors_rules": types.ListType{ElemType: corsRuleObjectType},
 	})
+	raw := map[string]attr.Value{
+		"get_s3cors_configuration": types.BoolNull(),
+		"s3cors_configuration":     nullCors,
+	}
+
+	// NFS-style prior/plan: no CORS configured. Must not call DELETE (rest=nil would panic).
+	prior := &View{tfstate: is.NewTFStateMust(raw, schema, nil)}
+	plan := &View{tfstate: is.NewTFStateMust(raw, schema, nil)}
+
+	err := prior.AfterUpdateResource(t.Context(), plan, nil, Record{
+		"id":        int64(41),
+		"protocols": []any{"NFS"},
+	})
+	require.NoError(t, err)
+}
+
+func TestView_AfterUpdateResource_RejectsCorsOnNonS3View(t *testing.T) {
+	t.Parallel()
+
+	schema := viewCorsTestSchema()
+	planView := testViewWithCorsRules(t, testCorsRule(t, nil))
+	raw := planView.tfstate.Raw
+	raw["get_s3cors_configuration"] = types.BoolNull()
+	planView.tfstate = is.NewTFStateMust(raw, schema, nil)
+	prior := &View{tfstate: is.NewTFStateMust(map[string]attr.Value{
+		"get_s3cors_configuration": types.BoolNull(),
+		"s3cors_configuration": types.ObjectNull(map[string]attr.Type{
+			"cors_rules": types.ListType{ElemType: corsRuleObjectType},
+		}),
+	}, schema, nil)}
+
+	err := prior.AfterUpdateResource(t.Context(), planView, nil, Record{
+		"id":        int64(661),
+		"protocols": []any{"NFS"},
+	})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), `protocols to include "S3"`)
 }

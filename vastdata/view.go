@@ -142,7 +142,7 @@ func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record
 	}
 	// S3 CORS is only valid for S3 bucket views.
 	if !isS3View(record) {
-		return Record{"s3cors_configuration": nil}, nil
+		return nil, nil
 	}
 
 	id := record.RecordID()
@@ -150,11 +150,8 @@ func (m *View) GetSubResources(ctx context.Context, rest *VMSRest, record Record
 
 	// --- s3cors_configuration ---
 	corsRec, err := rest.Views.ViewS3corsConfigurationWithContext_GET(ctx, id, nil)
-	// Non-S3 views may return 400 "not an S3 bucket"; treat like not found.
-	if isNotFoundErr(err) {
-		err = nil
-		corsRec = nil
-	} else if err = ignoreStatusCodes(err, http.StatusNotFound, http.StatusBadRequest); err != nil {
+	// 404: no CORS config; 400: view is not an S3 bucket.
+	if err = ignoreStatusCodes(err, http.StatusNotFound, http.StatusBadRequest); err != nil {
 		return nil, err
 	}
 	if corsRec != nil {
@@ -201,6 +198,9 @@ func (m *View) AfterCreateResource(ctx context.Context, rest *VMSRest, record Re
 	if !hasCors || body == nil {
 		return nil
 	}
+	if !isS3View(record) {
+		return fmt.Errorf(`s3cors_configuration requires protocols to include "S3"`)
+	}
 	if err := corsVersionCheck(ctx, rest); err != nil {
 		return err
 	}
@@ -236,14 +236,13 @@ func (m *View) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource
 			return nil // endpoint not available on this cluster, nothing to delete
 		}
 		err = rest.Views.ViewS3corsConfigurationWithContext_DELETE(ctx, id)
-		if isNotFoundErr(err) {
-			return nil
-		}
-		// 404: already gone; 400: view is not an S3 bucket.
 		return ignoreStatusCodes(err, http.StatusNotFound, http.StatusBadRequest)
 	}
 
-	// User has s3cors_configuration block — enforce version requirement.
+	// User has s3cors_configuration block — only valid on S3 bucket views.
+	if !isS3View(record) {
+		return fmt.Errorf(`s3cors_configuration requires protocols to include "S3"`)
+	}
 	if err := corsVersionCheck(ctx, rest); err != nil {
 		return err
 	}
@@ -280,8 +279,7 @@ func isS3View(record Record) bool {
 
 // hasCorsConfigured reports whether s3cors_configuration is present and non-null in tfstate.
 func (m *View) hasCorsConfigured() bool {
-	rawCors, hasCors := m.tfstate.Raw["s3cors_configuration"]
-	return hasCors && !rawCors.IsNull() && !rawCors.IsUnknown()
+	return m.tfstate != nil && m.tfstate.Enabled && m.tfstate.IsKnownAndNotNull("s3cors_configuration")
 }
 
 // corsBody converts the s3cors_configuration from tfstate into a params map
