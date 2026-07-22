@@ -133,3 +133,56 @@ func TestView_corsBody_maxAgeSecondsZero_roundTrip(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, int64(0), rule["max_age_seconds"])
 }
+
+func TestIsS3View(t *testing.T) {
+	tests := []struct {
+		name     string
+		record   Record
+		expected bool
+	}{
+		{name: "nil record", record: nil, expected: false},
+		{name: "missing protocols", record: Record{"id": 1}, expected: false},
+		{name: "nil protocols", record: Record{"protocols": nil}, expected: false},
+		{name: "NFS only", record: Record{"protocols": []any{"NFS"}}, expected: false},
+		{name: "NFS and NFS4", record: Record{"protocols": []any{"NFS", "NFS4"}}, expected: false},
+		{name: "S3 only", record: Record{"protocols": []any{"S3"}}, expected: true},
+		{name: "S3 and NFS", record: Record{"protocols": []any{"NFS", "S3"}}, expected: true},
+		{name: "string slice S3", record: Record{"protocols": []string{"S3"}}, expected: true},
+		{name: "string slice NFS", record: Record{"protocols": []string{"NFS"}}, expected: false},
+		{name: "BLOCK only", record: Record{"protocols": []any{"BLOCK"}}, expected: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, isS3View(tt.record))
+		})
+	}
+}
+
+func TestView_hasCorsConfigured(t *testing.T) {
+	t.Run("null cors", func(t *testing.T) {
+		view := &View{
+			tfstate: is.NewTFStateMust(
+				map[string]attr.Value{
+					"s3cors_configuration": types.ObjectNull(map[string]attr.Type{
+						"cors_rules": types.ListType{ElemType: corsRuleObjectType},
+					}),
+				},
+				nil,
+				nil,
+			),
+		}
+		assert.False(t, view.hasCorsConfigured())
+	})
+
+	t.Run("with cors rules", func(t *testing.T) {
+		view := testViewWithCorsRules(t, testCorsRule(t, nil))
+		assert.True(t, view.hasCorsConfigured())
+	})
+
+	t.Run("missing key", func(t *testing.T) {
+		view := &View{
+			tfstate: is.NewTFStateMust(map[string]attr.Value{}, nil, nil),
+		}
+		assert.False(t, view.hasCorsConfigured())
+	})
+}
