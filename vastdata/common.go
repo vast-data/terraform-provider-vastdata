@@ -320,7 +320,7 @@ func ValidateFieldIsNoneOf[T string | int64 | float64](tfState *is.TFState, fiel
 
 func ensureNotChanged(tfState *is.TFState, planTfState *is.TFState, fields ...string) error {
 	for _, field := range fields {
-		if !tfState.IsKnownAndNotNull(field) {
+		if planTfState.IsUnknown(field) {
 			continue
 		}
 		if !tfState.Get(field).Equal(planTfState.Get(field)) {

@@ -276,6 +276,11 @@ func (m *ComputeCluster) TfState() *is.TFState {
 	return m.tfstate
 }
 
+// PrepareUpdateResource rejects changes to create-only network fields before PATCH (TERF-266).
+func (m *ComputeCluster) PrepareUpdateResource(_ context.Context, plan PrepareUpdateResource, _ *VMSRest) error {
+	return ensureNotChanged(m.tfstate, plan.(*ComputeCluster).tfstate, "netmask", "default_gateway", "vlan")
+}
+
 func (m *ComputeCluster) NormalizeRecordForCreateAdopt(record Record) Record {
 	if record == nil {
 		return record
