@@ -99,6 +99,25 @@ func (r *Resource) NewManager(state any) ResourceManager {
 	return r.newManager(out, schema)
 }
 
+// overlayWriteOnlyFromConfig copies write-only attribute values from Config into
+// manager's tfstate. Write-only values are always null in Plan/State and are only
+// available on Config (Terraform >= 1.11). Without this, create/update would omit
+// secrets such as certificate PEMs from the API body (TERF-268).
+func (r *Resource) overlayWriteOnlyFromConfig(manager ResourceManager, config tfsdk.Config) {
+	ts := manager.TfState()
+	if ts == nil || !ts.Enabled || ts.Hints == nil || len(ts.Hints.WriteOnlyFields) == 0 {
+		return
+	}
+	cfgTs := r.NewManager(config).TfState()
+	for _, key := range ts.Hints.WriteOnlyFields {
+		v, ok := cfgTs.Raw[key]
+		if !ok || v == nil || v.IsNull() || v.IsUnknown() {
+			continue
+		}
+		ts.Raw[key] = v
+	}
+}
+
 // ----------------------------------------
 //      RESOURCE INTERFACE IMPLEMENTATION
 // ----------------------------------------
@@ -421,7 +440,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		managerName       = r.managerName
 		record            DisplayableRecord
 		tfState           = manager.TfState()
-		tsStateCopy       = tfState.Copy() // Original vlaues from plan.
+		tsStateCopy       = tfState.Copy() // Original values from plan (write-only still null).
 		err               error
 		transactionDelete = func() {
 			if resp.Diagnostics.HasError() {
@@ -442,6 +461,9 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 			}
 		}
 	)
+
+	// Write-only attrs are null in Plan; load them from Config for the API request.
+	r.overlayWriteOnlyFromConfig(manager, req.Config)
 
 	if imp, ok := manager.(PrepareCreateResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("PrepareCreateResource[%s]: do.", managerName))
@@ -637,6 +659,8 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 	// Need to align original plan state with the current state in case response returned inconsistent data.
 	// IOW you set fieldA as optional to valueA but backend returned valueB.
 	tsStateCopy.CopyNonEmptyFieldsTo(tfState)
+	// Never persist write-only values (always null in Terraform state).
+	tfState.ClearWriteOnlyFields()
 
 	if err = tfState.SetState(ctx, &resp.State); err != nil {
 		resp.Diagnostics.AddError(
@@ -869,6 +893,9 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 		err         error
 	)
 
+	// Write-only attrs are null in Plan; load them from Config for the API request.
+	r.overlayWriteOnlyFromConfig(planManager, req.Config)
+
 	if imp, ok := stateManger.(PrepareUpdateResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("PrepareUpdateResource[%s]: do.", managerName))
 		if err = imp.PrepareUpdateResource(ctx, planManager.(PrepareUpdateResource), rest); err != nil {
@@ -1039,6 +1066,8 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 
 	// Copy changes from plan to state.
 	planTfState.CopyKnownFieldsTo(tfState)
+	// Never persist write-only values (always null in Terraform state).
+	tfState.ClearWriteOnlyFields()
 
 	if err = tfState.SetState(ctx, &resp.State); err != nil {
 		resp.Diagnostics.AddError(

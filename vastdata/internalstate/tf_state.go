@@ -1160,6 +1160,27 @@ func (s *TFState) GetCreateParams() vast_client.Params {
 	return createParams
 }
 
+// ClearWriteOnlyFields nulls all WriteOnlyFields in Raw so they are never
+// persisted to Terraform state (write-only values must always be null in state).
+func (s *TFState) ClearWriteOnlyFields() {
+	if s == nil || !s.Enabled || s.Hints == nil {
+		return
+	}
+	for _, key := range s.Hints.WriteOnlyFields {
+		typ, ok := s.TypeMap[key]
+		if !ok {
+			delete(s.Raw, key)
+			continue
+		}
+		nullVal, _, err := BuildAttrValueFromAny(typ, nil)
+		if err != nil {
+			delete(s.Raw, key)
+			continue
+		}
+		s.Raw[key] = nullVal
+	}
+}
+
 // listsHaveSameContentIgnoringOrder checks if two attr.Value instances are lists
 // with the same content, regardless of order. This is used to prevent drift when
 // the API returns list elements in a different order than the user's configuration.

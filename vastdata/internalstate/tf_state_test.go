@@ -2867,6 +2867,35 @@ func TestGetCreateParams_WithOptionalWriteOnlyFields(t *testing.T) {
 	assert.Equal(t, "secret", result["password"])
 }
 
+func TestClearWriteOnlyFields(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"name":        rschema.StringAttribute{Required: true},
+			"certificate": rschema.StringAttribute{Optional: true, WriteOnly: true},
+			"private_key": rschema.StringAttribute{Optional: true, WriteOnly: true},
+		},
+	}
+	ts := NewTFStateMust(map[string]attr.Value{
+		"name":        types.StringValue("c"),
+		"certificate": types.StringValue("PEM-CERT"),
+		"private_key": types.StringValue("PEM-KEY"),
+	}, schema, &TFStateHints{
+		WriteOnlyFields: []string{"certificate", "private_key"},
+	})
+
+	require.Contains(t, ts.GetCreateParams(), "certificate")
+	ts.ClearWriteOnlyFields()
+	assert.True(t, ts.Raw["certificate"].IsNull())
+	assert.True(t, ts.Raw["private_key"].IsNull())
+	assert.Equal(t, "c", ts.String("name"))
+	create := ts.GetCreateParams()
+	assert.NotContains(t, create, "certificate")
+	assert.NotContains(t, create, "private_key")
+	assert.Equal(t, "c", create["name"])
+}
+
 // TestListsHaveSameContentIgnoringOrder_SimpleStrings tests order-independent comparison for simple string lists
 func TestListsHaveSameContentIgnoringOrder_SimpleStrings(t *testing.T) {
 	// Same content, different order
