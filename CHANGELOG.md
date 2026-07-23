@@ -11,7 +11,7 @@ BUG FIXES:
 NEW RESOURCES:
 
 * **vastdata_blob_expansion**: Manage blob expansion pipelines for VAST Database tables
-* **vastdata_certificate**: Manage cluster certificates (e.g. Kafka mTLS)
+* **vastdata_certificate**: Manage server TLS credentials for webhook, Kafka TLS, Kafka mTLS, etc.
 * **vastdata_compute_cluster**: Manage VAST compute clusters
 * **vastdata_compute_cluster_control**: Trigger compute cluster lifecycle actions (start, stop, certificate rotation, etc.)
 * **vastdata_quota_group**: Manage quota groups and assign quotas to them
@@ -19,7 +19,7 @@ NEW RESOURCES:
 * **vastdata_tenant_metric_labels**: Manage tenant metric label definitions
 * **vastdata_tenant_metric_label_values**: Manage per-tenant metric label values
 * **vastdata_tenant_metric_label_values_bulk**: Bulk-manage per-tenant metric label values
-* **vastdata_tls_certificate**: Manage TLS CA/CRL certificates for cluster protocols
+* **vastdata_tls_certificate**: Manage CA certificates for client mTLS, optionally per tenant.
 
 NEW DATA SOURCES:
 
