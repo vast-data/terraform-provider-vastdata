@@ -2,6 +2,7 @@
 package provider
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -38,7 +39,9 @@ func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 				"hard_limit_inodes",
 				"soft_limit_inodes",
 			},
-			SchemaRef: QuotaSchemaRef,
+			// Create-only: API rejects PATCH (including null). Omitting after create must not plan a clear (TERF-224).
+			CreateOnlyFields: []string{"is_physical_quota"},
+			SchemaRef:        QuotaSchemaRef,
 		},
 	)}
 }
@@ -59,4 +62,12 @@ func (m *Quota) TfState() *is.TFState {
 
 func (m *Quota) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Quotas
+}
+
+func (m *Quota) PrepareUpdateResource(_ context.Context, plan PrepareUpdateResource, _ *VMSRest) error {
+	planTs := plan.(*Quota).tfstate
+	if !planTs.IsKnownAndNotNull("is_physical_quota") {
+		return nil
+	}
+	return ensureNotChanged(m.tfstate, planTs, "is_physical_quota")
 }

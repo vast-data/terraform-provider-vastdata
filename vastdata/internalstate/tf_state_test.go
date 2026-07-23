@@ -1963,6 +1963,38 @@ func TestGetUpdateParams_ExcludesEditOnlyFields(t *testing.T) {
 	assert.NotContains(t, updateParams, "id", "id should not be in update params")
 }
 
+// TERF-224: omitting a create-only bool must not produce PATCH {"field": null}.
+func TestGetUpdateParams_ExcludesCreateOnlyClearedFields(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":                rschema.Int64Attribute{Optional: true},
+			"name":              rschema.StringAttribute{Optional: true},
+			"is_physical_quota": rschema.BoolAttribute{Optional: true, Computed: true},
+		},
+	}
+	hints := &TFStateHints{CreateOnlyFields: []string{"is_physical_quota"}}
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"id":                types.Int64Value(3),
+		"name":              types.StringValue("terf224_physical"),
+		"is_physical_quota": types.BoolValue(true),
+	}, schema, hints)
+
+	// Config omitted is_physical_quota → plan null (before UseStateForUnknown).
+	planState := NewTFStateMust(map[string]attr.Value{
+		"id":                types.Int64Value(3),
+		"name":              types.StringValue("terf224_physical"),
+		"is_physical_quota": types.BoolNull(),
+	}, schema, hints)
+
+	updateParams := planState.GetUpdateParams(currentState)
+	assert.NotContains(t, updateParams, "is_physical_quota",
+		"create-only field must not be cleared with null on update")
+	assert.Empty(t, updateParams)
+}
+
 func TestGetUpdateParams_NoHints(t *testing.T) {
 	schema := rschema.Schema{
 		Attributes: map[string]rschema.Attribute{

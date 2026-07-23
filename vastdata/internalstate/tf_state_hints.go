@@ -83,6 +83,12 @@ type TFStateHints struct {
 	// optional or required. Write-only fields cannot be computed.
 	WriteOnlyFields []string
 
+	// CreateOnlyFields lists fields that may be set on create (POST) but must never
+	// be sent on update (PATCH). Omitting them from configuration after create must
+	// not plan a null clear. These fields are also treated as Computed so
+	// UseStateForUnknown keeps the prior state value when the attribute is omitted.
+	CreateOnlyFields []string
+
 	// EditOnlyFields lists fields that can be updated only during PATCH request.
 	// For instance some resources have field "enabled" that cannot be set to false along with create (POST) request.
 	EditOnlyFields []string

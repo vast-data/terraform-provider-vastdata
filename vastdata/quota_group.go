@@ -54,6 +54,7 @@ func (m *QuotaGroup) NewResourceManager(raw map[string]attr.Value, schema any) R
 				"hard_limit_inodes",
 				"soft_limit_inodes",
 			},
+			CreateOnlyFields: []string{"is_physical_quota"},
 			AdditionalSchemaAttributes: map[string]any{
 				// quotas_ids drives the assign_quotas sub-action.
 				// Send the desired list of quota IDs; the API response shows them
@@ -112,6 +113,14 @@ func (m *QuotaGroup) TfState() *is.TFState {
 
 func (m *QuotaGroup) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.QuotaGroups
+}
+
+func (m *QuotaGroup) PrepareUpdateResource(_ context.Context, plan PrepareUpdateResource, _ *VMSRest) error {
+	planTs := plan.(*QuotaGroup).tfstate
+	if !planTs.IsKnownAndNotNull("is_physical_quota") {
+		return nil
+	}
+	return ensureNotChanged(m.tfstate, planTs, "is_physical_quota")
 }
 
 // AfterCreateResource calls action sub-endpoints after a quota group is created.
