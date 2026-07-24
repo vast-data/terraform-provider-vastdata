@@ -191,6 +191,10 @@ func flagsFromHintsForResource(name string, hints *TFStateHints, required, optio
 			computed = false
 			optional = true
 		}
+		if contains(hints.CreateOnlyFields, name) {
+			// Keep prior state when omitted from config (via UseStateForUnknown).
+			computed = true
+		}
 		if contains(hints.SensitiveFields, name) {
 			sensitive = true
 		}

@@ -336,6 +336,7 @@ func TestFlagsFromHintsForResource_OverrideLogic(t *testing.T) {
 		WriteOnlyFields:         []string{"field6"},
 		SensitiveFields:         []string{"field7"},
 		PreserveOrderFields:     []string{"field8"},
+		CreateOnlyFields:        []string{"field9"},
 	}
 
 	tests := []struct {
@@ -413,6 +414,19 @@ func TestFlagsFromHintsForResource_OverrideLogic(t *testing.T) {
 			expectedOptional:  true,
 			expectedComputed:  false,
 			expectedSensitive: true,
+			expectedOrdered:   false,
+			expectedWriteOnly: false,
+		},
+		{
+			name:              "create_only_field",
+			fieldName:         "field9",
+			initialRequired:   false,
+			initialOptional:   true,
+			initialComputed:   false,
+			expectedRequired:  false,
+			expectedOptional:  true,
+			expectedComputed:  true, // create-only becomes computed for UseStateForUnknown
+			expectedSensitive: false,
 			expectedOrdered:   false,
 			expectedWriteOnly: false,
 		},

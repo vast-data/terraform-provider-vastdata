@@ -748,6 +748,10 @@ func (s *TFState) CopyKnownFieldsTo(other *TFState) {
 		if ok && meta.Computed && v.IsNull() {
 			continue
 		}
+		// Create-only: omit from config must not wipe the value from Terraform state.
+		if v.IsNull() && s.Hints != nil && slices.Contains(s.Hints.CreateOnlyFields, k) {
+			continue
+		}
 
 		other.Raw[k] = v
 		other.Meta[k] = s.Meta[k]
@@ -864,6 +868,10 @@ func (s *TFState) DiffFields(
 
 		if v.IsNull() || v.IsUnknown() {
 			if !searchEmpty && ok && meta.satisfyFieldFilterFlag(comb, flags...) {
+				// Create-only fields must not be cleared via PATCH when omitted from config.
+				if s.Hints != nil && slices.Contains(s.Hints.CreateOnlyFields, k) {
+					continue
+				}
 				// Detect a non-null → null transition: the plan clears this field.
 				if otherVal, exists := other.Raw[k]; exists && !otherVal.IsNull() && !otherVal.IsUnknown() {
 					clearedFields[k] = nil
@@ -1032,13 +1040,14 @@ func (s *TFState) GetChangedParams(otherState *TFState) vast_client.Params {
 }
 
 // GetUpdateParams returns a map of changed parameters suitable for update operations,
-// excluding edit-only fields and delete-only fields.
+// excluding edit-only fields, create-only fields, and delete-only fields.
 //
 // This method:
 //  1. Gets all changed fields between plan and current state (like GetChangedParams)
 //  2. Excludes EditOnlyFields - fields that should only be set via separate edit operations
-//  3. Excludes DeleteOnlyBodyFields - fields only used during delete operations
-//  4. Excludes DeleteOnlyParamFields - query params only used during delete operations
+//  3. Excludes CreateOnlyFields - fields that may be set on create but must never be PATCH'd
+//  4. Excludes DeleteOnlyBodyFields - fields only used during delete operations
+//  5. Excludes DeleteOnlyParamFields - query params only used during delete operations
 //
 // EditOnlyFields should be handled separately after the main update operation.
 func (s *TFState) GetUpdateParams(otherState *TFState) vast_client.Params {
@@ -1046,6 +1055,7 @@ func (s *TFState) GetUpdateParams(otherState *TFState) vast_client.Params {
 	var exclude []string
 	if s.Hints != nil {
 		exclude = append(exclude, s.Hints.EditOnlyFields...)                                   // Edit only fields should be updated separately
+		exclude = append(exclude, s.Hints.CreateOnlyFields...)                                 // Create-only fields must never be PATCH'd
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyBodyFields))...)  // Delete only fields should not be in update
 		exclude = append(exclude, slices.Collect(maps.Keys(s.Hints.DeleteOnlyParamFields))...) // Delete only fields should not be in update
 		exclude = append(exclude, s.subResourceKeys()...)                                      // Sub-resource fields are managed via hooks, not the main API.
