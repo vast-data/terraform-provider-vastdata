@@ -1,3 +1,9 @@
+## 4.0.1
+
+BUG FIXES:
+
+* **vastdata_vip_pool**: Retry delete on `503 SERVICE_UNAVAILABLE` while an associated replication peer is still being removed asynchronously (TERF-269).
+
 ## 4.0.0
 
 NOTES:

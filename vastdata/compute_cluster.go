@@ -210,9 +210,9 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:               ComputeClusterSchemaRef,
-			SubResources:            allComputeClusterSubResources,
-			AsyncTaskTimeout:        &computeClusterAsyncTaskTimeout,
+			SchemaRef:        ComputeClusterSchemaRef,
+			SubResources:     allComputeClusterSubResources,
+			AsyncTaskTimeout: &computeClusterAsyncTaskTimeout,
 			RetryOn: &is.RetryPolicy{
 				Create: computeClusterSubResourceRetryOn,
 			},

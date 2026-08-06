@@ -775,8 +775,8 @@ type deleteErrorAPI struct {
 }
 
 func (m *deleteErrorAPI) Session() core.RESTSession { return nil }
-func (m *deleteErrorAPI) GetResourceType() string          { return "test" }
-func (m *deleteErrorAPI) GetResourcePath() string          { return "test" }
+func (m *deleteErrorAPI) GetResourceType() string   { return "test" }
+func (m *deleteErrorAPI) GetResourcePath() string   { return "test" }
 func (m *deleteErrorAPI) List(vast_client.Params) (RecordSet, error) {
 	return nil, nil
 }
@@ -794,7 +794,7 @@ func (m *deleteErrorAPI) Ensure(vast_client.Params, vast_client.Params) (Record,
 	return nil, nil
 }
 func (m *deleteErrorAPI) Get(vast_client.Params) (Record, error) { return nil, nil }
-func (m *deleteErrorAPI) GetById(any) (Record, error)          { return nil, nil }
+func (m *deleteErrorAPI) GetById(any) (Record, error)            { return nil, nil }
 func (m *deleteErrorAPI) Exists(vast_client.Params) (bool, error) {
 	return false, nil
 }
@@ -837,7 +837,6 @@ func (m *deleteErrorAPI) GetIteratorWithContext(context.Context, vast_client.Par
 	return nil
 }
 
-
 func TestDeleteRecordBySearchParams_ReturnsNon404ApiError(t *testing.T) {
 	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
 		"id": rschema.Int64Attribute{Optional: true, Computed: true},
@@ -866,8 +865,8 @@ func TestDeleteRecordBySearchParams_ReturnsNon404ApiError(t *testing.T) {
 func TestRetryOnExpression_DeleteRetriesTransient503(t *testing.T) {
 	attempts := 0
 	expr := &is.RetryExpression{
-		StatusCodes: []int{503},
-		Times:       3,
+		StatusCodes:  []int{503},
+		Times:        3,
 		SleepSeconds: 0,
 	}
 
