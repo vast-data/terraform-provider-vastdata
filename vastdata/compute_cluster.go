@@ -210,10 +210,12 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:               ComputeClusterSchemaRef,
-			SubResources:            allComputeClusterSubResources,
-			AsyncTaskTimeout:        &computeClusterAsyncTaskTimeout,
-			RetryOn:                 computeClusterSubResourceRetryOn,
+			SchemaRef:        ComputeClusterSchemaRef,
+			SubResources:     allComputeClusterSubResources,
+			AsyncTaskTimeout: &computeClusterAsyncTaskTimeout,
+			RetryOn: &is.RetryPolicy{
+				Create: computeClusterSubResourceRetryOn,
+			},
 			NotRequiredSchemaFields: []string{"cnodes"},
 			PreserveOrderFields:     []string{"static_ip_ranges"},
 			// Present in GET response but omitted from CreateParams OpenAPI schema,
@@ -232,7 +234,6 @@ func (m *ComputeCluster) NewDatasourceManager(raw map[string]attr.Value, schema 
 		&is.TFStateHints{
 			SchemaRef:           ComputeClusterSchemaRef,
 			SubResources:        allComputeClusterSubResources,
-			RetryOn:             computeClusterSubResourceRetryOn,
 			PreserveOrderFields: []string{"static_ip_ranges"},
 		},
 	)}

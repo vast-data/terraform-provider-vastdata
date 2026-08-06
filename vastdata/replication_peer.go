@@ -27,9 +27,11 @@ func (m *ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema a
 			SchemaRef: ReplicationPeersSchemaRef,
 			// 503 SERVICE_UNAVAILABLE / HANDSHAKE_IN_PROGRESS is transient and occurs when
 			// two peers are created concurrently. Retry until the handshake completes.
-			RetryOn: &is.RetryExpression{
-				StatusCodes: []int{503},
-				Times:       10,
+			RetryOn: &is.RetryPolicy{
+				Create: &is.RetryExpression{
+					StatusCodes: []int{503},
+					Times:       10,
+				},
 			},
 		},
 	)}
