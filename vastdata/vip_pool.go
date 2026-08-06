@@ -37,6 +37,15 @@ func (m *VipPool) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 			ReadOnlyFields:          []string{"serves_tenant"},
 			PreserveOrderFields:     []string{"ip_ranges", "client_monitoring_ips"},
 			PreserveUserValueFields: []string{"ips_count"},
+			// TERF-269: replication VIP pools cannot be deleted until the replication peer
+			// is fully removed. Peer deletion is async, so DELETE may return 503 CONFLICT
+			// until teardown completes.
+			RetryOn: &is.RetryPolicy{
+				Delete: &is.RetryExpression{
+					StatusCodes: []int{http.StatusServiceUnavailable},
+					Times:       10,
+				},
+			},
 			AdditionalSchemaAttributes: map[string]any{
 				"ips_count": rschema.Int64Attribute{
 					Optional: true,

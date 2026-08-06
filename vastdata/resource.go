@@ -481,15 +481,15 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 		fmt.Sprintf("Create[%q] - plan:\n%s\n", managerName, tfState.Pretty()),
 	)
 
-	var retryOn *is.RetryExpression
-	if tfState.Hints != nil {
-		retryOn = tfState.Hints.RetryOn
+	var createRetryOn *is.RetryExpression
+	if tfState.Hints != nil && tfState.Hints.RetryOn != nil {
+		createRetryOn = tfState.Hints.RetryOn.Create
 	}
 	if imp, ok := manager.(CreateResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("CreateResource[%s]: do.", managerName))
 		createFn := imp.CreateResource
-		if retryOn != nil {
-			createFn = WithRetry(retryOn, managerName, imp.CreateResource)
+		if createRetryOn != nil {
+			createFn = WithRetry(createRetryOn, "CreateResource", managerName, imp.CreateResource)
 		}
 		record, err = createFn(ctx, rest)
 	} else {
@@ -530,8 +530,8 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 				defaultCreate := func(ctx context.Context, _ *VMSRest) (DisplayableRecord, error) {
 					return api.CreateWithContext(ctx, createParams)
 				}
-				if retryOn != nil {
-					defaultCreate = WithRetry(retryOn, managerName, defaultCreate)
+				if createRetryOn != nil {
+					defaultCreate = WithRetry(createRetryOn, "CreateResource", managerName, defaultCreate)
 				}
 				if record, err = defaultCreate(ctx, rest); err == nil {
 					r.checkIntegrity(ctx, record.(Record), createParams)
@@ -1103,9 +1103,21 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 		fmt.Sprintf("Delete[%q] - state:\n%s\n", managerName, tfState.Pretty()),
 	)
 
+	var deleteRetryOn *is.RetryExpression
+	if tfState.Hints != nil && tfState.Hints.RetryOn != nil {
+		deleteRetryOn = tfState.Hints.RetryOn.Delete
+	}
+
 	if imp, ok := manager.(DeleteResource); ok {
 		tflog.Debug(ctx, fmt.Sprintf("DeleteResource[%s]: do.", managerName))
-		err = imp.DeleteResource(ctx, rest)
+		deleteFn := imp.DeleteResource
+		if deleteRetryOn != nil {
+			_, err = WithRetry(deleteRetryOn, "DeleteResource", managerName, func(ctx context.Context, rest *VMSRest) (struct{}, error) {
+				return struct{}{}, deleteFn(ctx, rest)
+			})(ctx, rest)
+		} else {
+			err = deleteFn(ctx, rest)
+		}
 	} else {
 		// Delegate to the default delete implementation
 		tflog.Debug(ctx, fmt.Sprintf("Delete[%s]: use default implementation.", managerName))
@@ -1114,20 +1126,31 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 			return
 		}
 
-		record, err := r.deleteRecordBySearchParams(ctx, manager, "Delete")
-		if err == nil && record != nil {
-			// In case record is AsyncTask
-			var asyncTimeout *time.Duration
-			if tfState.Hints != nil {
-				asyncTimeout = tfState.Hints.AsyncTaskTimeout
+		defaultDelete := func(ctx context.Context, rest *VMSRest) error {
+			var record Record
+			var delErr error
+			record, delErr = r.deleteRecordBySearchParams(ctx, manager, "Delete")
+			if delErr != nil {
+				return delErr
 			}
-			if err := handleMaybeAsyncTask(ctx, rest, record, asyncTimeout); err != nil {
-				resp.Diagnostics.AddError(
-					fmt.Sprintf("AsyncTask - delete[%s].", managerName),
-					err.Error(),
-				)
-				return
+			if record != nil {
+				var asyncTimeout *time.Duration
+				if tfState.Hints != nil {
+					asyncTimeout = tfState.Hints.AsyncTaskTimeout
+				}
+				if asyncErr := handleMaybeAsyncTask(ctx, rest, record, asyncTimeout); asyncErr != nil {
+					return asyncErr
+				}
 			}
+			return nil
+		}
+
+		if deleteRetryOn != nil {
+			_, err = WithRetry(deleteRetryOn, "DeleteResource", managerName, func(ctx context.Context, rest *VMSRest) (struct{}, error) {
+				return struct{}{}, defaultDelete(ctx, rest)
+			})(ctx, rest)
+		} else {
+			err = defaultDelete(ctx, rest)
 		}
 	}
 
@@ -1364,22 +1387,21 @@ func (r *Resource) checkIntegrity(
 	}
 }
 
-// WithRetry wraps a CreateResource-compatible callback with retry logic driven by a
-// RetryExpression. The returned function has the same signature as the original and
-// can be used as a drop-in replacement wherever CreateResource is called.
+// WithRetry wraps fn with retry logic driven by expr.
+// operation is used for log messages (e.g. "CreateResource", "DeleteResource").
 //
 // A retry is attempted when:
 //  1. The call returns an *ApiError whose StatusCode is listed in expr.StatusCodes, AND
 //  2. If expr.BodyContains is non-empty, at least one substring is present in the response body.
 //
 // Any other error type is returned immediately without retrying.
-func WithRetry(
+func WithRetry[T any](
 	expr *is.RetryExpression,
-	managerName string,
-	fn func(context.Context, *VMSRest) (DisplayableRecord, error),
-) func(context.Context, *VMSRest) (DisplayableRecord, error) {
-	return func(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-		return retryOnExpression(ctx, expr, "CreateResource", managerName, func() (DisplayableRecord, error) {
+	operation, managerName string,
+	fn func(context.Context, *VMSRest) (T, error),
+) func(context.Context, *VMSRest) (T, error) {
+	return func(ctx context.Context, rest *VMSRest) (T, error) {
+		return retryOnExpression(ctx, expr, operation, managerName, func() (T, error) {
 			return fn(ctx, rest)
 		})
 	}

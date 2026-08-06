@@ -171,9 +171,9 @@ type TFStateHints struct {
 	// Useful for offline or performance-critical scenarios. Default is false.
 	SkipRefreshAPICall bool
 
-	// RetryOn configures retry behaviour for resource creation requests.
-	// When set, failed create calls are retried according to the expression rules.
-	RetryOn *RetryExpression
+	// RetryOn configures retry behaviour for resource create and delete API calls only.
+	// It is not used by the datasource read path.
+	RetryOn *RetryPolicy
 
 	// AsyncTaskTimeout overrides the default timeout used when waiting
 	// for asynchronous task completion after create/update operations.
@@ -222,7 +222,18 @@ type SubResourceHint struct {
 	Writable bool
 }
 
-// RetryExpression defines the conditions and parameters for retrying a failed create request.
+// RetryPolicy groups retry rules for different resource lifecycle operations.
+type RetryPolicy struct {
+	// Create configures retries for resource creation (custom CreateResource and the
+	// default create path).
+	Create *RetryExpression
+
+	// Delete configures retries for resource deletion (custom DeleteResource and the
+	// default delete path).
+	Delete *RetryExpression
+}
+
+// RetryExpression defines the conditions and parameters for retrying a failed API request.
 // Retries are triggered when the API returns one of the configured StatusCodes and, if
 // BodyContains is non-empty, at least one of the listed substrings is found in the response body.
 type RetryExpression struct {
@@ -235,7 +246,7 @@ type RetryExpression struct {
 	// a retry to be triggered (in addition to the status code check).
 	BodyContains []string
 
-	// Times is the maximum number of create attempts (including the first).
+	// Times is the maximum number of attempts (including the first).
 	// Defaults to 5 when zero or negative.
 	Times int
 

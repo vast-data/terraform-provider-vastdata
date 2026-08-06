@@ -17,6 +17,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	vast_client "github.com/vast-data/go-vast-client"
+	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -766,4 +768,117 @@ func TestOverlayWriteOnlyFromConfig_IncludedInCreateParams(t *testing.T) {
 	assert.Equal(t, "CA-PEM", params["ca_certificate"])
 	assert.Equal(t, "tf-cert", params["name"])
 	assert.Equal(t, "WEBHOOK", params["cert_type"])
+}
+
+type deleteErrorAPI struct {
+	deleteErr error
+}
+
+func (m *deleteErrorAPI) Session() core.RESTSession { return nil }
+func (m *deleteErrorAPI) GetResourceType() string          { return "test" }
+func (m *deleteErrorAPI) GetResourcePath() string          { return "test" }
+func (m *deleteErrorAPI) List(vast_client.Params) (RecordSet, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) Create(vast_client.Params) (Record, error) { return nil, nil }
+func (m *deleteErrorAPI) Update(any, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) Delete(vast_client.Params, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) DeleteById(any, vast_client.Params, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) Ensure(vast_client.Params, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) Get(vast_client.Params) (Record, error) { return nil, nil }
+func (m *deleteErrorAPI) GetById(any) (Record, error)          { return nil, nil }
+func (m *deleteErrorAPI) Exists(vast_client.Params) (bool, error) {
+	return false, nil
+}
+func (m *deleteErrorAPI) MustExists(vast_client.Params) bool { return false }
+func (m *deleteErrorAPI) GetIterator(vast_client.Params, int) core.Iterator {
+	return nil
+}
+func (m *deleteErrorAPI) Lock(...any) func() { return func() {} }
+func (m *deleteErrorAPI) ListWithContext(context.Context, vast_client.Params) (RecordSet, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) CreateWithContext(context.Context, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) UpdateWithContext(context.Context, any, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) DeleteWithContext(context.Context, vast_client.Params, vast_client.Params, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) DeleteByIdWithContext(_ context.Context, _ any, _, _ vast_client.Params) (Record, error) {
+	return nil, m.deleteErr
+}
+func (m *deleteErrorAPI) EnsureWithContext(context.Context, vast_client.Params, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) GetWithContext(context.Context, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) GetByIdWithContext(context.Context, any) (Record, error) {
+	return nil, nil
+}
+func (m *deleteErrorAPI) ExistsWithContext(context.Context, vast_client.Params) (bool, error) {
+	return false, nil
+}
+func (m *deleteErrorAPI) MustExistsWithContext(context.Context, vast_client.Params) bool {
+	return false
+}
+func (m *deleteErrorAPI) GetIteratorWithContext(context.Context, vast_client.Params, int) core.Iterator {
+	return nil
+}
+
+
+func TestDeleteRecordBySearchParams_ReturnsNon404ApiError(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id": rschema.Int64Attribute{Optional: true, Computed: true},
+	}}
+	tf := is.NewTFStateMust(
+		map[string]attr.Value{"id": types.Int64Value(8)},
+		schema,
+		&is.TFStateHints{},
+	)
+	deleteErr := &ApiError{
+		StatusCode: 503,
+		Body:       `{"detail":"vip_pool_remove returned an error: ObjectRemoveResultCode.CONFLICT"}`,
+	}
+
+	_, err := deleteRecordBySearchParams(
+		context.Background(),
+		&deleteErrorAPI{deleteErr: deleteErr},
+		tf,
+		"vastdata_vip_pool",
+		"Delete",
+	)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "503")
+}
+
+func TestRetryOnExpression_DeleteRetriesTransient503(t *testing.T) {
+	attempts := 0
+	expr := &is.RetryExpression{
+		StatusCodes: []int{503},
+		Times:       3,
+		SleepSeconds: 0,
+	}
+
+	_, err := retryOnExpression(context.Background(), expr, "Delete", "vastdata_vip_pool", func() (struct{}, error) {
+		attempts++
+		if attempts < 3 {
+			return struct{}{}, &ApiError{StatusCode: 503, Body: "CONFLICT"}
+		}
+		return struct{}{}, nil
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, 3, attempts)
 }
