@@ -43,7 +43,7 @@ func (m *VipPool) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 			RetryOn: &is.RetryPolicy{
 				Delete: &is.RetryExpression{
 					StatusCodes: []int{http.StatusServiceUnavailable},
-					Times:       10,
+					Times:       30,
 				},
 			},
 			AdditionalSchemaAttributes: map[string]any{
