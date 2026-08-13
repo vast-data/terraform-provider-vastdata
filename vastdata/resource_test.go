@@ -4,6 +4,7 @@ package provider
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -880,4 +881,28 @@ func TestRetryOnExpression_DeleteRetriesTransient503(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Equal(t, 3, attempts)
+}
+
+func TestRetryOnExpression_DeleteRetriesReplicationPeerProtectionPolicyConflict(t *testing.T) {
+	attempts := 0
+	expr := &is.RetryExpression{
+		StatusCodes:  []int{http.StatusBadRequest},
+		BodyContains: []string{"Protection Policy"},
+		Times:        3,
+		SleepSeconds: 0,
+	}
+
+	_, err := retryOnExpression(context.Background(), expr, "Delete", "vastdata_replication_peer", func() (struct{}, error) {
+		attempts++
+		if attempts < 2 {
+			return struct{}{}, &ApiError{
+				StatusCode: http.StatusBadRequest,
+				Body:       `{"detail":"can't delete tfsync-peer 7 because it is used by Protection Policy tfsync-ppath9","code":"bad_request"}`,
+			}
+		}
+		return struct{}{}, nil
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, 2, attempts)
 }

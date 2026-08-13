@@ -25,12 +25,19 @@ func (m *ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema a
 		schema,
 		&is.TFStateHints{
 			SchemaRef: ReplicationPeersSchemaRef,
-			// 503 SERVICE_UNAVAILABLE / HANDSHAKE_IN_PROGRESS is transient and occurs when
-			// two peers are created concurrently. Retry until the handshake completes.
 			RetryOn: &is.RetryPolicy{
+				// 503 SERVICE_UNAVAILABLE / HANDSHAKE_IN_PROGRESS is transient and occurs when
+				// two peers are created concurrently. Retry until the handshake completes.
 				Create: &is.RetryExpression{
 					StatusCodes: []int{503},
 					Times:       10,
+				},
+				// Protected path deletion is async; the protection policy may still reference
+				// the peer briefly after the delete task completes. Retry until teardown finishes.
+				Delete: &is.RetryExpression{
+					StatusCodes:  []int{http.StatusBadRequest},
+					BodyContains: []string{"Protection Policy"},
+					Times:        30,
 				},
 			},
 		},
