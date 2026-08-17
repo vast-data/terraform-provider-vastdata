@@ -132,10 +132,13 @@ class TestRealCustomerScenarios:
             assert 'nfs_read_write   = ["10.72.34.0/24"]' in content
             assert 'nfs_read_write   = ["10.72.33.0/24","10.72.34.0/24"]' in content
             
-            # Check that vip_pools references are preserved
-            assert 'vip_pools     = [vastdata_vip_pool.prod.id]' in content
-            assert 'vip_pools     = [vastdata_vip_pool.dev.id]' in content
-            assert 'vip_pools     = [vastdata_vip_pool.dev.id,vastdata_vip_pool.prod.id]' in content
+            # vip_pools was removed in v3 and replaced by permission_per_vip_pool.
+            # The migration script removes vip_pools assignments and inserts a TODO comment.
+            import re as _re
+            assert not _re.search(r'^\s*vip_pools\s*=', content, _re.MULTILINE), \
+                "vip_pools assignment should be removed by migration (replaced by permission_per_vip_pool)"
+            assert 'permission_per_vip_pool' in content or 'TODO' in content, \
+                "Migration should insert a TODO comment about permission_per_vip_pool"
     
     def test_all_customer_files_migrate_successfully(self, vast_terraform_dir, temp_migration_dirs):
         """Test that all customer files can be migrated without syntax errors."""

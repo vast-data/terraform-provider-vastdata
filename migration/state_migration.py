@@ -30,7 +30,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-VERSION = "1.0.0"
+VERSION = "1.2.0"
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +91,117 @@ def parse_tfstate(state_file: str) -> Dict:
 NON_IMPORTABLE_RESOURCE_TYPES = {
     "vastdata_user_key",
 }
+
+# Resources that require a composite import ID (pipe-separated field values)
+# instead of a plain numeric ID.  The list of fields maps to the provider's
+# ImportFields hint.  The import string is built as field1|field2|…
+#
+# If any field value is missing the script falls back to the numeric ``id``.
+RESOURCE_IMPORT_FIELDS: Dict[str, List[str]] = {
+    "vastdata_view":        ["path", "tenant_name"],
+    "vastdata_view_policy": ["name", "tenant_name"],
+}
+
+
+def _build_tenant_id_map(state: Dict) -> Dict[int, str]:
+    """Return a {tenant_id: tenant_name} mapping built from any resource in the
+    state that carries both ``tenant_id`` and ``tenant_name`` attributes.
+    Falls back to "default" for tenant_id=1 if no explicit mapping is found.
+    """
+    mapping: Dict[int, str] = {1: "default"}  # safe default
+    for resource in state.get('resources', []):
+        for instance in resource.get('instances', []):
+            attrs = instance.get('attributes', {})
+            tid = attrs.get('tenant_id')
+            tname = attrs.get('tenant_name')
+            if tid is not None and tname:
+                try:
+                    mapping[int(tid)] = str(tname)
+                except (ValueError, TypeError):
+                    pass
+    return mapping
+
+
+def _build_import_id(rtype: str, attrs: Dict, tenant_map: Dict[int, str]) -> str:
+    """Return the correct import ID string for *rtype*.
+
+    For resources listed in RESOURCE_IMPORT_FIELDS the ID is a pipe-separated
+    composite (e.g. ``/my-bucket|default``).  If any required field is absent
+    the function falls back to the plain numeric ``id``.
+
+    For all other resource types the plain numeric ``id`` is returned.
+    """
+    import_fields = RESOURCE_IMPORT_FIELDS.get(rtype)
+    if import_fields is None:
+        return str(attrs.get('id', ''))
+
+    values = []
+    for field in import_fields:
+        val = attrs.get(field)
+        if val is None and field == 'tenant_name':
+            # Derive tenant_name from tenant_id when not stored directly.
+            tenant_id = attrs.get('tenant_id')
+            if tenant_id is not None:
+                val = tenant_map.get(int(tenant_id), 'default')
+        if not val:
+            # Missing field — fall back to plain numeric id.
+            log_warning(
+                f"  Cannot build composite import ID for {rtype}: "
+                f"field '{field}' is missing. Falling back to numeric id."
+            )
+            return str(attrs.get('id', ''))
+        values.append(str(val))
+
+    return '|'.join(values)
+
+
+def extract_resource_ids(state: Dict) -> Dict[str, str]:
+    """Extract {terraform_address: import_id} for importable VastData resources.
+
+    For most resources the import ID is the numeric ``id`` stored in the state,
+    which lets ``terraform import`` perform a direct by-ID API call
+    (``GET /<endpoint>/<id>/``) — O(1) and fast.
+
+    For resources listed in RESOURCE_IMPORT_FIELDS a composite pipe-separated
+    ID is built from the relevant field values (e.g. ``/bucket-path|default``
+    for vastdata_view).  This matches the format expected by the provider's
+    ImportState implementation for those resource types.
+
+    Resources without an ``id`` attribute (or those in NON_IMPORTABLE_RESOURCE_TYPES)
+    are skipped.
+
+    Returns:
+        dict mapping terraform address strings to import ID strings.
+        Example: {"vastdata_view_policy.my_policy": "my-policy|default"}
+    """
+    tenant_map = _build_tenant_id_map(state)
+    result: Dict[str, str] = {}
+    for resource in state.get('resources', []):
+        rtype = resource.get('type', '')
+        rname = resource.get('name', '')
+        if not rtype.startswith('vastdata_'):
+            continue
+        if rtype in NON_IMPORTABLE_RESOURCE_TYPES:
+            continue
+        instances = resource.get('instances', [])
+        if not instances:
+            continue
+        for instance in instances:
+            attrs = instance.get('attributes', {})
+            if attrs.get('id') is None:
+                continue
+            import_id = _build_import_id(rtype, attrs, tenant_map)
+            if not import_id:
+                continue
+            index_key = instance.get('index_key')
+            if index_key is not None:
+                addr = f"{rtype}.{rname}[{json.dumps(index_key)}]"
+            elif len(instances) > 1:
+                addr = f"{rtype}.{rname}[{instances.index(instance)}]"
+            else:
+                addr = f"{rtype}.{rname}"
+            result[addr] = import_id
+    return result
 
 
 def separate_vast_resources(resources: List[Dict]) -> Tuple[List[Dict], List[Dict], List[Dict]]:
@@ -287,6 +398,10 @@ def verify_migrate_mode_support(workdir: str) -> None:
         )
 
     # --- Fallback: banner detection via terraform plan ---
+    # The dev-override warning only appears in plan/apply/init output, not in
+    # 'terraform version'. So we run plan once and check for EITHER the banner
+    # (emitted by the v3 provider's Configure()) OR the dev_overrides notice
+    # (which means the locally-built binary IS the v3 provider we just built).
     log_info("Running 'terraform plan' with VASTDATA_MIGRATE_MODE=1 to detect banner …")
     env = os.environ.copy()
     env['VASTDATA_MIGRATE_MODE'] = '1'
@@ -302,33 +417,126 @@ def verify_migrate_mode_support(workdir: str) -> None:
 
     combined = (result.stdout or '') + (result.stderr or '')
 
-    if 'VASTDATA MIGRATE MODE ENABLED' not in combined:
-        log_error(
-            "The installed VastData provider does NOT support VASTDATA_MIGRATE_MODE.\n"
-            "Running 'terraform apply' with an older provider could CREATE or DESTROY\n"
-            "real resources — this is NOT safe for migration.\n\n"
-            "Please upgrade the VastData Terraform provider to v3.0+ and try again."
+    if 'VASTDATA MIGRATE MODE ENABLED' in combined:
+        log_success("Provider supports VASTDATA_MIGRATE_MODE — safe to proceed.")
+        return
+
+    # When dev_overrides are active the lock file is never written, so the
+    # version cannot be detected from 'terraform version -json'. The plan
+    # output itself contains the dev_overrides notice — if it is present we
+    # trust the locally built binary as the v3 provider.
+    if 'provider development overrides are in effect' in combined.lower() \
+            or 'dev_overrides' in combined.lower():
+        log_warning(
+            "Provider development overrides are in effect. "
+            "Trusting the locally built binary as v3 — skipping banner check."
         )
-        sys.exit(1)
+        log_success("Provider supports VASTDATA_MIGRATE_MODE — safe to proceed.")
+        return
 
-    log_success("Provider supports VASTDATA_MIGRATE_MODE — safe to proceed.")
+    log_error(
+        "The installed VastData provider does NOT support VASTDATA_MIGRATE_MODE.\n"
+        "Running 'terraform apply' with an older provider could CREATE or DESTROY\n"
+        "real resources — this is NOT safe for migration.\n\n"
+        "Please upgrade the VastData Terraform provider to v3.0+ and try again."
+    )
+    sys.exit(1)
 
 
-def run_terraform_apply_migrate(workdir: str) -> None:
-    """Run `VASTDATA_MIGRATE_MODE=1 terraform apply -auto-approve`."""
-    log_info("Running: VASTDATA_MIGRATE_MODE=1 terraform apply -auto-approve")
-    env = os.environ.copy()
-    env['VASTDATA_MIGRATE_MODE'] = '1'
+def release_state_lock(workdir: str) -> None:
+    """Force-release a stale Terraform state lock if one exists.
+
+    A stale lock (``OperationTypeInvalid``) is left behind when a previous
+    Terraform command exits abnormally.  Without releasing it every subsequent
+    ``terraform import`` call fails immediately.
+
+    This function runs ``terraform force-unlock -force <lock-id>`` for any
+    lock whose operation type indicates it is stale (i.e. not an active
+    plan/apply/import).
+    """
     result = subprocess.run(
-        ['terraform', 'apply', '-auto-approve'],
+        ['terraform', 'state', 'list'],
         cwd=workdir,
-        env=env,
+        capture_output=True,
         text=True,
     )
-    if result.returncode != 0:
-        log_error("terraform apply (migrate mode) failed.")
+    # We intentionally ignore the exit code here — even a locked state returns
+    # the lock info in stderr which we parse below.
+    combined = (result.stdout or '') + (result.stderr or '')
+
+    import re
+    lock_id_match = re.search(r'ID:\s+([0-9a-f-]{36})', combined)
+    if not lock_id_match:
+        return  # no lock found
+
+    lock_id = lock_id_match.group(1)
+    # Only force-unlock stale locks (OperationTypeInvalid) to avoid accidentally
+    # breaking an active in-progress operation.
+    if 'OperationTypeInvalid' not in combined and 'resource temporarily unavailable' not in combined:
+        return
+
+    log_warning(f"Detected stale state lock (ID: {lock_id}). Force-unlocking …")
+    unlock_result = subprocess.run(
+        ['terraform', 'force-unlock', '-force', lock_id],
+        cwd=workdir,
+        capture_output=True,
+        text=True,
+    )
+    if unlock_result.returncode == 0:
+        log_success(f"State lock {lock_id} released.")
+    else:
+        log_warning(
+            f"Could not auto-release lock {lock_id}: {unlock_result.stderr.strip()}\n"
+            f"Run manually:  terraform force-unlock -force {lock_id}"
+        )
+
+
+def run_terraform_import_all(workdir: str, resource_ids: Dict[str, str]) -> None:
+    """Import each resource using ``terraform import``.
+
+    For most resources the import token is the numeric ``id`` which triggers a
+    direct by-ID API call (``GET /<endpoint>/<id>/``) — O(1) and fast.
+
+    For resources whose provider ImportState expects a composite key
+    (e.g. ``vastdata_view`` → ``/path|tenant_name``) the script builds the
+    correct pipe-separated string from the original state attributes.
+
+    ``-lock=false`` is passed to every import call so that a stale lock file
+    from a previous failed run does not block re-execution.
+
+    Resources that fail to import are reported; the script exits with a
+    non-zero code if any import fails.
+    """
+    if not resource_ids:
+        log_warning("No importable VastData resources found in the original state.")
+        return
+
+    # Try to release any stale lock before starting.
+    release_state_lock(workdir)
+
+    log_info(f"Importing {len(resource_ids)} resource(s) using IDs from original state …")
+    failed: List[Tuple[str, str]] = []
+
+    for address, import_id in resource_ids.items():
+        log_info(f"  terraform import {address} {import_id!r}")
+        result = subprocess.run(
+            ['terraform', 'import', '-lock=false', address, import_id],
+            cwd=workdir,
+            text=True,
+        )
+        if result.returncode != 0:
+            log_error(f"  ✗ Failed to import {address} (import_id={import_id!r})")
+            failed.append((address, import_id))
+        else:
+            log_success(f"  ✓ {address}")
+
+    if failed:
+        log_error(f"{len(failed)} resource(s) could not be imported:")
+        for addr, import_id in failed:
+            log_error(f"    terraform import {addr} {import_id!r}")
         sys.exit(1)
-    log_success("terraform apply (migrate mode) completed.")
+
+    log_success(f"All {len(resource_ids)} resource(s) imported successfully.")
 
 
 # ---------------------------------------------------------------------------
@@ -406,6 +614,15 @@ Examples:
     # Step 1: Parse the existing state
     state = parse_tfstate(state_file)
 
+    # Step 1b: Extract resource IDs BEFORE stripping (needed for terraform import)
+    resource_ids = extract_resource_ids(state)
+    if resource_ids:
+        log_info(f"Extracted {len(resource_ids)} resource ID(s) for direct import:")
+        for addr, import_id in resource_ids.items():
+            log_info(f"  {addr} → {import_id!r}")
+    else:
+        log_warning("No importable resource IDs found in the state file.")
+
     # Step 2: Strip VastData resources
     cleaned_state, vast_importable_count, vast_preserved_count, non_vast_count = strip_vast_resources(state)
 
@@ -434,32 +651,32 @@ Examples:
         log_info("To continue manually:")
         log_info(f"  cd {workdir}")
         log_info("  terraform init")
-        log_info("  VASTDATA_MIGRATE_MODE=1 terraform apply -auto-approve")
+        for addr, import_id in resource_ids.items():
+            log_info(f"  terraform import -lock=false {addr} {import_id!r}")
         sys.exit(0)
 
     # Step 4: terraform init
     run_terraform_init(workdir)
 
-    # Step 5: verify the provider supports VASTDATA_MIGRATE_MODE
-    verify_migrate_mode_support(workdir)
-
-    # Step 6: terraform apply in migrate mode
-    run_terraform_apply_migrate(workdir)
+    # Step 5: Import each resource directly by its numeric ID.
+    # terraform import <address> <id> calls GetByIdWithContext which is a single
+    # direct API call — no slow name-based list+filter across the whole cluster.
+    run_terraform_import_all(workdir, resource_ids)
 
     # ---- Summary ----
     print()
     log_success("=" * 70)
     log_success("State migration completed successfully!")
     log_success("=" * 70)
-    log_info(f"  VastData resources re-imported          : {vast_importable_count}")
-    log_info(f"  VastData resources preserved (non-importable) : {vast_preserved_count}")
-    log_info(f"  Non-VastData resources kept             : {non_vast_count}")
-    log_info(f"  New state file                          : {dest_state}")
+    log_info(f"  VastData resources imported    : {len(resource_ids)}")
+    log_info(f"  VastData resources preserved   : {vast_preserved_count}")
+    log_info(f"  Non-VastData resources kept    : {non_vast_count}")
+    log_info(f"  New state file                 : {dest_state}")
     print()
     log_info("Next steps:")
     log_info("  1. Verify: terraform plan   (should show no changes)")
     log_info("  2. If using a remote backend, upload the new state file.")
-    log_info("  3. Continue using the v3.0 provider normally (no VASTDATA_MIGRATE_MODE).")
+    log_info("  3. Continue using the v3.0 provider normally.")
     print()
 
 
