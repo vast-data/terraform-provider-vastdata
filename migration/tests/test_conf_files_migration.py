@@ -1010,8 +1010,8 @@ class TestNewFixtureValidation:
             assert 'resource "vastdata_non_local_user"' not in actual_content
             # Check comments preserved
             assert "# s3_policies_ids     = [] check" in actual_content
-            # Check dynamic blocks preserved
-            assert 'dynamic "client_ip_ranges"' in actual_content
+            # Check dynamic client_ip_ranges converted for tenant resources
+            assert 'client_ip_ranges = [for r in var.tenant_client_ip_ranges' in actual_content
             
         elif fixture_name == "conf_vippool_ip_ranges":
             # Check IP ranges transformed to list of lists

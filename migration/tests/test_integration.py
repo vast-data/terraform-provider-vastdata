@@ -23,10 +23,10 @@ class TestIntegration:
     
     def test_migration_script_version(self):
         """Test that the migration script version is correctly defined."""
-        assert VERSION == "1.2.1"
+        assert VERSION == "1.2.4"
     
     def test_provider_version_update(self, temp_dir):
-        """Test that VastData provider version is updated from 1.x.x to 2.0.0."""
+        """Test that VastData provider version is updated from 1.x.x to 3.0.0."""
         # Create input file with provider version 1.x.x
         terraform_content = '''terraform {
   required_providers {
@@ -56,7 +56,7 @@ resource "vastdata_administators_managers" "admin" {
         result = output_file.read_text()
         
         # Verify provider version was updated
-        assert 'version = "2.0.0"' in result
+        assert 'version = "3.0.0"' in result
         assert 'version = "1.7.0"' not in result
         
         # Verify resource was also transformed
