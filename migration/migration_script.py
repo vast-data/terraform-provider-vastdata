@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 import argparse
 
-VERSION = "1.2.8"
+VERSION = "1.2.9"
 
 # Marker inserted when a v1 attribute cannot be converted automatically.
 MANUAL_STEP_PREFIX = "# TODO:"
@@ -208,6 +208,57 @@ def try_convert_dynamic_client_ip_ranges(body_lines, start_index):
 
     return f"  {comprehension}", j - start_index
 
+def try_convert_dynamic_frames(body_lines, start_index):
+    """Convert a standard dynamic frames block to a list-of-maps attribute."""
+    block_lines = []
+    brace = 0
+    j = start_index
+    while j < len(body_lines):
+        line = body_lines[j]
+        block_lines.append(line)
+        brace += line.count("{") - line.count("}")
+        j += 1
+        if brace == 0:
+            break
+
+    block_str = "\n".join(block_lines)
+    for_each_match = re.search(r"for_each\s*=\s*(.+)", block_str)
+    if not for_each_match:
+        return None, 0
+
+    for_each_expr = for_each_match.group(1).strip().rstrip(",")
+    iterator_match = re.search(r"iterator\s*=\s*(\w+)", block_str)
+    iterator_name = iterator_match.group(1) if iterator_match else "frames"
+    iterator_ref = f"{iterator_name}.value"
+
+    if iterator_ref not in block_str:
+        return None, 0
+
+    content_attrs = None
+    for idx, line in enumerate(block_lines):
+        if re.match(r"content\s*\{", line.strip()):
+            content_attrs, _ = parse_nested_block(block_lines, idx)
+            break
+
+    if not content_attrs:
+        return None, 0
+
+    field_lines = []
+    for field_name, field_value in content_attrs.items():
+        converted_value = re.sub(
+            rf"\b{re.escape(iterator_name)}\.value\b",
+            "f",
+            field_value,
+        )
+        field_lines.append(f"    {field_name} = {converted_value}")
+
+    if not field_lines:
+        return None, 0
+
+    fields_str = ",\n".join(field_lines)
+    comprehension = f"frames = [for f in {for_each_expr} : {{\n{fields_str}\n  }}]"
+    return f"  {comprehension}", j - start_index
+
 def convert_vippool_permissions_blocks(body_lines, start_index):
     """Convert vippool_permissions blocks to permission_per_vip_pool map."""
     permissions = {}
@@ -387,6 +438,12 @@ def transform_resource_block(lines, i):
             dyn_key = dyn_match.group(1)
             if dyn_key == "client_ip_ranges":
                 converted, consumed = try_convert_dynamic_client_ip_ranges(body_lines, j)
+                if converted:
+                    transformed.append(converted)
+                    j += consumed
+                    continue
+            if dyn_key == "frames":
+                converted, consumed = try_convert_dynamic_frames(body_lines, j)
                 if converted:
                     transformed.append(converted)
                     j += consumed

@@ -83,6 +83,60 @@ class TestBreakingChanges:
         assert 'client_ip_ranges = [for r in var.tenant_client_ip_ranges : [r["start_ip"], r["end_ip"]]]' in result
         assert 'dynamic "client_ip_ranges"' not in result
 
+    def test_protection_policy_converts_dynamic_frames_dot_access(self):
+        content = '''resource "vastdata_protection_policy" "pp" {
+  name           = "dynfr-policy"
+  clone_type     = "LOCAL"
+  indestructible = false
+  prefix         = "dynfr"
+  dynamic "frames" {
+    for_each = var.frames
+    content {
+      every      = frames.value.every
+      keep_local = frames.value.keep_local
+      start_at   = frames.value.start_at
+    }
+  }
+}'''
+        result, _ = transform_resource_block(content.split("\n"), 0)
+        assert 'frames = [for f in var.frames : {' in result
+        assert "every = f.every" in result.replace(" ", "")
+        assert "keep_local = f.keep_local" in result.replace(" ", "")
+        assert "start_at = f.start_at" in result.replace(" ", "")
+        assert 'dynamic "frames"' not in result
+
+    def test_protection_policy_converts_dynamic_frames_bracket_access(self):
+        content = '''resource "vastdata_protection_policy" "pp" {
+  name = "dynfr-policy"
+  dynamic "frames" {
+    for_each = var.frames
+    content {
+      every      = frames.value["every"]
+      keep_local = frames.value["keep_local"]
+      start_at   = frames.value["start_at"]
+    }
+  }
+}'''
+        result, _ = transform_resource_block(content.split("\n"), 0)
+        assert 'frames = [for f in var.frames : {' in result
+        assert 'every=f["every"]' in result.replace(" ", "")
+        assert 'dynamic "frames"' not in result
+
+    def test_protection_policy_converts_dynamic_frames_custom_iterator(self):
+        content = '''resource "vastdata_protection_policy" "pp" {
+  name = "dynfr-policy"
+  dynamic "frames" {
+    for_each = var.frames
+    iterator = frame
+    content {
+      every = frame.value.every
+    }
+  }
+}'''
+        result, _ = transform_resource_block(content.split("\n"), 0)
+        assert 'frames = [for f in var.frames : {' in result
+        assert "every = f.every" in result
+
     def test_tenant_removes_vippool_ids_with_comment(self):
         content = '''resource "vastdata_tenant" "tenant1" {
   name        = "tenant1"
