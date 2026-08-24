@@ -3,6 +3,7 @@
 BUG FIXES:
 
 * **vastdata_vip_pool**: Retry delete on `503 SERVICE_UNAVAILABLE` while an associated replication peer is still being removed asynchronously (TERF-269).
+* **vastdata_replication_peer**: Retry delete on HTTP 400 while a deleted protected path’s protection policy still references the peer (TERF-270).
 
 ## 4.0.0
 
