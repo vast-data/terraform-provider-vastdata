@@ -37,7 +37,6 @@ class TestSchemaTransformations:
             "Block List --> Attributes Set": [],
             "List of Number --> Set of Number": ["roles", "s3_policies_ids", "gids", "tenants"],
             "Block List --> List of List of String": ["client_ip_ranges", "ip_ranges"],
-            "List of Number --> String": ["active_cnode_ids"],
             "List of String --> Set of String": [
                 "object_types", "ldap_groups", "permissions_list", "groups", "users",
                 "abac_tags", "hosts", "abe_protocols", "bucket_creators", "bucket_creators_groups",
@@ -60,7 +59,7 @@ class TestSchemaTransformations:
             ("addresses", "Block List --> List of Maps"),
             ("roles", "List of Number --> Set of Number"),
             ("client_ip_ranges", "Block List --> List of List of String"),
-            ("active_cnode_ids", "List of Number --> String"),
+            ("active_cnode_ids", None),
             ("permissions_list", "List of String --> Set of String"),
             ("unknown_attribute", None)
         ]
@@ -132,8 +131,8 @@ class TestSchemaTransformations:
         for element in expected_elements:
             assert element.strip() in result
     
-    def test_list_of_number_to_string_transformation(self):
-        """Test List of Number --> String transformation."""
+    def test_active_cnode_ids_preserved_as_list(self):
+        """active_cnode_ids remains a list of numbers in v3."""
         terraform_content = '''resource "vastdata_example" "test" {
   name = "test-resource"
   active_cnode_ids = [1, 2, 3, 4, 5]
@@ -143,21 +142,20 @@ class TestSchemaTransformations:
         result, consumed = transform_resource_block(lines, 0)
         
         assert result is not None
-        assert 'active_cnode_ids = "1,2,3,4,5"' in result
-        assert 'active_cnode_ids = [1, 2, 3, 4, 5]' not in result
+        assert 'active_cnode_ids = [1, 2, 3, 4, 5]' in result
     
-    def test_list_of_number_to_string_with_negative_numbers(self):
-        """Test List of Number --> String transformation with negative numbers."""
+    def test_active_cnode_ids_variable_reference_preserved(self):
+        """Variable references for active_cnode_ids must not be converted to empty strings."""
         terraform_content = '''resource "vastdata_example" "test" {
   name = "test-resource"
-  active_cnode_ids = [-1, 0, 1, 2, -3]
+  active_cnode_ids = var.active_cnode_ids
 }'''
         
         lines = terraform_content.split('\n')
         result, consumed = transform_resource_block(lines, 0)
         
         assert result is not None
-        assert 'active_cnode_ids = "-1,0,1,2,-3"' in result
+        assert 'active_cnode_ids = var.active_cnode_ids' in result
     
     def test_block_list_to_list_of_list_of_string_transformation(self):
         """Test Block List --> List of List of String transformation."""
@@ -239,7 +237,7 @@ class TestSchemaTransformations:
     ip = "10.0.1.1"
   }
   
-  # List of Number --> String (for active_cnode_ids only)
+  # active_cnode_ids remains a list in v3
   active_cnode_ids = [1, 2, 3]
   
   # cnode_ids should remain as list (no transformation)
@@ -262,8 +260,8 @@ class TestSchemaTransformations:
         assert 'frames = [' in result
         assert 'name = "frame1"' in result
         
-        # Check active_cnode_ids transformation (should become string)
-        assert 'active_cnode_ids = "1,2,3"' in result
+        # Check active_cnode_ids remains a list
+        assert 'active_cnode_ids = [1, 2, 3]' in result
         
         # Check cnode_ids remains as list (no transformation)
         assert 'cnode_ids = [4, 5, 6]' in result
@@ -340,7 +338,7 @@ resource "vastdata_administators_managers" "manager1" {
   }
   
   cnode_ids = [1, 2, 3]  # Should remain as list
-  active_cnode_ids = [4, 5, 6]  # Should become string
+  active_cnode_ids = [4, 5, 6]  # Should remain a list
 }
 
 resource "vastdata_kafka_brokers" "broker1" {
@@ -373,7 +371,7 @@ resource "vastdata_kafka_brokers" "broker1" {
         assert 'capacity_limits = {' in result
         assert 'frames = [' in result
         assert 'cnode_ids = [1, 2, 3]' in result  # Should remain as list
-        assert 'active_cnode_ids = "4,5,6"' in result  # Should become string
+        assert 'active_cnode_ids = [4, 5, 6]' in result  # Should remain as list
         assert 'client_ip_ranges = [' in result
         assert '["192.168.1.1", "192.168.1.100"]' in result
         

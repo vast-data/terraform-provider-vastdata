@@ -30,7 +30,14 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-VERSION = "1.2.0"
+VERSION = "1.2.5"
+
+# Reuse the same rename map as migration_script.py so import addresses match
+# converted .tf configuration resource types.
+try:
+    from migration_script import resource_type_rename_map
+except ImportError:  # pragma: no cover - running as installed module
+    resource_type_rename_map = {}
 
 
 # ---------------------------------------------------------------------------
@@ -65,6 +72,19 @@ def log_error(msg: str) -> None:
 # ---------------------------------------------------------------------------
 # State manipulation
 # ---------------------------------------------------------------------------
+
+def _is_data_source(resource: Dict) -> bool:
+    """Return True when *resource* is a Terraform data source state entry."""
+    return resource.get('mode') == 'data'
+
+
+def _is_vastdata_data_source(resource: Dict) -> bool:
+    """Return True when *resource* is a vastdata_* data source in state."""
+    return (
+        resource.get('type', '').startswith('vastdata_')
+        and _is_data_source(resource)
+    )
+
 
 def parse_tfstate(state_file: str) -> Dict:
     """Parse a Terraform state file and return the JSON dict."""
@@ -101,6 +121,47 @@ RESOURCE_IMPORT_FIELDS: Dict[str, List[str]] = {
     "vastdata_view":        ["path", "tenant_name"],
     "vastdata_view_policy": ["name", "tenant_name"],
 }
+
+# Attributes the v3 provider cannot repopulate from API GET (create-only, etc.).
+# After terraform import these are copied from the original v1 state when null.
+PRESERVE_ATTRIBUTES_FROM_V1: Dict[str, List[str]] = {
+    "vastdata_view": ["create_dir"],
+    "vastdata_quota": ["is_physical_quota"],
+    "vastdata_quota_group": ["is_physical_quota"],
+    "vastdata_qos_policy": ["attached_users"],
+}
+
+# JSON string attributes rewritten to indented form after import so migrated state
+# matches typical heredoc formatting in converted .tf files.
+PRETTIFY_JSON_ATTRIBUTES: Dict[str, List[str]] = {
+    "vastdata_s3_policy": ["policy"],
+}
+
+
+def _map_resource_type(rtype: str) -> str:
+    """Map v1/v2 state resource types to v3 configuration resource types."""
+    return resource_type_rename_map.get(rtype, rtype)
+
+
+def _build_terraform_address(
+    module: str,
+    rtype: str,
+    rname: str,
+    *,
+    index_key=None,
+    instance_index: int = None,
+) -> str:
+    """Build a full Terraform resource address including module path."""
+    if index_key is not None:
+        resource_addr = f"{rtype}.{rname}[{json.dumps(index_key)}]"
+    elif instance_index is not None:
+        resource_addr = f"{rtype}.{rname}[{instance_index}]"
+    else:
+        resource_addr = f"{rtype}.{rname}"
+
+    if module:
+        return f"{module}.{resource_addr}"
+    return resource_addr
 
 
 def _build_tenant_id_map(state: Dict) -> Dict[int, str]:
@@ -170,18 +231,26 @@ def extract_resource_ids(state: Dict) -> Dict[str, str]:
     Resources without an ``id`` attribute (or those in NON_IMPORTABLE_RESOURCE_TYPES)
     are skipped.
 
-    Returns:
-        dict mapping terraform address strings to import ID strings.
-        Example: {"vastdata_view_policy.my_policy": "my-policy|default"}
+    Import addresses use the v3 resource type names from ``migration_script.resource_type_rename_map``
+    so they match converted ``.tf`` configuration (e.g. ``vastdata_administators_roles``
+    in state → ``vastdata_administrator_role`` for import).
+
+    Module paths from the state ``module`` field are included so resources declared
+    inside modules import correctly (e.g. ``module.views["env1"].vastdata_view.this``).
     """
     tenant_map = _build_tenant_id_map(state)
     result: Dict[str, str] = {}
     for resource in state.get('resources', []):
         rtype = resource.get('type', '')
+        if _is_data_source(resource):
+            # Data sources are refreshed on read — never terraform import-ed.
+            continue
+        mapped_rtype = _map_resource_type(rtype)
         rname = resource.get('name', '')
+        module = resource.get('module', '')
         if not rtype.startswith('vastdata_'):
             continue
-        if rtype in NON_IMPORTABLE_RESOURCE_TYPES:
+        if mapped_rtype in NON_IMPORTABLE_RESOURCE_TYPES:
             continue
         instances = resource.get('instances', [])
         if not instances:
@@ -190,18 +259,227 @@ def extract_resource_ids(state: Dict) -> Dict[str, str]:
             attrs = instance.get('attributes', {})
             if attrs.get('id') is None:
                 continue
-            import_id = _build_import_id(rtype, attrs, tenant_map)
+            # Prefer the numeric ID from the existing state. It enables a direct
+            # by-ID API call and avoids ambiguous composite keys (e.g. view path="/").
+            import_id = str(attrs['id'])
             if not import_id:
                 continue
             index_key = instance.get('index_key')
             if index_key is not None:
-                addr = f"{rtype}.{rname}[{json.dumps(index_key)}]"
+                addr = _build_terraform_address(
+                    module, mapped_rtype, rname, index_key=index_key,
+                )
             elif len(instances) > 1:
-                addr = f"{rtype}.{rname}[{instances.index(instance)}]"
+                addr = _build_terraform_address(
+                    module,
+                    mapped_rtype,
+                    rname,
+                    instance_index=instances.index(instance),
+                )
             else:
-                addr = f"{rtype}.{rname}"
+                addr = _build_terraform_address(module, mapped_rtype, rname)
             result[addr] = import_id
     return result
+
+
+def extract_v1_attributes(state: Dict) -> Dict[str, Dict]:
+    """Return {terraform_address: attributes} for importable VastData resources.
+
+    Used to preserve create-only and other non-round-tripping attributes after
+    ``terraform import`` refreshes state from the cluster API.
+    """
+    result: Dict[str, Dict] = {}
+    for resource in state.get('resources', []):
+        rtype = resource.get('type', '')
+        if _is_data_source(resource):
+            continue
+        mapped_rtype = _map_resource_type(rtype)
+        rname = resource.get('name', '')
+        module = resource.get('module', '')
+        if not rtype.startswith('vastdata_'):
+            continue
+        if mapped_rtype in NON_IMPORTABLE_RESOURCE_TYPES:
+            continue
+        instances = resource.get('instances', [])
+        if not instances:
+            continue
+        for instance in instances:
+            attrs = instance.get('attributes', {})
+            if attrs.get('id') is None:
+                continue
+            index_key = instance.get('index_key')
+            if index_key is not None:
+                addr = _build_terraform_address(
+                    module, mapped_rtype, rname, index_key=index_key,
+                )
+            elif len(instances) > 1:
+                addr = _build_terraform_address(
+                    module,
+                    mapped_rtype,
+                    rname,
+                    instance_index=instances.index(instance),
+                )
+            else:
+                addr = _build_terraform_address(module, mapped_rtype, rname)
+            result[addr] = attrs
+    return result
+
+
+def patch_imported_attributes(
+    workdir: str,
+    v1_attrs: Dict[str, Dict],
+    imported_addresses: Dict[str, str],
+) -> int:
+    """Merge selected v1 attributes into state when import left them null.
+
+    Returns the number of attribute values patched.
+    """
+    state_path = os.path.join(workdir, 'terraform.tfstate')
+    state = parse_tfstate(state_path)
+    patched = 0
+
+    for resource in state.get('resources', []):
+        if _is_data_source(resource):
+            continue
+        rtype = resource.get('type', '')
+        mapped_rtype = _map_resource_type(rtype)
+        preserve_fields = PRESERVE_ATTRIBUTES_FROM_V1.get(mapped_rtype)
+        if not preserve_fields:
+            continue
+
+        rname = resource.get('name', '')
+        module = resource.get('module', '')
+        instances = resource.get('instances', [])
+        for instance in instances:
+            index_key = instance.get('index_key')
+            if index_key is not None:
+                addr = _build_terraform_address(
+                    module, mapped_rtype, rname, index_key=index_key,
+                )
+            elif len(instances) > 1:
+                addr = _build_terraform_address(
+                    module,
+                    mapped_rtype,
+                    rname,
+                    instance_index=instances.index(instance),
+                )
+            else:
+                addr = _build_terraform_address(module, mapped_rtype, rname)
+
+            if addr not in imported_addresses:
+                continue
+
+            v1 = v1_attrs.get(addr, {})
+            attrs = instance.setdefault('attributes', {})
+            for field in preserve_fields:
+                if field not in v1 or v1[field] is None:
+                    continue
+                if attrs.get(field) is not None:
+                    continue
+                attrs[field] = v1[field]
+                patched += 1
+                log_info(f"  Preserved {addr}.{field} = {v1[field]!r} from v1 state")
+
+    if patched:
+        write_state(state, state_path)
+        log_success(f"Preserved {patched} attribute value(s) from v1 state.")
+    else:
+        log_info("No create-only attributes needed patching.")
+
+    return patched
+
+
+def _json_strings_equivalent(a, b) -> bool:
+    """Return True when two values contain equivalent JSON documents."""
+    if a == b:
+        return True
+    if not isinstance(a, str) or not isinstance(b, str):
+        return False
+    try:
+        return json.loads(a) == json.loads(b)
+    except (json.JSONDecodeError, TypeError):
+        return False
+
+
+def _canonicalize_json_string(value: str) -> str:
+    """Return compact canonical JSON matching provider CanonicalJSONString."""
+    parsed = json.loads(value)
+    return json.dumps(parsed, separators=(',', ':'), sort_keys=True)
+
+
+def prettify_json_fields(
+    workdir: str,
+    v1_attrs: Dict[str, Dict],
+    imported_addresses: Dict[str, str],
+) -> int:
+    """Canonicalize configured JSON attributes in migrated state.
+
+    The v3 provider stores JSON policy fields in compact canonical form so
+    Terraform plan does not drift on whitespace.  This step rewrites imported
+    state to that form when the semantic content is unchanged.
+    """
+    state_path = os.path.join(workdir, 'terraform.tfstate')
+    state = parse_tfstate(state_path)
+    prettified = 0
+
+    for resource in state.get('resources', []):
+        if _is_data_source(resource):
+            continue
+        rtype = resource.get('type', '')
+        mapped_rtype = _map_resource_type(rtype)
+        json_fields = PRETTIFY_JSON_ATTRIBUTES.get(mapped_rtype)
+        if not json_fields:
+            continue
+
+        rname = resource.get('name', '')
+        module = resource.get('module', '')
+        instances = resource.get('instances', [])
+        for instance in instances:
+            index_key = instance.get('index_key')
+            if index_key is not None:
+                addr = _build_terraform_address(
+                    module, mapped_rtype, rname, index_key=index_key,
+                )
+            elif len(instances) > 1:
+                addr = _build_terraform_address(
+                    module,
+                    mapped_rtype,
+                    rname,
+                    instance_index=instances.index(instance),
+                )
+            else:
+                addr = _build_terraform_address(module, mapped_rtype, rname)
+
+            if addr not in imported_addresses:
+                continue
+
+            v1 = v1_attrs.get(addr, {})
+            attrs = instance.setdefault('attributes', {})
+            for field in json_fields:
+                current = attrs.get(field)
+                if not isinstance(current, str) or not current.strip():
+                    continue
+
+                try:
+                    new_value = _canonicalize_json_string(current)
+                except json.JSONDecodeError:
+                    log_warning(
+                        f"  Skipping {addr}.{field}: value is not valid JSON"
+                    )
+                    continue
+
+                if new_value != current:
+                    attrs[field] = new_value
+                    prettified += 1
+                    log_info(f"  Prettified {addr}.{field}")
+
+    if prettified:
+        write_state(state, state_path)
+        log_success(f"Prettified {prettified} JSON attribute value(s) in state.")
+    else:
+        log_info("No JSON attributes needed prettifying.")
+
+    return prettified
 
 
 def separate_vast_resources(resources: List[Dict]) -> Tuple[List[Dict], List[Dict], List[Dict]]:
@@ -225,6 +503,13 @@ def separate_vast_resources(resources: List[Dict]) -> Tuple[List[Dict], List[Dic
         resource_type = resource.get('type', '')
         if not resource_type.startswith('vastdata_'):
             non_vast.append(resource)
+        elif _is_vastdata_data_source(resource):
+            log_info(
+                f"Preserving VastData data source "
+                f"'{resource.get('name', '?')}' (type: {resource_type}) "
+                f"— refreshed on read, not re-imported."
+            )
+            vast_preserved.append(resource)
         elif resource_type in NON_IMPORTABLE_RESOURCE_TYPES:
             log_info(
                 f"Preserving non-importable VastData resource "
@@ -616,6 +901,7 @@ Examples:
 
     # Step 1b: Extract resource IDs BEFORE stripping (needed for terraform import)
     resource_ids = extract_resource_ids(state)
+    v1_attributes = extract_v1_attributes(state)
     if resource_ids:
         log_info(f"Extracted {len(resource_ids)} resource ID(s) for direct import:")
         for addr, import_id in resource_ids.items():
@@ -662,6 +948,12 @@ Examples:
     # terraform import <address> <id> calls GetByIdWithContext which is a single
     # direct API call — no slow name-based list+filter across the whole cluster.
     run_terraform_import_all(workdir, resource_ids)
+
+    # Step 6: Restore create-only attributes that import cannot read from the API.
+    patch_imported_attributes(workdir, v1_attributes, resource_ids)
+
+    # Step 7: Canonicalize JSON policy fields so state matches provider storage.
+    prettify_json_fields(workdir, v1_attributes, resource_ids)
 
     # ---- Summary ----
     print()

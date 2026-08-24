@@ -7,7 +7,12 @@ import re
 from pathlib import Path
 import argparse
 
-VERSION = "1.2.3"
+VERSION = "1.2.9"
+
+# Marker inserted when a v1 attribute cannot be converted automatically.
+MANUAL_STEP_PREFIX = "# TODO:"
+
+VIP_POOL_REF_PATTERN = re.compile(r"vastdata_vip_pool\.(\w+)\.id")
 
 # Resource type rename map (old → new)
 resource_type_rename_map = {
@@ -43,7 +48,6 @@ key_groups = {
     "Block List --> List of Maps": ["addresses", "group_quotas", "user_quotas"],
     "List of Number --> Set of Number": ["roles", "s3_policies_ids", "gids", "tenants"],
     "Block List --> List of List of String": ["client_ip_ranges", "ip_ranges"],
-    "List of Number --> String": ["active_cnode_ids"],
     "List of String --> Set of String": [
         "object_types", "ldap_groups", "permissions_list", "groups", "users",
         "abac_tags", "hosts", "abe_protocols", "bucket_creators", "bucket_creators_groups",
@@ -83,6 +87,11 @@ resource_specific_renames = {
     "vastdata_protected_path": {
         "target_id": "remote_target_id",
     },
+    # S3 object locking attribute renames in v3
+    "vastdata_view": {
+        "s3_locks": "locking",
+        "s3_locks_retention_period": "default_retention_period",
+    },
 }
 
 # Per-resource-type attributes to remove: {resource_type: set(attr_names)}
@@ -92,6 +101,10 @@ resource_specific_renames = {
 # is removed and a TODO comment is inserted so the user can add it manually.
 resource_specific_removals = {
     "vastdata_view_policy": {"vip_pools"},
+    "vastdata_replication_peer": {"peer_name", "is_local"},
+    "vastdata_tenant": {"vippool_ids"},
+    "vastdata_qos_policy": {"attached_users_identifiers"},
+    "vastdata_vip_pool": {"active_cnode_ids"},
 }
 
 # Replacement comments inserted when a resource-specific attribute is removed.
@@ -100,6 +113,34 @@ resource_specific_removal_comments = {
         "vip_pools": (
             "# TODO: vip_pools was replaced by permission_per_vip_pool in v3.\n"
             '# Add: permission_per_vip_pool = { "<pool_id>" = "RW" }'
+        ),
+    },
+    "vastdata_replication_peer": {
+        "peer_name": (
+            "# NOTE: peer_name is read-only in v3 and is populated by the provider."
+        ),
+        "is_local": (
+            "# NOTE: is_local is read-only in v3 and is populated by the provider."
+        ),
+    },
+    "vastdata_tenant": {
+        "vippool_ids": (
+            "# TODO: vippool_ids was removed from vastdata_tenant in v3.\n"
+            "# MIGRATION REQUIRED: in v3 set vastdata_vip_pool.tenant_id on each pool.\n"
+            "# VAST API rejects tenant_id changes when views exist on the pool's current tenant."
+        ),
+    },
+    "vastdata_qos_policy": {
+        "attached_users_identifiers": (
+            "# TODO: attached_users_identifiers was removed in v3.\n"
+            "# MIGRATION REQUIRED: add attached_users manually (literal user IDs cannot be\n"
+            "# converted automatically — use vastdata_user.<name>.id in v1 config, or add\n"
+            "# attached_users with name/fqdn/identifier_type/identifier_value by hand)."
+        ),
+    },
+    "vastdata_vip_pool": {
+        "active_cnode_ids": (
+            "# NOTE: active_cnode_ids is read-only in v3 and is populated by the provider."
         ),
     },
 }
@@ -112,6 +153,9 @@ resource_specific_additions = {
     "vastdata_user": {
         "local_provider_id": "1",
     },
+    "vastdata_group": {
+        "local_provider_id": "1",
+    },
 }
 
 def get_group_for_key(key):
@@ -120,6 +164,215 @@ def get_group_for_key(key):
         if k == key:
             return key_to_group[k]
     return None
+
+def try_convert_dynamic_client_ip_ranges(body_lines, start_index):
+    """Convert a standard dynamic client_ip_ranges block to a list attribute."""
+    block_lines = []
+    brace = 0
+    j = start_index
+    while j < len(body_lines):
+        line = body_lines[j]
+        block_lines.append(line)
+        brace += line.count("{") - line.count("}")
+        j += 1
+        if brace == 0:
+            break
+
+    block_str = "\n".join(block_lines)
+    for_each_match = re.search(r"for_each\s*=\s*(.+)", block_str)
+    if not for_each_match:
+        return None, 0
+
+    for_each_expr = for_each_match.group(1).strip()
+    has_bracket_access = (
+        '["start_ip"]' in block_str
+        or "['start_ip']" in block_str
+        or '["end_ip"]' in block_str
+        or "['end_ip']" in block_str
+    )
+    has_dot_access = (
+        ".start_ip" in block_str
+        or ".end_ip" in block_str
+    )
+    if not has_bracket_access and not has_dot_access:
+        return None, 0
+
+    if has_bracket_access:
+        comprehension = (
+            f'client_ip_ranges = [for r in {for_each_expr} : [r["start_ip"], r["end_ip"]]]'
+        )
+    else:
+        comprehension = (
+            f'client_ip_ranges = [for r in {for_each_expr} : [r.start_ip, r.end_ip]]'
+        )
+
+    return f"  {comprehension}", j - start_index
+
+def try_convert_dynamic_frames(body_lines, start_index):
+    """Convert a standard dynamic frames block to a list-of-maps attribute."""
+    block_lines = []
+    brace = 0
+    j = start_index
+    while j < len(body_lines):
+        line = body_lines[j]
+        block_lines.append(line)
+        brace += line.count("{") - line.count("}")
+        j += 1
+        if brace == 0:
+            break
+
+    block_str = "\n".join(block_lines)
+    for_each_match = re.search(r"for_each\s*=\s*(.+)", block_str)
+    if not for_each_match:
+        return None, 0
+
+    for_each_expr = for_each_match.group(1).strip().rstrip(",")
+    iterator_match = re.search(r"iterator\s*=\s*(\w+)", block_str)
+    iterator_name = iterator_match.group(1) if iterator_match else "frames"
+    iterator_ref = f"{iterator_name}.value"
+
+    if iterator_ref not in block_str:
+        return None, 0
+
+    content_attrs = None
+    for idx, line in enumerate(block_lines):
+        if re.match(r"content\s*\{", line.strip()):
+            content_attrs, _ = parse_nested_block(block_lines, idx)
+            break
+
+    if not content_attrs:
+        return None, 0
+
+    field_lines = []
+    for field_name, field_value in content_attrs.items():
+        converted_value = re.sub(
+            rf"\b{re.escape(iterator_name)}\.value\b",
+            "f",
+            field_value,
+        )
+        field_lines.append(f"    {field_name} = {converted_value}")
+
+    if not field_lines:
+        return None, 0
+
+    fields_str = ",\n".join(field_lines)
+    comprehension = f"frames = [for f in {for_each_expr} : {{\n{fields_str}\n  }}]"
+    return f"  {comprehension}", j - start_index
+
+def convert_vippool_permissions_blocks(body_lines, start_index):
+    """Convert vippool_permissions blocks to permission_per_vip_pool map."""
+    permissions = {}
+    j = start_index
+    while j < len(body_lines) and body_lines[j].strip().startswith("vippool_permissions {"):
+        attrs, consumed = parse_nested_block(body_lines, j)
+        j += consumed
+        pool_id = attrs.get("vippool_id", "").strip().strip('"')
+        permission = attrs.get("vippool_permissions", "").strip().strip('"')
+        if pool_id and permission:
+            permissions[pool_id] = permission
+
+    if not permissions:
+        return None, 0
+
+    lines = ["  permission_per_vip_pool = {"]
+    for pool_id, permission in permissions.items():
+        pool_id = pool_id.strip()
+        if re.match(r'^\d+$', pool_id):
+            key = f'"{pool_id}"'
+        else:
+            key = f"({pool_id})"
+        lines.append(f'    {key} = "{permission}"')
+    lines.append("  }")
+    return "\n".join(lines), j - start_index
+
+
+def try_convert_attached_users_identifiers(indent: str, value_expr: str):
+    """Convert attached_users_identifiers to attached_users when it references a user resource.
+
+    v1 configs commonly use [tostring(vastdata_user.foo.id)]. The v3 API stores the
+    attachment as sid_str + user SID — reference vastdata_user.foo.sid (not invented values).
+    Returns converted HCL or None when the expression cannot be converted safely.
+    """
+    match = re.search(r"vastdata_user\.(\w+)\.id", value_expr)
+    if not match:
+        return None
+    user_ref = f"vastdata_user.{match.group(1)}"
+    return (
+        f"{indent}attached_users = [{{\n"
+        f"{indent}  name             = {user_ref}.name\n"
+        f'{indent}  fqdn             = ""\n'
+        f'{indent}  identifier_type  = "sid_str"\n'
+        f"{indent}  identifier_value = {user_ref}.sid\n"
+        f"{indent}}}]"
+    )
+
+
+def read_assignment_value(body_lines, start_index):
+    """Return (indent, attr_key, value_expr, end_index) for a full assignment."""
+    assign = re.match(r"(\s*)(\w+)\s*=\s*(.*)$", body_lines[start_index])
+    if not assign:
+        return None
+    indent, attr_key, remainder = assign.groups()
+    end = skip_attribute_assignment(body_lines, start_index)
+    parts = [remainder.strip()]
+    for idx in range(start_index + 1, end):
+        parts.append(body_lines[idx].strip())
+    return indent, attr_key, " ".join(parts), end
+
+
+def is_empty_vippool_ids_list(value_expr: str) -> bool:
+    cleaned = re.sub(r"\s+", "", value_expr)
+    return cleaned in ("[]",)
+
+
+def try_convert_vippool_ids(indent: str, value_expr: str, tenant_resource_name: str):
+    """Remove tenant.vippool_ids and document the v3 manual association model.
+
+    v1: vastdata_tenant.vippool_ids = [vastdata_vip_pool.a.id, ...]
+    v3: vastdata_vip_pool.a.tenant_id = vastdata_tenant.<tenant>.id
+
+    tenant_id is NOT auto-injected: the VAST API rejects moving a pool to another
+    tenant when views already exist on the pool's current tenant.
+    """
+    if is_empty_vippool_ids_list(value_expr):
+        return "", True
+    pool_names = VIP_POOL_REF_PATTERN.findall(value_expr)
+    if not pool_names:
+        return None, False
+    pools = ", ".join(f"vastdata_vip_pool.{name}" for name in pool_names)
+    note_lines = [
+        f"{indent}# NOTE: vippool_ids removed from vastdata_tenant in v3.",
+        (
+            f"{indent}# In v3, set tenant_id on each pool if appropriate: {pools} "
+            f"(vastdata_tenant.{tenant_resource_name})."
+        ),
+        (
+            f"{indent}# WARNING: VAST API rejects tenant_id changes when views exist "
+            "on the pool's current tenant."
+        ),
+    ]
+    return "\n".join(note_lines), True
+
+
+def skip_attribute_assignment(body_lines, start_index):
+    """Return the line index after a complete attribute assignment."""
+    line = body_lines[start_index]
+    assign = re.match(r'(\s*)(\w+)\s*=\s*(.*)$', line)
+    if not assign:
+        return start_index + 1
+
+    remainder = assign.group(3)
+    square = remainder.count('[') - remainder.count(']')
+    curly = remainder.count('{') - remainder.count('}')
+    j = start_index + 1
+    while square > 0 or curly > 0:
+        if j >= len(body_lines):
+            break
+        next_line = body_lines[j]
+        square += next_line.count('[') - next_line.count(']')
+        curly += next_line.count('{') - next_line.count('}')
+        j += 1
+    return j
 
 def parse_nested_block(lines, start_index):
     attrs = {}
@@ -162,11 +415,15 @@ def transform_resource_block(lines, i):
     # Split the first line to get the resource type
     parts = transformed[0].split()
     current_resource_type = None
-    if len(parts) > 1:
-        resource_type = parts[1]  # This includes quotes, e.g., "vastdata_resource"
-        resource_type_clean = resource_type.strip('"')  # Remove quotes for lookup
+    current_resource_name = None
+    header_match = re.match(
+        r'resource\s+"([^"]+)"\s+"([^"]+)"',
+        transformed[0].strip(),
+    )
+    if header_match:
+        resource_type_clean = header_match.group(1)
+        current_resource_name = header_match.group(2)
         current_resource_type = resource_type_clean
-        # Check if the resource type is in the resource_type_rename_map
         new_resource_type = resource_type_rename_map.get(resource_type_clean)
         if new_resource_type:
             transformed[0] = transformed[0].replace(resource_type_clean, new_resource_type)
@@ -178,7 +435,20 @@ def transform_resource_block(lines, i):
         # Detect dynamic block, e.g. dynamic "client_ip_ranges" {
         dyn_match = re.match(r'dynamic\s+"(\w+)"\s*{', stripped)
         if dyn_match:
-            # Preserve dynamic blocks as-is; auto-converting is error-prone without context
+            dyn_key = dyn_match.group(1)
+            if dyn_key == "client_ip_ranges":
+                converted, consumed = try_convert_dynamic_client_ip_ranges(body_lines, j)
+                if converted:
+                    transformed.append(converted)
+                    j += consumed
+                    continue
+            if dyn_key == "frames":
+                converted, consumed = try_convert_dynamic_frames(body_lines, j)
+                if converted:
+                    transformed.append(converted)
+                    j += consumed
+                    continue
+            # Preserve other dynamic blocks as-is; auto-converting is error-prone without context
             brace = 0
             while j < len(body_lines):
                 transformed.append(body_lines[j].rstrip())
@@ -187,6 +457,13 @@ def transform_resource_block(lines, i):
                 if brace == 0:
                     break
             continue  # Continue outer loop
+
+        if stripped.startswith("vippool_permissions {"):
+            converted, consumed = convert_vippool_permissions_blocks(body_lines, j)
+            if converted:
+                transformed.append(converted)
+                j += consumed
+                continue
 
         # Check normal block pattern e.g. client_ip_ranges { ... }
         m = re.match(r'(\w+)\s*{', stripped)
@@ -282,8 +559,33 @@ def transform_resource_block(lines, i):
             
             # Skip attributes that should be removed entirely (global)
             if attr_key in attributes_to_remove:
-                j += 1
+                j = skip_attribute_assignment(body_lines, j)
                 continue
+
+            # vastdata_qos_policy: auto-convert attached_users_identifiers when possible
+            if (
+                current_resource_type == "vastdata_qos_policy"
+                and attr_key == "attached_users_identifiers"
+            ):
+                converted = try_convert_attached_users_identifiers(indent, value_expr)
+                if converted:
+                    transformed.append(converted)
+                    j = skip_attribute_assignment(body_lines, j)
+                    continue
+
+            # vastdata_tenant: map vippool_ids -> vastdata_vip_pool.tenant_id
+            if current_resource_type == "vastdata_tenant" and attr_key == "vippool_ids":
+                assignment = read_assignment_value(body_lines, j)
+                if assignment:
+                    _, _, full_value, end_j = assignment
+                    note, handled = try_convert_vippool_ids(
+                        indent, full_value, current_resource_name or ""
+                    )
+                    if handled:
+                        if note:
+                            transformed.append(note)
+                        j = end_j
+                        continue
 
             # Skip attributes removed for this specific resource type, inserting a TODO comment
             if current_resource_type in resource_specific_removals and \
@@ -294,7 +596,7 @@ def transform_resource_block(lines, i):
                 if comment:
                     for comment_line in comment.splitlines():
                         transformed.append(f"{indent}{comment_line}")
-                j += 1
+                j = skip_attribute_assignment(body_lines, j)
                 continue
 
             # Handle attribute name changes
@@ -316,33 +618,7 @@ def transform_resource_block(lines, i):
                 attr_key = resource_renames[attr_key]
 
             group = get_group_for_key(attr_key)
-            if group == "List of Number --> String":
-                # Handle multi-line list by collecting all content until closing bracket
-                if value_expr.strip() == "[":
-                    # Multi-line list - collect all lines until closing bracket
-                    all_content = ""
-                    temp_j = j + 1
-                    brace_count = 1
-                    while temp_j < len(body_lines) and brace_count > 0:
-                        next_line = body_lines[temp_j].strip()
-                        all_content += " " + next_line
-                        brace_count += next_line.count("[") - next_line.count("]")
-                        temp_j += 1
-                    
-                    # Extract numbers from the collected content
-                    numbers = re.findall(r"-?\d+", all_content)
-                    joined = ",".join(numbers)
-                    transformed.append(f"{indent}{attr_key} = \"{joined}\"")
-                    j = temp_j
-                    continue
-                else:
-                    # Single-line list
-                    numbers = re.findall(r"-?\d+", value_expr)
-                    joined = ",".join(numbers)
-                    transformed.append(f"{indent}{attr_key} = \"{joined}\"")
-                    j += 1
-                    continue
-            
+
             # If attribute name was changed but no group transformation needed
             if attr_key != original_attr_key:
                 transformed.append(f"{indent}{attr_key} = {value_expr}")
@@ -430,7 +706,7 @@ def transform_data_block(lines, i):
     return "".join(block), j - i
 
 def transform_terraform_block(lines, i):
-    """Transform terraform blocks to update VastData provider version from 1.x.x to 2.0.0."""
+    """Transform terraform blocks to update VastData provider version from 1.x.x to 3.0.0."""
     if not lines[i].strip().startswith("terraform "):
         return None, 0
 
@@ -457,8 +733,8 @@ def transform_terraform_block(lines, i):
             block_str = "".join(block)
             # Look for vastdata provider context
             if 'vastdata' in block_str and 'vast-data/vastdata' in block_str:
-                # Update version from 1.x.x to 2.0.0
-                updated_line = line.replace(version_match.group(2), "2.0.0")
+                # Update version from 1.x.x to 3.0.0
+                updated_line = line.replace(version_match.group(2), "3.0.0")
                 transformed_block.append(updated_line)
                 provider_version_updated = True
                 continue
@@ -511,7 +787,40 @@ def transform_file(input_path: Path, output_path: Path):
 
 
 
-def main(src_folder, dst_folder):
+def find_manual_steps(directory: Path):
+    """Return (file, line_no, line_text) for every unresolved migration TODO."""
+    findings = []
+    for tf_file in sorted(directory.rglob("*_converted.tf")):
+        try:
+            lines = tf_file.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            continue
+        for line_no, line in enumerate(lines, start=1):
+            if MANUAL_STEP_PREFIX in line:
+                findings.append((tf_file, line_no, line.strip()))
+    return findings
+
+
+def report_manual_steps(findings, dst_folder: Path) -> None:
+    print("\n" + "=" * 60)
+    print("❌ MIGRATION INCOMPLETE — MANUAL STEPS REQUIRED")
+    print("=" * 60)
+    print(
+        "The converter removed v1 attributes that cannot be mapped automatically.\n"
+        "Fix every item below in the converted files, then re-run the migration script.\n"
+        "Do not run terraform apply until this script exits successfully."
+    )
+    print(f"\nOutput directory: {dst_folder}\n")
+    current_file = None
+    for tf_file, line_no, line_text in findings:
+        if tf_file != current_file:
+            current_file = tf_file
+            print(f"  {tf_file}:")
+        print(f"    line {line_no}: {line_text}")
+    print("\n" + "=" * 60)
+
+
+def main(src_folder, dst_folder, allow_incomplete: bool = False):
     src_folder = Path(src_folder)
     dst_folder = Path(dst_folder)
 
@@ -538,6 +847,12 @@ def main(src_folder, dst_folder):
         transform_file(tf_file, output_file)
         converted_files.append(output_file)
 
+    # Fail closed: do not leave the user with a silently incomplete stack.
+    manual_steps = find_manual_steps(dst_folder)
+    if manual_steps and not allow_incomplete:
+        report_manual_steps(manual_steps, dst_folder)
+        sys.exit(2)
+
     # Print summary
     print("\n" + "=" * 60)
     print("📋 CONVERSION COMPLETE")
@@ -546,8 +861,13 @@ def main(src_folder, dst_folder):
     print(f"✅ Files converted: {len(converted_files)}")
     print(f"📁 Output location: {dst_folder}")
     
+    if manual_steps:
+        print(f"\n⚠️  {len(manual_steps)} manual step(s) remain (--allow-incomplete was set).")
+    else:
+        print("\n✅ No manual migration steps detected in converted files.")
+
     print("\n" + "⚠️ " * 20)
-    print("📋 NEXT STEPS - USER ACTION REQUIRED")
+    print("📋 NEXT STEPS")
     print("⚠️ " * 20)
     print("1. 🔍 Review each converted file carefully")
     print("2. 💾 Backup your terraform state files") 
@@ -564,6 +884,11 @@ if __name__ == "__main__":
     )
     parser.add_argument("src_folder", nargs="?", help="Source folder containing .tf files")
     parser.add_argument("dst_folder", nargs="?", help="Destination folder for converted files")
+    parser.add_argument(
+        "--allow-incomplete",
+        action="store_true",
+        help="Write converted files even when manual migration steps remain (default: exit with error)",
+    )
     parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     args = parser.parse_args()
 
@@ -571,4 +896,4 @@ if __name__ == "__main__":
         parser.print_help()
         sys.exit(1)
 
-    main(args.src_folder, args.dst_folder)
+    main(args.src_folder, args.dst_folder, allow_incomplete=args.allow_incomplete)

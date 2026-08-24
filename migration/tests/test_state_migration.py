@@ -28,6 +28,10 @@ from state_migration import (
     parse_tfstate,
     separate_vast_resources,
     strip_vast_resources,
+    extract_resource_ids,
+    extract_v1_attributes,
+    patch_imported_attributes,
+    prettify_json_fields,
     write_state,
     run_terraform_init,
     run_terraform_apply_migrate,
@@ -53,7 +57,7 @@ def _make_state(resources, *, version=4, serial=5, lineage="test-lineage"):
     }
 
 
-def _managed(rtype, name, attrs, *, provider=None):
+def _managed(rtype, name, attrs, *, provider=None, module=None):
     """Build a managed-resource entry."""
     entry = {
         "mode": "managed",
@@ -63,6 +67,8 @@ def _managed(rtype, name, attrs, *, provider=None):
     }
     if provider:
         entry["provider"] = provider
+    if module:
+        entry["module"] = module
     return entry
 
 
@@ -177,17 +183,18 @@ class TestSeparateVastResources:
         assert vast == []
         assert non_vast == []
 
-    def test_data_sources_are_classified_correctly(self):
-        """Data sources with vastdata_ prefix should be classified as vast."""
+    def test_data_sources_are_preserved_not_imported(self):
+        """VastData data sources stay in state and are never terraform import-ed."""
         resources = [
             _data("vastdata_vip_pool", "pool", {"id": 1}),
             _data("aws_ami", "ubuntu", {"id": "ami-123"}),
         ]
 
-        vast, non_vast = separate_vast_resources(resources)
+        importable, preserved, non_vast = separate_vast_resources(resources)
 
-        assert len(vast) == 1
-        assert vast[0]["type"] == "vastdata_vip_pool"
+        assert len(importable) == 0
+        assert len(preserved) == 1
+        assert preserved[0]["type"] == "vastdata_vip_pool"
         assert len(non_vast) == 1
         assert non_vast[0]["type"] == "aws_ami"
 
@@ -214,6 +221,217 @@ class TestSeparateVastResources:
 
         assert len(vast) == 0
         assert len(non_vast) == 1
+
+
+# ---------------------------------------------------------------------------
+# TestExtractResourceIds
+# ---------------------------------------------------------------------------
+
+class TestExtractResourceIds:
+    """Import addresses must use v3 resource types from migration_script."""
+
+    def test_renamed_resource_type_uses_v3_address(self):
+        state = _make_state([
+            _managed("vastdata_administators_roles", "read_only", {"id": 18}),
+        ])
+
+        result = extract_resource_ids(state)
+
+        assert result == {"vastdata_administrator_role.read_only": "18"}
+
+    def test_unchanged_resource_type_keeps_address(self):
+        state = _make_state([
+            _managed("vastdata_tenant", "tenant1", {"id": 3}),
+        ])
+
+        result = extract_resource_ids(state)
+
+        assert result == {"vastdata_tenant.tenant1": "3"}
+
+    def test_renamed_resource_with_for_each_index(self):
+        state = _make_state([{
+            "mode": "managed",
+            "type": "vastdata_replication_peers",
+            "name": "peer",
+            "instances": [
+                {
+                    "index_key": "a",
+                    "schema_version": 0,
+                    "attributes": {"id": 7},
+                },
+            ],
+        }])
+
+        result = extract_resource_ids(state)
+
+        assert result == {'vastdata_replication_peer.peer["a"]': "7"}
+
+    def test_module_resource_includes_module_path(self):
+        state = _make_state([
+            _managed(
+                "vastdata_view",
+                "this",
+                {"id": 20, "path": "/tfmod-env1", "tenant_name": "default"},
+                module='module.views["env1"]',
+            ),
+        ])
+
+        result = extract_resource_ids(state)
+
+        assert result == {
+            'module.views["env1"].vastdata_view.this': "/tfmod-env1|default",
+        }
+
+    def test_module_for_each_instances_get_unique_addresses(self):
+        state = _make_state([
+            _managed(
+                "vastdata_view_policy",
+                "nfs",
+                {"id": 5, "name": "tfmod-policy", "tenant_name": "default"},
+            ),
+            _managed(
+                "vastdata_view",
+                "this",
+                {"id": 20, "path": "/tfmod-env2", "tenant_name": "default"},
+                module='module.views["env2"]',
+            ),
+            _managed(
+                "vastdata_view",
+                "this",
+                {"id": 21, "path": "/tfmod-env1", "tenant_name": "default"},
+                module='module.views["env1"]',
+            ),
+        ])
+
+        result = extract_resource_ids(state)
+
+        assert len(result) == 3
+        assert result['vastdata_view_policy.nfs'] == "tfmod-policy|default"
+        assert result['module.views["env1"].vastdata_view.this'] == "/tfmod-env1|default"
+        assert result['module.views["env2"].vastdata_view.this'] == "/tfmod-env2|default"
+
+    def test_data_sources_are_excluded_from_import(self):
+        state = _make_state([
+            _data("vastdata_tenant", "default", {"id": 1, "name": "default"}),
+            _managed(
+                "vastdata_view_policy",
+                "nfs",
+                {"id": 5, "name": "tfds-policy", "tenant_name": "default"},
+            ),
+        ])
+
+        result = extract_resource_ids(state)
+
+        assert result == {"vastdata_view_policy.nfs": "5"}
+
+
+class TestPreserveCreateOnlyAttributes:
+    """create-only attributes must survive import via v1 state patching."""
+
+    def test_extract_v1_attributes_maps_view_create_dir(self):
+        state = _make_state([
+            _managed("vastdata_view", "global_mgmt", {
+                "id": 42,
+                "path": "/global_mgmt",
+                "create_dir": True,
+            }),
+        ])
+
+        result = extract_v1_attributes(state)
+
+        assert result == {
+            "vastdata_view.global_mgmt": {
+                "id": 42,
+                "path": "/global_mgmt",
+                "create_dir": True,
+            },
+        }
+
+    def test_patch_imported_attributes_restores_null_create_dir(self, tmp_path):
+        v1_state = _make_state([
+            _managed("vastdata_view", "global_mgmt", {
+                "id": 42,
+                "path": "/global_mgmt",
+                "create_dir": True,
+            }),
+        ])
+        v1_attrs = extract_v1_attributes(v1_state)
+        imported = {"vastdata_view.global_mgmt": "42"}
+
+        post_import = _make_state([
+            _managed("vastdata_view", "global_mgmt", {
+                "id": 42,
+                "path": "/global_mgmt",
+                "create_dir": None,
+            }),
+        ])
+        state_path = tmp_path / "terraform.tfstate"
+        write_state(post_import, str(state_path))
+
+        patched = patch_imported_attributes(str(tmp_path), v1_attrs, imported)
+
+        assert patched == 1
+        with open(state_path) as fh:
+            loaded = json.load(fh)
+        attrs = loaded["resources"][0]["instances"][0]["attributes"]
+        assert attrs["create_dir"] is True
+
+    def test_prettify_json_fields_restores_v1_policy_format(self, tmp_path):
+        pretty_policy = (
+            '{\n  "Version": "2012-10-17",\n  "Statement": []\n}'
+        )
+        compact_policy = '{"Statement":[],"Version":"2012-10-17"}'
+
+        v1_state = _make_state([
+            _managed("vastdata_s3_policy", "s3policy_ro", {
+                "id": 3,
+                "name": "s3_codex_ro",
+                "policy": pretty_policy,
+            }),
+        ])
+        v1_attrs = extract_v1_attributes(v1_state)
+        imported = {"vastdata_s3_policy.s3policy_ro": "3"}
+
+        post_import = _make_state([
+            _managed("vastdata_s3_policy", "s3policy_ro", {
+                "id": 3,
+                "name": "s3_codex_ro",
+                "policy": pretty_policy,
+            }),
+        ])
+        state_path = tmp_path / "terraform.tfstate"
+        write_state(post_import, str(state_path))
+
+        count = prettify_json_fields(str(tmp_path), v1_attrs, imported)
+
+        assert count == 1
+        with open(state_path) as fh:
+            loaded = json.load(fh)
+        attrs = loaded["resources"][0]["instances"][0]["attributes"]
+        assert attrs["policy"] == compact_policy
+
+    def test_prettify_json_fields_prettifies_without_v1(self, tmp_path):
+        pretty_policy = (
+            '{\n  "Version": "2012-10-17",\n  "Statement": [{"Effect": "Allow"}]\n}'
+        )
+        compact_policy = '{"Statement":[{"Effect":"Allow"}],"Version":"2012-10-17"}'
+
+        post_import = _make_state([
+            _managed("vastdata_s3_policy", "s3policy_ro", {
+                "id": 3,
+                "policy": pretty_policy,
+            }),
+        ])
+        state_path = tmp_path / "terraform.tfstate"
+        write_state(post_import, str(state_path))
+
+        count = prettify_json_fields(str(tmp_path), {}, {"vastdata_s3_policy.s3policy_ro": "3"})
+
+        assert count == 1
+        with open(state_path) as fh:
+            loaded = json.load(fh)
+        attrs = loaded["resources"][0]["instances"][0]["attributes"]
+        assert attrs["policy"] == compact_policy
 
 
 # ---------------------------------------------------------------------------
@@ -308,13 +526,14 @@ class TestStripVastResources:
             _data("vastdata_vip_pool", "pool", {"id": 1}),
         ])
 
-        cleaned, vast_count, non_vast_count = strip_vast_resources(state)
+        cleaned, importable_count, preserved_count, non_vast_count = strip_vast_resources(state)
 
-        # vastdata_tenant (managed) + vastdata_vip_pool (data) = 2 vast
-        assert vast_count == 2
-        # aws_ami (data) = 1 non-vast
+        assert importable_count == 1
+        assert preserved_count == 1
         assert non_vast_count == 1
-        assert cleaned["resources"][0]["type"] == "aws_ami"
+        assert len(cleaned["resources"]) == 2
+        types = {r["type"] for r in cleaned["resources"]}
+        assert types == {"aws_ami", "vastdata_vip_pool"}
 
     def test_large_mixed_state(self):
         """State with many resources from multiple providers."""

@@ -192,8 +192,8 @@ class TestConfSpecificFixtures:
         # Original block syntax should be gone
         assert 'ip_ranges {' not in result
     
-    def test_tenant_dynamic_blocks_preserved(self, temp_dir):
-        """Test that dynamic blocks in tenant configuration are preserved."""
+    def test_tenant_dynamic_blocks_converted(self, temp_dir):
+        """Test that standard tenant dynamic client_ip_ranges blocks are converted."""
         terraform_content = '''variable tenant_client_ip_ranges {
     type = list(object({
       start_ip = string
@@ -223,14 +223,9 @@ resource vastdata_tenant tenant1 {
         
         result = output_file.read_text()
         
-        # Dynamic block should be preserved exactly
-        assert 'dynamic "client_ip_ranges"' in result
-        assert 'for_each = var.tenant_client_ip_ranges' in result
-        assert 'client_ip_ranges.value["start_ip"]' in result
-        assert 'client_ip_ranges.value["end_ip"]' in result
-        
-        # Should not be converted to static format
-        assert 'client_ip_ranges = [' not in result
+        # Standard dynamic block should be converted to list attribute
+        assert 'client_ip_ranges = [for r in var.tenant_client_ip_ranges : [r["start_ip"], r["end_ip"]]]' in result
+        assert 'dynamic "client_ip_ranges"' not in result
     
     def test_share_acl_transformation_s3_view(self, temp_dir):
         """Test share_acl block transformation in S3 view."""
