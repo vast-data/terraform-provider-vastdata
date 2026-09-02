@@ -79,6 +79,7 @@ resource "vastdata_tenant" "with_views_count" {
 - `capacity_rules` (Attributes) (see [below for nested schema](#nestedatt--capacity_rules))
 - `client_ip_ranges` (List of List of String) Array of ranges of client IPs to be served by the tenant. For client requests made to a VIP that belongs to a VIP Pool that is not associated to a specific tenant, the client's source IP is checked against the Client IPs that are defined within each tenant. That check determines access. The client IPs that you associate with each tenant must be unique per tenant.
 - `default_others_share_level_perm` (String) Default Share-level permissions for Others
+- `delete_local_provider` (Boolean) If set to true, deletes the VMS auto-created local provider for this tenant on destroy and on create rollback. Cannot be used together with local_provider_id.
 - `domain_name` (String) Domain name to incorporate into the VMS tenant login page URL.
 - `encryption_crn` (String) Tenant's encryption group unique identifier (deprecated)
 - `encryption_group` (String) Tenant's encryption group unique identifier
