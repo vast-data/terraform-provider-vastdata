@@ -52,6 +52,12 @@ func (p *VastProvider) Metadata(ctx context.Context, req provider.MetadataReques
 
 func (p *VastProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		// alias is a Terraform meta-argument (not listed below). Use it for multiple
+		// clusters (e.g. GNS); resources must then set provider = vastdata.<alias>.
+		MarkdownDescription: "Manage Vast Data clusters via the VMS API. " +
+			"To target more than one cluster in the same configuration, " +
+			"use Terraform's provider `alias` meta-argument and set `provider = vastdata.<alias>` " +
+			"on each resource or data source.",
 		Attributes: map[string]schema.Attribute{
 			"host": schema.StringAttribute{
 				Required:            true,
