@@ -84,6 +84,14 @@ func (CustomImportOnly) Error() string {
 	return "custom-import-only"
 }
 
+// ignoreResourceGone treats client NotFoundError and HTTP 404 as success (resource already gone).
+func ignoreResourceGone(err error) error {
+	if err == nil || isNotFoundErr(err) {
+		return nil
+	}
+	return ignoreStatusCodes(err, http.StatusNotFound)
+}
+
 // PopulateIDFieldsFromNestedObjects examines all keys in tfstate that end with "_id"
 // and attempts to populate them from nested objects in the record.
 //

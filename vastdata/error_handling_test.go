@@ -15,6 +15,7 @@ import (
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/require"
+	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -69,6 +70,21 @@ func TestErrorHandling_HTTPErrors(t *testing.T) {
 			// Note: expectStatusCodes may not work with simple errors, so skip this check
 		})
 	}
+}
+
+func TestIgnoreResourceGone(t *testing.T) {
+	require.NoError(t, ignoreResourceGone(nil))
+
+	notFound := &ApiError{StatusCode: http.StatusNotFound, Body: "gone"}
+	require.NoError(t, ignoreResourceGone(notFound))
+
+	other := &ApiError{StatusCode: http.StatusBadRequest, Body: "bad"}
+	require.Equal(t, other, ignoreResourceGone(other))
+
+	require.NoError(t, ignoreResourceGone(&core.NotFoundError{
+		Resource: "localproviders",
+		Query:    "name=vastdbtenant-lp-cleanup",
+	}))
 }
 
 func TestErrorHandling_NetworkErrors(t *testing.T) {

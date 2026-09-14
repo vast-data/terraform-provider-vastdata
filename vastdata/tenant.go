@@ -47,15 +47,24 @@ func (m *Tenant) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:             TenantSchemaRef,
-			DeleteOnlyParamFields: map[string]string{"force_delete": "force"},
-			PreserveOrderFields:   []string{"client_ip_ranges"},
-			SubResources:          []is.SubResourceHint{tenantViewsCountSubResource},
+			SchemaRef:               TenantSchemaRef,
+			NotComputedSchemaFields: []string{"local_provider_id"},
+			DeleteOnlyParamFields: map[string]string{
+				"force_delete":          "force",
+				"delete_local_provider": "", // custom: handled via LocalProviders API (destroy + create rollback)
+			},
+			PreserveOrderFields: []string{"client_ip_ranges"},
+			SubResources:        []is.SubResourceHint{tenantViewsCountSubResource},
 			AdditionalSchemaAttributes: map[string]any{
 				"force_delete": rschema.BoolAttribute{
 					Optional: true,
 					Description: "If set to true, forces deletion of the tenant even if it has empty subdirectories" +
 						" or other removable remnants. Use with caution, as this will bypass standard cleanup checks.",
+				},
+				"delete_local_provider": rschema.BoolAttribute{
+					Optional: true,
+					Description: "If set to true, deletes the VMS auto-created local provider for this tenant " +
+						"on destroy and on create rollback. Cannot be used together with local_provider_id.",
 				},
 			},
 		},
@@ -80,6 +89,25 @@ func (m *Tenant) TfState() *is.TFState {
 
 func (m *Tenant) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Tenants
+}
+
+// ValidateResourceConfig rejects delete_local_provider together with a user-supplied
+// local_provider_id. Only VMS auto-created providers (provider-<tenant_name>) may be
+// deleted; a configured local_provider_id is out of this resource's control.
+func (m *Tenant) ValidateResourceConfig(context.Context) error {
+	if m.tfstate == nil {
+		return nil
+	}
+	deleteLP := m.tfstate.IsKnownAndNotNull("delete_local_provider") && m.tfstate.Bool("delete_local_provider")
+	hasLPID := m.tfstate.IsKnownAndNotNull("local_provider_id")
+	if deleteLP && hasLPID {
+		return fmt.Errorf(
+			"delete_local_provider cannot be set together with local_provider_id: " +
+				"only VMS auto-created local providers (provider-<tenant_name>) may be deleted; " +
+				"a user-supplied local_provider_id is out of this resource's control",
+		)
+	}
+	return nil
 }
 
 // GetSubResources fetches /tenants/{id}/views_count/ on VAST clusters running
@@ -133,4 +161,42 @@ func (m *Tenant) TransformResponseRecord(record Record) Record {
 	}
 	record["vippools"] = normalized
 	return record
+}
+
+func dedicatedLocalProviderName(tenantName string) string {
+	return "provider-" + tenantName
+}
+
+func (m *Tenant) findDedicatedLocalProvider(ctx context.Context, rest *VMSRest) (Record, error) {
+	tenantName := m.tfstate.String("name")
+	if tenantName == "" {
+		return nil, nil
+	}
+	rec, err := rest.LocalProviders.GetWithContext(ctx, params{"name": dedicatedLocalProviderName(tenantName)})
+	if err != nil {
+		if isNotFoundErr(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	if rec != nil && !rec.Empty() {
+		return rec, nil
+	}
+	return nil, nil
+}
+
+func (m *Tenant) AfterDeleteResource(ctx context.Context, rest *VMSRest) error {
+	if m.tfstate == nil || !m.tfstate.IsKnownAndNotNull("delete_local_provider") || !m.tfstate.Bool("delete_local_provider") {
+		return nil
+	}
+
+	rec, err := m.findDedicatedLocalProvider(ctx, rest)
+	if err != nil {
+		return err
+	}
+	if rec == nil || rec.Empty() {
+		return nil
+	}
+	_, err = rest.LocalProviders.DeleteByIdWithContext(ctx, rec.RecordID(), nil, nil)
+	return ignoreResourceGone(err)
 }

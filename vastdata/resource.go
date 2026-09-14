@@ -458,6 +458,10 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 						)
 					}
 				}
+				if imp, ok := manager.(AfterDeleteResource); ok {
+					tflog.Debug(ctx, fmt.Sprintf("AfterDeleteResource[%s]: create rollback cleanup.", managerName))
+					_ = imp.AfterDeleteResource(ctx, rest)
+				}
 			}
 		}
 	)

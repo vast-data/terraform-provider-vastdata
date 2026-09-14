@@ -1086,8 +1086,13 @@ func (s *TFState) GetDeleteOnlyBodyParams() vast_client.Params {
 			SearchOptional,
 		), true)
 		for _, key := range deleteOnlyKeys {
-			if apiName, ok := s.Hints.DeleteOnlyBodyFields[key]; ok && apiName != "" {
-				if v, present := searchParams[key]; present {
+			apiName, ok := s.Hints.DeleteOnlyBodyFields[key]
+			if !ok || apiName == "" {
+				delete(searchParams, key)
+				continue
+			}
+			if v, present := searchParams[key]; present {
+				if apiName != key {
 					searchParams[apiName] = v // remap to API name
 					delete(searchParams, key)
 				}
@@ -1112,8 +1117,13 @@ func (s *TFState) GetDeleteOnlyQueryParams() vast_client.Params {
 			SearchOptional,
 		), true)
 		for _, key := range deleteOnlyKeys {
-			if apiName, ok := s.Hints.DeleteOnlyParamFields[key]; ok && apiName != "" {
-				if v, present := searchParams[key]; present {
+			apiName, ok := s.Hints.DeleteOnlyParamFields[key]
+			if !ok || apiName == "" {
+				delete(searchParams, key)
+				continue
+			}
+			if v, present := searchParams[key]; present {
+				if apiName != key {
 					searchParams[apiName] = v // remap to API name
 					delete(searchParams, key)
 				}
