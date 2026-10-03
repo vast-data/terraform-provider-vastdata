@@ -1,0 +1,49 @@
+ssh_user             = "vastdata"
+ssh_private_key_path = "~/.ssh/id_ed25519"
+
+rke2_channel  = "v1.35"
+cluster_token = "RKE2CLUSTER"
+
+# Optional: ping a CSI VIP from every node during prep
+# ping_vip = "172.200.205.19"
+
+# prepare_nodes = true
+# apt_upgrade   = false
+
+control_plane_nodes = [
+  { name = "ubuntu-01", management_ip = "10.144.19.2", storage_ip = "172.200.14.146" },
+  { name = "ubuntu-02", management_ip = "10.144.19.3", storage_ip = "172.200.15.122" },
+  { name = "ubuntu-03", management_ip = "10.144.19.4", storage_ip = "172.200.15.107" },
+]
+
+worker_nodes = [
+  { name = "ubuntu-04", management_ip = "10.144.19.5", storage_ip = "172.200.14.1" },
+  { name = "ubuntu-05", management_ip = "10.144.19.6", storage_ip = "172.200.15.216" },
+  { name = "ubuntu-06", management_ip = "10.144.19.7", storage_ip = "172.200.14.111" },
+]
+
+kubeconfig_artifacts_dir = "out"
+
+# Podman registry (optional). Module installs Podman/TLS/certs; local disk by default.
+# enable_podman_registry  = true
+# registry_host           = "10.144.19.8"
+# registry_run_smoke_test = true
+# Optional VAST NFS (from vms_setup docker view / VIP); omit for local disk on registry VM:
+# registry_nfs_export     = "172.200.205.19:/de-lab-docker/images"
+# registry_mountpoint     = "/mnt/nfs/docker-registry"
+
+# --- Storage (optional; at most one default SC) ---
+# Multipass / lab without VAST CSI:
+# enable_local_path_storage = true
+# local_path_set_default    = true
+
+# VAST CSI Driver (after dataengine_vms_setup with enable_csi=true):
+# enable_vast_csi      = true
+# vast_csi_set_default = true
+# vast_csi_endpoint    = "10.143.12.206"          # VMS
+# vast_csi_username    = "de-lab-csi-driver"
+# vast_csi_password    = "changeme"
+# vast_csi_tenant      = "de-lab-csi"
+# vast_csi_vip_pool    = "de-lab-csi-vippool"
+# vast_csi_view_policy = "de-lab-csi-policy"
+# If also enabling local-path, set one of *_set_default = false.
