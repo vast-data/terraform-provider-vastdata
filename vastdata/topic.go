@@ -28,6 +28,16 @@ func (m *Topic) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 		&is.TFStateHints{
 			SchemaRef:      TopicSchemaRef,
 			ReadOnlyFields: []string{"num_events", "tenant_id"},
+			// After broker view create, topics/show can return VMS 400 wrapping a transient
+			// Kafka 403 Forbidden until the database is ready.
+			RetryOn: &is.RetryPolicy{
+				Create: &is.RetryExpression{
+					StatusCodes:  []int{http.StatusBadRequest},
+					BodyContains: []string{"Forbidden", "403 Client Error"},
+					Times:        5,
+					SleepSeconds: 10,
+				},
+			},
 		},
 	)}
 }

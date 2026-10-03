@@ -55,6 +55,16 @@ func (m *Tenant) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 			},
 			PreserveOrderFields: []string{"client_ip_ranges"},
 			SubResources:        []is.SubResourceHint{tenantViewsCountSubResource},
+			// Data Engine teardown clears data_engine_enabled asynchronously; tenant DELETE
+			// can race and return 400 until the flag flips off.
+			RetryOn: &is.RetryPolicy{
+				Delete: &is.RetryExpression{
+					StatusCodes:  []int{http.StatusBadRequest},
+					BodyContains: []string{"data engine enabled"},
+					Times:        30,
+					SleepSeconds: 5,
+				},
+			},
 			AdditionalSchemaAttributes: map[string]any{
 				"force_delete": rschema.BoolAttribute{
 					Optional: true,

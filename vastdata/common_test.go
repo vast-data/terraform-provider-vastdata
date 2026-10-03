@@ -837,6 +837,19 @@ func TestDelete_EmptyDeleteResourceSkipsAPI(t *testing.T) {
 	}
 }
 
+
+func TestPathIDField(t *testing.T) {
+	if got := pathIDField(nil); got != "id" {
+		t.Fatalf("nil hints: got %q, want id", got)
+	}
+	if got := pathIDField(&is.TFStateHints{}); got != "id" {
+		t.Fatalf("empty PathIDField: got %q, want id", got)
+	}
+	if got := pathIDField(&is.TFStateHints{PathIDField: "guid"}); got != "guid" {
+		t.Fatalf("PathIDField=guid: got %q, want guid", got)
+	}
+}
+
 func TestRecordByGUID(t *testing.T) {
 	records := RecordSet{
 		{"id": int64(6), "guid": "aaa", "name": "other"},
