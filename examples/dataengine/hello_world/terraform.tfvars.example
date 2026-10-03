@@ -1,0 +1,28 @@
+vms_host        = "vast-cluster.example.com"
+vms_username    = "admin"
+vms_password    = "******"
+skip_ssl_verify = true
+
+# From: cd ../vms_setup && terraform output
+tenant_name            = "de-lab"
+container_registry_vrn = "vast:dataengine:container-registries:dockerhub"
+kubernetes_cluster_vrn = "vast:dataengine:kubernetes-clusters:de-lab-k8s"
+
+broker_name = "de-lab-broker"
+topic_name  = "engine-main"
+
+artifact_source       = "fnn45/hello-world"
+image_tag             = "latest"
+skip_image_validation = true
+
+function_name         = "de-test-function"
+schedule_trigger_name = "de-test-trigger"
+element_trigger_name  = "de-test-element-trigger"
+# element_source_bucket = "de-lab-broker"  # defaults to broker_name
+
+pipeline_name      = "de-test-pipeline"
+pipeline_namespace = "vast-pipelines"
+
+secret_namespace = "vast-pipelines"
+secret_name      = "de-hello-app-secret"
+# secret_entries defaults to DEMO_USER / DEMO_TOKEN
