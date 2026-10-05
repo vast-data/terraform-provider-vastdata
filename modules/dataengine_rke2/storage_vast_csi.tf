@@ -88,7 +88,7 @@ resource "helm_release" "vast_csi" {
           ]
           secretName             = var.vast_csi_secret_name
           secretNamespace        = var.vast_csi_namespace
-          setDefaultStorageClass = var.vast_csi_set_default
+          setDefaultStorageClass = local.vast_csi_is_default
         }
       }
       controller = {

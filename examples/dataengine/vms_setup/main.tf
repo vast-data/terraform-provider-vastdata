@@ -19,7 +19,7 @@ provider "vastdata" {
 }
 
 module "dataengine" {
-  source = "git::ssh://git@git.vastdata.com/dev/terraform-provider-vastdata.git//modules/dataengine_vms_setup?ref=6ef33289b392ff6664dc24f5b8199cc3239c1390"
+  source = "git::ssh://git@git.vastdata.com/dev/terraform-provider-vastdata.git//modules/dataengine_vms_setup?ref=85ba8e8f53fafcae17b4fafa7422348e06069c57"
 
   name_prefix = var.name_prefix
 

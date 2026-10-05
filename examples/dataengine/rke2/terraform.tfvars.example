@@ -32,18 +32,17 @@ kubeconfig_artifacts_dir = "out"
 # registry_nfs_export     = "172.200.205.19:/de-lab-docker/images"
 # registry_mountpoint     = "/mnt/nfs/docker-registry"
 
-# --- Storage (optional; at most one default SC) ---
-# Multipass / lab without VAST CSI:
-# enable_local_path_storage = true
-# local_path_set_default    = true
-
-# VAST CSI Driver (after dataengine_vms_setup with enable_csi=true):
+# --- Storage -----------------------------------------------------------------
+# Default (omit both): installs local-path and makes it the default SC (Zarf/lab).
+# enable_local_path_storage = false   # opt out of local-path entirely
+#
+# VAST CSI (after dataengine_vms_setup with enable_csi=true). When CSI is on,
+# local-path is skipped unless you set enable_local_path_storage = true.
 # enable_vast_csi      = true
-# vast_csi_set_default = true
 # vast_csi_endpoint    = "10.143.12.206"          # VMS
 # vast_csi_username    = "de-lab-csi-driver"
 # vast_csi_password    = "changeme"
 # vast_csi_tenant      = "de-lab-csi"
 # vast_csi_vip_pool    = "de-lab-csi-vippool"
 # vast_csi_view_policy = "de-lab-csi-policy"
-# If also enabling local-path, set one of *_set_default = false.
+# # With both backends: CSI is default; set vast_csi_set_default=false to prefer local-path.

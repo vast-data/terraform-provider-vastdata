@@ -455,12 +455,29 @@ const (
 
 // Common modifiers
 const (
-	ModifierForceNew = schema_generation.ModifierForceNew
+	ModifierForceNew             = schema_generation.ModifierForceNew
+	ModifierForceNewIfConfigured = schema_generation.ModifierForceNewIfConfigured
 )
 
 // ----------------------------------
 // MISC
 // ----------------------------------
+
+// isRedacted reports whether v is an API placeholder for secret material
+// (e.g. "******") rather than a real value. Use when GET responses redact
+// fields that must not be written into Terraform state.
+func isRedacted(v any) bool {
+	s, ok := v.(string)
+	if !ok {
+		return false
+	}
+	switch strings.TrimSpace(s) {
+	case "******", "********", "[REDACTED]", "redacted":
+		return true
+	default:
+		return false
+	}
+}
 
 func withContext(ctx context.Context, method string, managerName string, fn func(ctx context.Context)) {
 	ctx = client.ContextWithRequestID(ctx)

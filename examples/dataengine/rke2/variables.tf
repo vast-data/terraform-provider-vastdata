@@ -157,8 +157,9 @@ variable "registry_restart_rke2" {
 }
 
 variable "enable_local_path_storage" {
-  type    = bool
-  default = false
+  type     = bool
+  default  = null
+  nullable = true
 }
 
 variable "local_path_version" {

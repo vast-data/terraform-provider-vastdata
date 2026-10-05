@@ -1,5 +1,5 @@
 resource "null_resource" "local_path_storage" {
-  count = var.enable_local_path_storage ? 1 : 0
+  count = local.local_path_storage_enabled ? 1 : 0
 
   depends_on = [null_resource.finalize]
 
@@ -8,7 +8,7 @@ resource "null_resource" "local_path_storage" {
     fingerprint = local.install_fingerprint
     kubeconfig  = local.kubeconfig_abs
     version     = var.local_path_version
-    default     = tostring(var.local_path_set_default)
+    default     = tostring(local.local_path_is_default)
   }
 
   provisioner "local-exec" {
@@ -17,7 +17,7 @@ resource "null_resource" "local_path_storage" {
     environment = {
       KUBECONFIG         = local.kubeconfig_abs
       LOCAL_PATH_VERSION = var.local_path_version
-      SET_DEFAULT        = tostring(var.local_path_set_default)
+      SET_DEFAULT        = tostring(local.local_path_is_default)
     }
   }
 }

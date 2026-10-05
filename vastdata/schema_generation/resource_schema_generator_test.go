@@ -348,6 +348,28 @@ func Test_injectModifiers_SensitiveComputedGetsUseState(t *testing.T) {
 		"Sensitive create-only/computed fields must keep prior state when omitted from config")
 }
 
+func Test_injectModifiers_ForceNewIfConfigured(t *testing.T) {
+	att := rschema.StringAttribute{
+		Optional:  true,
+		Computed:  true,
+		Sensitive: true,
+	}
+	hints := &TFStateHints{
+		CommonModifiersMapping: map[string]string{
+			"certificate_authority_b64": ModifierForceNewIfConfigured,
+		},
+	}
+
+	modified := injectModifiers(att, "certificate_authority_b64", hints)
+	mod, ok := modified.(rschema.StringAttribute)
+	require.True(t, ok)
+	require.True(t, containsUseStateForUnknown(mod.PlanModifiers))
+	// RequiresReplaceIfConfigured from the mapping + UseStateForUnknown for computed.
+	require.Len(t, mod.PlanModifiers, 2)
+	_, ok = commonStringModifiers[ModifierForceNewIfConfigured]
+	require.True(t, ok, "commonStringModifiers must register force_new_if_configured")
+}
+
 func Test_injectModifiers_FromHints(t *testing.T) {
 	att := rschema.StringAttribute{
 		Optional: true,

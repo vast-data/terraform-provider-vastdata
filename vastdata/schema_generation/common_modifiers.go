@@ -10,20 +10,24 @@ import (
 )
 
 const (
-	ModifierForceNew = "force_new"
+	ModifierForceNew             = "force_new"
+	ModifierForceNewIfConfigured = "force_new_if_configured"
 )
 
 // Common plan modifiers for string attributes (e.g., "path", "name")
 var commonStringModifiers = map[string][]planmodifier.String{
-	ModifierForceNew: {stringplanmodifier.RequiresReplace()},
+	ModifierForceNew:             {stringplanmodifier.RequiresReplace()},
+	ModifierForceNewIfConfigured: {stringplanmodifier.RequiresReplaceIfConfigured()},
 }
 
 // Common plan modifiers for int64 attributes (e.g., "retry_count")
 var commonIntModifiers = map[string][]planmodifier.Int64{
-	ModifierForceNew: {int64planmodifier.RequiresReplace()},
+	ModifierForceNew:             {int64planmodifier.RequiresReplace()},
+	ModifierForceNewIfConfigured: {int64planmodifier.RequiresReplaceIfConfigured()},
 }
 
 // Common plan modifiers for float64 attributes (e.g., "threshold")
 var commonFloatModifiers = map[string][]planmodifier.Float64{
-	ModifierForceNew: {float64planmodifier.RequiresReplace()},
+	ModifierForceNew:             {float64planmodifier.RequiresReplace()},
+	ModifierForceNewIfConfigured: {float64planmodifier.RequiresReplaceIfConfigured()},
 }

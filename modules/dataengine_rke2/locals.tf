@@ -44,7 +44,7 @@ locals {
 
   registry_enabled = var.enable_podman_registry
 
-  registry_ssh_host = coalesce(var.registry_management_ip, var.registry_host)
+  registry_ssh_host = try(coalesce(var.registry_management_ip, var.registry_host), null)
 
   registry_fingerprint = sha256(jsonencode({
     host        = var.registry_host
@@ -63,15 +63,24 @@ locals {
   kubeconfig_abs           = abspath(local.kubeconfig_local_path)
   kubeconfig_artifacts_abs = abspath(local.kubeconfig_artifacts_dir)
 
-  local_path_storage_enabled = var.enable_local_path_storage
+  # Auto: local-path when CSI is off; explicit true/false overrides.
+  local_path_storage_enabled = coalesce(var.enable_local_path_storage, !var.enable_vast_csi)
   vast_csi_enabled           = var.enable_vast_csi
 
-  # Preferred default SC name for consumers (zarf, docs). Null if neither sets default.
+  # Only one default SC: CSI wins when both ask to be default.
+  local_path_is_default = (
+    local.local_path_storage_enabled &&
+    var.local_path_set_default &&
+    !(local.vast_csi_enabled && var.vast_csi_set_default)
+  )
+  vast_csi_is_default = local.vast_csi_enabled && var.vast_csi_set_default
+
+  # Preferred default SC name for consumers (zarf, docs). Null if neither is default.
   storage_class_name = (
-    var.enable_vast_csi && var.vast_csi_set_default ? var.vast_csi_storage_class_name :
-    var.enable_local_path_storage && var.local_path_set_default ? "local-path" :
-    var.enable_vast_csi ? var.vast_csi_storage_class_name :
-    var.enable_local_path_storage ? "local-path" :
+    local.vast_csi_is_default ? var.vast_csi_storage_class_name :
+    local.local_path_is_default ? "local-path" :
+    local.vast_csi_enabled ? var.vast_csi_storage_class_name :
+    local.local_path_storage_enabled ? "local-path" :
     null
   )
 }
@@ -87,16 +96,6 @@ check "registry_inputs" {
   assert {
     condition     = !var.enable_podman_registry || var.registry_host != null
     error_message = "enable_podman_registry requires registry_host."
-  }
-}
-
-check "storage_single_default" {
-  assert {
-    condition = !(
-      var.enable_local_path_storage && var.local_path_set_default &&
-      var.enable_vast_csi && var.vast_csi_set_default
-    )
-    error_message = "Only one StorageClass may be default: set local_path_set_default or vast_csi_set_default to false."
   }
 }
 

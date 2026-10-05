@@ -227,9 +227,9 @@ The root module must declare `kubernetes` and `helm` and point them at `kubernet
 | `registry_force_recert` | no | `false` | Regenerate the registry cert even if one exists |
 | `registry_run_smoke_test` | no | `false` | Optional check that pushes `alpine` into the new registry. Setup already curls `/v2/_catalog` |
 | `registry_restart_rke2` | no | `true` | Restart RKE2 after writing `registries.yaml`. The file is read only when the process starts |
-| `enable_local_path_storage` | no | `false` | Install Rancher local-path StorageClass |
+| `enable_local_path_storage` | no | `null` (auto) | Install local-path. Auto: on when CSI is off, off when CSI alone is on. Set `true`/`false` to override |
 | `local_path_version` | no | `v0.0.31` | local-path-provisioner release tag |
-| `local_path_set_default` | no | `true` | Make `local-path` the default StorageClass |
+| `local_path_set_default` | no | `true` | Make `local-path` the default SC (ignored when CSI is also default) |
 | `enable_vast_csi` | no | `false` | Install the VAST CSI Driver (needs kubeconfig already on disk) |
 | `vast_csi_endpoint` | when CSI on | null | VMS address for the CSI secret |
 | `vast_csi_username` | when CSI on | null | CSI driver service-account username |
@@ -247,7 +247,7 @@ The root module must declare `kubernetes` and `helm` and point them at `kubernet
 | `vast_csi_snapshotter_version` | no | `v7.0.1` | external-snapshotter tag |
 | `vast_csi_install_snapshotter` | no | `true` | Install snapshot CRDs and controller before Helm |
 
-Only one StorageClass may be the default. If both backends are enabled, set one of `local_path_set_default` or `vast_csi_set_default` to false.
+By default (neither flag set) the module installs **local-path** and marks it default.
 
 ### Examples
 
@@ -299,7 +299,6 @@ module "rke2" {
     { name = "de-w2", management_ip = "10.178.218.238", storage_ip = "10.178.218.238" },
   ]
 
-  enable_local_path_storage = true
 
   enable_podman_registry = true
   registry_host          = "10.178.218.164"

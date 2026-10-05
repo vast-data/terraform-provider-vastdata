@@ -195,3 +195,43 @@ func TestMtlsMaterialFromKubeconfig_Errors(t *testing.T) {
 		t.Fatal("expected missing context")
 	}
 }
+
+func TestDeMtlsTransformResponseRecord_DropsRedactedKey(t *testing.T) {
+	m := &DeMtlsAuthenticationCredential{tfstate: is.NewTFStateMust(
+		map[string]attr.Value{"tenant_name": types.StringValue("de-shared")},
+		rschema.Schema{Attributes: map[string]rschema.Attribute{
+			"tenant_name":               rschema.StringAttribute{Optional: true},
+			"client_key_b64":            rschema.StringAttribute{Optional: true},
+			"client_certificate_b64":    rschema.StringAttribute{Optional: true},
+			"certificate_authority_b64": rschema.StringAttribute{Optional: true},
+		}},
+		&is.TFStateHints{},
+	)}
+
+	out := m.TransformResponseRecord(Record{
+		"name":                      "tf-mtls-pem-repro",
+		"client_key_b64":            "******",
+		"client_certificate_b64":    "LS0tLS1CRUdJTi...",
+		"certificate_authority_b64": "LS0tLS1CRUdJTi...",
+		"tenant_guid":               "d707214e-3c70-4cae-9c89-03be8b75abf8",
+	}, nil)
+
+	if _, ok := out["client_key_b64"]; ok {
+		t.Fatal("redacted client_key_b64 must be removed from the response record")
+	}
+	if out["client_certificate_b64"] != "LS0tLS1CRUdJTi..." {
+		t.Fatalf("real client_certificate_b64 must be kept: %v", out["client_certificate_b64"])
+	}
+	if out["tenant_name"] != "de-shared" {
+		t.Fatalf("tenant_name: got %v", out["tenant_name"])
+	}
+}
+
+func TestIsRedacted(t *testing.T) {
+	if !isRedacted("******") {
+		t.Fatal("expected ****** to be redacted")
+	}
+	if isRedacted("LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQo=") {
+		t.Fatal("real PEM must not be treated as redacted")
+	}
+}

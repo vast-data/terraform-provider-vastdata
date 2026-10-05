@@ -26,7 +26,7 @@ terraform {
 }
 
 module "rke2" {
-  source = "git::ssh://git@git.vastdata.com/dev/terraform-provider-vastdata.git//modules/dataengine_rke2?ref=6ef33289b392ff6664dc24f5b8199cc3239c1390"
+  source = "git::ssh://git@git.vastdata.com/dev/terraform-provider-vastdata.git//modules/dataengine_rke2?ref=85ba8e8f53fafcae17b4fafa7422348e06069c57"
 
   ssh_user             = var.ssh_user
   ssh_private_key_path = var.ssh_private_key_path

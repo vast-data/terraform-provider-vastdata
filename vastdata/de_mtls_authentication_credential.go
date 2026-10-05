@@ -58,11 +58,19 @@ func (m *DeMtlsAuthenticationCredential) NewResourceManager(raw map[string]attr.
 				deTenantNameAttr,
 				"context_name",
 			},
-			PreserveUserValueFields: []string{deTenantNameAttr, "context_name"},
+			PreserveUserValueFields: []string{
+				deTenantNameAttr,
+				"context_name",
+				"client_key_b64",
+			},
 			CommonModifiersMapping: map[string]string{
-				"certificate_authority_b64": ModifierForceNew,
-				"client_certificate_b64":    ModifierForceNew,
-				"client_key_b64":            ModifierForceNew,
+				// Replace only when the operator sets PEMs in config. With kubeconfig_data,
+				// PEMs are derived at create and omitted afterward — unconditional ForceNew
+				// treated that omission as a change and destroyed the credential on any edit
+				// (e.g. description). CreateOnly + UseStateForUnknown keep prior PEM state.
+				"certificate_authority_b64": ModifierForceNewIfConfigured,
+				"client_certificate_b64":    ModifierForceNewIfConfigured,
+				"client_key_b64":            ModifierForceNewIfConfigured,
 				deTenantNameAttr:            ModifierForceNew,
 				"context_name":              ModifierForceNew,
 			},
@@ -109,7 +117,19 @@ func (m *DeMtlsAuthenticationCredential) TransformQueryParams(query params, rest
 }
 
 func (m *DeMtlsAuthenticationCredential) TransformResponseRecord(response Record) Record {
-	return ensureTenantNameInRecord(response, m.tfstate, nil)
+	response = ensureTenantNameInRecord(response, m.tfstate, nil)
+	// GET redacts the private key (and may redact other PEMs). Drop placeholders so
+	// FillFromRecord cannot put "******" into state and force perpetual replacement.
+	for _, key := range []string{
+		"client_key_b64",
+		"client_certificate_b64",
+		"certificate_authority_b64",
+	} {
+		if isRedacted(response[key]) {
+			delete(response, key)
+		}
+	}
+	return response
 }
 
 // TransformRequestBody drops provider-only tenant_name and kubeconfig fields from the API body.

@@ -244,13 +244,19 @@ variable "registry_restart_rke2" {
 }
 
 # -----------------------------------------------------------------------------
-# Storage (optional): local-path and/or VAST CSI
+# Storage: local-path (lab default) and/or VAST CSI
 # -----------------------------------------------------------------------------
 
 variable "enable_local_path_storage" {
-  type        = bool
-  description = "If true, install Rancher local-path provisioner and StorageClass local-path after the cluster is Ready."
-  default     = false
+  type = bool
+  description = <<-EOT
+    Install Rancher local-path provisioner and StorageClass local-path after the
+    cluster is Ready. Default null means auto: install when enable_vast_csi is
+    false (lab default); skip when CSI alone is enabled. Set true to
+    keep local-path alongside CSI, or false to opt out entirely.
+  EOT
+  default  = null
+  nullable = true
 }
 
 variable "local_path_version" {
@@ -261,8 +267,12 @@ variable "local_path_version" {
 
 variable "local_path_set_default" {
   type        = bool
-  description = "If true, annotate local-path as the default StorageClass."
-  default     = true
+  description = <<-EOT
+    Annotate local-path as the default StorageClass when it is installed.
+    Ignored (treated as false) when VAST CSI is also installed with
+    vast_csi_set_default=true so only one default SC is configured.
+  EOT
+  default = true
 }
 
 variable "enable_vast_csi" {
