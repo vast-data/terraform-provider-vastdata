@@ -60,9 +60,14 @@ func (m *Topic) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Topics
 }
 
+// topicIdentityParams includes tenant_id when set (required for non-default tenants on show/delete).
+func (m *Topic) topicIdentityParams() params {
+	searchParams, _ := m.tfstate.SetIfAvailable("database_name", "name", "tenant_id")
+	return searchParams
+}
+
 func (m *Topic) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	searchParams, _ := m.tfstate.SetIfAvailable("database_name", "name")
-	record, err := rest.Topics.TopicShowWithContext_GET(ctx, searchParams)
+	record, err := rest.Topics.TopicShowWithContext_GET(ctx, m.topicIdentityParams())
 	if apiErr, ok := asApiError(err); ok {
 		if strings.Contains(apiErr.Body, "UNKNOWN_TOPIC_OR_PARTITION") {
 			return nil, nil
@@ -109,7 +114,6 @@ func (m *Topic) DeleteResource(ctx context.Context, rest *VMSRest) error {
 	if _, err := m.ReadDatasource(ctx, rest); err != nil {
 		return err
 	}
-	deleteParams, _ := m.tfstate.SetIfAvailable("database_name", "name")
-	err := rest.Topics.TopicDeleteWithContext_DELETE(ctx, deleteParams)
+	err := rest.Topics.TopicDeleteWithContext_DELETE(ctx, m.topicIdentityParams())
 	return ignoreStatusCodes(err, http.StatusNotFound)
 }

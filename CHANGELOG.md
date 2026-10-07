@@ -2,6 +2,8 @@
 
 BUG FIXES:
 
+* **vastdata_topic**: Include `tenant_id` on topic show/delete so destroy works for non-default tenants (previously DELETE omitted `tenant_id`, got 404, and Terraform still reported Destruction complete).
+
 * **vastdata_view_policy**: Fixed refresh hanging or running out of memory when NFS IP list fields contain wide CIDRs (e.g. `0.0.0.0/0`, `10.0.0.0/8`, IPv6 `/64`). IP lists are now compared as merged address ranges instead of being expanded host-by-host. The same drift protection now also covers `read_only`, `read_write`, `s3_read_only`, `s3_read_write`, `smb_read_only`, `smb_read_write` and `trash_access` (TERF-233).
 
 ENHANCEMENTS:

@@ -52,7 +52,7 @@ vip_pool = {
 
 # --- Optional: destroy behavior ----------------------------------------------
 # delete_dir          = true    # default true — delete view dirs on destroy (needs Trash API)
-# force_delete_tenant = false   # default false — set true only if tenant delete still fails
+# force_delete_tenant = true    # lab: empty /tenant dir often needs force on destroy
 
 # --- Data Engine + tenant-admin manager --------------------------------------
 enable_data_engine = true
