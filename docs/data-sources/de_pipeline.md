@@ -41,6 +41,7 @@ data "vastdata_de_pipeline" "by_vrn" {
 - `description` (String) A description of the resource.
 - `guid` (String) A globally unique identifier (GUID) for the resource.
 - `id` (Number) A globally unique identifier (ID) for the resource.
+- `include_usage` (Boolean) Whether to include current resource usage (CPU/memory) in the response.
 - `kubernetes_cluster_vrn` (String) A logical path for resource grouping and policy assignment. The structure of the logical path is: vast:dataengine:<resource type>:<custom structure per type>
 where resource type is one of: triggers / functions / pipelines / topics / kubernetes-clusters / container-registries / mtls-authentication-credentials.
 - `last_revision_number` (Number) The latest revision number
@@ -60,6 +61,7 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 
 - `owner` (Attributes) Represents the owner of the resource. (see [below for nested schema](#nestedatt--owner))
 - `tags` (Set of String) Custom tags for organizing and categorizing resources in the GUI.
+- `used_resources` (Map of Set of Object) Per-function-deployment resource usage, keyed by function deployment name. Each value is the list of pod resources for that function deployment (empty when scaled to zero).
 
 <a id="nestedatt--owner"></a>
 ### Nested Schema for `owner`

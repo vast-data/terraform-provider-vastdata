@@ -35,30 +35,49 @@ func (m *DeKubernetesSecret) NewResourceManager(raw map[string]attr.Value, schem
 			SkipRefreshAPICall:   true,
 			ExcludedSchemaFields: []string{"cursor", "limit", "order_by"},
 			SensitiveFields:      []string{"entries"},
+			// OpenAPI marks kubernetes_cluster_vrn required; TF allows name OR vrn.
+			NotRequiredSchemaFields: []string{deKubernetesClusterVrnAttr},
 			CreateOnlyFields: []string{
-				"kubernetes_cluster_vrn",
+				deKubernetesClusterVrnAttr,
+				deKubernetesClusterNameAttr,
 				"namespace",
 				"secret_name",
 				deTenantNameAttr,
 			},
 			PreserveUserValueFields: []string{
-				"kubernetes_cluster_vrn",
+				deKubernetesClusterVrnAttr,
+				deKubernetesClusterNameAttr,
 				"namespace",
 				"secret_name",
 				"entries",
 				deTenantNameAttr,
 			},
 			CommonModifiersMapping: map[string]string{
-				"kubernetes_cluster_vrn": ModifierForceNew,
-				"namespace":              ModifierForceNew,
-				"secret_name":            ModifierForceNew,
-				deTenantNameAttr:         ModifierForceNew,
+				deKubernetesClusterVrnAttr:  ModifierForceNew,
+				deKubernetesClusterNameAttr: ModifierForceNew,
+				"namespace":                 ModifierForceNew,
+				"secret_name":               ModifierForceNew,
+				deTenantNameAttr:            ModifierForceNew,
 			},
 			AdditionalSchemaAttributes: map[string]any{
-				deTenantNameAttr: deTenantNameSchemaAttribute(),
+				deTenantNameAttr:            deTenantNameSchemaAttribute(),
+				deKubernetesClusterVrnAttr:  deKubernetesClusterVrnSchemaAttribute(),
+				deKubernetesClusterNameAttr: deKubernetesClusterNameSchemaAttribute(),
 			},
 		},
 	)}
+}
+
+func (m *DeKubernetesSecret) ValidateResourceConfig(context.Context) error {
+	return validateKubernetesClusterNameOrVrnInState(m.tfstate)
+}
+
+func (m *DeKubernetesSecret) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
+	return resolveKubernetesClusterNameOrVrnInState(ctx, m.tfstate, rest)
+}
+
+func (m *DeKubernetesSecret) PrepareUpdateResource(ctx context.Context, plan PrepareUpdateResource, rest *VMSRest) error {
+	return resolveKubernetesClusterNameOrVrnInState(ctx, plan.(*DeKubernetesSecret).tfstate, rest)
 }
 
 func (m *DeKubernetesSecret) TransformQueryParams(query params, rest *VMSRest) params {
@@ -66,11 +85,16 @@ func (m *DeKubernetesSecret) TransformQueryParams(query params, rest *VMSRest) p
 }
 
 func (m *DeKubernetesSecret) TransformRequestBody(body params) params {
-	return deTransformRequestBody(body)
+	body = deTransformRequestBody(body)
+	if body != nil {
+		body.Without(deKubernetesClusterNameAttr)
+	}
+	return body
 }
 
 func (m *DeKubernetesSecret) TransformResponseRecord(response Record) Record {
-	return ensureTenantNameInRecord(response, m.tfstate, nil)
+	response = ensureTenantNameInRecord(response, m.tfstate, nil)
+	return preserveKubernetesClusterNameInRecord(response, m.tfstate)
 }
 
 func (m *DeKubernetesSecret) TfState() is.ResourceState {
@@ -89,7 +113,7 @@ func (m *DeKubernetesSecret) CreateResource(ctx context.Context, rest *VMSRest) 
 	if _, err := api.CreateWithContext(ctx, query, body); err != nil {
 		return nil, err
 	}
-	return Record(body), nil
+	return m.TransformResponseRecord(Record(body)), nil
 }
 
 func (m *DeKubernetesSecret) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
@@ -102,7 +126,7 @@ func (m *DeKubernetesSecret) UpdateResource(ctx context.Context, plan UpdateReso
 		return nil, err
 	}
 	m.tfstate = planMgr.tfstate
-	return Record(body), nil
+	return planMgr.TransformResponseRecord(Record(body)), nil
 }
 
 func (m *DeKubernetesSecret) DeleteResource(ctx context.Context, rest *VMSRest) error {
@@ -111,7 +135,7 @@ func (m *DeKubernetesSecret) DeleteResource(ctx context.Context, rest *VMSRest) 
 		return fmt.Errorf("de_kubernetes_secret: empty state")
 	}
 	body := core.Params{}
-	for _, k := range []string{"kubernetes_cluster_vrn", "namespace", "secret_name"} {
+	for _, k := range []string{deKubernetesClusterVrnAttr, "namespace", "secret_name"} {
 		if !ts.IsKnownAndNotNull(k) {
 			return fmt.Errorf("de_kubernetes_secret delete: missing %q", k)
 		}

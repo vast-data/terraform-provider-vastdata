@@ -1,12 +1,13 @@
 # Create a Data Engine pipeline linking a schedule trigger to a function,
 # then deploy it (default) and wait until status is Ready.
+# Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name.
 
 resource "vastdata_de_pipeline" "hello" {
-  name                   = "de-test-pipeline"
-  tenant_name            = "de-lab"
-  kubernetes_cluster_vrn = vastdata_de_kubernetes_cluster.example.vrn
-  namespace              = "vast-pipelines"
-  deploy                 = true
+  name                    = "de-test-pipeline"
+  tenant_name             = "de-lab"
+  kubernetes_cluster_name = vastdata_de_kubernetes_cluster.example.name
+  namespace               = "vast-pipelines"
+  deploy                  = true
 
   manifest = {
     triggers = [

@@ -31,6 +31,10 @@ func (m *DeFunction) NewResourceManager(raw map[string]attr.Value, schema any) R
 				"cursor", "limit", "order_by",
 				"owner_name", "created_after", "created_before", "updated_after", "updated_before",
 			},
+			// OpenAPI marks container_registry_vrn required; TF allows name OR vrn.
+			NotRequiredSchemaFields: []string{deContainerRegistryVrnAttr},
+			// OpenAPI leaves image_tag optional; require it for a valid create body.
+			RequiredSchemaFields: []string{"image_tag"},
 			// Revision/image fields are not returned on GET /functions/{guid}.
 			CreateOnlyFields: []string{deTenantNameAttr},
 			PreserveUserValueFields: []string{
@@ -44,14 +48,17 @@ func (m *DeFunction) NewResourceManager(raw map[string]attr.Value, schema any) R
 				"is_published",
 				"architecture",
 				"runtime",
-				"container_registry_vrn",
+				deContainerRegistryVrnAttr,
+				deContainerRegistryNameAttr,
 				deTenantNameAttr,
 			},
 			CommonModifiersMapping: map[string]string{
 				deTenantNameAttr: ModifierForceNew,
 			},
 			AdditionalSchemaAttributes: map[string]any{
-				deTenantNameAttr: deTenantNameSchemaAttribute(),
+				deTenantNameAttr:            deTenantNameSchemaAttribute(),
+				deContainerRegistryVrnAttr:  deContainerRegistryVrnSchemaAttribute(),
+				deContainerRegistryNameAttr: deContainerRegistryNameSchemaAttribute(),
 			},
 		},
 	)}
@@ -84,6 +91,18 @@ func (m *DeFunction) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.DataEngine.Functions
 }
 
+func (m *DeFunction) ValidateResourceConfig(context.Context) error {
+	return validateContainerRegistryNameOrVrnInState(m.tfstate)
+}
+
+func (m *DeFunction) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
+	return resolveContainerRegistryNameOrVrnInState(ctx, m.tfstate, rest)
+}
+
+func (m *DeFunction) PrepareUpdateResource(ctx context.Context, plan PrepareUpdateResource, rest *VMSRest) error {
+	return resolveContainerRegistryNameOrVrnInState(ctx, plan.(*DeFunction).tfstate, rest)
+}
+
 // UpdateResource uses PUT /functions/{guid} with a full create-shaped body.
 // Diff-only updates omit unchanged required fields (e.g. name) and the API returns 422.
 func (m *DeFunction) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
@@ -99,7 +118,10 @@ func (m *DeFunction) UpdateResource(ctx context.Context, plan UpdateResource, re
 	// Image/registry changes should always mint a new revision so pipelines pull the new artifact.
 	if m.tfstate != nil && planTS != nil {
 		changed := planTS.GetUpdateParams(m.tfstate)
-		for _, k := range []string{"artifact_source", "artifact_type", "image_tag", "container_registry_vrn"} {
+		for _, k := range []string{
+			"artifact_source", "artifact_type", "image_tag",
+			deContainerRegistryVrnAttr, deContainerRegistryNameAttr,
+		} {
 			if _, ok := changed[k]; ok {
 				body["force_new_revision"] = true
 				break
@@ -136,11 +158,13 @@ func (m *DeFunction) TransformRequestBody(body params) params {
 		body.Without(
 			"guid", "id", "vrn", "created_at", "updated_at", "owner", "tenant_guid",
 			"last_published_revision_number", "last_revision_number", "default_revision_number",
+			deContainerRegistryNameAttr,
 		)
 	}
 	return body
 }
 
 func (m *DeFunction) TransformResponseRecord(response Record) Record {
-	return ensureTenantNameInRecord(response, m.tfstate, nil)
+	response = ensureTenantNameInRecord(response, m.tfstate, nil)
+	return preserveContainerRegistryNameInRecord(response, m.tfstate)
 }

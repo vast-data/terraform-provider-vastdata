@@ -40,6 +40,7 @@ data "vastdata_de_schedule_trigger" "by_vrn" {
 - `created_after` (Number) Filter triggers created after this timestamp (microseconds since epoch)
 - `created_at` (String) Timestamp when the resource was created.
 - `created_before` (Number) Filter triggers created before this timestamp (microseconds since epoch)
+- `custom_extensions` (Map of String) Custom key/value pairs passed as event output extensions. Flat map only (no nesting). Keys must be lowercase letters and digits, start with a letter, and be 1–20 characters.
 - `description` (String) A description of the resource.
 - `guid` (String) A globally unique identifier (GUID) for the resource.
 - `id` (Number) A globally unique identifier (ID) for the resource.

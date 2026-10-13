@@ -15,12 +15,13 @@ description: |-
 ```terraform
 # Create (or upsert) a Kubernetes secret via Data Engine.
 # There is no GET API — Terraform tracks identity from config and refreshes from state.
+# Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name.
 
 resource "vastdata_de_kubernetes_secret" "example" {
-  tenant_name            = "de-lab" # required for cluster-admin auth
-  kubernetes_cluster_vrn = vastdata_de_kubernetes_cluster.example.vrn
-  namespace              = "vast-dataengine"
-  secret_name            = "db-credentials"
+  tenant_name             = "de-lab" # required for cluster-admin auth
+  kubernetes_cluster_name = vastdata_de_kubernetes_cluster.example.name
+  namespace               = "vast-dataengine"
+  secret_name             = "db-credentials"
 
   entries = [
     {
@@ -63,13 +64,13 @@ resource "vastdata_de_kubernetes_secret" "pipelines" {
 ### Required
 
 - `entries` (Attributes Set, Sensitive) (see [below for nested schema](#nestedatt--entries))
-- `kubernetes_cluster_vrn` (String) A logical path for resource grouping and policy assignment. The structure of the logical path is: vast:dataengine:<resource type>:<custom structure per type>
-where resource type is one of: triggers / functions / pipelines / topics / kubernetes-clusters / container-registries / mtls-authentication-credentials.
 - `namespace` (String) The namespace in the kubernetes cluster in which the secret is stored.
 - `secret_name` (String) The name of the secret in the kubernetes cluster.
 
 ### Optional
 
+- `kubernetes_cluster_name` (String) Kubernetes cluster name. Resolved to a VRN before create/update. Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
+- `kubernetes_cluster_vrn` (String) Kubernetes cluster VRN (vast:dataengine:kubernetes-clusters:...). Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
 - `tenant_name` (String) Tenant name for Data Engine API queries. Required for cluster-admin auth; optional when the provider already authenticates as that tenant.
 
 <a id="nestedatt--entries"></a>

@@ -3,14 +3,15 @@
 #
 # Prerequisites: vastdata_de_engine, vastdata_de_container_registry.
 
+# Exactly one of container_registry_vrn or container_registry_name.
 resource "vastdata_de_function" "hello" {
-  name                   = "de-test-function"
-  tenant_name            = "de-lab" # required for cluster-admin auth
-  container_registry_vrn = vastdata_de_container_registry.example.vrn
-  artifact_source        = "de-lab-test/hello-world"
-  image_tag              = "latest"
-  revision_alias         = "latest"
-  description            = "Hello World function"
+  name                    = "de-test-function"
+  tenant_name             = "de-lab" # required for cluster-admin auth
+  container_registry_name = vastdata_de_container_registry.example.name
+  artifact_source         = "de-lab-test/hello-world"
+  image_tag               = "latest"
+  revision_alias          = "latest"
+  description             = "Hello World function"
 }
 
 # ---------------------

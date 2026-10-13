@@ -197,7 +197,7 @@ func TestMtlsMaterialFromKubeconfig_Errors(t *testing.T) {
 }
 
 func TestDeMtlsTransformResponseRecord_DropsRedactedKey(t *testing.T) {
-	m := &DeMtlsAuthenticationCredential{tfstate: is.NewTFStateMust(
+	m := &DeMtlsAuthenticationCredential{tfstate: is.NewResourceState(
 		map[string]attr.Value{"tenant_name": types.StringValue("de-shared")},
 		rschema.Schema{Attributes: map[string]rschema.Attribute{
 			"tenant_name":               rschema.StringAttribute{Optional: true},
@@ -214,7 +214,7 @@ func TestDeMtlsTransformResponseRecord_DropsRedactedKey(t *testing.T) {
 		"client_certificate_b64":    "LS0tLS1CRUdJTi...",
 		"certificate_authority_b64": "LS0tLS1CRUdJTi...",
 		"tenant_guid":               "d707214e-3c70-4cae-9c89-03be8b75abf8",
-	}, nil)
+	})
 
 	if _, ok := out["client_key_b64"]; ok {
 		t.Fatal("redacted client_key_b64 must be removed from the response record")

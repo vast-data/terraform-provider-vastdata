@@ -51,6 +51,11 @@ resource "vastdata_de_schedule_trigger" "hourly" {
   config = {
     cron_schedule = "0 0 * ? * * *"
   }
+
+  custom_extensions = {
+    env     = "lab"
+    purpose = "hourly"
+  }
 }
 
 # --------------------
@@ -85,6 +90,7 @@ resource "vastdata_de_schedule_trigger" "daily" {
 ### Optional
 
 - `broker` (Attributes) (see [below for nested schema](#nestedatt--broker))
+- `custom_extensions` (Map of String) Custom key/value pairs passed as event output extensions. Flat map only (no nesting). Keys must be lowercase letters and digits, start with a letter, and be 1–20 characters.
 - `description` (String) A description of the resource.
 - `tags` (Set of String) Custom tags for organizing and categorizing resources in the GUI.
 - `tenant_name` (String) Tenant name for Data Engine API queries. Required for cluster-admin auth; optional when the provider already authenticates as that tenant.
@@ -110,7 +116,7 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 
 Required:
 
-- `cron_schedule` (String) Cron schedule for a Schedule Trigger.
+- `cron_schedule` (String) Schedule for a Schedule Trigger. Accepts a 5-field cron expression, a 6/7-field Quartz expression, or an interval as "<value><unit>" with an optional "@<start time>" suffix, where the units are s/m/h/d/w and the start time is seconds since epoch in UTC and acts as the anchor of the interval (for example "10s" or "7m@1704067200"). An interval submitted without a start time is stored anchored at the time of the request.
 
 
 <a id="nestedatt--broker"></a>

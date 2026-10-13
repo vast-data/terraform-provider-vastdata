@@ -36,6 +36,11 @@ resource "vastdata_de_schedule_trigger" "hourly" {
   config = {
     cron_schedule = "0 0 * ? * * *"
   }
+
+  custom_extensions = {
+    env     = "lab"
+    purpose = "hourly"
+  }
 }
 
 # --------------------

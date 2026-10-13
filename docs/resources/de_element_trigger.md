@@ -50,6 +50,11 @@ resource "vastdata_de_element_trigger" "with_filters" {
   source_types = ["S3"]
   tags         = ["example", "filtered"]
 
+  custom_extensions = {
+    env     = "lab"
+    purpose = "filtered"
+  }
+
   broker = {
     name = "de-lab-broker"
     type = "Internal"
@@ -106,6 +111,7 @@ resource "vastdata_de_element_trigger" "removed_only" {
 ### Optional
 
 - `broker` (Attributes) (see [below for nested schema](#nestedatt--broker))
+- `custom_extensions` (Map of String) Custom key/value pairs passed as event output extensions. Flat map only (no nesting). Keys must be lowercase letters and digits, start with a letter, and be 1–20 characters.
 - `description` (String) A description of the resource.
 - `source_types` (Set of String) Source types from which we want to trigger events. Relevant for Element Trigger
 - `tags` (Set of String) Custom tags for organizing and categorizing resources in the GUI.

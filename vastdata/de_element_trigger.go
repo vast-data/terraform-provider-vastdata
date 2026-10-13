@@ -3,9 +3,12 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -29,7 +32,7 @@ func (m *DeElementTrigger) NewResourceManager(raw map[string]attr.Value, schema 
 		&is.TFStateHints{
 			SchemaRef:            DeElementTriggerSchemaRef,
 			PathIDField:          "guid",
-			ExcludedSchemaFields: []string{"cursor", "limit", "order_by", "custom_extensions"},
+			ExcludedSchemaFields: []string{"cursor", "limit", "order_by"},
 			CreateOnlyFields:     []string{deTenantNameAttr},
 			PreserveUserValueFields: []string{
 				deTenantNameAttr,
@@ -37,12 +40,14 @@ func (m *DeElementTrigger) NewResourceManager(raw map[string]attr.Value, schema 
 				"broker",
 				"topic_name",
 				"source_types",
+				deCustomExtensionsAttr,
 			},
 			CommonModifiersMapping: map[string]string{
 				deTenantNameAttr: ModifierForceNew,
 			},
 			AdditionalSchemaAttributes: map[string]any{
-				deTenantNameAttr: deTenantNameSchemaAttribute(),
+				deTenantNameAttr:       deTenantNameSchemaAttribute(),
+				deCustomExtensionsAttr: deCustomExtensionsSchemaAttribute(),
 			},
 		},
 	)}
@@ -55,10 +60,11 @@ func (m *DeElementTrigger) NewDatasourceManager(raw map[string]attr.Value, schem
 		&is.TFStateHints{
 			SchemaRef:            DeElementTriggerSchemaRef,
 			PathIDField:          "guid",
-			ExcludedSchemaFields: []string{"cursor", "limit", "order_by", "custom_extensions"},
+			ExcludedSchemaFields: []string{"cursor", "limit", "order_by"},
 			SearchableFields:     []string{"guid", "vrn", "name"},
 			AdditionalSchemaAttributes: map[string]any{
-				deTenantNameAttr: deTenantNameSchemaAttribute(),
+				deTenantNameAttr:       deTenantNameSchemaAttribute(),
+				deCustomExtensionsAttr: deCustomExtensionsSchemaAttribute(),
 			},
 		},
 	)}
@@ -149,4 +155,103 @@ func (m *DeElementTrigger) TransformRequestBody(body params) params {
 
 func (m *DeElementTrigger) TransformResponseRecord(response Record) Record {
 	return ensureTenantNameInRecord(normalizeTriggerRecord(response), m.tfstate, nil)
+}
+
+// ValidateResourceConfig enforces create checks that OpenAPI leaves optional:
+// non-empty config.events + config.source_bucket_name, and topic_name ↔ broker together.
+func (m *DeElementTrigger) ValidateResourceConfig(context.Context) error {
+	return validateDeElementTriggerConfig(m.tfstate)
+}
+
+func validateDeElementTriggerConfig(ts is.ResourceState) error {
+	if ts == nil {
+		return nil
+	}
+
+	// Skip while plan refs are still unknown.
+	if v, ok := ts.RawValues()["config"]; ok && v.IsUnknown() {
+		return nil
+	}
+	if v, ok := ts.RawValues()["topic_name"]; ok && v.IsUnknown() {
+		return nil
+	}
+	if v, ok := ts.RawValues()["broker"]; ok && v.IsUnknown() {
+		return nil
+	}
+
+	if err := validateDeElementTriggerRequiredConfig(ts); err != nil {
+		return err
+	}
+	return validateDeElementTriggerBrokerTopic(ts)
+}
+
+func validateDeElementTriggerRequiredConfig(ts is.ResourceState) error {
+	cfgVal, ok := ts.RawValues()["config"]
+	if !ok || cfgVal.IsNull() {
+		return fmt.Errorf("config is required")
+	}
+	cfg, ok := cfgVal.(types.Object)
+	if !ok {
+		return fmt.Errorf("config: expected object")
+	}
+	attrs := cfg.Attributes()
+
+	eventsVal, hasEvents := attrs["events"]
+	if !hasEvents || eventsVal.IsNull() {
+		return fmt.Errorf("config.events is required")
+	}
+	if eventsVal.IsUnknown() {
+		return nil
+	}
+	switch e := eventsVal.(type) {
+	case types.Set:
+		if len(e.Elements()) == 0 {
+			return fmt.Errorf("config.events must not be empty")
+		}
+	case types.List:
+		if len(e.Elements()) == 0 {
+			return fmt.Errorf("config.events must not be empty")
+		}
+	}
+
+	bucketVal, hasBucket := attrs["source_bucket_name"]
+	if !hasBucket || bucketVal.IsNull() {
+		return fmt.Errorf("config.source_bucket_name is required")
+	}
+	if bucketVal.IsUnknown() {
+		return nil
+	}
+	if s, ok := bucketVal.(types.String); ok && strings.TrimSpace(s.ValueString()) == "" {
+		return fmt.Errorf("config.source_bucket_name is required")
+	}
+	return nil
+}
+
+// validateDeElementTriggerBrokerTopic enforces broker/topic pairing:
+// topic_name and broker are both set or both omitted. When either is present,
+// validateAllOf requires the other.
+func validateDeElementTriggerBrokerTopic(ts is.ResourceState) error {
+	topicSet := false
+	if v, ok := ts.RawValues()["topic_name"]; ok && !v.IsNull() && !v.IsUnknown() {
+		if s, ok := v.(types.String); ok && strings.TrimSpace(s.ValueString()) != "" {
+			topicSet = true
+		}
+	}
+	brokerSet := false
+	if v, ok := ts.RawValues()["broker"]; ok && !v.IsNull() && !v.IsUnknown() {
+		if obj, ok := v.(types.Object); ok {
+			attrs := obj.Attributes()
+			name, hasName := attrs["name"]
+			typ, hasType := attrs["type"]
+			nameSet := hasName && !name.IsNull() && !name.IsUnknown() &&
+				strings.TrimSpace(name.(types.String).ValueString()) != ""
+			typeSet := hasType && !typ.IsNull() && !typ.IsUnknown() &&
+				strings.TrimSpace(typ.(types.String).ValueString()) != ""
+			brokerSet = nameSet || typeSet
+		}
+	}
+	if !topicSet && !brokerSet {
+		return nil
+	}
+	return validateAllOf(ts, "topic_name", "broker")
 }

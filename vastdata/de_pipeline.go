@@ -67,9 +67,11 @@ func (m *DePipeline) NewResourceManager(raw map[string]attr.Value, schema any) R
 				"conditional_trigger_labels",
 			},
 			// OpenAPI PipelineCreateInfo only marks name required; keep TF UX of requiring the graph fields.
+			// kubernetes_cluster_vrn is required by OpenAPI; TF allows name OR vrn.
 			RequiredSchemaFields: []string{
-				"name", "manifest", "kubernetes_cluster_vrn", "namespace",
+				"name", "manifest", "namespace",
 			},
+			NotRequiredSchemaFields: []string{deKubernetesClusterVrnAttr},
 			// Match prior custom schema: ordered lists (not sets) for graph nodes/edges and tags.
 			PreserveOrderFields: []string{
 				"tags",
@@ -85,6 +87,8 @@ func (m *DePipeline) NewResourceManager(raw map[string]attr.Value, schema any) R
 				"manifest",
 				deTenantNameAttr,
 				"deploy",
+				deKubernetesClusterVrnAttr,
+				deKubernetesClusterNameAttr,
 			},
 			CommonModifiersMapping: map[string]string{
 				deTenantNameAttr: ModifierForceNew,
@@ -100,7 +104,9 @@ func (m *DePipeline) NewResourceManager(raw map[string]attr.Value, schema any) R
 				},
 			},
 			AdditionalSchemaAttributes: map[string]any{
-				deTenantNameAttr: deTenantNameSchemaAttribute(),
+				deTenantNameAttr:            deTenantNameSchemaAttribute(),
+				deKubernetesClusterVrnAttr:  deKubernetesClusterVrnSchemaAttribute(),
+				deKubernetesClusterNameAttr: deKubernetesClusterNameSchemaAttribute(),
 				"deploy": rschema.BoolAttribute{
 					Optional: true,
 					Computed: true,
@@ -134,12 +140,25 @@ func (m *DePipeline) NewDatasourceManager(raw map[string]attr.Value, schema any)
 	)}
 }
 
+func (m *DePipeline) ValidateResourceConfig(context.Context) error {
+	return validateKubernetesClusterNameOrVrnInState(m.tfstate)
+}
+
+func (m *DePipeline) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
+	return resolveKubernetesClusterNameOrVrnInState(ctx, m.tfstate, rest)
+}
+
+func (m *DePipeline) PrepareUpdateResource(ctx context.Context, plan PrepareUpdateResource, rest *VMSRest) error {
+	return resolveKubernetesClusterNameOrVrnInState(ctx, plan.(*DePipeline).tfstate, rest)
+}
+
 func (m *DePipeline) TransformQueryParams(query params, rest *VMSRest) params {
 	return deTransformQueryParams(query, m.tfstate, rest)
 }
 
 func (m *DePipeline) TransformResponseRecord(response Record) Record {
-	return ensureTenantNameInRecord(response, m.tfstate, nil)
+	response = ensureTenantNameInRecord(response, m.tfstate, nil)
+	return preserveKubernetesClusterNameInRecord(response, m.tfstate)
 }
 
 func (m *DePipeline) TfState() is.ResourceState {
@@ -346,6 +365,7 @@ func (m *DePipeline) TransformRequestBody(body params) params {
 	if body != nil {
 		body.Without(
 			"deploy",
+			deKubernetesClusterNameAttr,
 			"guid", "id", "status", "reason", "vrn",
 			"created_at", "updated_at", "owner", "tenant_guid",
 			"last_revision_number", "stack_guid", "stack_revision_number",
@@ -507,7 +527,7 @@ func (m *DePipeline) stateRecord(apiRec Record) Record {
 	for k, v := range apiRec {
 		out[k] = v
 	}
-	for _, key := range []string{"manifest", "deploy", deTenantNameAttr} {
+	for _, key := range []string{"manifest", "deploy", deTenantNameAttr, deKubernetesClusterNameAttr} {
 		if m.tfstate == nil || !m.tfstate.HasAttribute(key) || !m.tfstate.IsKnownAndNotNull(key) {
 			continue
 		}

@@ -223,7 +223,7 @@ test-profile-mem:
 generate-docs: fmt
 	@echo "Generating documentation and headers..."
 	@go run $(CURDIR)/misc/generate_examples.go
-	cd tools; go generate ./...; cd -
+	cd tools; GOWORK=off go generate ./...; cd -
 
 
 ifeq (gen-openapi-tar, $(firstword $(MAKECMDGOALS)))

@@ -34,13 +34,15 @@ resource "vastdata_de_container_registry" "example" {
   url         = "https://registry.example.com"
   auth_type   = "none"
 
+  # Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name.
   primary_kubernetes_cluster = {
-    kubernetes_cluster_vrn = vastdata_de_kubernetes_cluster.example.vrn
-    namespace              = "default"
+    kubernetes_cluster_name = vastdata_de_kubernetes_cluster.example.name
+    namespace               = "default"
   }
 
   additional_kubernetes_clusters = [
     for ns in setsubtract(toset(vastdata_de_kubernetes_cluster.example.namespaces), toset(["default"])) : {
+      # Same one-of: vrn (shown) or kubernetes_cluster_name.
       kubernetes_cluster_vrn = vastdata_de_kubernetes_cluster.example.vrn
       namespace              = ns
     }

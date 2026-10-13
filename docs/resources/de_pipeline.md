@@ -15,13 +15,14 @@ description: |-
 ```terraform
 # Create a Data Engine pipeline linking a schedule trigger to a function,
 # then deploy it (default) and wait until status is Ready.
+# Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name.
 
 resource "vastdata_de_pipeline" "hello" {
-  name                   = "de-test-pipeline"
-  tenant_name            = "de-lab"
-  kubernetes_cluster_vrn = vastdata_de_kubernetes_cluster.example.vrn
-  namespace              = "vast-pipelines"
-  deploy                 = true
+  name                    = "de-test-pipeline"
+  tenant_name             = "de-lab"
+  kubernetes_cluster_name = vastdata_de_kubernetes_cluster.example.name
+  namespace               = "vast-pipelines"
+  deploy                  = true
 
   manifest = {
     triggers = [
@@ -156,8 +157,6 @@ resource "vastdata_de_pipeline" "element_only" {
 
 ### Required
 
-- `kubernetes_cluster_vrn` (String) A logical path for resource grouping and policy assignment. The structure of the logical path is: vast:dataengine:<resource type>:<custom structure per type>
-where resource type is one of: triggers / functions / pipelines / topics / kubernetes-clusters / container-registries / mtls-authentication-credentials.
 - `manifest` (Attributes) (see [below for nested schema](#nestedatt--manifest))
 - `name` (String) A name for the resource.
 - `namespace` (String) The namespace in the kubernetes cluster
@@ -166,6 +165,8 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 
 - `deploy` (Boolean) When true (default), POST /pipeline/{guid}/deploy after create/update and wait until status is Ready.
 - `description` (String) A description of the resource.
+- `kubernetes_cluster_name` (String) Kubernetes cluster name. Resolved to a VRN before create/update. Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
+- `kubernetes_cluster_vrn` (String) Kubernetes cluster VRN (vast:dataengine:kubernetes-clusters:...). Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
 - `tags` (List of String) Custom tags for organizing and categorizing resources in the GUI.
 - `tenant_name` (String) Tenant name for Data Engine API queries. Required for cluster-admin auth; optional when the provider already authenticates as that tenant.
 
@@ -182,6 +183,7 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 - `status` (String) The status of pipeline deployment
 - `tenant_guid` (String) A globally unique identifier (GUID) for the resource.
 - `updated_at` (String) Timestamp when the resource was last updated.
+- `used_resources` (Map of Set of Object) Per-function-deployment resource usage, keyed by function deployment name. Each value is the list of pod resources for that function deployment (empty when scaled to zero).
 - `vrn` (String) A logical path for resource grouping and policy assignment. The structure of the logical path is: vast:dataengine:<resource type>:<custom structure per type>
 where resource type is one of: triggers / functions / pipelines / topics / kubernetes-clusters / container-registries / mtls-authentication-credentials.
 
@@ -195,7 +197,8 @@ Optional:
 - `links` (Attributes List) Links which define the calling graph of functions in a pipeline. |
 Each of the sources at the source array triggers all function deployments in the destination array |
 if all the labels in the conditional_trigger_labels array are set to the specified values. |
-The label values are set by the source function handler using the context.set_trigger_labels() method. (see [below for nested schema](#nestedatt--manifest--links))
+The label values are set by the source function handler using event.set_trigger_labels(),
+or by a UserDefined trigger invoke via trigger_labels. (see [below for nested schema](#nestedatt--manifest--links))
 - `triggers` (Attributes List) (see [below for nested schema](#nestedatt--manifest--triggers))
 
 <a id="nestedatt--manifest--config"></a>
@@ -205,6 +208,7 @@ Optional:
 
 - `configmaps` (Attributes Set) ConfigMaps that will be mounted to the deployment (see [below for nested schema](#nestedatt--manifest--config--configmaps))
 - `environment_variables` (Attributes Set) (see [below for nested schema](#nestedatt--manifest--config--environment_variables))
+- `secret_definitions` (Attributes Set) Secrets supplied inline and mounted to the deployment (see [below for nested schema](#nestedatt--manifest--config--secret_definitions))
 - `secrets` (Set of String)
 
 <a id="nestedatt--manifest--config--configmaps"></a>
@@ -229,6 +233,18 @@ Required:
 Optional:
 
 - `value` (String)
+
+
+<a id="nestedatt--manifest--config--secret_definitions"></a>
+### Nested Schema for `manifest.config.secret_definitions`
+
+Required:
+
+- `name` (String) Name of the secret. It is mounted into pods at /secrets/<name>.
+
+Optional:
+
+- `data` (Map of String) Key-value pairs of string secret values.
 
 
 
@@ -256,6 +272,7 @@ Optional:
 - `environment_variables` (Attributes List) (see [below for nested schema](#nestedatt--manifest--function_deployments--config--environment_variables))
 - `event_batching` (Attributes) (see [below for nested schema](#nestedatt--manifest--function_deployments--config--event_batching))
 - `log_level` (String) Log level for functions and services.
+- `secret_definitions` (Attributes List) Secrets supplied inline and mounted to the deployment (see [below for nested schema](#nestedatt--manifest--function_deployments--config--secret_definitions))
 - `secrets` (List of String)
 
 <a id="nestedatt--manifest--function_deployments--config--configmaps"></a>
@@ -289,6 +306,18 @@ Required:
 
 - `batch_max_size` (Number) The maximum number of events to batch together.
 - `batch_timeout_ms` (Number) The timeout in milliseconds for the batch. The batch will be invoked after this timeout, even if the batch is not full.
+
+
+<a id="nestedatt--manifest--function_deployments--config--secret_definitions"></a>
+### Nested Schema for `manifest.function_deployments.config.secret_definitions`
+
+Required:
+
+- `name` (String) Name of the secret. It is mounted into pods at /secrets/<name>.
+
+Optional:
+
+- `data` (Map of String) Key-value pairs of string secret values.
 
 
 

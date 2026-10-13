@@ -4,6 +4,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -32,19 +33,21 @@ func (m *DeScheduleTrigger) NewResourceManager(raw map[string]attr.Value, schema
 		&is.TFStateHints{
 			SchemaRef:            DeScheduleTriggerSchemaRef,
 			PathIDField:          "guid",
-			ExcludedSchemaFields: []string{"cursor", "limit", "order_by", "custom_extensions"},
+			ExcludedSchemaFields: []string{"cursor", "limit", "order_by"},
 			CreateOnlyFields:     []string{deTenantNameAttr},
 			PreserveUserValueFields: []string{
 				deTenantNameAttr,
 				"config",
 				"broker",
 				"topic_name",
+				deCustomExtensionsAttr,
 			},
 			CommonModifiersMapping: map[string]string{
 				deTenantNameAttr: ModifierForceNew,
 			},
 			AdditionalSchemaAttributes: map[string]any{
-				deTenantNameAttr: deTenantNameSchemaAttribute(),
+				deTenantNameAttr:       deTenantNameSchemaAttribute(),
+				deCustomExtensionsAttr: deCustomExtensionsSchemaAttribute(),
 			},
 		},
 	)}
@@ -57,10 +60,11 @@ func (m *DeScheduleTrigger) NewDatasourceManager(raw map[string]attr.Value, sche
 		&is.TFStateHints{
 			SchemaRef:            DeScheduleTriggerSchemaRef,
 			PathIDField:          "guid",
-			ExcludedSchemaFields: []string{"cursor", "limit", "order_by", "custom_extensions"},
+			ExcludedSchemaFields: []string{"cursor", "limit", "order_by"},
 			SearchableFields:     []string{"guid", "vrn", "name"},
 			AdditionalSchemaAttributes: map[string]any{
-				deTenantNameAttr: deTenantNameSchemaAttribute(),
+				deTenantNameAttr:       deTenantNameSchemaAttribute(),
+				deCustomExtensionsAttr: deCustomExtensionsSchemaAttribute(),
 			},
 		},
 	)}
@@ -169,7 +173,35 @@ func normalizeTriggerRecord(rec Record) Record {
 	if broker, ok := out["broker"]; ok {
 		out["broker"] = normalizeKafkaBroker(broker)
 	}
+	if ext, ok := out[deCustomExtensionsAttr]; ok {
+		out[deCustomExtensionsAttr] = normalizeCustomExtensions(ext)
+	}
 	return out
+}
+
+// normalizeCustomExtensions coerces API values to strings for map(string) state.
+// OpenAPI is a free-form object; values may arrive as numbers.
+func normalizeCustomExtensions(v any) any {
+	switch m := v.(type) {
+	case map[string]any:
+		out := make(map[string]any, len(m))
+		for k, val := range m {
+			if val == nil {
+				out[k] = ""
+				continue
+			}
+			if s, ok := val.(string); ok {
+				out[k] = s
+				continue
+			}
+			out[k] = fmt.Sprint(val)
+		}
+		return out
+	case Record:
+		return normalizeCustomExtensions(map[string]any(m))
+	default:
+		return v
+	}
 }
 
 func normalizeTriggerConfig(v any) any {

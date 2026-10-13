@@ -35,6 +35,11 @@ resource "vastdata_de_element_trigger" "with_filters" {
   source_types = ["S3"]
   tags         = ["example", "filtered"]
 
+  custom_extensions = {
+    env     = "lab"
+    purpose = "filtered"
+  }
+
   broker = {
     name = "de-lab-broker"
     type = "Internal"

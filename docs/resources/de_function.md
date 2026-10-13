@@ -18,14 +18,15 @@ description: |-
 #
 # Prerequisites: vastdata_de_engine, vastdata_de_container_registry.
 
+# Exactly one of container_registry_vrn or container_registry_name.
 resource "vastdata_de_function" "hello" {
-  name                   = "de-test-function"
-  tenant_name            = "de-lab" # required for cluster-admin auth
-  container_registry_vrn = vastdata_de_container_registry.example.vrn
-  artifact_source        = "de-lab-test/hello-world"
-  image_tag              = "latest"
-  revision_alias         = "latest"
-  description            = "Hello World function"
+  name                    = "de-test-function"
+  tenant_name             = "de-lab" # required for cluster-admin auth
+  container_registry_name = vastdata_de_container_registry.example.name
+  artifact_source         = "de-lab-test/hello-world"
+  image_tag               = "latest"
+  revision_alias          = "latest"
+  description             = "Hello World function"
 }
 
 # ---------------------
@@ -66,8 +67,7 @@ resource "vastdata_de_function" "plain" {
 ### Required
 
 - `artifact_source` (String) URL for user image or S3 bucket path to source code, Depending on Artifact type
-- `container_registry_vrn` (String) A logical path for resource grouping and policy assignment. The structure of the logical path is: vast:dataengine:<resource type>:<custom structure per type>
-where resource type is one of: triggers / functions / pipelines / topics / kubernetes-clusters / container-registries / mtls-authentication-credentials.
+- `image_tag` (String) Tag of the container image in the container registry.
 - `name` (String) A name for the resource.
 
 ### Optional
@@ -75,15 +75,16 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 - `architecture` (String)
 - `artifact_type` (String) The type of the artifact provided with which the provisioning service is expected to run.
 Right now the only supported type is "image". Only relevant when function is created using source code and not container image.
+- `container_registry_name` (String) Container registry name. Resolved to a VRN before create/update. Exactly one of container_registry_vrn or container_registry_name must be set.
+- `container_registry_vrn` (String) Container registry VRN (vast:dataengine:container-registries:...). Exactly one of container_registry_vrn or container_registry_name must be set.
 - `default_revision_number` (Number) The default revision number. If not provided, the latest revision will be used.
 - `description` (String) A description of the resource.
 - `force_new_revision` (Boolean) Force creating a new revision on update. By default, updating only function-level metadata (tags/description) does not create a new revision. When true, a new revision is created even if only tags/description changed.
-- `image_tag` (String) Tag of the container image in the container registry.
 - `is_published` (Boolean) If the function revision was not published yet, other users can't use it.
 - `revision_alias` (String) Alias for the revision. If not provided, the revision number will be used.
 - `revision_description` (String) Description of the revision.
 - `runtime` (String)
-- `skip_image_validation` (Boolean) Skip image reachability validation when creating the function. Useful when the container registry uses authentication that the provisioning service cannot access (e.g., ECR with IRSA where only the K8s cluster has credentials).
+- `skip_image_validation` (Boolean) Deprecated. Prefer setting the container registry's is_accessible_to_data_engine to false, which also skips create-time image reachability validation. Kept for compatibility / internal use.
 - `tags` (Set of String) Custom tags for organizing and categorizing resources in the GUI.
 - `tenant_name` (String) Tenant name for Data Engine API queries. Required for cluster-admin auth; optional when the provider already authenticates as that tenant.
 

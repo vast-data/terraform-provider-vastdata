@@ -49,13 +49,15 @@ resource "vastdata_de_container_registry" "example" {
   url         = "https://registry.example.com"
   auth_type   = "none"
 
+  # Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name.
   primary_kubernetes_cluster = {
-    kubernetes_cluster_vrn = vastdata_de_kubernetes_cluster.example.vrn
-    namespace              = "default"
+    kubernetes_cluster_name = vastdata_de_kubernetes_cluster.example.name
+    namespace               = "default"
   }
 
   additional_kubernetes_clusters = [
     for ns in setsubtract(toset(vastdata_de_kubernetes_cluster.example.namespaces), toset(["default"])) : {
+      # Same one-of: vrn (shown) or kubernetes_cluster_name.
       kubernetes_cluster_vrn = vastdata_de_kubernetes_cluster.example.vrn
       namespace              = ns
     }
@@ -69,12 +71,12 @@ resource "vastdata_de_container_registry" "example" {
 ### Required
 
 - `name` (String) A name for the resource.
-- `primary_kubernetes_cluster` (Attributes) (see [below for nested schema](#nestedatt--primary_kubernetes_cluster))
+- `primary_kubernetes_cluster` (Attributes) Primary Kubernetes cluster and namespace for the container registry. (see [below for nested schema](#nestedatt--primary_kubernetes_cluster))
 - `url` (String) URL to the container registry.
 
 ### Optional
 
-- `additional_kubernetes_clusters` (Attributes Set) List of Kubernetes clusters and namespaces where the container registry is replicated. (see [below for nested schema](#nestedatt--additional_kubernetes_clusters))
+- `additional_kubernetes_clusters` (Attributes Set) Additional Kubernetes clusters and namespaces where the container registry is replicated. (see [below for nested schema](#nestedatt--additional_kubernetes_clusters))
 - `auth_type` (String) Flag indincating login to the container registry requires user and password, secret name, or none
 - `description` (String) A description of the resource.
 - `email` (String) User email for logging in the container registry
@@ -101,9 +103,9 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 
 Optional:
 
-- `kubernetes_cluster_vrn` (String) A logical path for resource grouping and policy assignment. The structure of the logical path is: vast:dataengine:<resource type>:<custom structure per type>
-where resource type is one of: triggers / functions / pipelines / topics / kubernetes-clusters / container-registries / mtls-authentication-credentials.
-- `namespace` (String)
+- `kubernetes_cluster_name` (String) Kubernetes cluster name. Resolved to a VRN before create/update. Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
+- `kubernetes_cluster_vrn` (String) Kubernetes cluster VRN (vast:dataengine:kubernetes-clusters:...). Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
+- `namespace` (String) Kubernetes namespace on the cluster.
 
 
 <a id="nestedatt--additional_kubernetes_clusters"></a>
@@ -111,9 +113,9 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 
 Optional:
 
-- `kubernetes_cluster_vrn` (String) A logical path for resource grouping and policy assignment. The structure of the logical path is: vast:dataengine:<resource type>:<custom structure per type>
-where resource type is one of: triggers / functions / pipelines / topics / kubernetes-clusters / container-registries / mtls-authentication-credentials.
-- `namespace` (String)
+- `kubernetes_cluster_name` (String) Kubernetes cluster name. Resolved to a VRN before create/update. Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
+- `kubernetes_cluster_vrn` (String) Kubernetes cluster VRN (vast:dataengine:kubernetes-clusters:...). Exactly one of kubernetes_cluster_vrn or kubernetes_cluster_name must be set.
+- `namespace` (String) Kubernetes namespace on the cluster.
 
 
 <a id="nestedatt--owner"></a>
