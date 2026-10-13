@@ -103,6 +103,9 @@ var allTFComponents = []TFManager{
 	&QuotaGroup{},
 	&BlobExpansion{},
 	&Certificate{},
+	&VmsCertificate{},
+	&S3Certificate{},
+	&NfsCertificate{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
@@ -204,6 +207,10 @@ type PrepareUpdateResource interface {
 
 type PrepareDeleteResource interface {
 	PrepareDeleteResource(context.Context, *VMSRest) error
+}
+
+type ModifyPlanResource interface {
+	ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error
 }
 
 type ImportResourceState interface {

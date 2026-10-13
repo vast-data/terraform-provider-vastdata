@@ -35,6 +35,7 @@ const (
 	OpUpdate         = "Update"
 	OpDelete         = "Delete"
 	OpValidateConfig = "ValidateConfig"
+	OpModifyPlan     = "ModifyPlan"
 )
 
 const (
@@ -207,6 +208,30 @@ func (r *Resource) ValidateConfig(ctx context.Context, req resource.ValidateConf
 	withContext(ctx, OpValidateConfig, r.managerName, func(ctx context.Context) {
 		r.validateConfigImpl(ctx, req, resp)
 	})
+}
+
+func (r *Resource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	withContext(ctx, OpModifyPlan, r.managerName, func(ctx context.Context) {
+		r.modifyPlanImpl(ctx, req, resp)
+	})
+}
+
+func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
+	if req.Plan.Raw.IsNull() {
+		return
+	}
+	manager := r.NewManager(req.Plan)
+	imp, ok := manager.(ModifyPlanResource)
+	if !ok {
+		return
+	}
+	tflog.Debug(ctx, fmt.Sprintf("ModifyPlanResource[%s]: do.", r.managerName))
+	if err := imp.ModifyPlan(ctx, req, resp); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("ModifyPlanResource[%q]", r.managerName),
+			err.Error(),
+		)
+	}
 }
 
 // ----------------------------------------
