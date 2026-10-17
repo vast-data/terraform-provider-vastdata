@@ -68,10 +68,6 @@ func (m *DeKubernetesSecret) NewResourceManager(raw map[string]attr.Value, schem
 	)}
 }
 
-func (m *DeKubernetesSecret) ValidateResourceConfig(context.Context) error {
-	return validateKubernetesClusterNameOrVrnInState(m.tfstate)
-}
-
 func (m *DeKubernetesSecret) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
 	return resolveKubernetesClusterNameOrVrnInState(ctx, m.tfstate, rest)
 }

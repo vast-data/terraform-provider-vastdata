@@ -109,16 +109,19 @@ func (m *DeContainerRegistry) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.DataEngine.ContainerRegistries
 }
 
-func (m *DeContainerRegistry) ValidateResourceConfig(context.Context) error {
-	return deCRValidateKubernetesClusterRefsConfig(m.tfstate)
-}
-
 func (m *DeContainerRegistry) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
+	if err := deCRValidateKubernetesClusterRefsConfig(m.tfstate); err != nil {
+		return err
+	}
 	return deCRResolveKubernetesClusterRefsInState(ctx, m.tfstate, rest)
 }
 
 func (m *DeContainerRegistry) PrepareUpdateResource(ctx context.Context, plan PrepareUpdateResource, rest *VMSRest) error {
-	return deCRResolveKubernetesClusterRefsInState(ctx, plan.(*DeContainerRegistry).tfstate, rest)
+	ts := plan.(*DeContainerRegistry).tfstate
+	if err := deCRValidateKubernetesClusterRefsConfig(ts); err != nil {
+		return err
+	}
+	return deCRResolveKubernetesClusterRefsInState(ctx, ts, rest)
 }
 
 func (m *DeContainerRegistry) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

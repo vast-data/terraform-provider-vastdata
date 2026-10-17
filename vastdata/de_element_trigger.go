@@ -157,10 +157,14 @@ func (m *DeElementTrigger) TransformResponseRecord(response Record) Record {
 	return ensureTenantNameInRecord(normalizeTriggerRecord(response), m.tfstate, nil)
 }
 
-// ValidateResourceConfig enforces create checks that OpenAPI leaves optional:
+// PrepareCreateResource enforces create checks that OpenAPI leaves optional:
 // non-empty config.events + config.source_bucket_name, and topic_name ↔ broker together.
-func (m *DeElementTrigger) ValidateResourceConfig(context.Context) error {
+func (m *DeElementTrigger) PrepareCreateResource(context.Context, *VMSRest) error {
 	return validateDeElementTriggerConfig(m.tfstate)
+}
+
+func (m *DeElementTrigger) PrepareUpdateResource(_ context.Context, plan PrepareUpdateResource, _ *VMSRest) error {
+	return validateDeElementTriggerConfig(plan.(*DeElementTrigger).tfstate)
 }
 
 func validateDeElementTriggerConfig(ts is.ResourceState) error {

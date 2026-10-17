@@ -140,10 +140,6 @@ func (m *DePipeline) NewDatasourceManager(raw map[string]attr.Value, schema any)
 	)}
 }
 
-func (m *DePipeline) ValidateResourceConfig(context.Context) error {
-	return validateKubernetesClusterNameOrVrnInState(m.tfstate)
-}
-
 func (m *DePipeline) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
 	return resolveKubernetesClusterNameOrVrnInState(ctx, m.tfstate, rest)
 }

@@ -91,10 +91,6 @@ func (m *DeFunction) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.DataEngine.Functions
 }
 
-func (m *DeFunction) ValidateResourceConfig(context.Context) error {
-	return validateContainerRegistryNameOrVrnInState(m.tfstate)
-}
-
 func (m *DeFunction) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
 	return resolveContainerRegistryNameOrVrnInState(ctx, m.tfstate, rest)
 }
