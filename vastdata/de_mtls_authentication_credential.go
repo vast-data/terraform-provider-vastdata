@@ -44,6 +44,16 @@ func (m *DeMtlsAuthenticationCredential) NewResourceManager(raw map[string]attr.
 				"client_certificate_b64",
 				"client_key_b64",
 			},
+			OptionalSchemaFields: []string{
+				"certificate_authority_b64",
+				"client_certificate_b64",
+				"client_key_b64",
+			},
+			ComputedSchemaFields: []string{
+				"certificate_authority_b64",
+				"client_certificate_b64",
+				"client_key_b64",
+			},
 			SensitiveFields: []string{
 				"certificate_authority_b64",
 				"client_certificate_b64",
@@ -52,27 +62,19 @@ func (m *DeMtlsAuthenticationCredential) NewResourceManager(raw map[string]attr.
 			},
 			WriteOnlyFields: []string{"kubeconfig_data"},
 			CreateOnlyFields: []string{
-				"certificate_authority_b64",
-				"client_certificate_b64",
-				"client_key_b64",
 				deTenantNameAttr,
 				"context_name",
 			},
 			PreserveUserValueFields: []string{
 				deTenantNameAttr,
 				"context_name",
+				"certificate_authority_b64",
+				"client_certificate_b64",
 				"client_key_b64",
 			},
 			CommonModifiersMapping: map[string]string{
-				// Replace only when the operator sets PEMs in config. With kubeconfig_data,
-				// PEMs are derived at create and omitted afterward — unconditional ForceNew
-				// treated that omission as a change and destroyed the credential on any edit
-				// (e.g. description). CreateOnly + UseStateForUnknown keep prior PEM state.
-				"certificate_authority_b64": ModifierForceNewIfConfigured,
-				"client_certificate_b64":    ModifierForceNewIfConfigured,
-				"client_key_b64":            ModifierForceNewIfConfigured,
-				deTenantNameAttr:            ModifierForceNew,
-				"context_name":              ModifierForceNew,
+				deTenantNameAttr: ModifierForceNew,
+				"context_name":   ModifierForceNew,
 			},
 			AdditionalSchemaAttributes: map[string]any{
 				deTenantNameAttr: deTenantNameSchemaAttribute(),
@@ -81,7 +83,7 @@ func (m *DeMtlsAuthenticationCredential) NewResourceManager(raw map[string]attr.
 					Sensitive: true,
 					WriteOnly: true,
 					Description: "Raw kubeconfig YAML. Alternative to certificate_authority_b64 / " +
-						"client_certificate_b64 / client_key_b64. Parsed at create time only; never stored in state.",
+						"client_certificate_b64 / client_key_b64. Parsed on create/update when set; never stored in state.",
 				},
 				"context_name": rschema.StringAttribute{
 					Optional: true,
@@ -230,7 +232,19 @@ func (m *DeMtlsAuthenticationCredential) ValidateResourceConfig(context.Context)
 
 // PrepareCreateResource derives certificate_*_b64 from kubeconfig_data when set.
 func (m *DeMtlsAuthenticationCredential) PrepareCreateResource(context.Context, *VMSRest) error {
-	ts := m.tfstate
+	return prepareMtlsPEMs(m.tfstate, true)
+}
+
+// PrepareUpdateResource re-derives PEMs from kubeconfig_data when supplied on update,
+// or leaves existing PEM values for an in-place cert rotation / metadata-only change.
+func (m *DeMtlsAuthenticationCredential) PrepareUpdateResource(_ context.Context, plan PrepareUpdateResource, _ *VMSRest) error {
+	return prepareMtlsPEMs(plan.(*DeMtlsAuthenticationCredential).tfstate, false)
+}
+
+// prepareMtlsPEMs fills certificate_*_b64 from kubeconfig_data when present.
+// On create (requireMaterial), PEMs or kubeconfig are mandatory; on update, omitted
+// PEMs keep prior state (optional+computed + PreserveUserValueFields).
+func prepareMtlsPEMs(ts *is.TFState, requireMaterial bool) error {
 	if ts == nil {
 		return fmt.Errorf("mtls authentication credential: empty state")
 	}
@@ -256,6 +270,9 @@ func (m *DeMtlsAuthenticationCredential) PrepareCreateResource(context.Context, 
 	}
 
 	if caSet && certSet && keySet {
+		return nil
+	}
+	if !requireMaterial {
 		return nil
 	}
 	return fmt.Errorf(

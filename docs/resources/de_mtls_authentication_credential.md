@@ -65,7 +65,7 @@ It is used by the Kubernetes client (e.g., kubectl) to prove its identity to the
 This key must remain confidential and secure.
 - `context_name` (String) Kubeconfig context to use with kubeconfig_data. Defaults to current-context. Ignored when certificate_*_b64 fields are set directly.
 - `description` (String) A description of the resource.
-- `kubeconfig_data` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Raw kubeconfig YAML. Alternative to certificate_authority_b64 / client_certificate_b64 / client_key_b64. Parsed at create time only; never stored in state.
+- `kubeconfig_data` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Raw kubeconfig YAML. Alternative to certificate_authority_b64 / client_certificate_b64 / client_key_b64. Parsed on create/update when set; never stored in state.
 - `tags` (Set of String) Custom tags for organizing and categorizing resources in the GUI.
 - `tenant_name` (String) Tenant name for Data Engine API queries. Required for cluster-admin auth; optional when the provider already authenticates as that tenant.
 
