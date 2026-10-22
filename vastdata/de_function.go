@@ -111,19 +111,7 @@ func (m *DeFunction) UpdateResource(ctx context.Context, plan UpdateResource, re
 	if len(body) == 0 {
 		return m.ReadResource(ctx, rest)
 	}
-	// Image/registry changes should always mint a new revision so pipelines pull the new artifact.
-	if m.tfstate != nil && planTS != nil {
-		changed := planTS.GetUpdateParams(m.tfstate)
-		for _, k := range []string{
-			"artifact_source", "artifact_type", "image_tag",
-			deContainerRegistryVrnAttr, deContainerRegistryNameAttr,
-		} {
-			if _, ok := changed[k]; ok {
-				body["force_new_revision"] = true
-				break
-			}
-		}
-	}
+
 	api := m.API(rest)
 	query := plan.(*DeFunction).TransformQueryParams(nil, rest)
 	rec, err := api.UpdateWithContext(ctx, guid, query, body)
@@ -156,6 +144,10 @@ func (m *DeFunction) TransformRequestBody(body params) params {
 			"last_published_revision_number", "last_revision_number", "default_revision_number",
 			deContainerRegistryNameAttr,
 		)
+		// 5.5 rejects the field entirely; omit unless the user explicitly set true (5.6+).
+		if v, ok := body["force_new_revision"]; !ok || v == nil || v == false {
+			body.Without("force_new_revision")
+		}
 	}
 	return body
 }
