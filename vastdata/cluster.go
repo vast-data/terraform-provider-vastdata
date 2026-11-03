@@ -58,8 +58,10 @@ func (m *Cluster) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:    ClusterSchemaRef,
-			SubResources: []is.SubResourceHint{clusterS3TrueIPSubResource},
+			SchemaRef:            ClusterSchemaRef,
+			SubResources:         []is.SubResourceHint{clusterS3TrueIPSubResource},
+			EditOnlyFields:       []string{"enable_trash"},
+			OptionalSchemaFields: []string{"enable_trash"},
 		},
 	)}
 }
