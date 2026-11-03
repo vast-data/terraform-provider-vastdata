@@ -73,6 +73,7 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `enable_rack_level_resiliency` (Boolean) Enable rack level resiliency
 - `enable_similarity` (Boolean) Enable similarity
 - `enable_smb` (Boolean) Enable support for SMB
+- `enable_trash` (Boolean)
 - `encryption_type` (String) Encryption type. INTERNAL = keys are managed internally. CIPHER_TRUST_KMIP=Keys are stored and managed on Thales Group CipherTrust Data Security Platform, FORTANIX_KMIP=Keys are stored and managed on Fortanix DSM, HASHICORP_KMIP=Keys are stored and managed on HashiCorp Vault Enterprise.
 - `external_managed_dpu` (Boolean) Cluster has externally managed DPUs. Default: False
 - `failing_components_cnodes_failure_to_fail_percentage` (Number) Percentage of all CNodes that are allowed to fail
@@ -155,7 +156,6 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `enable_bucket_replication` (Boolean) True if bucket replication is enabled
 - `enable_json_audit` (Boolean) If enabled, audit logs are saved in JSON format into a file in the directory specified as audit_dir_name.  Can be enabled in addition to enable_vast_db_audit.
 - `enable_s3` (Boolean) S3 protocol enabled
-- `enable_trash` (Boolean)
 - `enable_turbo_boost` (Boolean) Enable Turbo Boost
 - `enable_vast_db_audit` (Boolean) If enabled, audit logs are saved in a VAST DataBase table. Can be enabled in addition to enable_json_audit.
 - `enabled` (Boolean) cluster enabled
