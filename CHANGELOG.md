@@ -5,6 +5,7 @@ NEW RESOURCES:
 * **vastdata_vms_certificate**: Manage the VMS web/API TLS certificate with write-only PEM certificate and private key.
 * **vastdata_s3_certificate**: Manage the S3 HTTPS endpoint certificate with write-only PEM certificate and private key (VAST 5.4+).
 * **vastdata_nfs_certificate**: Manage the NFSv4 RPC-with-TLS certificate with write-only PEM certificate and private key (VAST 5.4+).
+* **vastdata_callhome_config**: Manage Call Home / Uplink settings (`obfuscated`, `cloud_enabled`, proxy, etc.) via `/callhomeconfigs/{id}/`. Create adopts the existing config (no POST); destroy is a no-op. Optional write-only `uplink_email` / `uplink_password` / `uplink_token` register the cluster with VAST Uplink (TERF-307).
 * **vastdata_vms_network_settings**: Manage VMS network settings (upstream DNS, NTP, gateways, MTUs, hosts, management VIPs) via `/vms/{id}/network_settings/` (TERF-306).
 
 ENHANCEMENTS:

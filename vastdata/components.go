@@ -106,6 +106,7 @@ var allTFComponents = []TFManager{
 	&VmsCertificate{},
 	&S3Certificate{},
 	&NfsCertificate{},
+	&CallhomeConfig{},
 	&VmsNetworkSettings{},
 }
 
