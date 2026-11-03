@@ -1,7 +1,8 @@
-## 4.0.2
+## 4.1.0
 
 ENHANCEMENTS:
 
+* **vastdata_cluster**: Removing the resource from configuration or running `terraform destroy` clears Terraform state only and does not call DELETE on the cluster.
 * **vastdata_tenant**: Added optional `delete_local_provider` to remove the VMS auto-created local provider on tenant destroy and on failed create rollback. Looks up the provider by tenant name or `provider-<tenant_name>`; skipped when `local_provider_id` is set in config during create rollback; missing providers are ignored (TERF-278).
 
 ## 4.0.1

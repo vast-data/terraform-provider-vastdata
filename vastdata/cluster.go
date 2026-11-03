@@ -85,6 +85,11 @@ func (m *Cluster) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Clusters
 }
 
+func (m *Cluster) DeleteResource(ctx context.Context, rest *VMSRest) error {
+	// No-op. Cluster cannot be deleted via Terraform.
+	return nil
+}
+
 // GetSubResources fetches /clusters/{id}/s3_true_ip_config/ on VAST clusters
 // running version >= 5.5.0. Set get_s3_true_ip_config = false to opt out.
 func (m *Cluster) GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error) {
