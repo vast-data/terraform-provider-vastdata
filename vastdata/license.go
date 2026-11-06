@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -30,9 +31,11 @@ func (m *License) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 			RequiredSchemaFields: []string{"license_key"},
 			WriteOnlyFields:      []string{"license_key"},
 			SensitiveFields:      []string{"license_key"},
-			// No PATCH on /licenses/{id}/ — changing the key requires replace.
-			CommonModifiersMapping: map[string]string{
-				"license_key": ModifierForceNew,
+			// license_key is write-only (not in state).
+			//Track a computed MD5 of the key and
+			// force replace when that changes.
+			AdditionalSchemaAttributes: map[string]any{
+				"license_key_md5": ContentMD5SchemaAttribute("license_key", true),
 			},
 		},
 	)}
@@ -72,9 +75,16 @@ func (m *License) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 	return rest.Licenses.CreateWithContext(ctx, m.tfstate.GetCreateParams())
 }
 
-// TransformResponseRecord drops license_key from GET responses so the secret
-// is never written into Terraform state (write-only on create only).
+// TransformResponseRecord derives license_key_md5 for drift detection, then drops
+// license_key so the secret is never written into Terraform state.
 func (m *License) TransformResponseRecord(record Record) Record {
+	SetRecordContentMD5(record, "license_key", "license_key_md5")
 	delete(record, "license_key")
 	return record
+}
+
+// ModifyPlan sets license_key_md5 from the write-only license_key in config so
+func (m *License) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5(ctx, req, resp, "license_key", "license_key_md5")
+	return nil
 }

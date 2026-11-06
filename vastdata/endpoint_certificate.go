@@ -3,7 +3,6 @@ package provider
 
 import (
 	"context"
-	"crypto/md5"
 	"crypto/sha256"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -56,12 +55,11 @@ func parsePEMCertificateInfo(pemData string) (*pemCertificateInfo, error) {
 			return nil, fmt.Errorf("parse certificate: %w", err)
 		}
 		sum := sha256.Sum256(cert.Raw)
-		md5sum := md5.Sum(cert.Raw) //nolint:gosec // stored hash for Terraform plan equality, not a security control
 		return &pemCertificateInfo{
 			NotAfter:          cert.NotAfter.UTC().Format(time.RFC3339),
 			Subject:           cert.Subject.String(),
 			FingerprintSHA256: hex.EncodeToString(sum[:]),
-			MD5:               hex.EncodeToString(md5sum[:]),
+			MD5:               BytesMD5Hex(cert.Raw),
 		}, nil
 	}
 }

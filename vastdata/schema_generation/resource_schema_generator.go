@@ -35,6 +35,8 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		return nil, fmt.Errorf("create schema reference is required but was nil")
 	}
 
+	defer beginSchemaPack(hints)()
+
 	resourcePath := hints.SchemaRef.Create.Path
 	resourceMethod := hints.SchemaRef.Create.Method
 	if resourcePath == "" {
@@ -53,15 +55,15 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	// Resolve createSchemaRef
 	switch resourceMethod {
 	case http.MethodPost:
-		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPost, resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(schemaPack, http.MethodPost, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get POST schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodGet:
-		if createSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get GET schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
-		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(schemaPack, http.MethodPatch, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get PATCH schema for resource %q: %w", resourcePath, err)
 		}
 	default:
@@ -74,7 +76,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	switch resourceMethod {
 	case http.MethodPost:
 		// Try to get model schema from POST response
-		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPost, resourcePath)
+		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodPost, resourcePath)
 
 		// If POST doesn't have a response schema, try to use the Read endpoint as fallback
 		if err != nil && hints.SchemaRef.Read != nil {
@@ -82,25 +84,31 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			readMethod := hints.SchemaRef.Read.Method
 			if readMethod == http.MethodGet && readPath != "" {
 				warnWithContext(ctx, fmt.Sprintf("POST response schema not found for %q, using GET %q for model schema", resourcePath, readPath))
-				if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, readPath); err != nil {
+				if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, readPath); err != nil {
 					return nil, fmt.Errorf("failed to get model schema from POST response or GET %q: %w", readPath, err)
 				}
 			} else {
 				return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
 			}
 		} else if err != nil {
-			return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
+			// Write-only creates (no response body and no read endpoint) still need a model.
+			if createSchemaRef != nil {
+				modelSchemaRef = createSchemaRef
+				err = nil
+			} else {
+				return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
+			}
 		}
 	case http.MethodGet:
 		// Use GET response schema for both create and model schemas (typically for read-only or schema-only resources)
-		if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
+		if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get GET model schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
-		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPatch, resourcePath)
+		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodPatch, resourcePath)
 		if err != nil {
 			// Fallback: use PATCH request body schema
-			if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
+			if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(schemaPack, http.MethodPatch, resourcePath); err != nil {
 				return nil, fmt.Errorf("failed to get model schema for PATCH resource %q: %w", resourcePath, err)
 			}
 		}
@@ -195,7 +203,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	}
 
 	// Will be optional only fields (Query parameters).
-	params, err := openapi_schema.GetQueryParameters(http.MethodGet, resourcePath)
+	params, err := openapi_schema.GetQueryParameters(schemaPack, http.MethodGet, resourcePath)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +214,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			continue
 		}
 		name := p.Name
-		if contains(excludeSearchParams, name) {
+		if contains(excludeSearchParams, name) || isExcluded(name, hints) {
 			continue
 		}
 		if p.Required {
@@ -218,7 +226,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		if _, exists := allProps[name]; exists {
 			continue
 		}
-		if !contains(excludeSearchParams, name) && !contains(hints.ReadOnlyFields, name) {
+		if !contains(excludeSearchParams, name) && !isExcluded(name, hints) && !contains(hints.ReadOnlyFields, name) {
 			return nil, fmt.Errorf("field %q was detected as read-only for resource %q"+
 				" but is not listed in ReadOnlyFields or ExcludedSchemaFields."+
 				" Such fields cannot be used in context of create/update but only as search query params", name, resourcePath)
@@ -234,7 +242,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		infoWithContext(ctx, fmt.Sprintf("ReadOnly fields: %v", hints.ReadOnlyFields))
 	}
 
-	if searchableQueryParams, err := openapi_schema.SearchableQueryParams(resourcePath); err == nil {
+	if searchableQueryParams, err := openapi_schema.SearchableQueryParams(schemaPack, resourcePath); err == nil {
 		var filteredSearchableParams []string
 		for _, name := range searchableQueryParams {
 			if _, ok := allProps[name]; ok {

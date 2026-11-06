@@ -5,11 +5,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
+	"sort"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -49,8 +52,13 @@ func (m *VmsNetworkSettings) NewResourceManager(raw map[string]attr.Value, schem
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:            VmsNetworkSettingsSchemaRef,
-			ImportFields:         []string{"vms_id"},
+			SchemaRef:    VmsNetworkSettingsSchemaRef,
+			ImportFields: []string{"vms_id"},
+			// OpenAPI PATCH response is only {async_task}, so request-body fields
+			// would stay optional-only and FillFromRecordForImport would skip them
+			// (TERF-312). Mark them computed so import/read populate state; schema
+			// generation also attaches UseStateForUnknown for partial configs.
+			ComputedSchemaFields: append([]string{}, vmsNetworkSettingsPatchFields...),
 			ExcludedSchemaFields: []string{"async_task"},
 			AsyncTaskTimeout:     &vmsNetworkSettingsAsyncTaskTimeout,
 			AdditionalSchemaAttributes: map[string]any{
@@ -154,24 +162,82 @@ func updateVmsNetworkSettings(ctx context.Context, vmsId int64, overlay params, 
 	if vmsId == 0 {
 		return nil, fmt.Errorf("vms_id is required")
 	}
-	if len(overlay) == 0 {
-		return rest.Vms.VmsNetworkSettingsWithContext_GET(ctx, vmsId)
-	}
 
 	current, err := rest.Vms.VmsNetworkSettingsWithContext_GET(ctx, vmsId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read VMS network settings before update: %w", err)
 	}
-	body := mergeVmsNetworkSettingsPatchBody(m.TransformResponseRecord(current), overlay)
+	transformed := m.TransformResponseRecord(current)
 
-	asyncResult, err := rest.Vms.VmsNetworkSettingsWithContext_PATCH(ctx, vmsId, body, vmsNetworkSettingsAsyncTaskTimeout)
-	if err != nil {
+	if len(overlay) == 0 || vmsNetworkSettingsOverlayMatches(transformed, overlay) {
+		if len(overlay) > 0 {
+			tflog.Info(ctx, "VMS network settings already match config; skipping PATCH")
+		}
+		return transformed, nil
+	}
+
+	body := mergeVmsNetworkSettingsPatchBody(transformed, overlay)
+	if _, err := rest.Vms.VmsNetworkSettingsWithContext_PATCH(ctx, vmsId, body, vmsNetworkSettingsAsyncTaskTimeout); err != nil {
 		return nil, fmt.Errorf("failed to update VMS network settings: %w", err)
 	}
-	if asyncResult != nil && asyncResult.IsFailed() {
-		return nil, fmt.Errorf("VMS network settings task failed: %v", asyncResult.Err)
-	}
 	return rest.Vms.VmsNetworkSettingsWithContext_GET(ctx, vmsId)
+}
+
+// vmsNetworkSettingsOverlayMatches reports whether every overlay key already
+// equals the corresponding value on the transformed GET record.
+func vmsNetworkSettingsOverlayMatches(current Record, overlay params) bool {
+	for key, want := range overlay {
+		if !vmsNetworkSettingsValuesEqual(current[key], want) {
+			return false
+		}
+	}
+	return true
+}
+
+func vmsNetworkSettingsValuesEqual(a, b any) bool {
+	return reflect.DeepEqual(normalizeVmsNetworkSettingsValue(a), normalizeVmsNetworkSettingsValue(b))
+}
+
+func normalizeVmsNetworkSettingsValue(v any) any {
+	switch x := v.(type) {
+	case nil:
+		return nil
+	case float64:
+		if x == float64(int64(x)) {
+			return int64(x)
+		}
+		return x
+	case float32:
+		return normalizeVmsNetworkSettingsValue(float64(x))
+	case int:
+		return int64(x)
+	case int32:
+		return int64(x)
+	case []string:
+		out := append([]string(nil), x...)
+		sort.Strings(out)
+		return out
+	case []any:
+		out := make([]any, len(x))
+		for i, e := range x {
+			out[i] = normalizeVmsNetworkSettingsValue(e)
+		}
+		// Order-insensitive for primitive lists (ntp, dns, …).
+		if allPrimitiveScalars(out) {
+			sort.Slice(out, func(i, j int) bool {
+				return fmt.Sprint(out[i]) < fmt.Sprint(out[j])
+			})
+		}
+		return out
+	case map[string]any:
+		out := make(map[string]any, len(x))
+		for k, e := range x {
+			out[k] = normalizeVmsNetworkSettingsValue(e)
+		}
+		return out
+	default:
+		return v
+	}
 }
 
 // mergeVmsNetworkSettingsPatchBody builds a full PATCH body: current GET values

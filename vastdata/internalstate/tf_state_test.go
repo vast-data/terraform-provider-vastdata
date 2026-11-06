@@ -1391,6 +1391,7 @@ func TestGetGenericSearchParams(t *testing.T) {
 			"guid": "abc-def",
 		}, got)
 	})
+
 }
 
 func TestGetSearchParams_BothGenericAndReadOnly(t *testing.T) {

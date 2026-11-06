@@ -778,24 +778,27 @@ type deleteErrorAPI struct {
 func (m *deleteErrorAPI) Session() core.RESTSession { return nil }
 func (m *deleteErrorAPI) GetResourceType() string   { return "test" }
 func (m *deleteErrorAPI) GetResourcePath() string   { return "test" }
+func (m *deleteErrorAPI) GetApiRoot() string        { return "" }
 func (m *deleteErrorAPI) List(vast_client.Params) (RecordSet, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) Create(vast_client.Params) (Record, error) { return nil, nil }
-func (m *deleteErrorAPI) Update(any, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) Create(...vast_client.Params) (Record, error) { return nil, nil }
+func (m *deleteErrorAPI) Update(any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) Delete(vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) Delete(vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) DeleteById(any, vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) DeleteById(any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) Ensure(vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) Ensure(vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
 func (m *deleteErrorAPI) Get(vast_client.Params) (Record, error) { return nil, nil }
-func (m *deleteErrorAPI) GetById(any) (Record, error)            { return nil, nil }
+func (m *deleteErrorAPI) GetById(any, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
 func (m *deleteErrorAPI) Exists(vast_client.Params) (bool, error) {
 	return false, nil
 }
@@ -807,25 +810,25 @@ func (m *deleteErrorAPI) Lock(...any) func() { return func() {} }
 func (m *deleteErrorAPI) ListWithContext(context.Context, vast_client.Params) (RecordSet, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) CreateWithContext(context.Context, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) CreateWithContext(context.Context, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) UpdateWithContext(context.Context, any, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) UpdateWithContext(context.Context, any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) DeleteWithContext(context.Context, vast_client.Params, vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) DeleteWithContext(context.Context, vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) DeleteByIdWithContext(_ context.Context, _ any, _, _ vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) DeleteByIdWithContext(_ context.Context, _ any, _ ...vast_client.Params) (Record, error) {
 	return nil, m.deleteErr
 }
-func (m *deleteErrorAPI) EnsureWithContext(context.Context, vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) EnsureWithContext(context.Context, vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
 func (m *deleteErrorAPI) GetWithContext(context.Context, vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) GetByIdWithContext(context.Context, any) (Record, error) {
+func (m *deleteErrorAPI) GetByIdWithContext(context.Context, any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
 func (m *deleteErrorAPI) ExistsWithContext(context.Context, vast_client.Params) (bool, error) {

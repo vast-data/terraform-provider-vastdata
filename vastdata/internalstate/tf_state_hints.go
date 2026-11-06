@@ -175,6 +175,10 @@ type TFStateHints struct {
 	// It is not used by the datasource read path.
 	RetryOn *RetryPolicy
 
+	// PathIDField is the record attribute used as the URL id for Get/Update/Delete
+	// (for example "guid" on DataEngine). Empty means "id".
+	PathIDField string
+
 	// AsyncTaskTimeout overrides the default timeout used when waiting
 	// for asynchronous task completion after create/update operations.
 	// When nil, the provider uses the default timeout (10 minutes).
@@ -263,6 +267,9 @@ type SchemaReference struct {
 
 	// Read specifies the OpenAPI endpoint to use for extracting the read schema (e.g., GET /volumes/{id}).
 	Read *OpenAPIEndpointRef
+
+	// Pack is the OpenAPI document id ("vms" or "dataengine"). Empty means VMS.
+	Pack OpenAPIPack
 }
 
 func NewSchemaReference(
@@ -298,6 +305,16 @@ type OpenAPIEndpointRef struct {
 	Method string
 	// Path in OpenAPI (e.g., "/volumes", "/volumes/{id}")
 	Path string
+}
+
+// Pack selects the OpenAPI document used to build the schema.
+// Empty means the VMS pack. DataEngine resources set openapi_schema.PackDataEngine.
+type OpenAPIPack = string
+
+func NewDataEngineSchemaReference(createMethod, createPath, readMethod, readPath string) *SchemaReference {
+	ref := NewSchemaReference(createMethod, createPath, readMethod, readPath)
+	ref.Pack = "dataengine"
+	return ref
 }
 
 type TFStateHintsForCustom struct {

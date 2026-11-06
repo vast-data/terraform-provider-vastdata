@@ -15,20 +15,22 @@ package provider
 
 import (
 	"context"
-	"errors"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
-	"io"
-	"net"
 	"net/http"
-	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/go-test/deep"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
@@ -642,120 +644,124 @@ func deleteDuplicates[T comparable](s []T) []T {
 	return result
 }
 
+// allPrimitiveScalars reports whether every element is nil or a scalar
+// (string, bool, int64, float64). Used when normalizing list comparisons.
+func allPrimitiveScalars(vals []any) bool {
+	for _, v := range vals {
+		switch v.(type) {
+		case nil, string, bool, int64, float64:
+		default:
+			return false
+		}
+	}
+	return true
+}
+
+// ----------------------------------
+// Write-only field fingerprints
+// ----------------------------------
+//
+// Helpers for tracking changes to write-only / sensitive string fields that
+// Terraform does not store in state. Pattern:
+//
+//  1. Keep the secret as WriteOnly (+ Sensitive).
+//  2. Add a computed "<field>_md5" attribute (see ContentMD5SchemaAttribute).
+//  3. In ModifyPlan, call SetPlanContentMD5 so the plan fingerprint comes from
+//     the configured value.
+//  4. On read/transform, call SetRecordContentMD5 when the API still returns the
+//     secret (or clear the md5 when it does not) so state stays in sync.
+//
+// Used by vastdata_license today; the same helpers apply to any future
+// write-only string that needs replace/update detection.
+
+// ContentMD5Hex returns the lowercase hex MD5 of s.
+//
+//nolint:gosec // plan/state equality fingerprint, not a security control
+func ContentMD5Hex(s string) string {
+	return BytesMD5Hex([]byte(s))
+}
+
+// BytesMD5Hex returns the lowercase hex MD5 of b.
+//
+//nolint:gosec // plan/state equality fingerprint, not a security control
+func BytesMD5Hex(b []byte) string {
+	sum := md5.Sum(b)
+	return hex.EncodeToString(sum[:])
+}
+
+// ContentMD5SchemaAttribute builds a computed string attribute that stores an
+// MD5 fingerprint of a write-only field for change detection.
+// If requiresReplace is true, a fingerprint change forces resource replace
+// (use when the API has no PATCH for that field).
+func ContentMD5SchemaAttribute(sourceField string, requiresReplace bool) rschema.StringAttribute {
+	mods := []planmodifiers.String{
+		stringplanmodifier.UseStateForUnknown(),
+	}
+	if requiresReplace {
+		mods = append([]planmodifiers.String{stringplanmodifier.RequiresReplace()}, mods...)
+	}
+	return rschema.StringAttribute{
+		Computed: true,
+		Description: fmt.Sprintf(
+			"MD5 of %s (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.",
+			sourceField,
+		),
+		PlanModifiers: mods,
+	}
+}
+
+// SetPlanContentMD5 reads sourceField from config and sets md5Field on the plan
+// to ContentMD5Hex(value). No-op when the plan is null or the source is null/empty.
+func SetPlanContentMD5(
+	ctx context.Context,
+	req resource.ModifyPlanRequest,
+	resp *resource.ModifyPlanResponse,
+	sourceField, md5Field string,
+) {
+	if req.Plan.Raw.IsNull() {
+		return
+	}
+	var src types.String
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root(sourceField), &src)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	if src.IsUnknown() {
+		resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(md5Field), types.StringUnknown())...)
+		return
+	}
+	if src.IsNull() || src.ValueString() == "" {
+		return
+	}
+	resp.Diagnostics.Append(resp.Plan.SetAttribute(
+		ctx,
+		path.Root(md5Field),
+		types.StringValue(ContentMD5Hex(src.ValueString())),
+	)...)
+}
+
+// SetRecordContentMD5 sets record[md5Field] to ContentMD5Hex of record[sourceField]
+// when sourceField is a non-empty string. Leaves md5Field untouched otherwise.
+func SetRecordContentMD5(record Record, sourceField, md5Field string) {
+	if record == nil {
+		return
+	}
+	if key, ok := record[sourceField].(string); ok && key != "" {
+		record[md5Field] = ContentMD5Hex(key)
+	}
+}
+
 // ----------------------------------
 // Async tasks
 // ----------------------------------
-
-// isTransientAsyncPollError reports whether err is a temporary network / availability
-// failure while polling an async task. These are expected when VMS restarts mid-task
-// (e.g. compute cluster create that deactivates the VMS cnode).
-func isTransientAsyncPollError(err error) bool {
-	if err == nil {
-		return false
-	}
-	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-		return false
-	}
-
-	msg := err.Error()
-	// Non-retryable outcomes from go-vast-client WaitAPICondition.
-	if strings.Contains(msg, "WaitAPICondition verification failed") ||
-		strings.Contains(msg, "WaitAPICondition timeout") ||
-		strings.Contains(msg, "WaitAPICondition cancelled") {
-		return false
-	}
-
-	var apiErr *ApiError
-	if errors.As(err, &apiErr) {
-		switch apiErr.StatusCode {
-		case 0, http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
-			return true
-		}
-		return false
-	}
-
-	var netErr net.Error
-	if errors.As(err, &netErr) {
-		return true
-	}
-	var opErr *net.OpError
-	if errors.As(err, &opErr) {
-		return true
-	}
-	var urlErr *url.Error
-	if errors.As(err, &urlErr) {
-		return isTransientAsyncPollError(urlErr.Err)
-	}
-	if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
-		return true
-	}
-	if errors.Is(err, syscall.ECONNRESET) ||
-		errors.Is(err, syscall.ECONNREFUSED) ||
-		errors.Is(err, syscall.EPIPE) ||
-		errors.Is(err, syscall.ETIMEDOUT) {
-		return true
-	}
-
-	lower := strings.ToLower(msg)
-	for _, s := range []string{
-		"connection reset by peer",
-		"connection refused",
-		"broken pipe",
-		"i/o timeout",
-		"tls: handshake timeout",
-		"server closed idle connection",
-		"use of closed network connection",
-		"http2: client connection force closed",
-		"http2: client connection lost",
-		"eof",
-	} {
-		if strings.Contains(lower, s) {
-			return true
-		}
-	}
-	return false
-}
 
 func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, timeout *time.Duration) error {
 	waitTimeout := 10 * time.Minute
 	if timeout != nil {
 		waitTimeout = *timeout
 	}
-	deadline := time.Now().Add(waitTimeout)
-
-	for {
-		remaining := time.Until(deadline)
-		if remaining <= 0 {
-			return fmt.Errorf("async task wait timed out after %v", waitTimeout)
-		}
-
-		asyncResult, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, remaining)
-		if err == nil {
-			if asyncResult != nil {
-				return asyncResult.Err
-			}
-			return nil
-		}
-		if !isTransientAsyncPollError(err) {
-			return err
-		}
-
-		tflog.Warn(ctx, fmt.Sprintf(
-			"Async task poll hit transient network error; retrying until deadline: %v", err,
-		))
-
-		sleepFor := 5 * time.Second
-		if sleepFor > remaining {
-			sleepFor = remaining
-		}
-		timer := time.NewTimer(sleepFor)
-		select {
-		case <-ctx.Done():
-			timer.Stop()
-			return ctx.Err()
-		case <-timer.C:
-		}
-	}
+	_, err := untyped.MaybeWaitAsyncResultWithContext(ctx, record, rest, waitTimeout)
+	return err
 }
 
 func resolveRecordAfterAsyncTask(ctx context.Context, manager ResourceManager, rest *VMSRest, record Record, managerName string) (Record, error) {

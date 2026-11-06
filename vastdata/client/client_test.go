@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 	"testing"
 	"time"
@@ -146,16 +147,29 @@ func (m MockResponse) PrettyJson(prefix ...string) string {
 func TestAfterRequestFnCallback(t *testing.T) {
 
 	tests := []struct {
-		name     string
-		response vast_client.Renderable
+		name       string
+		response   vast_client.Renderable
+		statusCode int
 	}{
 		{
-			name:     "simple_response",
-			response: MockResponse{data: map[string]interface{}{"id": 123, "name": "test"}},
+			name:       "simple_response",
+			response:   MockResponse{data: map[string]interface{}{"id": 123, "name": "test"}},
+			statusCode: http.StatusOK,
 		},
 		{
-			name:     "empty_response",
-			response: MockResponse{data: map[string]interface{}{}},
+			name:       "empty_success_body",
+			response:   vast_client.Record{},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name:       "nil_on_error",
+			response:   nil,
+			statusCode: http.StatusServiceUnavailable,
+		},
+		{
+			name:       "nil_on_transport_error",
+			response:   nil,
+			statusCode: 0,
 		},
 		{
 			name: "complex_response",
@@ -165,6 +179,7 @@ func TestAfterRequestFnCallback(t *testing.T) {
 					map[string]interface{}{"id": 2, "name": "user2"},
 				},
 			}},
+			statusCode: http.StatusOK,
 		},
 	}
 
@@ -172,12 +187,18 @@ func TestAfterRequestFnCallback(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := ContextWithRequestID(context.Background())
 
-			result, err := AfterRequestFnCallback(ctx, tt.response)
+			result, err := AfterRequestFnCallback(ctx, tt.response, tt.statusCode)
 
 			require.NoError(t, err)
 			require.Equal(t, tt.response, result)
 		})
 	}
+}
+
+func TestFormatResponseBody(t *testing.T) {
+	require.Equal(t, "<unsuccessful>", formatResponseBody(nil))
+	require.Equal(t, "<>", formatResponseBody(vast_client.Record{}))
+	require.NotEqual(t, "<>", formatResponseBody(MockResponse{data: map[string]interface{}{"id": 1}}))
 }
 
 func TestContextWithRequestID(t *testing.T) {

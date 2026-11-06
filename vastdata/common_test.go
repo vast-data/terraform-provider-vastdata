@@ -4,9 +4,6 @@ package provider
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"io"
 	"reflect"
 	"testing"
 
@@ -354,36 +351,40 @@ func TestPopulateIDFieldsFromNestedObjects_NilInputs(t *testing.T) {
 	})
 }
 
-func TestIsTransientAsyncPollError(t *testing.T) {
-	tests := []struct {
-		name string
-		err  error
-		want bool
-	}{
-		{"nil", nil, false},
-		{"canceled", context.Canceled, false},
-		{"deadline", context.DeadlineExceeded, false},
-		{"verification failed", fmt.Errorf("WaitAPICondition verification failed: boom"), false},
-		{"timeout", fmt.Errorf("WaitAPICondition timeout after 10m0s"), false},
-		{"cancelled", fmt.Errorf("WaitAPICondition cancelled: %w", context.Canceled), false},
-		{"generic", errors.New("task failed"), false},
-		{"api 400", &ApiError{StatusCode: 400, Body: "bad"}, false},
-		{"api 503", &ApiError{StatusCode: 503, Body: "unavailable"}, true},
-		{"api unreachable", &ApiError{StatusCode: 0, Body: "unreachable"}, true},
-		{
-			"wrapped connection reset",
-			fmt.Errorf("WaitAPICondition API call failed: %w",
-				fmt.Errorf(`failed to perform GET request to https://v162:443/api/latest/vtasks/20/, error Get "https://v162:443/api/latest/vtasks/20/": read tcp 10.241.12.3:62794->10.141.200.162:443: connection reset by peer`)),
-			true,
-		},
-		{"eof", io.EOF, true},
+func TestContentMD5Hex(t *testing.T) {
+	a := ContentMD5Hex("key-a")
+	b := ContentMD5Hex("key-b")
+	if a == "" || len(a) != 32 {
+		t.Fatalf("ContentMD5Hex(key-a) = %q, want 32-char hex", a)
+	}
+	if a == b {
+		t.Fatalf("expected different hashes for different inputs")
+	}
+	if a != ContentMD5Hex("key-a") {
+		t.Fatalf("ContentMD5Hex not stable")
+	}
+}
+
+func TestBytesMD5Hex(t *testing.T) {
+	if ContentMD5Hex("abc") != BytesMD5Hex([]byte("abc")) {
+		t.Fatalf("ContentMD5Hex and BytesMD5Hex disagree")
+	}
+}
+
+func TestSetRecordContentMD5(t *testing.T) {
+	rec := Record{"license_key": "secret-value", "state": "ACTIVE"}
+	SetRecordContentMD5(rec, "license_key", "license_key_md5")
+	if rec["license_key_md5"] != ContentMD5Hex("secret-value") {
+		t.Fatalf("license_key_md5 = %v, want %s", rec["license_key_md5"], ContentMD5Hex("secret-value"))
+	}
+	if rec["state"] != "ACTIVE" {
+		t.Fatalf("state mutated: %v", rec["state"])
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isTransientAsyncPollError(tt.err); got != tt.want {
-				t.Errorf("isTransientAsyncPollError() = %v, want %v", got, tt.want)
-			}
-		})
+	SetRecordContentMD5(nil, "license_key", "license_key_md5") // no panic
+	empty := Record{"license_key": ""}
+	SetRecordContentMD5(empty, "license_key", "license_key_md5")
+	if _, has := empty["license_key_md5"]; has {
+		t.Fatalf("empty source should not set md5")
 	}
 }

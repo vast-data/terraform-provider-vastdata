@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -26,17 +27,47 @@ import (
 
 type TFStateHints = is.TFStateHints
 
+// schemaPack is the OpenAPI pack used by resolveComposedSchema/resolveAllRefs
+// while a schema is being built. GetResourceSchema and GetDatasourceSchema set it.
+var (
+	schemaPackMu sync.Mutex
+	schemaPack   = openapi_schema.PackVMS
+)
+
+func beginSchemaPack(hints *TFStateHints) func() {
+	schemaPackMu.Lock()
+	prev := schemaPack
+	schemaPack = openAPIPack(hints)
+	return func() {
+		schemaPack = prev
+		schemaPackMu.Unlock()
+	}
+}
+
+func openAPIPack(hints *TFStateHints) openapi_schema.Pack {
+	if hints != nil && hints.SchemaRef != nil && hints.SchemaRef.Pack != "" {
+		return openapi_schema.Pack(hints.SchemaRef.Pack)
+	}
+	return openapi_schema.PackVMS
+}
+
+func resolveComposedSchema(schema *openapi3.Schema) *openapi3.Schema {
+	return openapi_schema.ResolveComposedSchema(schemaPack, schema)
+}
+
+func resolveAllRefs(ref *openapi3.SchemaRef) *openapi3.Schema {
+	return openapi_schema.ResolveAllRefs(schemaPack, ref)
+}
+
 // Aliases to shared OpenAPI schema utilities from go-vast-client/openapi_schema
 var (
-	resolveComposedSchema = openapi_schema.ResolveComposedSchema
-	resolveAllRefs        = openapi_schema.ResolveAllRefs
-	isObject              = openapi_schema.IsObject
-	isAmbiguousObject     = openapi_schema.IsAmbiguousObject
-	isPrimitive           = openapi_schema.IsPrimitive
-	isStringOrInteger     = openapi_schema.IsStringOrInteger
-	IsEmptySchema         = openapi_schema.IsEmptySchema
-	compareSchemaValues   = openapi_schema.CompareSchemaValues
-	getSchemaType         = openapi_schema.GetSchemaType
+	isObject            = openapi_schema.IsObject
+	isAmbiguousObject   = openapi_schema.IsAmbiguousObject
+	isPrimitive         = openapi_schema.IsPrimitive
+	isStringOrInteger   = openapi_schema.IsStringOrInteger
+	IsEmptySchema       = openapi_schema.IsEmptySchema
+	compareSchemaValues = openapi_schema.CompareSchemaValues
+	getSchemaType       = openapi_schema.GetSchemaType
 )
 
 // getKnownDescription returns known descriptions for properties that lost their descriptions
@@ -297,9 +328,7 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		// Add UseStateForUnknown for all computed attributes (optional+computed or computed-only)
-		// This prevents "known after apply" noise when the field hasn't changed
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, stringplanmodifier.UseStateForUnknown())
 		}
 		return a
@@ -312,7 +341,7 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, int64planmodifier.UseStateForUnknown())
 		}
 		return a
@@ -325,55 +354,55 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, float64planmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.BoolAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, boolplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.ListAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, listplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.SetAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, setplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.MapAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, mapplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.SingleNestedAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, objectplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.ObjectAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, objectplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.ListNestedAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, listplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.SetNestedAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, setplanmodifier.UseStateForUnknown())
 		}
 		return a

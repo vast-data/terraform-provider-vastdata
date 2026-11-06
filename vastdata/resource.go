@@ -171,8 +171,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 			// provider, causing a schema-reconciliation update.  Resources that
 			// implement MigrateModePassThroughUpdate opt in to allowing that
 			// update instead of being blocked.
-			manager := r.NewManager(req.Plan)
-			if _, ok := manager.(MigrateModePassThroughUpdate); !ok {
+			if _, ok := r.EmptyManager().(MigrateModePassThroughUpdate); !ok {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("MigrateMode[%s]: update operation blocked.", r.managerName),
 					"VASTDATA_MIGRATE_MODE is intended for populating an EMPTY state from existing infrastructure. "+
