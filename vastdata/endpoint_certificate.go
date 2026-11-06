@@ -162,8 +162,17 @@ func (o *endpointCertificateOps) metadataRecord(parentID int64, pemData string, 
 			if info.FingerprintSHA256 != "" {
 				out[attrFingerprintSHA256] = info.FingerprintSHA256
 			}
+			return out
 		}
 	}
+	// TERF-311: after VMS reset_certificate (or NFS cert removal) the API returns
+	// null certificate_info. FillFromRecord only updates keys present on the
+	// record, so omitting computed fields would leave stale PEM metadata in
+	// state and hide drift. Clear them so the next plan re-applies the cert.
+	out[attrNotAfter] = ""
+	out[attrSubject] = ""
+	out[attrFingerprintSHA256] = ""
+	out[attrCertificateMD5] = ""
 	return out
 }
 

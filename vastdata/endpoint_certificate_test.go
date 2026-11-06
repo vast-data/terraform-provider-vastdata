@@ -94,12 +94,22 @@ func TestEndpointCertificateOps_MetadataRecord(t *testing.T) {
 	assert.Equal(t, info.MD5, rec[attrCertificateMD5])
 	assert.Len(t, info.MD5, 32)
 
+	// TERF-311: redacted PEM with no certificate_info must clear computed
+	// metadata so an external reset/removal is visible on the next plan.
 	redacted := o.metadataRecord(7, "*****", nil)
 	assert.Equal(t, int64(7), redacted["vms_id"])
-	_, hasFP := redacted[attrFingerprintSHA256]
-	assert.False(t, hasFP)
-	_, hasMD5 := redacted[attrCertificateMD5]
-	assert.False(t, hasMD5)
+	assert.Equal(t, "", redacted[attrFingerprintSHA256])
+	assert.Equal(t, "", redacted[attrCertificateMD5])
+	assert.Equal(t, "", redacted[attrSubject])
+	assert.Equal(t, "", redacted[attrNotAfter])
+
+	clearedInfo := o.metadataRecord(7, "***", Record{
+		"ssl_certificate_info": nil,
+	})
+	assert.Equal(t, "", clearedInfo[attrSubject])
+	assert.Equal(t, "", clearedInfo[attrFingerprintSHA256])
+	assert.Equal(t, "", clearedInfo[attrCertificateMD5])
+	assert.Equal(t, "", clearedInfo[attrNotAfter])
 
 	fromAPI := o.metadataRecord(7, "***", Record{
 		"ssl_certificate_info": map[string]any{
@@ -113,6 +123,8 @@ func TestEndpointCertificateOps_MetadataRecord(t *testing.T) {
 	})
 	assert.Equal(t, "CN=l3118-vms,O=VastData Test,C=US", fromAPI[attrSubject])
 	assert.Equal(t, "2027-10-06T08:12:43Z", fromAPI[attrNotAfter])
+	_, hasMD5 := fromAPI[attrCertificateMD5]
+	assert.False(t, hasMD5, "API certificate_info has no MD5; leave unset so prior state MD5 is kept when cert is still present")
 }
 
 // TERF-310: VMS returns subject RDNs in certificate encoding order (O,OU,CN for
