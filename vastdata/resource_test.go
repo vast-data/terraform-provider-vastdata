@@ -266,7 +266,7 @@ func TestParseComposite_SingleToken_TreatAsID_String(t *testing.T) {
 }
 
 // Helpers for default import tests
-type testManager struct{ tf *is.TFState }
+type testManager struct{ tf is.ResourceState }
 
 func (t *testManager) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return t
@@ -274,7 +274,7 @@ func (t *testManager) NewResourceManager(raw map[string]attr.Value, schema any) 
 func (t *testManager) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return nil
 }
-func (t *testManager) TfState() *is.TFState                      { return t.tf }
+func (t *testManager) TfState() is.ResourceState                 { return t.tf }
 func (t *testManager) API(_ *VMSRest) VastResourceAPIWithContext { return nil }
 func (t *testManager) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
 	// Return a record based on current state for testing
@@ -492,12 +492,12 @@ func TestResource_ManagerWithSchemaOnly_FillsZeroRaw(t *testing.T) {
 	require.True(t, tf.IsNull("name"))
 }
 
-type testDSManager struct{ tf *is.TFState }
+type testDSManager struct{ tf is.ResourceState }
 
 func (t *testDSManager) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return t
 }
-func (t *testDSManager) TfState() *is.TFState                      { return t.tf }
+func (t *testDSManager) TfState() is.ResourceState                 { return t.tf }
 func (t *testDSManager) API(_ *VMSRest) VastResourceAPIWithContext { return nil }
 
 func buildTestDatasourceWithSchema(schema dschema.Schema, hints *is.TFStateHints) *Datasource {

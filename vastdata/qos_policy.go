@@ -16,11 +16,11 @@ var QosPolicySchemaRef = is.NewSchemaReference(
 )
 
 type QosPolicy struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *QosPolicy) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &QosPolicy{tfstate: is.NewTFStateMust(
+	return &QosPolicy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -40,7 +40,7 @@ func (m *QosPolicy) NewResourceManager(raw map[string]attr.Value, schema any) Re
 }
 
 func (m *QosPolicy) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &QosPolicy{tfstate: is.NewTFStateMust(
+	return &QosPolicy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -49,7 +49,7 @@ func (m *QosPolicy) NewDatasourceManager(raw map[string]attr.Value, schema any) 
 	}
 }
 
-func (m *QosPolicy) TfState() *is.TFState {
+func (m *QosPolicy) TfState() is.ResourceState {
 	return m.tfstate
 }
 

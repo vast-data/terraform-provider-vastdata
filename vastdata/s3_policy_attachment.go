@@ -18,11 +18,11 @@ import (
 )
 
 type S3PolicyAttachment struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &S3PolicyAttachment{tfstate: is.NewTFStateMust(
+	return &S3PolicyAttachment{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -106,7 +106,7 @@ func (m *S3PolicyAttachment) NewResourceManager(raw map[string]attr.Value, schem
 	)}
 }
 
-func (m *S3PolicyAttachment) TfState() *is.TFState {
+func (m *S3PolicyAttachment) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -117,7 +117,7 @@ func (m *S3PolicyAttachment) API(_ *VMSRest) VastResourceAPIWithContext {
 // ensurePolicyIDAndGUID ensures s3_policy_guid is populated in tfstate.
 // Supports both ways: user provides either s3_policy_id OR s3_policy_guid.
 // Returns the current s3_policy_id to use for operations.
-func (m *S3PolicyAttachment) ensurePolicyIDAndGUID(ctx context.Context, rest *VMSRest, ts *is.TFState) (int64, error) {
+func (m *S3PolicyAttachment) ensurePolicyIDAndGUID(ctx context.Context, rest *VMSRest, ts is.ResourceState) (int64, error) {
 
 	if ts.IsKnownAndNotNull("s3_policy_guid") {
 		// User provided GUID, lookup current ID (but don't store it in state)
@@ -161,7 +161,7 @@ func (m *S3PolicyAttachment) validateS3PolicyAttachmentConfig() error {
 	return nil
 }
 
-func (m *S3PolicyAttachment) getSearchParamsFromState(tfState *is.TFState) (params, string) {
+func (m *S3PolicyAttachment) getSearchParamsFromState(tfState is.ResourceState) (params, string) {
 	var (
 		key           string
 		val           any
@@ -488,6 +488,10 @@ func (m *S3PolicyAttachment) DeleteResource(ctx context.Context, rest *VMSRest) 
 
 	record, err := getFn(ctx, searchParams)
 	if err != nil {
+		// The user or group is already gone, so there is nothing left to detach.
+		if ignoreResourceGone(err) == nil {
+			return nil
+		}
 		return fmt.Errorf("failed to fetch record: %w", err)
 	}
 
@@ -510,5 +514,6 @@ func (m *S3PolicyAttachment) DeleteResource(ctx context.Context, rest *VMSRest) 
 
 	searchParams["s3_policies_ids"] = set.ToSlice()
 	_, err = updateFn(ctx, searchParams)
-	return err
+	// The user or group disappeared between the lookup and the update.
+	return ignoreResourceGone(err)
 }

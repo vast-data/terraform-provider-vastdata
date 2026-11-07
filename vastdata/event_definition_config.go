@@ -3,9 +3,10 @@ package provider
 
 import (
 	"context"
+	"net/http"
+
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -19,11 +20,11 @@ var EventDefinitionConfigSchemaRef = is.NewSchemaReference(
 )
 
 type EventDefinitionConfig struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *EventDefinitionConfig) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &EventDefinitionConfig{tfstate: is.NewTFStateMust(
+	return &EventDefinitionConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -39,7 +40,7 @@ func (m *EventDefinitionConfig) NewResourceManager(raw map[string]attr.Value, sc
 }
 
 func (m *EventDefinitionConfig) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &EventDefinitionConfig{tfstate: is.NewTFStateMust(
+	return &EventDefinitionConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -54,7 +55,7 @@ func (m *EventDefinitionConfig) NewDatasourceManager(raw map[string]attr.Value, 
 	)}
 }
 
-func (m *EventDefinitionConfig) TfState() *is.TFState {
+func (m *EventDefinitionConfig) TfState() is.ResourceState {
 	return m.tfstate
 }
 

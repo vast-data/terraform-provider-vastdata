@@ -19,11 +19,11 @@ var KerberosKeytabSchemaRef = is.NewSchemaReference(
 )
 
 type KerberosKeytab struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *KerberosKeytab) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &KerberosKeytab{tfstate: is.NewTFStateMust(
+	return &KerberosKeytab{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -47,7 +47,7 @@ func (m *KerberosKeytab) NewResourceManager(raw map[string]attr.Value, schema an
 	)}
 }
 
-func (m *KerberosKeytab) TfState() *is.TFState {
+func (m *KerberosKeytab) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -82,7 +82,7 @@ func (m *KerberosKeytab) DeleteResource(ctx context.Context, rest *VMSRest) erro
 
 // processKerberosKeytab handles the complex keytab generation and optional upload logic.
 // This is used by both CreateResource and UpdateResource for KerberosKeytab.
-func processKerberosKeytab(ctx context.Context, kerberosId int64, tfstate *is.TFState, changedParams map[string]any, rest *VMSRest) (DisplayableRecord, error) {
+func processKerberosKeytab(ctx context.Context, kerberosId int64, tfstate is.ResourceState, changedParams map[string]any, rest *VMSRest) (DisplayableRecord, error) {
 	if kerberosId == 0 {
 		return nil, fmt.Errorf("failed to get kerberos ID: kerberos ID is empty")
 	}

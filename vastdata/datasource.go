@@ -12,8 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
@@ -30,7 +30,7 @@ func (d *Datasource) EmptyManager() DataSourceManager {
 func (d *Datasource) ManagerWithSchemaOnly(ctx context.Context) (DataSourceManager, error) {
 	// Get schema for the datasource to create a proper manager
 	emptyManager := d.newManager(nil, nil)
-	hints := emptyManager.TfState().Hints
+	hints := emptyManager.TfState().StateHints()
 	schema, err := schema_generation.GetDatasourceSchema(ctx, hints)
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (d *Datasource) schemaImpl(ctx context.Context, _ datasource.SchemaRequest,
 		return
 	}
 
-	resp.Schema = manager.TfState().Schema.(dschema.Schema)
+	resp.Schema = manager.TfState().SchemaDefinition().(dschema.Schema)
 }
 
 func (d *Datasource) configureImpl(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
@@ -133,18 +133,18 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 		err         error
 	)
 
-	if imp, ok := manager.(PrepareReadDatasource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("PrepareReadDatasource[%s]: do.", managerName))
-		if err = imp.PrepareReadDatasource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("PrepareReadDatasource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	if err = forEachHook(manager, func(imp PrepareReadDatasource) error {
+		logging.Debug(ctx, fmt.Sprintf("PrepareReadDatasource[%s]: do.", managerName))
+		return imp.PrepareReadDatasource(ctx, rest)
+	}); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("PrepareReadDatasource[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
-	tflog.Debug(
+	logging.Debug(
 		ctx,
 		fmt.Sprintf("Read[%q] - state:\n%s\n", managerName, tfState.Pretty()),
 	)
@@ -153,12 +153,12 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
-	if imp, ok := manager.(ReadDatasource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("ReadDatasource[%s]: do.", managerName))
+	if imp, ok := findHook[ReadDatasource](manager); ok {
+		logging.Debug(ctx, fmt.Sprintf("ReadDatasource[%s]: do.", managerName))
 		record, err = imp.ReadDatasource(ctx, rest)
 	} else {
 		// Delegate to the default read implementation
-		tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
+		logging.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
 		record, err = d.getRecordBySearchParams(ctx, manager, "Read")
 	}
 
@@ -171,8 +171,8 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 	}
 
 	if record != nil {
-		if transformer, ok := manager.(TransformResponseRecord); ok {
-			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
+		if transformer, ok := findHook[TransformResponseRecord](manager); ok {
+			logging.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
 			record = transformer.TransformResponseRecord(record.(Record))
 		}
 
@@ -193,22 +193,21 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 			return
 		}
 	} else {
-		tflog.Debug(ctx, fmt.Sprintf("Read[%s]: no record returned, skipping state update.", managerName))
+		logging.Debug(ctx, fmt.Sprintf("Read[%s]: no record returned, skipping state update.", managerName))
 	}
 
-	if imp, ok := manager.(AfterReadDatasource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterReadDatasource[%s]: do.", managerName))
-		if err = imp.AfterReadDatasource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterReadDatasource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
-
+	if err = forEachHook(manager, func(imp AfterReadDatasource) error {
+		logging.Debug(ctx, fmt.Sprintf("AfterReadDatasource[%s]: do.", managerName))
+		return imp.AfterReadDatasource(ctx, rest)
+	}); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("AfterReadDatasource[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
-	if err = tfState.SetState(ctx, &resp.State); err != nil {
+	if err = is.NewTFSdkSink(&resp.State).WriteState(ctx, tfState); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("Read[%s]: error setting state.", managerName),
 			err.Error(),
@@ -235,7 +234,7 @@ func (d *Datasource) getRecordBySearchParams(ctx context.Context, manager DataSo
 func (d *Datasource) checkNonEmptyFields(ctx context.Context, manager DataSourceManager, dg *diag.Diagnostics) bool {
 	ok := true
 	tfState := manager.TfState()
-	if tfState.Hints != nil && tfState.Hints.AllowEmptySearchParams {
+	if tfState.StateHints() != nil && tfState.StateHints().AllowEmptySearchParams {
 		return true
 	}
 	searchParams := getSearchParams(ctx, tfState, nil)
@@ -253,7 +252,7 @@ func (d *Datasource) checkNonEmptyFields(ctx context.Context, manager DataSource
 		for k := range availableParams {
 			keys = append(keys, k)
 		}
-		visualization := is.BuildDataSourceAttributesString(tfState.Schema.(dschema.Schema).Attributes, false, 2)
+		visualization := is.BuildDataSourceAttributesString(tfState.SchemaDefinition().(dschema.Schema).Attributes, false, 2)
 
 		dg.AddAttributeError(
 			path.Root(""),

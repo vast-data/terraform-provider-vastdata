@@ -17,11 +17,11 @@ var UserSchemaRef = is.NewSchemaReference(
 )
 
 type User struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *User) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &User{tfstate: is.NewTFStateMust(
+	return &User{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -40,7 +40,7 @@ func (m *User) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 }
 
 func (m *User) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &User{tfstate: is.NewTFStateMust(
+	return &User{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -49,7 +49,7 @@ func (m *User) NewDatasourceManager(raw map[string]attr.Value, schema any) DataS
 	}
 }
 
-func (m *User) TfState() *is.TFState {
+func (m *User) TfState() is.ResourceState {
 	return m.tfstate
 }
 

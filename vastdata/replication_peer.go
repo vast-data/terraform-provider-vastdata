@@ -16,11 +16,11 @@ var ReplicationPeersSchemaRef = is.NewSchemaReference(
 )
 
 type ReplicationPeer struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ReplicationPeer{tfstate: is.NewTFStateMust(
+	return &ReplicationPeer{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -45,7 +45,7 @@ func (m *ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema a
 }
 
 func (m *ReplicationPeer) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ReplicationPeer{tfstate: is.NewTFStateMust(
+	return &ReplicationPeer{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -54,7 +54,7 @@ func (m *ReplicationPeer) NewDatasourceManager(raw map[string]attr.Value, schema
 	}
 }
 
-func (m *ReplicationPeer) TfState() *is.TFState {
+func (m *ReplicationPeer) TfState() is.ResourceState {
 	return m.tfstate
 }
 

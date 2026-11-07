@@ -12,8 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 var VmsNetworkSettingsSchemaRef = is.NewSchemaReference(
@@ -44,11 +44,11 @@ var vmsNetworkSettingsPatchFields = []string{
 }
 
 type VmsNetworkSettings struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *VmsNetworkSettings) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &VmsNetworkSettings{tfstate: is.NewTFStateMust(
+	return &VmsNetworkSettings{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -72,7 +72,7 @@ func (m *VmsNetworkSettings) NewResourceManager(raw map[string]attr.Value, schem
 }
 
 func (m *VmsNetworkSettings) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &VmsNetworkSettings{tfstate: is.NewTFStateMust(
+	return &VmsNetworkSettings{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -101,7 +101,7 @@ func (m *VmsNetworkSettings) NewDatasourceManager(raw map[string]attr.Value, sch
 	)}
 }
 
-func (m *VmsNetworkSettings) TfState() *is.TFState {
+func (m *VmsNetworkSettings) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -171,7 +171,7 @@ func updateVmsNetworkSettings(ctx context.Context, vmsId int64, overlay params, 
 
 	if len(overlay) == 0 || vmsNetworkSettingsOverlayMatches(transformed, overlay) {
 		if len(overlay) > 0 {
-			tflog.Info(ctx, "VMS network settings already match config; skipping PATCH")
+			logging.Info(ctx, "VMS network settings already match config; skipping PATCH")
 		}
 		return transformed, nil
 	}

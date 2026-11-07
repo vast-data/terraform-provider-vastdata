@@ -20,11 +20,11 @@ var CnodeBgpConfigSchemaRef = is.NewSchemaReference(
 )
 
 type CnodeBgpConfig struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *CnodeBgpConfig) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &CnodeBgpConfig{tfstate: is.NewTFStateMust(
+	return &CnodeBgpConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -40,7 +40,7 @@ func (m *CnodeBgpConfig) NewResourceManager(raw map[string]attr.Value, schema an
 }
 
 func (m *CnodeBgpConfig) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &CnodeBgpConfig{tfstate: is.NewTFStateMust(
+	return &CnodeBgpConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -55,7 +55,7 @@ func (m *CnodeBgpConfig) NewDatasourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *CnodeBgpConfig) TfState() *is.TFState {
+func (m *CnodeBgpConfig) TfState() is.ResourceState {
 	return m.tfstate
 }
 

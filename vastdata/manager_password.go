@@ -19,11 +19,11 @@ var ManagerPasswordSchemaRef = is.NewSchemaReference(
 )
 
 type ManagerPassword struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ManagerPassword) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ManagerPassword{tfstate: is.NewTFStateMust(
+	return &ManagerPassword{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -35,7 +35,7 @@ func (m *ManagerPassword) NewResourceManager(raw map[string]attr.Value, schema a
 		},
 	)}
 }
-func (m *ManagerPassword) TfState() *is.TFState {
+func (m *ManagerPassword) TfState() is.ResourceState {
 	return m.tfstate
 }
 

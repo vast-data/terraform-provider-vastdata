@@ -18,11 +18,11 @@ var IamRoleCredentialsSchemaRef = is.NewSchemaReference(
 )
 
 type IamRoleCredentials struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *IamRoleCredentials) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &IamRoleCredentials{tfstate: is.NewTFStateMust(
+	return &IamRoleCredentials{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -37,7 +37,7 @@ func (m *IamRoleCredentials) NewDatasourceManager(raw map[string]attr.Value, sch
 	)}
 }
 
-func (m *IamRoleCredentials) TfState() *is.TFState {
+func (m *IamRoleCredentials) TfState() is.ResourceState {
 	return m.tfstate
 }
 

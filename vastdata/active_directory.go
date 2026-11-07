@@ -31,11 +31,11 @@ var ActiveDirectorySchemaRef = is.NewSchemaReference(
 )
 
 type ActiveDirectory struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ActiveDirectory{tfstate: is.NewTFStateMust(
+	return &ActiveDirectory{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -62,7 +62,7 @@ func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema a
 }
 
 func (m *ActiveDirectory) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ActiveDirectory{tfstate: is.NewTFStateMust(
+	return &ActiveDirectory{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -71,7 +71,7 @@ func (m *ActiveDirectory) NewDatasourceManager(raw map[string]attr.Value, schema
 	)}
 }
 
-func (m *ActiveDirectory) TfState() *is.TFState {
+func (m *ActiveDirectory) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -150,7 +150,7 @@ func (m *ActiveDirectory) shouldLeaveAD(currentState string, enabled bool) bool 
 // Takes both state and plan TFStates (plan can be nil) and uses fallback pattern
 // to get values from plan first, then state
 // forceEnabled can be used to override the enabled value (e.g., for deletion to force leave)
-func (m *ActiveDirectory) processADJoinLeave(ctx context.Context, stateTs, planTs *is.TFState, rest *VMSRest, record Record, forceEnabled *bool) error {
+func (m *ActiveDirectory) processADJoinLeave(ctx context.Context, stateTs, planTs is.ResourceState, rest *VMSRest, record Record, forceEnabled *bool) error {
 	// Get enabled from plan first, fallback to state, or use forced value
 	var enabled bool
 	var hasEnabled bool

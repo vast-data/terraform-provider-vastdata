@@ -20,11 +20,11 @@ var CertificateSchemaRef = is.NewSchemaReference(
 )
 
 type Certificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Certificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Certificate{tfstate: is.NewTFStateMust(
+	return &Certificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -56,7 +56,7 @@ func (m *Certificate) NewResourceManager(raw map[string]attr.Value, schema any) 
 }
 
 func (m *Certificate) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Certificate{tfstate: is.NewTFStateMust(
+	return &Certificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -65,7 +65,7 @@ func (m *Certificate) NewDatasourceManager(raw map[string]attr.Value, schema any
 	)}
 }
 
-func (m *Certificate) TfState() *is.TFState {
+func (m *Certificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 

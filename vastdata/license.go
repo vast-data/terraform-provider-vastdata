@@ -18,11 +18,11 @@ var LicenseSchemaRef = is.NewSchemaReference(
 )
 
 type License struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *License) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &License{tfstate: is.NewTFStateMust(
+	return &License{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -42,7 +42,7 @@ func (m *License) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 }
 
 func (m *License) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &License{tfstate: is.NewTFStateMust(
+	return &License{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -63,7 +63,7 @@ func (m *License) NewDatasourceManager(raw map[string]attr.Value, schema any) Da
 	)}
 }
 
-func (m *License) TfState() *is.TFState {
+func (m *License) TfState() is.ResourceState {
 	return m.tfstate
 }
 

@@ -23,11 +23,11 @@ var CallhomeConfigSchemaRef = is.NewSchemaReference(
 var callhomeConfigRegisterTimeout = 10 * time.Minute
 
 type CallhomeConfig struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *CallhomeConfig) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &CallhomeConfig{tfstate: is.NewTFStateMust(
+	return &CallhomeConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -92,7 +92,7 @@ func (m *CallhomeConfig) NewResourceManager(raw map[string]attr.Value, schema an
 }
 
 func (m *CallhomeConfig) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &CallhomeConfig{tfstate: is.NewTFStateMust(
+	return &CallhomeConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -107,7 +107,7 @@ func (m *CallhomeConfig) NewDatasourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *CallhomeConfig) TfState() *is.TFState {
+func (m *CallhomeConfig) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -146,7 +146,7 @@ func (m *CallhomeConfig) DeleteResource(_ context.Context, _ *VMSRest) error {
 	return nil
 }
 
-func ensureCallhomeConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
+func ensureCallhomeConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs is.ResourceState, rest *VMSRest) (DisplayableRecord, error) {
 	id := stateTs.Int64("id")
 	if id == 0 {
 		return nil, fmt.Errorf("id is required")
@@ -185,7 +185,7 @@ func ensureCallhomeConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.
 	return rest.CallhomeConfigs.GetByIdWithContext(ctx, id)
 }
 
-func registerCallhomeClusterIfNeeded(ctx context.Context, id int64, ts *is.TFState, rest *VMSRest) error {
+func registerCallhomeClusterIfNeeded(ctx context.Context, id int64, ts is.ResourceState, rest *VMSRest) error {
 	email, password, token := "", "", ""
 	if ts.IsKnownAndNotNull("uplink_email") {
 		email = ts.String("uplink_email")

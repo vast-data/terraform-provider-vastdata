@@ -18,11 +18,11 @@ var TopicSchemaRef = is.NewSchemaReference(
 )
 
 type Topic struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Topic) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Topic{tfstate: is.NewTFStateMust(
+	return &Topic{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -33,7 +33,7 @@ func (m *Topic) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 }
 
 func (m *Topic) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Topic{tfstate: is.NewTFStateMust(
+	return &Topic{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -42,7 +42,7 @@ func (m *Topic) NewDatasourceManager(raw map[string]attr.Value, schema any) Data
 	)}
 }
 
-func (m *Topic) TfState() *is.TFState {
+func (m *Topic) TfState() is.ResourceState {
 	return m.tfstate
 }
 

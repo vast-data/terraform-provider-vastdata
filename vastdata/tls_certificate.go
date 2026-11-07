@@ -8,9 +8,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 // POST /tlscertificates/ uses multipart/form-data which the schema generator
@@ -24,11 +24,11 @@ var TlsCertificateSchemaRef = is.NewSchemaReference(
 )
 
 type TlsCertificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *TlsCertificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &TlsCertificate{tfstate: is.NewTFStateMust(
+	return &TlsCertificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -59,7 +59,7 @@ func (m *TlsCertificate) NewResourceManager(raw map[string]attr.Value, schema an
 }
 
 func (m *TlsCertificate) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TlsCertificate{tfstate: is.NewTFStateMust(
+	return &TlsCertificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -68,7 +68,7 @@ func (m *TlsCertificate) NewDatasourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *TlsCertificate) TfState() *is.TFState {
+func (m *TlsCertificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -89,7 +89,7 @@ func (m *TlsCertificate) PrepareCreateResource(ctx context.Context, rest *VMSRes
 	if warnings, ok := result["warnings"]; ok {
 		if ws, ok := warnings.([]any); ok && len(ws) > 0 {
 			for _, w := range ws {
-				tflog.Warn(ctx, fmt.Sprintf("TlsCertificate is_operation_healthy warning: %v", w))
+				logging.Warn(ctx, fmt.Sprintf("TlsCertificate is_operation_healthy warning: %v", w))
 			}
 		}
 	}

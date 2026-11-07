@@ -16,11 +16,11 @@ var S3ReplicationPeerSchemaRef = is.NewSchemaReference(
 )
 
 type S3ReplicationPeer struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *S3ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &S3ReplicationPeer{tfstate: is.NewTFStateMust(
+	return &S3ReplicationPeer{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -31,7 +31,7 @@ func (m *S3ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema
 }
 
 func (m *S3ReplicationPeer) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &S3ReplicationPeer{tfstate: is.NewTFStateMust(
+	return &S3ReplicationPeer{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -40,7 +40,7 @@ func (m *S3ReplicationPeer) NewDatasourceManager(raw map[string]attr.Value, sche
 	)}
 }
 
-func (m *S3ReplicationPeer) TfState() *is.TFState {
+func (m *S3ReplicationPeer) TfState() is.ResourceState {
 	return m.tfstate
 }
 

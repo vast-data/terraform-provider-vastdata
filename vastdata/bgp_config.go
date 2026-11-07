@@ -15,11 +15,11 @@ var BgpConfigSchemaRef = is.NewSchemaReference(
 )
 
 type BgpConfig struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *BgpConfig) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &BgpConfig{tfstate: is.NewTFStateMust(
+	return &BgpConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -29,7 +29,7 @@ func (m *BgpConfig) NewResourceManager(raw map[string]attr.Value, schema any) Re
 }
 
 func (m *BgpConfig) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &BgpConfig{tfstate: is.NewTFStateMust(
+	return &BgpConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *BgpConfig) NewDatasourceManager(raw map[string]attr.Value, schema any) 
 	)}
 }
 
-func (m *BgpConfig) TfState() *is.TFState {
+func (m *BgpConfig) TfState() is.ResourceState {
 	return m.tfstate
 }
 

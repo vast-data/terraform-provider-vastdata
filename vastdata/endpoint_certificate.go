@@ -125,7 +125,7 @@ type endpointCertificateOps struct {
 	get         func(ctx context.Context, rest *VMSRest, parentID int64) (Record, error)
 }
 
-func (o *endpointCertificateOps) parentID(ts *is.TFState) (int64, error) {
+func (o *endpointCertificateOps) parentID(ts is.ResourceState) (int64, error) {
 	if ts.IsKnownAndNotNull(o.parentAttr) {
 		if id := ts.Int64(o.parentAttr); id != 0 {
 			return id, nil
@@ -267,7 +267,7 @@ func formatAPIDistinguishedName(raw any) string {
 	return name.String()
 }
 
-func (o *endpointCertificateOps) Read(ctx context.Context, rest *VMSRest, ts *is.TFState) (DisplayableRecord, error) {
+func (o *endpointCertificateOps) Read(ctx context.Context, rest *VMSRest, ts is.ResourceState) (DisplayableRecord, error) {
 	parentID, err := o.parentID(ts)
 	if err != nil {
 		return nil, err
@@ -285,7 +285,7 @@ func (o *endpointCertificateOps) Read(ctx context.Context, rest *VMSRest, ts *is
 	return o.metadataRecord(parentID, pemData, parent), nil
 }
 
-func (o *endpointCertificateOps) Apply(ctx context.Context, rest *VMSRest, ts *is.TFState) (DisplayableRecord, error) {
+func (o *endpointCertificateOps) Apply(ctx context.Context, rest *VMSRest, ts is.ResourceState) (DisplayableRecord, error) {
 	parentID, err := o.parentID(ts)
 	if err != nil {
 		return nil, err
@@ -354,6 +354,6 @@ func (o *endpointCertificateOps) ModifyPlan(ctx context.Context, req resource.Mo
 	return nil
 }
 
-func newResourceTFState(raw map[string]attr.Value, schema any, hints *is.TFStateHints) *is.TFState {
-	return is.NewTFStateMust(raw, schema, hints)
+func newResourceTFState(raw map[string]attr.Value, schema any, hints *is.TFStateHints) is.ResourceState {
+	return is.NewResourceState(raw, schema, hints)
 }

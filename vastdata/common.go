@@ -17,26 +17,30 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/go-test/deep"
+	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
 	"github.com/vast-data/go-vast-client/resources/untyped"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
@@ -86,6 +90,43 @@ func (CustomImportOnly) Error() string {
 	return "custom-import-only"
 }
 
+// cached decorates fn so it runs once. The cache object lives in the returned
+// closure and is named after fn; the name comes from the function itself.
+func cached[T any](fn func() T) func() T {
+	c := &onceCache[T]{name: callableName(fn)}
+	if c.name == "" {
+		panic("cached: cannot determine wrapped function name")
+	}
+	return func() T {
+		c.once.Do(func() { c.value = fn() })
+		return c.value
+	}
+}
+
+// onceCache is the value closed over by cached.
+type onceCache[T any] struct {
+	name  string
+	once  sync.Once
+	value T
+}
+
+// callableName returns the wrapped function's name, without the package path.
+func callableName(fn any) string {
+	v := reflect.ValueOf(fn)
+	if !v.IsValid() || v.Kind() != reflect.Func || v.IsNil() {
+		return ""
+	}
+	pc := runtime.FuncForPC(v.Pointer())
+	if pc == nil {
+		return ""
+	}
+	name := pc.Name()
+	if i := strings.LastIndex(name, "."); i >= 0 {
+		name = name[i+1:]
+	}
+	return name
+}
+
 // ignoreResourceGone treats client NotFoundError and HTTP 404 as success (resource already gone).
 func ignoreResourceGone(err error) error {
 	if err == nil || isNotFoundErr(err) {
@@ -104,13 +145,13 @@ func ignoreResourceGone(err error) error {
 //
 // This handles the common API pattern where responses contain nested objects
 // like {tenant: {id: 1, name: "foo"}} but the schema expects tenant_id: 1
-func PopulateIDFieldsFromNestedObjects(ctx context.Context, tfstate *is.TFState, record Record) {
+func PopulateIDFieldsFromNestedObjects(ctx context.Context, tfstate is.ResourceState, record Record) {
 	if record == nil || tfstate == nil {
 		return
 	}
 
 	// Iterate over all tfstate keys
-	for key := range tfstate.Raw {
+	for key := range tfstate.RawValues() {
 		// Check if key ends with "_id"
 		if !strings.HasSuffix(key, "_id") {
 			continue
@@ -140,7 +181,7 @@ func PopulateIDFieldsFromNestedObjects(ctx context.Context, tfstate *is.TFState,
 		// Try to extract "id" from the parent object
 		if id, idExists := parentMap["id"]; idExists && id != nil {
 			record[key] = id
-			tflog.Debug(ctx, fmt.Sprintf(
+			logging.Debug(ctx, fmt.Sprintf(
 				"PopulateIDFieldsFromNestedObjects: extracted %s=%v from %s.id",
 				key, id, parentKey,
 			))
@@ -176,19 +217,9 @@ const (
 
 func withContext(ctx context.Context, method string, managerName string, fn func(ctx context.Context)) {
 	ctx = client.ContextWithRequestID(ctx)
-	tflog.Debug(ctx, fmt.Sprintf("◉ %s[%s] start", method, managerName))
-	defer tflog.Debug(ctx, fmt.Sprintf("◉ %s[%s] end", method, managerName))
+	logging.Debug(ctx, fmt.Sprintf("◉ %s[%s] start", method, managerName))
+	defer logging.Debug(ctx, fmt.Sprintf("◉ %s[%s] end", method, managerName))
 	fn(ctx)
-}
-
-func safeDeepEqual(expected, actual any) (diff []string, panicked bool) {
-	defer func() {
-		if r := recover(); r != nil {
-			panicked = true
-		}
-	}()
-	diff = deep.Equal(expected, actual, deep.FLAG_IGNORE_SLICE_ORDER)
-	return diff, false
 }
 
 // isZeroValue reports whether v is the zero value for its type
@@ -217,7 +248,7 @@ func deleteZeroValues(params map[string]any, fields []string) {
 
 // validateOneOf ensures that at most one of the given fields is set (i.e., known and not null).
 // Returns an error if more than one field is set.
-func validateOneOf(tf *is.TFState, fields ...string) error {
+func validateOneOf(tf is.ResourceState, fields ...string) error {
 	var setFields []string
 	var fieldDeclared bool
 
@@ -240,7 +271,7 @@ func validateOneOf(tf *is.TFState, fields ...string) error {
 
 // validateAllOf ensures that all the given fields are set (i.e., known and not null).
 // Returns an error listing the fields that are missing.
-func validateAllOf(tf *is.TFState, fields ...string) error {
+func validateAllOf(tf is.ResourceState, fields ...string) error {
 	var missing []string
 
 	for _, field := range fields {
@@ -258,7 +289,7 @@ func validateAllOf(tf *is.TFState, fields ...string) error {
 
 // validateNoneOf ensures that none of the given fields are set (i.e., all are null or unknown).
 // Returns an error listing the fields that were incorrectly set.
-func validateNoneOf(tf *is.TFState, fields ...string) error {
+func validateNoneOf(tf is.ResourceState, fields ...string) error {
 	var setFields []string
 
 	for _, field := range fields {
@@ -275,7 +306,7 @@ func validateNoneOf(tf *is.TFState, fields ...string) error {
 }
 
 // ValidateFieldIsOneOf ensures that the specified field in allows only a limited set of valid values.
-func ValidateFieldIsOneOf[T string | int64 | float64](tfState *is.TFState, field string, validValues ...T) error {
+func ValidateFieldIsOneOf[T string | int64 | float64](tfState is.ResourceState, field string, validValues ...T) error {
 	if !tfState.IsKnownAndNotNull(field) {
 		return nil // Field is not set, no validation needed
 	}
@@ -302,7 +333,7 @@ func ValidateFieldIsOneOf[T string | int64 | float64](tfState *is.TFState, field
 }
 
 // ValidateFieldIsNoneOf ensures that the specified field in allows none of the invalid values.
-func ValidateFieldIsNoneOf[T string | int64 | float64](tfState *is.TFState, field string, invalidValues ...T) error {
+func ValidateFieldIsNoneOf[T string | int64 | float64](tfState is.ResourceState, field string, invalidValues ...T) error {
 	if !tfState.IsKnownAndNotNull(field) {
 		return nil // Field is not set, no validation needed
 	}
@@ -328,7 +359,7 @@ func ValidateFieldIsNoneOf[T string | int64 | float64](tfState *is.TFState, fiel
 	return nil
 }
 
-func ensureNotChanged(tfState *is.TFState, planTfState *is.TFState, fields ...string) error {
+func ensureNotChanged(tfState is.ResourceState, planTfState is.ResourceState, fields ...string) error {
 	for _, field := range fields {
 		if planTfState.IsUnknown(field) {
 			continue
@@ -356,9 +387,9 @@ func ensureNotChanged(tfState *is.TFState, planTfState *is.TFState, fields ...st
 // Returns:
 //   - map[string]any: a map of search fields extracted from state (e.g., id, guid, name, etc.)
 //   - error: if no searchable fields are found
-func getSearchParams(ctx context.Context, tfState, planTfState *is.TFState) params {
+func getSearchParams(ctx context.Context, tfState, planTfState is.ResourceState) params {
 	searchParams := tfState.GetGenericSearchParams(ctx)
-	if planTfState != nil {
+	if !is.IsNilState(planTfState) {
 		if sp := planTfState.GetReadOnlySearchParams(); len(sp) > 0 {
 			for k, v := range sp {
 				searchParams[k] = v
@@ -386,7 +417,7 @@ func getSearchParams(ctx context.Context, tfState, planTfState *is.TFState) para
 // Returns:
 //   - DisplayableRecord: the found record
 //   - error: if not found or all lookups fail
-func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState *is.TFState, planTfState *is.TFState, managerName, op string) (DisplayableRecord, error) {
+func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState is.ResourceState, planTfState is.ResourceState, managerName, op string) (DisplayableRecord, error) {
 	var (
 		record DisplayableRecord
 		err    error
@@ -407,14 +438,21 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 
 	// Attempt 1: get resource by ID.
 	if idExists {
-		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
+		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
 		// If the ID is set, we assume it's a direct call by ID
 		record, err = api.GetByIdWithContext(ctx, id)
 	}
 	// Attempt 2: get resource by GUID.
+	// Listed: some endpoints ignore the guid query parameter and
+	// return every record, which Get rejects as "too many records". The guid is compared
+	// here, and a list with no match is a 404 so the caller treats it as not found.
 	if (!idExists || expectStatusCodes(err, http.StatusNotFound)) && guidExists {
-		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found GUID = %v.", op, managerName, guid))
-		record, err = api.GetWithContext(ctx, params{"guid": guid})
+		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found GUID = %v.", op, managerName, guid))
+		var records RecordSet
+		records, err = api.ListWithContext(ctx, params{"guid": guid})
+		if err == nil {
+			record, err = recordByGUID(records, guid)
+		}
 	}
 	// Attempt 3: if both ID and GUID are not set or both reads failed, we use the search parameters.
 	if (!idExists && !guidExists) || expectStatusCodes(err, http.StatusNotFound) {
@@ -422,14 +460,14 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 		searchParams.Without("id", "guid")
 		if len(searchParams) > 0 {
 			if !idExists && !guidExists {
-				tflog.Debug(
+				logging.Debug(
 					ctx,
 					fmt.Sprintf("%s[%s]: no ID or GUID set, using search parameters %v.",
 						op, managerName, searchParams,
 					),
 				)
 			} else {
-				tflog.Debug(
+				logging.Debug(
 					ctx,
 					fmt.Sprintf("%s[%s]: ID %v or GUID %v not found, using search parameters %v.",
 						op, managerName, id, guid, searchParams,
@@ -444,6 +482,25 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 
 }
 
+// recordByGUID returns the record whose guid equals want. No match is a 404 ApiError, which
+// the callers of getRecordBySearchParams already treat as "not found".
+func recordByGUID(records RecordSet, want any) (Record, error) {
+	wanted := fmt.Sprint(want)
+	for _, rec := range records {
+		if rec == nil {
+			continue
+		}
+		got, ok := rec["guid"]
+		if ok && fmt.Sprint(got) == wanted {
+			return rec, nil
+		}
+	}
+	return nil, &ApiError{
+		StatusCode: http.StatusNotFound,
+		Body:       fmt.Sprintf("no record with guid %s", wanted),
+	}
+}
+
 // deleteRecordBySearchParams attempts to delete a resource by ID (preferred) or by generic search parameters.
 // It also supports appending additional deletion parameters using TFState hints (DeleteOnlyFields).
 //
@@ -456,7 +513,7 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 //
 // Returns:
 //   - error: any error that occurred during deletion, excluding 404s (they are ignored)
-func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState *is.TFState, managerName, op string) (vast_client.Record, error) {
+func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState is.ResourceState, managerName, op string) (vast_client.Record, error) {
 	var err error
 	var result vast_client.Record
 	searchParams := getSearchParams(ctx, tfState, nil)
@@ -472,19 +529,19 @@ func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithCont
 
 	var deleteBodyParams map[string]any
 	var deleteQueryParams map[string]any
-	if len(tfState.Hints.DeleteOnlyBodyFields) > 0 {
+	if len(tfState.StateHints().DeleteOnlyBodyFields) > 0 {
 		deleteBodyParams = tfState.GetDeleteOnlyBodyParams()
 	}
-	if len(tfState.Hints.DeleteOnlyParamFields) > 0 {
+	if len(tfState.StateHints().DeleteOnlyParamFields) > 0 {
 		deleteQueryParams = tfState.GetDeleteOnlyQueryParams()
 	}
 
 	if id, ok := searchParams["id"]; ok {
-		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
+		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
 		// If the ID is set, we assume it's a direct call by ID
 		result, err = api.DeleteByIdWithContext(ctx, id, deleteQueryParams, deleteBodyParams)
 	} else {
-		tflog.Debug(ctx, fmt.Sprintf("%s[%s]: no ID found, using search params.", op, managerName))
+		logging.Debug(ctx, fmt.Sprintf("%s[%s]: no ID found, using search params.", op, managerName))
 		result, err = api.DeleteWithContext(ctx, searchParams, deleteQueryParams, deleteBodyParams)
 	}
 	return result, ignoreStatusCodes(err, http.StatusNotFound)
@@ -494,30 +551,6 @@ func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithCont
 // ----------------------------------
 // Transformations
 // ----------------------------------
-
-// normalizeNumber attempts to convert float64 values to int64 if they are whole numbers.
-// This is useful for decoding JSON where numbers are unmarshaled as float64,
-// but Terraform schema (or other systems) expect integer types.
-// It also recursively normalizes values in slices and maps.
-func normalizeNumber(v any) any {
-	switch n := v.(type) {
-	case float64:
-		if float64(int64(n)) == n {
-			return int64(n)
-		}
-	case []any:
-		for i, elem := range n {
-			n[i] = normalizeNumber(elem)
-		}
-		return n
-	case map[string]any:
-		for k, v := range n {
-			n[k] = normalizeNumber(v)
-		}
-		return n
-	}
-	return v
-}
 
 // convertMapKeysRecursive recursively applies a key transformation function to all
 // keys in a map[string]any and its nested structures. It also traverses lists containing maps.
@@ -553,9 +586,9 @@ func dashToUnderscore(s string) string {
 }
 
 // parseImportId parses the import ID into the TFState attributes.
-func parseImportId(importID string, tfState *is.TFState) error {
+func parseImportId(importID string, tfState is.ResourceState) error {
 	// Use default import implementation
-	hints := tfState.Hints
+	hints := tfState.StateHints()
 
 	if strings.Contains(importID, "=") {
 		// Parse key=value pairs regardless of hints
@@ -765,10 +798,344 @@ func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, tim
 }
 
 func resolveRecordAfterAsyncTask(ctx context.Context, manager ResourceManager, rest *VMSRest, record Record, managerName string) (Record, error) {
-	resolver, ok := manager.(ResolveRecordAfterAsyncTask)
+	resolver, ok := findHook[ResolveRecordAfterAsyncTask](manager)
 	if !ok {
 		return record, nil
 	}
-	tflog.Debug(ctx, fmt.Sprintf("ResolveRecordAfterAsyncTask[%s]: do.", managerName))
+	logging.Debug(ctx, fmt.Sprintf("ResolveRecordAfterAsyncTask[%s]: do.", managerName))
 	return resolver.ResolveRecordAfterAsyncTask(ctx, rest, record)
+}
+
+const (
+	defaultRetryTimes        = 5
+	defaultRetrySleepSeconds = 10
+)
+
+// ---------------------------------------
+//      HELPER FUNCTIONS
+// ---------------------------------------
+
+// parseAndApplyCompositeImport parses a composite import string into values for the given fields
+// and invokes set(key, value) with properly typed Terraform attr values.
+// Accepted formats:
+//   - key=value pairs separated by ',' (e.g., "gid=1001,tenant_id=22,context=ad")
+//   - ordered values separated by '|' matching fields order
+func parseAndApplyCompositeImport(importID string, fields []string, tfState is.ResourceState, set func(string, attr.Value)) error {
+	kv := make(map[string]string)
+	s := strings.TrimSpace(importID)
+	if s == "" {
+		return fmt.Errorf("empty import id")
+	}
+
+	if strings.Contains(s, "=") {
+		// Handle key=value comma-separated format
+		sep := ","
+		if strings.Contains(s, ";") {
+			sep = ";"
+		}
+		parts := strings.Split(s, sep)
+		for _, p := range parts {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			kvPair := strings.SplitN(p, "=", 2)
+			if len(kvPair) != 2 {
+				return fmt.Errorf("segment %q is not in key=value form", p)
+			}
+			key := strings.TrimSpace(kvPair[0])
+			val := strings.TrimSpace(kvPair[1])
+			kv[key] = val
+		}
+	} else if strings.Contains(s, "|") {
+		// Handle ordered pipe-separated values
+		values := strings.Split(s, "|")
+		if len(values) != len(fields) {
+			return fmt.Errorf("expected %d values for fields %v, got %d", len(fields), fields, len(values))
+		}
+		for i, f := range fields {
+			kv[f] = strings.TrimSpace(values[i])
+		}
+	} else {
+		// Handle single token - treat as "id" field
+		if tfState.HasAttribute("id") {
+			kv["id"] = s
+		} else {
+			return fmt.Errorf("single token provided but no 'id' field available in schema")
+		}
+	}
+
+	// Set parsed fields with type coercion and schema validation
+	for f, val := range kv {
+		if !tfState.HasAttribute(f) {
+			return fmt.Errorf("field %q is not present in the schema", f)
+		}
+		t := tfState.Type(f)
+		switch {
+		case t.Equal(types.Int64Type):
+			n, perr := strconv.ParseInt(val, 10, 64)
+			if perr != nil {
+				return fmt.Errorf("invalid int64 for %q: %v", f, perr)
+			}
+			set(f, types.Int64Value(n))
+		case t.Equal(types.StringType):
+			set(f, types.StringValue(val))
+		case t.Equal(types.BoolType):
+			bv := strings.EqualFold(val, "true") || val == "1"
+			set(f, types.BoolValue(bv))
+		default:
+			// fallback: attempt passthrough as string
+			set(f, types.StringValue(val))
+		}
+	}
+	return nil
+}
+
+func (r *Resource) getRecordBySearchParams(ctx context.Context, manager, planManager ResourceManager, op string) (DisplayableRecord, error) {
+	var (
+		rest                         = r.providerData.Client
+		managerName                  = r.managerName
+		tfState                      = manager.TfState()
+		planTfState is.ResourceState = nil
+		api                          = manager.API(rest)
+	)
+	if planManager != nil {
+		planTfState = planManager.TfState()
+	}
+
+	return getRecordBySearchParams(ctx, api, tfState, planTfState, managerName, op)
+
+}
+
+func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager ResourceManager, op string) (Record, error) {
+	var (
+		rest        = r.providerData.Client
+		managerName = r.managerName
+		tfState     = manager.TfState()
+		api         = manager.API(rest)
+	)
+	return deleteRecordBySearchParams(ctx, api, tfState, managerName, op)
+}
+
+func (r *Resource) checkNonEmptyFields(ctx context.Context, manager ResourceManager, dg *diag.Diagnostics) bool {
+	ok := true
+	tfState := manager.TfState()
+	searchParams := getSearchParams(ctx, tfState, nil)
+	if len(searchParams) == 0 {
+		ok = false
+		availableParams := tfState.GetFilteredValues(
+			is.FilterOr,
+			nil,
+			is.SearchEmpty,
+			is.SearchRequired,
+			is.SearchSearchable,
+		)
+		keys := make([]string, 0, len(availableParams))
+		for k := range availableParams {
+			keys = append(keys, k)
+		}
+		visualization := is.BuildResourceAttributesString(tfState.SchemaDefinition().(rschema.Schema).Attributes, false, 2)
+		managerName := r.managerName
+		if len(keys) > 0 {
+			dg.AddAttributeError(
+				path.Root(""),
+				fmt.Sprintf("No searchable fields provided for %q resource.", managerName),
+				fmt.Sprintf(
+					"Schema:\n%s\nAt least one of the following fields must be set: %+v",
+					visualization,
+					keys,
+				),
+			)
+		} else {
+			dg.AddAttributeError(
+				path.Root(""),
+				fmt.Sprintf("No searchable fields provided for %q resource.", managerName),
+				fmt.Sprintf(
+					"Schema:\n%s\nNone of the fields are marked as required or searchable in the OpenAPI schema for %q.\n"+
+						"This typically indicates a missing or incomplete schema definition.",
+					visualization,
+					managerName,
+				),
+			)
+		}
+	}
+	return ok
+}
+
+// WithRetry wraps fn with retry logic driven by expr.
+// operation is used for log messages (e.g. "CreateResource", "DeleteResource").
+//
+// A retry is attempted when:
+//  1. The call returns an *ApiError whose StatusCode is listed in expr.StatusCodes, AND
+//  2. If expr.BodyContains is non-empty, at least one substring is present in the response body.
+//
+// Any other error type is returned immediately without retrying.
+func WithRetry[T any](
+	expr *is.RetryExpression,
+	operation, managerName string,
+	fn func(context.Context, *VMSRest) (T, error),
+) func(context.Context, *VMSRest) (T, error) {
+	return func(ctx context.Context, rest *VMSRest) (T, error) {
+		return retryOnExpression(ctx, expr, operation, managerName, func() (T, error) {
+			return fn(ctx, rest)
+		})
+	}
+}
+
+// retryOnExpression retries fn when it returns an error matching expr.
+func retryOnExpression[T any](
+	ctx context.Context,
+	expr *is.RetryExpression,
+	operation string,
+	scope string,
+	fn func() (T, error),
+) (T, error) {
+	var zero T
+	maxAttempts := expr.Times
+	if maxAttempts <= 0 {
+		maxAttempts = defaultRetryTimes
+	}
+	sleepSecs := expr.SleepSeconds
+	if sleepSecs <= 0 {
+		sleepSecs = defaultRetrySleepSeconds
+	}
+
+	var lastErr error
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		result, err := fn()
+		if err == nil {
+			if attempt > 1 {
+				logging.Info(ctx, fmt.Sprintf(
+					"%s[%s]: succeeded on attempt %d/%d.",
+					operation, scope, attempt, maxAttempts,
+				))
+			}
+			return result, nil
+		}
+
+		lastErr = err
+		if !shouldRetry(expr, err) {
+			return zero, err
+		}
+
+		logging.Warn(ctx, fmt.Sprintf(
+			"%s[%s]: attempt %d/%d failed (%s), retrying in %ds...",
+			operation, scope, attempt, maxAttempts, err.Error(), sleepSecs,
+		))
+
+		if attempt < maxAttempts {
+			time.Sleep(time.Duration(sleepSecs) * time.Second)
+		}
+	}
+
+	return zero, fmt.Errorf(
+		"%s[%s]: all %d attempts failed, last error: %w",
+		operation, scope, maxAttempts, lastErr,
+	)
+}
+
+// shouldRetry returns true when err satisfies the retry conditions defined in expr.
+func shouldRetry(expr *is.RetryExpression, err error) bool {
+	if !expectStatusCodes(err, expr.StatusCodes...) {
+		return false
+	}
+
+	if len(expr.BodyContains) == 0 {
+		return true
+	}
+	var apiErr *ApiError
+	if !errors.As(err, &apiErr) {
+		return true
+	}
+	for _, pattern := range expr.BodyContains {
+		if strings.Contains(apiErr.Body, pattern) {
+			return true
+		}
+	}
+	return false
+}
+
+// mergeSubResources calls GetSubResources (if implemented) and merges the
+// returned Record into the main record before FillFromRecord is called.
+// This keeps sub-resource data out of tfstate manipulation: the merged record
+// is the single source used to populate state.
+// manager may be a ResourceManager or a DataSourceManager — only the
+// GetSubResources interface is required.
+//
+// If at least one sub-resource hint declares MinVastVersion, the cluster version
+// is retrieved once (using the process-level cache) and passed to GetSubResources.
+// The implementation is then responsible for using clusterVersion to gate fetches.
+// When no hint uses MinVastVersion, nil is passed — implementations must tolerate nil.
+type hasTFState interface {
+	TfState() is.ResourceState
+}
+
+func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record DisplayableRecord, managerName string) error {
+	if record == nil {
+		return nil
+	}
+
+	var hints *is.TFStateHints
+	if hts, ok := manager.(hasTFState); ok {
+		hints = hts.TfState().StateHints()
+		if hints == nil || len(hints.SubResources) == 0 {
+			return nil
+		}
+	}
+
+	imp, ok := findHook[GetSubResources](manager)
+	if !ok {
+		return nil
+	}
+
+	// Fetch cluster version exactly once if any hint requires it.
+	// The result is passed into GetSubResources so implementations
+	// don't need to call GetCachedClusterVersion themselves.
+	var clusterVersion *version.Version
+	if hints != nil {
+		for _, sr := range hints.SubResources {
+			if sr.MinVastVersion != nil {
+				v, err := GetCachedClusterVersion(ctx, rest)
+				if err != nil {
+					logging.Warn(ctx, fmt.Sprintf(
+						"mergeSubResources[%s]: cannot retrieve cluster version for MinVastVersion check: %v",
+						managerName, err,
+					))
+				} else {
+					clusterVersion = v
+				}
+				break
+			}
+		}
+	}
+
+	logging.Debug(ctx, fmt.Sprintf("GetSubResources[%s]: do.", managerName))
+	sub, err := imp.GetSubResources(ctx, rest, record.(Record), clusterVersion)
+	if err != nil {
+		return err
+	}
+	if sub != nil {
+		for k, v := range sub {
+			record.(Record)[k] = v
+		}
+		return nil
+	}
+
+	// GetSubResources returned nil — the trigger is off or fetch was skipped.
+	if rm, ok := manager.(ResourceManager); ok {
+		if h := rm.TfState().StateHints(); h != nil {
+			for _, sr := range h.SubResources {
+				if sr.SchemaKey != "" {
+					// Nested sub-resource: null the top-level key.
+					record.(Record)[sr.SchemaKey] = nil
+				} else {
+					// Flat sub-resource: null each declared attribute individually.
+					for k := range sr.SchemaAttributes {
+						record.(Record)[k] = nil
+					}
+				}
+			}
+		}
+	}
+	return nil
 }

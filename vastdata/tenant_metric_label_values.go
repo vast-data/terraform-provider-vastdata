@@ -22,11 +22,11 @@ var TenantMetricLabelValuesSchemaRef = is.NewSchemaReference(
 )
 
 type TenantMetricLabelValues struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *TenantMetricLabelValues) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &TenantMetricLabelValues{tfstate: is.NewTFStateMust(
+	return &TenantMetricLabelValues{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -46,7 +46,7 @@ func (m *TenantMetricLabelValues) NewResourceManager(raw map[string]attr.Value, 
 }
 
 func (m *TenantMetricLabelValues) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TenantMetricLabelValues{tfstate: is.NewTFStateMust(
+	return &TenantMetricLabelValues{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -66,7 +66,7 @@ func (m *TenantMetricLabelValues) NewDatasourceManager(raw map[string]attr.Value
 	)}
 }
 
-func (m *TenantMetricLabelValues) TfState() *is.TFState {
+func (m *TenantMetricLabelValues) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -152,7 +152,8 @@ func (m *TenantMetricLabelValues) DeleteResource(ctx context.Context, rest *VMSR
 	id := ts.Int64("id")
 	path := tenantMetricLabelValueItemPath(tenantID, id)
 	_, err := core.Request[Record](ctx, rest.Tenants, http.MethodDelete, path, nil, nil)
-	return err
+	// The tenant may already be gone, which removes this value with it.
+	return ignoreResourceGone(err)
 }
 
 func (m *TenantMetricLabelValues) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

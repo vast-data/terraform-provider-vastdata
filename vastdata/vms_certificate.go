@@ -21,14 +21,14 @@ var vmsCertificateHints = endpointCertificateHints(
 )
 
 type VmsCertificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *VmsCertificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &VmsCertificate{tfstate: newResourceTFState(raw, schema, vmsCertificateHints)}
 }
 
-func (m *VmsCertificate) TfState() *is.TFState {
+func (m *VmsCertificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 

@@ -21,14 +21,14 @@ var s3CertificateHints = endpointCertificateHints(
 )
 
 type S3Certificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *S3Certificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &S3Certificate{tfstate: newResourceTFState(raw, schema, s3CertificateHints)}
 }
 
-func (m *S3Certificate) TfState() *is.TFState {
+func (m *S3Certificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 

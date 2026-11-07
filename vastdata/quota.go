@@ -17,11 +17,11 @@ var QuotaSchemaRef = is.NewSchemaReference(
 )
 
 type Quota struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Quota{tfstate: is.NewTFStateMust(
+	return &Quota{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -47,7 +47,7 @@ func (m *Quota) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 }
 
 func (m *Quota) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Quota{tfstate: is.NewTFStateMust(
+	return &Quota{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -56,7 +56,7 @@ func (m *Quota) NewDatasourceManager(raw map[string]attr.Value, schema any) Data
 	}
 }
 
-func (m *Quota) TfState() *is.TFState {
+func (m *Quota) TfState() is.ResourceState {
 	return m.tfstate
 }
 

@@ -13,9 +13,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vsd "github.com/vast-data/terraform-provider-vastdata/vastdata"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 var _ provider.Provider = &VastProvider{}
@@ -144,12 +144,12 @@ func (p *VastProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	migrateMode := os.Getenv("VASTDATA_MIGRATE_MODE")
 	isMigrateMode := migrateMode == "1" || migrateMode == "true" || migrateMode == "TRUE"
 	if isMigrateMode {
-		tflog.Warn(ctx, "╔══════════════════════════════════════════════════════════════════╗")
-		tflog.Warn(ctx, "║  VASTDATA MIGRATE MODE ENABLED                                  ║")
-		tflog.Warn(ctx, "║  Create operations will READ existing resources from the cluster ║")
-		tflog.Warn(ctx, "║  Update and Delete operations will be BLOCKED (empty state only) ║")
-		tflog.Warn(ctx, "║  Use this mode to populate state from existing infrastructure    ║")
-		tflog.Warn(ctx, "╚══════════════════════════════════════════════════════════════════╝")
+		logging.Warn(ctx, "╔══════════════════════════════════════════════════════════════════╗")
+		logging.Warn(ctx, "║  VASTDATA MIGRATE MODE ENABLED                                  ║")
+		logging.Warn(ctx, "║  Create operations will READ existing resources from the cluster ║")
+		logging.Warn(ctx, "║  Update and Delete operations will be BLOCKED (empty state only) ║")
+		logging.Warn(ctx, "║  Use this mode to populate state from existing infrastructure    ║")
+		logging.Warn(ctx, "╚══════════════════════════════════════════════════════════════════╝")
 	}
 
 	vmsRest, err := client.NewRest(host, port, username, password, apiToken, tenant, !skipSSL, p.version, restTimeout)

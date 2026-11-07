@@ -16,11 +16,11 @@ var WebhookSchemaRef = is.NewSchemaReference(
 )
 
 type Webhook struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Webhook) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Webhook{tfstate: is.NewTFStateMust(
+	return &Webhook{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -30,7 +30,7 @@ func (m *Webhook) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 }
 
 func (m *Webhook) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Webhook{tfstate: is.NewTFStateMust(
+	return &Webhook{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -39,7 +39,7 @@ func (m *Webhook) NewDatasourceManager(raw map[string]attr.Value, schema any) Da
 	)}
 }
 
-func (m *Webhook) TfState() *is.TFState {
+func (m *Webhook) TfState() is.ResourceState {
 	return m.tfstate
 }
 

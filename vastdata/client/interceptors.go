@@ -14,8 +14,8 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 type contextKey string
@@ -38,7 +38,7 @@ func BeforeRequestFnCallback(ctx context.Context, _ *http.Request, verb, url str
 	if body != nil {
 		bodyBytes, err := io.ReadAll(body)
 		if err != nil {
-			tflog.Error(ctx, "failed to read request body", map[string]any{
+			logging.Error(ctx, "failed to read request body", map[string]any{
 				"error": err.Error(),
 			})
 			return err
@@ -55,7 +55,7 @@ func BeforeRequestFnCallback(ctx context.Context, _ *http.Request, verb, url str
 		}
 	}
 
-	tflog.Info(ctx, logMsg.String())
+	logging.Info(ctx, logMsg.String())
 	return nil
 }
 
@@ -65,7 +65,7 @@ func BeforeRequestFnCallback(ctx context.Context, _ *http.Request, verb, url str
 // For more details see: https://github.com/vast-data/go-vast-client
 func AfterRequestFnCallback(ctx context.Context, response vast_client.Renderable, statusCode int) (vast_client.Renderable, error) {
 	uid, _ := ctx.Value(requestIDKey).(string)
-	tflog.Info(ctx, fmt.Sprintf("end: req_id=%s status_code=%d | %s", uid, statusCode, formatResponseBody(response)))
+	logging.Info(ctx, fmt.Sprintf("end: req_id=%s status_code=%d | %s", uid, statusCode, formatResponseBody(response)))
 	return response, nil
 }
 
@@ -84,4 +84,10 @@ func formatResponseBody(response vast_client.Renderable) string {
 func ContextWithRequestID(ctx context.Context) context.Context {
 	newID := atomic.AddUint32(&reqIDCounter, 1)
 	return context.WithValue(ctx, requestIDKey, fmt.Sprintf("0x%08x", newID))
+}
+
+// RequestIDFromContext returns the request ID set by ContextWithRequestID, or "".
+func RequestIDFromContext(ctx context.Context) string {
+	id, _ := ctx.Value(requestIDKey).(string)
+	return id
 }

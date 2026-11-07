@@ -19,11 +19,11 @@ var NonlocalUserSchemaRef = is.NewSchemaReference(
 )
 
 type NonlocalUser struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *NonlocalUser) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &NonlocalUser{tfstate: is.NewTFStateMust(
+	return &NonlocalUser{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -43,7 +43,7 @@ func (m *NonlocalUser) NewResourceManager(raw map[string]attr.Value, schema any)
 }
 
 func (m *NonlocalUser) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &NonlocalUser{tfstate: is.NewTFStateMust(
+	return &NonlocalUser{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -53,7 +53,7 @@ func (m *NonlocalUser) NewDatasourceManager(raw map[string]attr.Value, schema an
 	}
 }
 
-func (m *NonlocalUser) TfState() *is.TFState {
+func (m *NonlocalUser) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -91,7 +91,7 @@ func (m *NonlocalUser) DeleteResource(ctx context.Context, rest *VMSRest) error 
 // needs to be updated with new fields (like tenant_id or s3_policies_ids) and performs the update if necessary.
 //
 // This is used in both CreateResource and UpdateResource for NonLocalUser.
-func ensureNonlocalUserUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
+func ensureNonlocalUserUpdatedWith(ctx context.Context, stateTs, fieldsTs is.ResourceState, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := getSearchParams(ctx, stateTs, fieldsTs)
 	record, err := rest.Users.UserQueryWithContext_GET(ctx, searchParams)
 	if err != nil {

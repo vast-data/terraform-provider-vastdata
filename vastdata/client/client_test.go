@@ -7,10 +7,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	vast_client "github.com/vast-data/go-vast-client"
 )
@@ -374,4 +379,62 @@ func TestClientErrorScenarios(t *testing.T) {
 			require.NotNil(t, client)
 		}
 	})
+}
+
+// A host can replace the interceptors, and they see the real request and response.
+func TestNewRestWithHooks_CustomInterceptorsAreInvoked(t *testing.T) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`[{"id": 7, "name": "pool-a"}]`))
+	}))
+	defer srv.Close()
+	u, err := url.Parse(srv.URL)
+	require.NoError(t, err)
+	port, err := strconv.ParseInt(u.Port(), 10, 64)
+	require.NoError(t, err)
+
+	var before, after atomic.Int32
+	var gotVerb, gotURL string
+	var gotStatus int
+	rest, err := NewRestWithHooks(u.Hostname(), port, "", "", "token", "", false, "test", 10*time.Second, Hooks{
+		BeforeRequest: func(_ context.Context, _ *http.Request, verb, url string, _ io.Reader) error {
+			before.Add(1)
+			gotVerb, gotURL = verb, url
+			return nil
+		},
+		AfterRequest: func(_ context.Context, resp vast_client.Renderable, status int) (vast_client.Renderable, error) {
+			after.Add(1)
+			gotStatus = status
+			return resp, nil
+		},
+	})
+	require.NoError(t, err)
+
+	_, err = rest.VipPools.ListWithContext(context.Background(), vast_client.Params{})
+	require.NoError(t, err)
+
+	assert.EqualValues(t, 1, before.Load())
+	assert.EqualValues(t, 1, after.Load())
+	assert.Equal(t, "GET", gotVerb)
+	assert.Contains(t, gotURL, "/vippools")
+	assert.Equal(t, http.StatusOK, gotStatus)
+}
+
+func TestNewRestWithHooks_NilHooksAreAllowed(t *testing.T) {
+	rest, err := NewRestWithHooks("127.0.0.1", 1, "", "", "token", "", false, "test", time.Second, Hooks{})
+	require.NoError(t, err)
+	assert.NotNil(t, rest)
+}
+
+func TestDefaultHooks_AreTheTerraformInterceptors(t *testing.T) {
+	h := DefaultHooks()
+	assert.NotNil(t, h.BeforeRequest)
+	assert.NotNil(t, h.AfterRequest)
+}
+
+func TestRequestIDFromContext(t *testing.T) {
+	assert.Equal(t, "", RequestIDFromContext(context.Background()))
+	ctx := ContextWithRequestID(context.Background())
+	assert.Equal(t, ctx.Value(requestIDKey), RequestIDFromContext(ctx))
+	assert.NotEmpty(t, RequestIDFromContext(ctx))
 }

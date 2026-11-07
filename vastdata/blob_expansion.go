@@ -21,7 +21,7 @@ var BlobExpansionSchemaRef = is.NewSchemaReference(
 )
 
 type BlobExpansion struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func blobExpansionHints() *is.TFStateHints {
@@ -54,14 +54,14 @@ func blobExpansionDatasourceHints() *is.TFStateHints {
 }
 
 func (m *BlobExpansion) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &BlobExpansion{tfstate: is.NewTFStateMust(raw, schema, blobExpansionHints())}
+	return &BlobExpansion{tfstate: is.NewResourceState(raw, schema, blobExpansionHints())}
 }
 
 func (m *BlobExpansion) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &BlobExpansion{tfstate: is.NewTFStateMust(raw, schema, blobExpansionDatasourceHints())}
+	return &BlobExpansion{tfstate: is.NewResourceState(raw, schema, blobExpansionDatasourceHints())}
 }
 
-func (m *BlobExpansion) TfState() *is.TFState {
+func (m *BlobExpansion) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -217,11 +217,11 @@ var blobExpansionFlags = []struct{ field, addFlag, dropFlag string }{
 	{"copy_source_column", "add_copy_source_column", "remove_copy_source_column"},
 }
 
-func boolFromState(ts *is.TFState, boolField string) bool {
+func boolFromState(ts is.ResourceState, boolField string) bool {
 	v, ok := ts.GetAllValues()[boolField].(bool)
 	return ok && v
 }
 
-func boolChanged(stateTs, planTs *is.TFState, boolField string) bool {
+func boolChanged(stateTs, planTs is.ResourceState, boolField string) bool {
 	return boolFromState(stateTs, boolField) != boolFromState(planTs, boolField)
 }

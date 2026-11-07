@@ -21,14 +21,14 @@ var nfsCertificateHints = endpointCertificateHints(
 )
 
 type NfsCertificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *NfsCertificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &NfsCertificate{tfstate: newResourceTFState(raw, schema, nfsCertificateHints)}
 }
 
-func (m *NfsCertificate) TfState() *is.TFState {
+func (m *NfsCertificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 

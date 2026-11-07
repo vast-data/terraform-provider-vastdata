@@ -17,11 +17,11 @@ var S3LifeCycleRuleSchemaRef = is.NewSchemaReference(
 )
 
 type S3LifeCycleRule struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *S3LifeCycleRule) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &S3LifeCycleRule{tfstate: is.NewTFStateMust(
+	return &S3LifeCycleRule{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -32,7 +32,7 @@ func (m *S3LifeCycleRule) NewResourceManager(raw map[string]attr.Value, schema a
 }
 
 func (m *S3LifeCycleRule) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &S3LifeCycleRule{tfstate: is.NewTFStateMust(
+	return &S3LifeCycleRule{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -42,7 +42,7 @@ func (m *S3LifeCycleRule) NewDatasourceManager(raw map[string]attr.Value, schema
 	}
 }
 
-func (m *S3LifeCycleRule) TfState() *is.TFState {
+func (m *S3LifeCycleRule) TfState() is.ResourceState {
 	return m.tfstate
 }
 

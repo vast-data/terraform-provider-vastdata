@@ -7,14 +7,15 @@ import (
 	"errors"
 	"fmt"
 	"maps"
+	"reflect"
 	"slices"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	vast_client "github.com/vast-data/go-vast-client"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -205,21 +206,26 @@ func NewTFState(raw map[string]attr.Value, schema any, kind SchemaContext, hints
 	}, nil
 }
 
-func NewTFStateMust(raw map[string]attr.Value, schema any, hints *TFStateHints) *TFState {
-	var kind SchemaContext
-	if schema == nil {
-		kind = SchemaTypeUnknown
-	} else {
-		switch schema.(type) {
-		case rschema.Schema:
-			kind = SchemaForResource
-		case dsschema.Schema:
-			kind = SchemaForDataSource
-		default:
-			panic(fmt.Sprintf("unknown schema type: %T", schema))
-		}
+// NewTFStateFromSchema builds a TFState detecting the schema kind (resource/datasource)
+// from the schema type. It reports problems as errors, which makes it suitable for
+// StateFactory implementations; NewTFStateMust is the panicking variant.
+func NewTFStateFromSchema(raw map[string]attr.Value, schema any, hints *TFStateHints) (*TFState, error) {
+	kind := SchemaTypeUnknown
+	switch schema.(type) {
+	case nil:
+	case rschema.Schema:
+		kind = SchemaForResource
+	case dsschema.Schema:
+		kind = SchemaForDataSource
+	default:
+		return nil, fmt.Errorf("unknown schema type: %T", schema)
 	}
-	return Must(NewTFState(raw, schema, kind, hints))
+	return NewTFState(raw, schema, kind, hints)
+}
+
+// NewTFStateMust is NewTFStateFromSchema that panics on error.
+func NewTFStateMust(raw map[string]attr.Value, schema any, hints *TFStateHints) *TFState {
+	return Must(NewTFStateFromSchema(raw, schema, hints))
 }
 
 func (s *TFState) assertEnabled() {
@@ -232,7 +238,13 @@ func (s *TFState) assertEnabled() {
 // - The Raw map is deeply copied (per key).
 // - Schema, Kind, Meta, TypeMap, Hints are reused by reference.
 // This is useful when you want to modify Raw independently but keep schema and metadata intact.
-func (s *TFState) Copy() *TFState {
+func (s *TFState) Copy() ResourceState {
+	return s.CopyTFState()
+}
+
+// CopyTFState is the concrete-typed implementation of Copy. Implementations that embed
+// *TFState use it to re-wrap the copy in their own type when overriding Copy.
+func (s *TFState) CopyTFState() *TFState {
 	s.assertEnabled()
 
 	rawCopy := make(map[string]attr.Value, len(s.Raw))
@@ -375,11 +387,11 @@ func (s *TFState) IsKnownAndNotNull(path string) bool {
 
 // StringWithFallback gets a string value from the current TFState, falling back to another TFState if not found
 // Returns the value and a boolean indicating if it was found in either state
-func (s *TFState) StringWithFallback(fallback *TFState, path string) (string, bool) {
+func (s *TFState) StringWithFallback(fallback ResourceState, path string) (string, bool) {
 	if s.IsKnownAndNotNull(path) {
 		return s.String(path), true
 	}
-	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+	if !IsNilState(fallback) && fallback.IsKnownAndNotNull(path) {
 		return fallback.String(path), true
 	}
 	return "", false
@@ -387,11 +399,11 @@ func (s *TFState) StringWithFallback(fallback *TFState, path string) (string, bo
 
 // BoolWithFallback gets a bool value from the current TFState, falling back to another TFState if not found
 // Returns the value and a boolean indicating if it was found in either state
-func (s *TFState) BoolWithFallback(fallback *TFState, path string) (bool, bool) {
+func (s *TFState) BoolWithFallback(fallback ResourceState, path string) (bool, bool) {
 	if s.IsKnownAndNotNull(path) {
 		return s.Bool(path), true
 	}
-	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+	if !IsNilState(fallback) && fallback.IsKnownAndNotNull(path) {
 		return fallback.Bool(path), true
 	}
 	return false, false
@@ -399,11 +411,11 @@ func (s *TFState) BoolWithFallback(fallback *TFState, path string) (bool, bool) 
 
 // Int64WithFallback gets an int64 value from the current TFState, falling back to another TFState if not found
 // Returns the value and a boolean indicating if it was found in either state
-func (s *TFState) Int64WithFallback(fallback *TFState, path string) (int64, bool) {
+func (s *TFState) Int64WithFallback(fallback ResourceState, path string) (int64, bool) {
 	if s.IsKnownAndNotNull(path) {
 		return s.Int64(path), true
 	}
-	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+	if !IsNilState(fallback) && fallback.IsKnownAndNotNull(path) {
 		return fallback.Int64(path), true
 	}
 	return 0, false
@@ -411,11 +423,11 @@ func (s *TFState) Int64WithFallback(fallback *TFState, path string) (int64, bool
 
 // Float64WithFallback gets a float64 value from the current TFState, falling back to another TFState if not found
 // Returns the value and a boolean indicating if it was found in either state
-func (s *TFState) Float64WithFallback(fallback *TFState, path string) (float64, bool) {
+func (s *TFState) Float64WithFallback(fallback ResourceState, path string) (float64, bool) {
 	if s.IsKnownAndNotNull(path) {
 		return s.Float64(path), true
 	}
-	if fallback != nil && fallback.IsKnownAndNotNull(path) {
+	if !IsNilState(fallback) && fallback.IsKnownAndNotNull(path) {
 		return fallback.Float64(path), true
 	}
 	return 0.0, false
@@ -698,44 +710,40 @@ func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, in
 	return nil
 }
 
+// SetState is Terraform-specific and intentionally NOT part of ResourceState.
+// Orchestration code persists state through a StateSink (see TFSdkSink) instead.
 func (s *TFState) SetState(ctx context.Context, state *tfsdk.State) error {
-	for k, v := range s.Raw {
-		attrPath := path.Root(k)
-
-		tflog.Debug(ctx, fmt.Sprintf(
-			"SetState: key=%q type=%T value=%v",
-			k, v, v,
-		))
-
-		if diags := state.SetAttribute(ctx, attrPath, v); diags.HasError() {
-			return fmt.Errorf("set attribute %q: %s", k, diags.Errors())
-		}
-	}
-	return nil
+	return writeAttributesToTFSDK(ctx, s.Raw, state)
 }
 
 // CopyNonEmptyFieldsTo copies only non-null and known fields from this TFState
 // to another, along with their associated attribute metadata.
-func (s *TFState) CopyNonEmptyFieldsTo(other *TFState) {
+func (s *TFState) CopyNonEmptyFieldsTo(other ResourceState) {
 	s.assertEnabled()
-	other.assertEnabled()
+	assertStateEnabled(other)
 
+	otherRaw := other.RawValues()
+	otherCore := coreOf(other)
 	for k, v := range s.Raw {
 		if v.IsNull() || v.IsUnknown() {
 			continue // skip null or unknown values
 		}
-		other.Raw[k] = v
-		other.Meta[k] = s.Meta[k]
+		otherRaw[k] = v
+		if otherCore != nil {
+			otherCore.Meta[k] = s.Meta[k]
+		}
 	}
 }
 
 // CopyKnownFieldsTo copies only known fields from this TFState
 // to another, along with their associated attribute metadata.
 // It skips unknown values and null values for computed fields (which should come from API responses).
-func (s *TFState) CopyKnownFieldsTo(other *TFState) {
+func (s *TFState) CopyKnownFieldsTo(other ResourceState) {
 	s.assertEnabled()
-	other.assertEnabled()
+	assertStateEnabled(other)
 
+	otherRaw := other.RawValues()
+	otherCore := coreOf(other)
 	for k, v := range s.Raw {
 		if v.IsUnknown() {
 			continue // skip unknown values
@@ -753,8 +761,10 @@ func (s *TFState) CopyKnownFieldsTo(other *TFState) {
 			continue
 		}
 
-		other.Raw[k] = v
-		other.Meta[k] = s.Meta[k]
+		otherRaw[k] = v
+		if otherCore != nil {
+			otherCore.Meta[k] = s.Meta[k]
+		}
 	}
 }
 
@@ -831,15 +841,16 @@ func (s *TFState) GetAllValues() map[string]any {
 }
 
 func (s *TFState) DiffFields(
-	other *TFState,
+	other ResourceState,
 	comb FilterTagCombination,
 	fields []string,
 	flags ...FieldFilterFlag,
 
 ) map[string]any {
 	s.assertEnabled()
-	other.assertEnabled()
+	assertStateEnabled(other)
 
+	otherRaw := other.RawValues()
 	searchEmpty := contains(flags, SearchEmpty)
 
 	fieldMap := make(map[string]struct{})
@@ -873,7 +884,7 @@ func (s *TFState) DiffFields(
 					continue
 				}
 				// Detect a non-null → null transition: the plan clears this field.
-				if otherVal, exists := other.Raw[k]; exists && !otherVal.IsNull() && !otherVal.IsUnknown() {
+				if otherVal, exists := otherRaw[k]; exists && !otherVal.IsNull() && !otherVal.IsUnknown() {
 					clearedFields[k] = nil
 				}
 			}
@@ -884,7 +895,7 @@ func (s *TFState) DiffFields(
 			continue
 		}
 
-		if otherVal, ok := other.Raw[k]; !ok || otherVal.IsNull() || otherVal.IsUnknown() || !v.Equal(otherVal) {
+		if otherVal, ok := otherRaw[k]; !ok || otherVal.IsNull() || otherVal.IsUnknown() || !v.Equal(otherVal) {
 			diff[k] = ConvertAttrValueToRaw(v, valType)
 		}
 	}
@@ -922,7 +933,7 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		SearchSearchable,
 	); len(sp) > 0 {
 		// Last attempt: get all optional fields and perform search by all of them
-		tflog.Debug(ctx, "++ 'optional(common search scope)'")
+		logging.Debug(ctx, "++ 'optional(common search scope)'")
 		searchParams = sp
 	} else if sp := s.GetFilteredValues(
 		FilterOr,
@@ -933,7 +944,7 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		SearchSearchable,
 	); len(sp) > 0 {
 		// Get all params required + searchable for search.
-		tflog.Debug(ctx, "++ 'required+searchable'")
+		logging.Debug(ctx, "++ 'required+searchable'")
 		searchParams = sp
 	} else if sp := s.GetFilteredValues(
 		FilterOr,
@@ -942,14 +953,14 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 		SearchPrimitivesOnly,
 	); len(sp) > 0 {
 		// Get all optional fields that are primitive types (string, int, bool) for search.
-		tflog.Debug(ctx, "++ 'search by all non-primitive fields'")
+		logging.Debug(ctx, "++ 'search by all non-primitive fields'")
 		searchParams = sp
 	}
 
 	for _, field := range AdditionalSearchableFields {
 		// Try go get resource ID and GUID and other additional fields from current state
 		if val, ok := s.Raw[field]; ok && !val.IsNull() && !val.IsUnknown() {
-			tflog.Debug(ctx, fmt.Sprintf("++ 'search by %s'", field))
+			logging.Debug(ctx, fmt.Sprintf("++ 'search by %s'", field))
 			searchParams[field] = ConvertAttrValueToRaw(val, s.Type(field))
 		}
 	}
@@ -959,7 +970,7 @@ func (s *TFState) GetGenericSearchParams(ctx context.Context) vast_client.Params
 	if s.Hints != nil {
 		for _, field := range s.Hints.SearchFilterFields {
 			if val, ok := s.Raw[field]; ok && !val.IsNull() && !val.IsUnknown() {
-				tflog.Debug(ctx, fmt.Sprintf("++ 'search filter field %s'", field))
+				logging.Debug(ctx, fmt.Sprintf("++ 'search filter field %s'", field))
 				searchParams[field] = ConvertAttrValueToRaw(val, s.Type(field))
 			}
 		}
@@ -1013,7 +1024,7 @@ func (s *TFState) GetReadEditOnlyParams() vast_client.Params {
 //
 // This is used in UpdateResource to handle edit-only fields separately from the main update.
 // Edit-only fields are those that cannot be set during creation but can be modified via update operations.
-func (s *TFState) GetChangedEditOnlyParams(otherState *TFState) vast_client.Params {
+func (s *TFState) GetChangedEditOnlyParams(otherState ResourceState) vast_client.Params {
 	searchParams := make(vast_client.Params)
 	if s.Hints != nil && len(s.Hints.EditOnlyFields) > 0 {
 		// Get all changed fields
@@ -1034,7 +1045,7 @@ func (s *TFState) GetChangedEditOnlyParams(otherState *TFState) vast_client.Para
 // GetChangedParams returns a map of parameters that differ between this TFState (plan)
 // and another TFState (current state), returning only the changed fields.
 // This is commonly used in UpdateResource methods to send only modified fields to the API.
-func (s *TFState) GetChangedParams(otherState *TFState) vast_client.Params {
+func (s *TFState) GetChangedParams(otherState ResourceState) vast_client.Params {
 	diffParams := s.DiffFields(otherState, FilterOr, nil, SearchOptional, SearchRequired)
 	return diffParams
 }
@@ -1050,7 +1061,7 @@ func (s *TFState) GetChangedParams(otherState *TFState) vast_client.Params {
 //  5. Excludes DeleteOnlyParamFields - query params only used during delete operations
 //
 // EditOnlyFields should be handled separately after the main update operation.
-func (s *TFState) GetUpdateParams(otherState *TFState) vast_client.Params {
+func (s *TFState) GetUpdateParams(otherState ResourceState) vast_client.Params {
 	// Build exclusion list
 	var exclude []string
 	if s.Hints != nil {
@@ -1242,4 +1253,195 @@ func listsHaveSameContentIgnoringOrder(a, b attr.Value) bool {
 	}
 
 	return true
+}
+
+// ============================================================================
+// Resource state abstraction (shared by Terraform and Crossplane)
+// ============================================================================
+//
+// Resource managers (User, VipPool, License, ...) only ever talk to ResourceState.
+// The attribute bag logic (typed getters/setters, FillFromRecord, request params
+// builders, diffing) is identical for every runtime; what differs per runtime is:
+//
+//   - how the bag is seeded (Terraform plan/state vs Crossplane CR spec),
+//   - which values may be unknown (Terraform plans have unknowns, CRs do not),
+//   - where the result is persisted (tfsdk.State vs CR status) - see StateSink.
+//
+// Terraform uses *TFState directly. Other runtimes embed *TFState and override
+// only what differs (see crossplane-provider-vastdata/internal/state).
+
+// ResourceState is the state abstraction managers depend on.
+type ResourceState interface {
+	// --- Introspection ---
+
+	// IsEnabled reports whether a schema is attached (false for schema-less placeholder states).
+	IsEnabled() bool
+	// StateHints returns the manager hints (may be nil for placeholder states).
+	StateHints() *TFStateHints
+	// SchemaDefinition returns the schema the state was built from
+	// (resource_schema.Schema or datasource_schema.Schema).
+	SchemaDefinition() any
+	// RawValues returns the LIVE attribute map. Mutating it mutates the state.
+	RawValues() map[string]attr.Value
+	HasAttribute(attributeName string) bool
+	Type(path string) attr.Type
+	IsRequired(path string) bool
+	IsOptional(path string) bool
+	IsComputed(path string) bool
+	Pretty() string
+
+	// --- Getters ---
+
+	String(path string) string
+	Bool(path string) bool
+	Int64(path string) int64
+	Float64(path string) float64
+	TfObject(path string) types.Object
+	TfList(path string) types.List
+	TfSet(path string) types.Set
+	IsNull(path string) bool
+	IsUnknown(path string) bool
+	IsKnownAndNotNull(path string) bool
+	StringWithFallback(fallback ResourceState, path string) (string, bool)
+	BoolWithFallback(fallback ResourceState, path string) (bool, bool)
+	Int64WithFallback(fallback ResourceState, path string) (int64, bool)
+	Float64WithFallback(fallback ResourceState, path string) (float64, bool)
+	Get(path string) attr.Value
+	ToSlice(path string) []any
+	ToMap(path string) map[string]any
+	SetToMapIfAvailable(m map[string]any, path ...string) bool
+	SetIfAvailable(path ...string) (map[string]any, bool)
+	GetAllValues() map[string]any
+	GetFilteredValues(comb FilterTagCombination, fieldSet *FieldSet, flags ...FieldFilterFlag) map[string]any
+
+	// --- Mutators ---
+
+	Set(key string, value any)
+	SetOrAdd(key string, value any)
+	FillFromRecord(record Record) error
+	FillFromRecordIncludingRequired(record Record, includeRequired bool) error
+	FillFromRecordForImport(record Record) error
+	ClearWriteOnlyFields()
+	CopyNonEmptyFieldsTo(other ResourceState)
+	CopyKnownFieldsTo(other ResourceState)
+	// Copy returns an independent copy of the same implementation type.
+	Copy() ResourceState
+
+	// --- Request parameter builders ---
+
+	DiffFields(other ResourceState, comb FilterTagCombination, fields []string, flags ...FieldFilterFlag) map[string]any
+	GetGenericSearchParams(ctx context.Context) vast_client.Params
+	GetReadOnlySearchParams() vast_client.Params
+	GetReadEditOnlyParams() vast_client.Params
+	GetCreateParams() vast_client.Params
+	GetUpdateParams(other ResourceState) vast_client.Params
+	GetChangedParams(other ResourceState) vast_client.Params
+	GetChangedEditOnlyParams(other ResourceState) vast_client.Params
+	GetDeleteOnlyBodyParams() vast_client.Params
+	GetDeleteOnlyQueryParams() vast_client.Params
+}
+
+var _ ResourceState = (*TFState)(nil)
+
+// IsEnabled implements ResourceState.
+func (s *TFState) IsEnabled() bool { return s.Enabled }
+
+// StateHints implements ResourceState.
+func (s *TFState) StateHints() *TFStateHints { return s.Hints }
+
+// SchemaDefinition implements ResourceState.
+func (s *TFState) SchemaDefinition() any { return s.Schema }
+
+// RawValues implements ResourceState. It returns the live attribute map.
+func (s *TFState) RawValues() map[string]attr.Value { return s.Raw }
+
+// TFStateCore returns the underlying *TFState. It is deliberately not part of
+// ResourceState: it is promoted through embedding so wrapper implementations
+// remain usable wherever the concrete attribute bag (Meta/TypeMap) is needed.
+func (s *TFState) TFStateCore() *TFState { return s }
+
+// coreOf returns the underlying *TFState of any state built on top of one, or nil.
+func coreOf(s ResourceState) *TFState {
+	if c, ok := s.(interface{ TFStateCore() *TFState }); ok {
+		return c.TFStateCore()
+	}
+	return nil
+}
+
+// IsNilState reports whether s is nil, including a typed-nil pointer boxed in the interface.
+func IsNilState(s ResourceState) bool {
+	if s == nil {
+		return true
+	}
+	v := reflect.ValueOf(s)
+	return v.Kind() == reflect.Ptr && v.IsNil()
+}
+
+func assertStateEnabled(s ResourceState) {
+	if IsNilState(s) || !s.IsEnabled() {
+		panic("ResourceState is nil or disabled; schema and meta not available")
+	}
+}
+
+// --- State sinks ---
+
+// StateSink persists a ResourceState into the runtime's backing store.
+// Terraform: a *tfsdk.State. Crossplane: the managed resource status.
+type StateSink interface {
+	WriteState(ctx context.Context, s ResourceState) error
+}
+
+// TFSdkSink writes a ResourceState into a Terraform Plugin Framework state.
+type TFSdkSink struct {
+	State *tfsdk.State
+}
+
+// NewTFSdkSink returns a StateSink backed by the given Terraform state.
+func NewTFSdkSink(state *tfsdk.State) StateSink {
+	return TFSdkSink{State: state}
+}
+
+// WriteState implements StateSink.
+func (t TFSdkSink) WriteState(ctx context.Context, s ResourceState) error {
+	return writeAttributesToTFSDK(ctx, s.RawValues(), t.State)
+}
+
+func writeAttributesToTFSDK(ctx context.Context, raw map[string]attr.Value, state *tfsdk.State) error {
+	for k, v := range raw {
+		attrPath := path.Root(k)
+
+		logging.Debug(ctx, fmt.Sprintf(
+			"SetState: key=%q type=%T value=%v",
+			k, v, v,
+		))
+
+		if diags := state.SetAttribute(ctx, attrPath, v); diags.HasError() {
+			return fmt.Errorf("set attribute %q: %s", k, diags.Errors())
+		}
+	}
+	return nil
+}
+
+// --- State factory ---
+
+// StateFactory builds the ResourceState implementation used by resource managers.
+type StateFactory func(raw map[string]attr.Value, schema any, hints *TFStateHints) (ResourceState, error)
+
+var stateFactory StateFactory
+
+// SetStateFactory overrides how NewResourceState builds states. It is meant to be
+// called once at process start-up (e.g. by the Crossplane provider's main) before
+// any manager is created; passing nil restores the default Terraform behaviour.
+// It is process-wide and not safe to call concurrently with NewResourceState.
+func SetStateFactory(f StateFactory) {
+	stateFactory = f
+}
+
+// NewResourceState is the single construction point managers use for their state.
+// By default it returns a *TFState; see SetStateFactory.
+func NewResourceState(raw map[string]attr.Value, schema any, hints *TFStateHints) ResourceState {
+	if stateFactory == nil {
+		return NewTFStateMust(raw, schema, hints)
+	}
+	return Must(stateFactory(raw, schema, hints))
 }

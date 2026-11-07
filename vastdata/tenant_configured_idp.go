@@ -17,11 +17,11 @@ var TenantConfiguredIdpSchemaRef = is.NewSchemaReference(
 )
 
 type TenantConfiguredIdp struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *TenantConfiguredIdp) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TenantConfiguredIdp{tfstate: is.NewTFStateMust(
+	return &TenantConfiguredIdp{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -30,7 +30,7 @@ func (m *TenantConfiguredIdp) NewDatasourceManager(raw map[string]attr.Value, sc
 	)}
 }
 
-func (m *TenantConfiguredIdp) TfState() *is.TFState {
+func (m *TenantConfiguredIdp) TfState() is.ResourceState {
 	return m.tfstate
 }
 

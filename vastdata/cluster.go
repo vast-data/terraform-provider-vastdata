@@ -50,11 +50,11 @@ var clusterS3TrueIPSubResource = is.SubResourceHint{
 }
 
 type Cluster struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Cluster) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Cluster{tfstate: is.NewTFStateMust(
+	return &Cluster{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -67,7 +67,7 @@ func (m *Cluster) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 }
 
 func (m *Cluster) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Cluster{tfstate: is.NewTFStateMust(
+	return &Cluster{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -77,7 +77,7 @@ func (m *Cluster) NewDatasourceManager(raw map[string]attr.Value, schema any) Da
 	)}
 }
 
-func (m *Cluster) TfState() *is.TFState {
+func (m *Cluster) TfState() is.ResourceState {
 	return m.tfstate
 }
 

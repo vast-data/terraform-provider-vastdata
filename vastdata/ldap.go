@@ -15,11 +15,11 @@ var LdapSchemaRef = is.NewSchemaReference(
 )
 
 type Ldap struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Ldap) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Ldap{tfstate: is.NewTFStateMust(
+	return &Ldap{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -31,7 +31,7 @@ func (m *Ldap) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 }
 
 func (m *Ldap) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Ldap{tfstate: is.NewTFStateMust(
+	return &Ldap{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -40,7 +40,7 @@ func (m *Ldap) NewDatasourceManager(raw map[string]attr.Value, schema any) DataS
 	)}
 }
 
-func (m *Ldap) TfState() *is.TFState {
+func (m *Ldap) TfState() is.ResourceState {
 	return m.tfstate
 }
 

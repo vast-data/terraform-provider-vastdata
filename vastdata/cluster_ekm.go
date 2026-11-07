@@ -19,11 +19,11 @@ var ClusterEkmSchemaRef = is.NewSchemaReference(
 )
 
 type ClusterEkm struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ClusterEkm) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ClusterEkm{tfstate: is.NewTFStateMust(
+	return &ClusterEkm{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -39,7 +39,7 @@ func (m *ClusterEkm) NewResourceManager(raw map[string]attr.Value, schema any) R
 	)}
 }
 
-func (m *ClusterEkm) TfState() *is.TFState {
+func (m *ClusterEkm) TfState() is.ResourceState {
 	return m.tfstate
 }
 

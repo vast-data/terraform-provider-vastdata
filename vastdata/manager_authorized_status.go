@@ -17,11 +17,11 @@ var ManagerAuthorizedStatusSchemaRef = is.NewSchemaReference(
 )
 
 type ManagerAuthorizedStatus struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ManagerAuthorizedStatus) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ManagerAuthorizedStatus{tfstate: is.NewTFStateMust(
+	return &ManagerAuthorizedStatus{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -30,7 +30,7 @@ func (m *ManagerAuthorizedStatus) NewDatasourceManager(raw map[string]attr.Value
 	)}
 }
 
-func (m *ManagerAuthorizedStatus) TfState() *is.TFState {
+func (m *ManagerAuthorizedStatus) TfState() is.ResourceState {
 	return m.tfstate
 }
 

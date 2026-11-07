@@ -10,7 +10,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/stretchr/testify/assert"
@@ -3127,4 +3129,147 @@ func TestListsHaveSameContentIgnoringOrder_NullAndUnknown(t *testing.T) {
 	})
 
 	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listC), "null and unknown should not be equal")
+}
+
+// ==========================================
+// Tests for the ResourceState abstraction
+// ==========================================
+
+// zeroRaw seeds every schema attribute with a null value, exactly like the
+// production schema-only manager does.
+func zeroRaw(schema rschema.Schema) map[string]attr.Value {
+	raw := make(map[string]attr.Value, len(schema.Attributes))
+	for k, a := range schema.Attributes {
+		raw[k], _, _ = BuildAttrValueFromAny(a.GetType(), nil)
+	}
+	return raw
+}
+
+func resourceStateTestSchema() rschema.Schema {
+	return rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":   rschema.Int64Attribute{Computed: true},
+		"name": rschema.StringAttribute{Required: true},
+		"note": rschema.StringAttribute{Optional: true},
+	}}
+}
+
+// crossplaneLikeState mimics a non-Terraform implementation: it embeds *TFState and
+// overrides only what differs (unknown semantics and Copy).
+type crossplaneLikeState struct{ *TFState }
+
+func (c *crossplaneLikeState) IsUnknown(string) bool { return false }
+func (c *crossplaneLikeState) Copy() ResourceState {
+	return &crossplaneLikeState{TFState: c.TFState.CopyTFState()}
+}
+
+func TestResourceState_TFStateImplementsInterface(t *testing.T) {
+	var s ResourceState = NewTFStateMust(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)
+	assert.True(t, s.IsEnabled())
+	assert.True(t, s.HasAttribute("name"))
+	assert.NotNil(t, s.RawValues())
+	assert.Equal(t, resourceStateTestSchema(), s.SchemaDefinition())
+	assert.Nil(t, s.StateHints())
+}
+
+func TestResourceState_NewResourceState_DefaultIsTFState(t *testing.T) {
+	s := NewResourceState(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)
+	_, ok := s.(*TFState)
+	assert.True(t, ok, "default factory must return *TFState, got %T", s)
+}
+
+func TestResourceState_SetStateFactory_OverridesImplementation(t *testing.T) {
+	SetStateFactory(func(raw map[string]attr.Value, schema any, hints *TFStateHints) (ResourceState, error) {
+		base, err := NewTFState(raw, schema, SchemaForResource, hints)
+		if err != nil {
+			return nil, err
+		}
+		return &crossplaneLikeState{TFState: base}, nil
+	})
+	t.Cleanup(func() { SetStateFactory(nil) })
+
+	s := NewResourceState(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)
+	cp, ok := s.(*crossplaneLikeState)
+	require.True(t, ok, "factory override must be used, got %T", s)
+
+	// Unknown-values are never reported by the override...
+	cp.Raw["name"] = types.StringUnknown()
+	assert.False(t, s.IsUnknown("name"))
+	// ...while the embedded TFState behaviour is unchanged.
+	assert.True(t, cp.TFState.IsUnknown("name"))
+
+	// Copy keeps the implementation type.
+	_, ok = s.Copy().(*crossplaneLikeState)
+	assert.True(t, ok, "Copy must preserve the wrapper type")
+
+	// Restoring the factory restores Terraform behaviour.
+	SetStateFactory(nil)
+	_, ok = NewResourceState(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil).(*TFState)
+	assert.True(t, ok)
+}
+
+func TestResourceState_CopyToWorksAcrossImplementations(t *testing.T) {
+	schema := resourceStateTestSchema()
+	tf := NewTFStateMust(zeroRaw(schema), schema, nil)
+	tf.SetOrAdd("name", "from-tf")
+	tf.SetOrAdd("note", "n1")
+
+	var other ResourceState = &crossplaneLikeState{TFState: NewTFStateMust(zeroRaw(schema), schema, nil)}
+	other.SetOrAdd("name", "old")
+
+	tf.CopyKnownFieldsTo(other)
+	assert.Equal(t, "from-tf", other.String("name"))
+	assert.Equal(t, "n1", other.String("note"))
+
+	// DiffFields/GetUpdateParams accept any implementation as "current state".
+	tf.SetOrAdd("name", "changed")
+	diff := tf.GetUpdateParams(other)
+	assert.Equal(t, "changed", diff["name"])
+}
+
+func TestResourceState_FallbackAcceptsInterfaceAndTypedNil(t *testing.T) {
+	schema := resourceStateTestSchema()
+	s := NewTFStateMust(zeroRaw(schema), schema, nil)
+	fb := NewTFStateMust(zeroRaw(schema), schema, nil)
+	fb.SetOrAdd("name", "fallback")
+
+	got, ok := s.StringWithFallback(fb, "name")
+	assert.True(t, ok)
+	assert.Equal(t, "fallback", got)
+
+	// A typed-nil *TFState boxed into the interface must be treated as "no fallback".
+	var typedNil *TFState
+	got, ok = s.StringWithFallback(typedNil, "name")
+	assert.False(t, ok)
+	assert.Equal(t, "", got)
+}
+
+func TestIsNilState(t *testing.T) {
+	var typedNil *TFState
+	assert.True(t, IsNilState(nil))
+	assert.True(t, IsNilState(typedNil))
+	assert.False(t, IsNilState(NewTFStateMust(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)))
+}
+
+func TestTFSdkSink_WritesAttributesIntoFrameworkState(t *testing.T) {
+	schema := resourceStateTestSchema()
+	ts := NewTFStateMust(zeroRaw(schema), schema, nil)
+	ts.SetOrAdd("id", int64(7))
+	ts.SetOrAdd("name", "vip")
+
+	objType := schema.Type().TerraformType(context.Background())
+	state := tfsdk.State{Schema: schema, Raw: tftypes.NewValue(objType, nil)}
+
+	require.NoError(t, NewTFSdkSink(&state).WriteState(context.Background(), ts))
+
+	var id types.Int64
+	var name types.String
+	require.False(t, state.GetAttribute(context.Background(), path.Root("id"), &id).HasError())
+	require.False(t, state.GetAttribute(context.Background(), path.Root("name"), &name).HasError())
+	assert.Equal(t, int64(7), id.ValueInt64())
+	assert.Equal(t, "vip", name.ValueString())
+
+	// The legacy SetState entry point must behave identically.
+	state2 := tfsdk.State{Schema: schema, Raw: tftypes.NewValue(objType, nil)}
+	require.NoError(t, ts.SetState(context.Background(), &state2))
+	assert.True(t, state.Raw.Equal(state2.Raw))
 }

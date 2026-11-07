@@ -19,11 +19,11 @@ var SupportBundlesQueueSchemaRef = is.NewSchemaReference(
 )
 
 type SupportBundlesQueue struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *SupportBundlesQueue) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &SupportBundlesQueue{tfstate: is.NewTFStateMust(
+	return &SupportBundlesQueue{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -41,7 +41,7 @@ func (m *SupportBundlesQueue) NewResourceManager(raw map[string]attr.Value, sche
 }
 
 func (m *SupportBundlesQueue) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &SupportBundlesQueue{tfstate: is.NewTFStateMust(
+	return &SupportBundlesQueue{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -50,7 +50,7 @@ func (m *SupportBundlesQueue) NewDatasourceManager(raw map[string]attr.Value, sc
 	)}
 }
 
-func (m *SupportBundlesQueue) TfState() *is.TFState {
+func (m *SupportBundlesQueue) TfState() is.ResourceState {
 	return m.tfstate
 }
 

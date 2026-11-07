@@ -202,7 +202,7 @@ func TestView_hasCorsConfigured(t *testing.T) {
 	t.Run("with cors rules", func(t *testing.T) {
 		t.Parallel()
 		view := testViewWithCorsRules(t, testCorsRule(t, nil))
-		view.tfstate = is.NewTFStateMust(view.tfstate.Raw, schema, nil)
+		view.tfstate = is.NewTFStateMust(view.tfstate.RawValues(), schema, nil)
 		assert.True(t, view.hasCorsConfigured())
 	})
 }
@@ -235,7 +235,7 @@ func TestView_AfterUpdateResource_RejectsCorsOnNonS3View(t *testing.T) {
 
 	schema := viewCorsTestSchema()
 	planView := testViewWithCorsRules(t, testCorsRule(t, nil))
-	raw := planView.tfstate.Raw
+	raw := planView.tfstate.RawValues()
 	raw["get_s3cors_configuration"] = types.BoolNull()
 	planView.tfstate = is.NewTFStateMust(raw, schema, nil)
 	prior := &View{tfstate: is.NewTFStateMust(map[string]attr.Value{

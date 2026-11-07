@@ -22,11 +22,11 @@ var UserKeySchemaRef = is.NewSchemaReference(
 )
 
 type UserKey struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &UserKey{tfstate: is.NewTFStateMust(
+	return &UserKey{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -65,7 +65,7 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 	)}
 }
 
-func (m *UserKey) TfState() *is.TFState {
+func (m *UserKey) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -90,7 +90,7 @@ func (m *UserKey) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableR
 	return nil, nil
 }
 
-func validatePgpPublicKey(ts *is.TFState) error {
+func validatePgpPublicKey(ts is.ResourceState) error {
 	if ts.IsNull("pgp_public_key") {
 		return nil
 	}
@@ -98,7 +98,7 @@ func validatePgpPublicKey(ts *is.TFState) error {
 	return err
 }
 
-func validateCustomUserKeyPair(ts *is.TFState) error {
+func validateCustomUserKeyPair(ts is.ResourceState) error {
 	hasAccessKey := ts.IsKnownAndNotNull("access_key")
 	hasSecretKey := ts.IsKnownAndNotNull("secret_key")
 	if hasAccessKey != hasSecretKey {
@@ -110,7 +110,7 @@ func validateCustomUserKeyPair(ts *is.TFState) error {
 	return validatePgpPublicKey(ts)
 }
 
-func finalizeUserKeyRecord(record Record, ts *is.TFState) (Record, error) {
+func finalizeUserKeyRecord(record Record, ts is.ResourceState) (Record, error) {
 	if ts.IsKnownAndNotNull("pgp_public_key") {
 		pgp := ts.String("pgp_public_key")
 		secretKey := record["secret_key"].(string)
@@ -132,14 +132,14 @@ func finalizeUserKeyRecord(record Record, ts *is.TFState) (Record, error) {
 	return record, nil
 }
 
-func userKeyCredentialsChanged(planTs, stateTs *is.TFState) bool {
+func userKeyCredentialsChanged(planTs, stateTs is.ResourceState) bool {
 	changed := planTs.GetChangedParams(stateTs)
 	_, accessKeyChanged := changed["access_key"]
 	_, secretKeyChanged := changed["secret_key"]
 	return accessKeyChanged || secretKeyChanged
 }
 
-func replaceUserKeyCredentials(ctx context.Context, rest *VMSRest, userId int64, stateTs, planTs *is.TFState) (Record, error) {
+func replaceUserKeyCredentials(ctx context.Context, rest *VMSRest, userId int64, stateTs, planTs is.ResourceState) (Record, error) {
 	oldAccessKey := stateTs.String("access_key")
 	if oldAccessKey == "" {
 		return nil, errors.New("cannot update credentials: existing access_key is unknown in state")

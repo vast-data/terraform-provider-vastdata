@@ -20,9 +20,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/go-vast-client/openapi_schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 type TFStateHints = is.TFStateHints
@@ -300,7 +300,7 @@ func buildAttrTypeFromSchema(schema *openapi3.Schema) attr.Type {
 
 func warnWithContext(ctx context.Context, message string) {
 	if ctx != nil {
-		tflog.Debug(ctx, fmt.Sprintf("⚠  %s", message))
+		logging.Debug(ctx, fmt.Sprintf("⚠  %s", message))
 	} else {
 		fmt.Printf("#===> ⚠️  %s\n", message)
 	}
@@ -308,7 +308,7 @@ func warnWithContext(ctx context.Context, message string) {
 
 func infoWithContext(ctx context.Context, message string) {
 	if ctx != nil {
-		tflog.Debug(ctx, fmt.Sprintf("◉  %s", message))
+		logging.Debug(ctx, fmt.Sprintf("◉  %s", message))
 	} else {
 		fmt.Printf("#===> 🟢  %s\n", message)
 	}

@@ -19,7 +19,7 @@ import (
 // FillFromRecordForImport populates state (OpenAPI PATCH response is only async_task).
 func TestVmsNetworkSettings_ImportFillsComputedFields(t *testing.T) {
 	mgr := (&VmsNetworkSettings{}).NewResourceManager(nil, nil).(*VmsNetworkSettings)
-	hints := mgr.TfState().Hints
+	hints := mgr.TfState().StateHints()
 	require.NotNil(t, hints)
 
 	schema, err := schema_generation.GetResourceSchema(context.Background(), hints)
