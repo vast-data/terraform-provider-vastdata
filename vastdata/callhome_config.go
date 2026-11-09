@@ -32,8 +32,8 @@ func (m *CallhomeConfig) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:    CallhomeConfigSchemaRef,
-			ImportFields: []string{"id"},
+			SchemaRef:  CallhomeConfigSchemaRef,
+			Importable: &notImportable, // write-only secrets (*_md5) cannot be restored from the API
 			// uplink_email is stored (not write-only) so changing it alone plans an
 			// update and re-runs register-cluster.
 			WriteOnlyFields: []string{

@@ -39,6 +39,25 @@ ALLOWED_DRIFT_RESOURCES = {
     "vastdata_s3_policy",
     "vastdata_s3_replication_peer",
     "vastdata_tenant",
+    # WriteOnlyMD5Fields: *_md5 fingerprints cannot be restored from the API after import
+    "vastdata_active_directory",
+    "vastdata_callhome_config",
+    "vastdata_certificate",
+    "vastdata_cluster",
+    "vastdata_cluster_ekm",
+    "vastdata_event_definition_config",
+    "vastdata_kerberos_keytab",
+    "vastdata_ldap",
+    "vastdata_license",
+    "vastdata_manager_password",
+    "vastdata_nfs_certificate",
+    "vastdata_nonlocal_user_key",
+    "vastdata_s3_certificate",
+    "vastdata_support_bundles_queue",
+    "vastdata_tls_certificate",
+    "vastdata_user",
+    "vastdata_user_key",
+    "vastdata_vms_certificate",
 }
 
 

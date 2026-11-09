@@ -30,10 +30,11 @@ func (m *Certificate) NewResourceManager(raw map[string]attr.Value, schema any) 
 		schema,
 		&is.TFStateHints{
 			SchemaRef:      CertificateSchemaRef,
+			Importable:     &notImportable, // write-only PEMs / pgp fields cannot be restored from the API
 			ReadOnlyFields: []string{"id", "created", "guid", "state"},
 			// API GET returns redacted placeholders for PEM material, not the real
 			// values. Treat as write-only so they are not stored in state and cannot
-			// create perpetual drift after import/refresh.
+			// create perpetual drift after refresh.
 			WriteOnlyFields:    []string{"ca_certificate", "certificate", "private_key"},
 			WriteOnlyMD5Fields: []string{"ca_certificate", "certificate", "private_key"},
 			SensitiveFields:    []string{"ca_certificate", "certificate", "private_key"},

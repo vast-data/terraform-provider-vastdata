@@ -153,7 +153,6 @@ resource "vastdata_view" "vastdb_view" {
 
 # --------------------
 
-# ignore:e2e - nfs4_triggers endpoint requires cluster-level feature enablement
 data "vastdata_view_policy" "vastdb_view_policy_default" {
   name = "default"
 }

@@ -35,6 +35,10 @@ type Resource struct {
 	newManager   ResourceFactoryFn
 	providerData *ProviderData
 	managerName  string
+	// lifecycle drives the CRUD operations of this resource kind. It is built in Configure.
+	// The framework creates a new Resource and calls Configure for every RPC, so it lives for
+	// one RPC, not for the provider process: add callbacks right after it is built.
+	lifecycle *ResourceLifecycle
 }
 
 func (r *Resource) EmptyManager() ResourceManager {
@@ -166,7 +170,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 			// provider, causing a schema-reconciliation update.  Resources that
 			// implement MigrateModePassThroughUpdate opt in to allowing that
 			// update instead of being blocked.
-			if _, ok := findHook[MigrateModePassThroughUpdate](r.EmptyManager()); !ok {
+			if _, ok := r.EmptyManager().(MigrateModePassThroughUpdate); !ok {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("MigrateMode[%s]: update operation blocked.", r.managerName),
 					"VASTDATA_MIGRATE_MODE is intended for populating an EMPTY state from existing infrastructure. "+
@@ -215,7 +219,7 @@ func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRe
 		return
 	}
 	manager := r.NewManager(req.Plan)
-	imp, ok := findHook[ModifyPlanResource](manager)
+	imp, ok := manager.(ModifyPlanResource)
 	if !ok {
 		return
 	}
@@ -264,6 +268,7 @@ func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureReques
 	}
 
 	r.providerData = providerData
+	r.lifecycle = NewResourceLifecycle(providerData.Client, r.managerName)
 }
 
 func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
@@ -295,10 +300,8 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		return
 	}
 
-	if err = forEachHook(manager, func(imp PrepareImportResourceState) error {
-		logging.Debug(ctx, fmt.Sprintf("PrepareImportResourceState[%s]: do.", managerName))
-		return imp.PrepareImportResourceState(ctx, rest)
-	}); err != nil {
+	logging.Debug(ctx, fmt.Sprintf("PrepareImportResourceState[%s]: do.", managerName))
+	if err = r.lifecycle.runPrepareImportResourceState(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("PrepareImportResourceState[%q]", managerName),
 			err.Error(),
@@ -311,9 +314,9 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		fmt.Sprintf("ImportState[%q] - state:\n%s\n", managerName, tfState.Pretty()),
 	)
 
-	if imp, ok := findHook[ImportResourceState](manager); ok {
+	if customImport, err := r.lifecycle.runImportResourceState(ctx, req, manager); customImport {
 		logging.Debug(ctx, fmt.Sprintf("ImportResourceState[%s]: do.", managerName))
-		if err := imp.ImportResourceState(req, ctx, rest); err != nil {
+		if err != nil {
 			if errors.As(err, &CustomImportOnly{}) {
 				logging.Debug(
 					ctx,
@@ -350,10 +353,8 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 	}
 
 	// Before reading, allow resource to prepare read (same as in readImpl)
-	if err = forEachHook(manager, func(prep PrepareReadResource) error {
-		logging.Debug(ctx, fmt.Sprintf("PrepareReadResource[%s]: do.", managerName))
-		return prep.PrepareReadResource(ctx, rest)
-	}); err != nil {
+	logging.Debug(ctx, fmt.Sprintf("PrepareReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runPrepareReadResource(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("PrepareReadResource[%q]", managerName),
 			err.Error(),
@@ -362,10 +363,13 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 	}
 
 	// Populate full state from backend using the same logic as read (without SDK response wrapper)
-	var record DisplayableRecord
-	if reader, ok := findHook[ReadResource](manager); ok {
-		logging.Debug(ctx, fmt.Sprintf("ImportState[%s]: reading resource after key parsing.", managerName))
-		record, err = reader.ReadResource(ctx, rest)
+	var (
+		record     DisplayableRecord
+		customRead bool
+	)
+	record, customRead, err = r.lifecycle.runReadResource(ctx, manager)
+	if customRead {
+		logging.Debug(ctx, fmt.Sprintf("ImportState[%s]: read resource after key parsing with ReadResource.", managerName))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: failed to read imported resource.", managerName),
@@ -393,10 +397,7 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 	}
 
 	if record != nil {
-		if transformer, ok := findHook[TransformResponseRecord](manager); ok {
-			logging.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
+		record = runTransformResponseRecord(manager, record.(Record))
 
 		// Automatically populate _id fields from nested objects
 		// e.g., extract local_provider_id from local_provider.id
@@ -418,10 +419,8 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 	}
 
 	// After read hook (same as in readImpl)
-	if err = forEachHook(manager, func(aft AfterReadResource) error {
-		logging.Debug(ctx, fmt.Sprintf("AfterReadResource[%s]: do.", managerName))
-		return aft.AfterReadResource(ctx, rest)
-	}); err != nil {
+	logging.Debug(ctx, fmt.Sprintf("AfterReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runAfterReadResource(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("AfterReadResource[%q]", managerName),
 			err.Error(),
@@ -438,10 +437,8 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		return
 	}
 
-	if err = forEachHook(manager, func(imp AfterImportResourceState) error {
-		logging.Debug(ctx, fmt.Sprintf("AfterImportResourceState[%s]: do.", managerName))
-		return imp.AfterImportResourceState(ctx, rest)
-	}); err != nil {
+	logging.Debug(ctx, fmt.Sprintf("AfterImportResourceState[%s]: do.", managerName))
+	if err = r.lifecycle.runAfterImportResourceState(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("AfterImportResourceState[%q]", managerName),
 			err.Error(),
@@ -456,8 +453,7 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 	// Write-only attrs are null in Plan; load them from Config for the API request.
 	r.overlayWriteOnlyFromConfig(manager, req.Config)
 
-	lc := NewResourceLifecycle(r.providerData.Client, r.managerName)
-	if err := lc.Create(ctx, manager); err != nil {
+	if err := r.lifecycle.Create(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("error creating %q resource.", r.managerName),
 			err.Error(),
@@ -474,7 +470,6 @@ func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, r
 
 func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var (
-		rest        = r.providerData.Client
 		manager     = r.NewManager(req.Plan)
 		managerName = r.managerName
 		tfState     = manager.TfState()
@@ -485,10 +480,8 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 	logging.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: reading existing resource instead of creating.", managerName))
 
 	// Prepare read hooks (same as in readImpl/importStateImpl)
-	if err = forEachHook(manager, func(prep PrepareReadResource) error {
-		logging.Debug(ctx, fmt.Sprintf("MigrateMode/PrepareReadResource[%s]: do.", managerName))
-		return prep.PrepareReadResource(ctx, rest)
-	}); err != nil {
+	logging.Debug(ctx, fmt.Sprintf("MigrateMode/PrepareReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runPrepareReadResource(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("MigrateMode/PrepareReadResource[%q]", managerName),
 			err.Error(),
@@ -497,10 +490,9 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 	}
 
 	// Read the resource using the same logic as import
-	if reader, ok := findHook[ReadResource](manager); ok {
-		logging.Debug(ctx, fmt.Sprintf("MigrateMode[%s]: using custom ReadResource.", managerName))
-		record, err = reader.ReadResource(ctx, rest)
-	} else {
+	var customRead bool
+	record, customRead, err = r.lifecycle.runReadResource(ctx, manager)
+	if !customRead {
 		logging.Debug(ctx, fmt.Sprintf("MigrateMode[%s]: using default read by search params.", managerName))
 		record, err = r.getRecordBySearchParams(ctx, manager, nil, "MigrateCreate")
 	}
@@ -515,10 +507,7 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 
 	if record != nil {
 		// Transform response if needed
-		if transformer, ok := findHook[TransformResponseRecord](manager); ok {
-			logging.Debug(ctx, fmt.Sprintf("MigrateMode/TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
+		record = runTransformResponseRecord(manager, record.(Record))
 
 		// Populate _id fields from nested objects (same as import)
 		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
@@ -540,10 +529,8 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 	}
 
 	// After read hook
-	if err = forEachHook(manager, func(aft AfterReadResource) error {
-		logging.Debug(ctx, fmt.Sprintf("MigrateMode/AfterReadResource[%s]: do.", managerName))
-		return aft.AfterReadResource(ctx, rest)
-	}); err != nil {
+	logging.Debug(ctx, fmt.Sprintf("MigrateMode/AfterReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runAfterReadResource(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("MigrateMode/AfterReadResource[%q]", managerName),
 			err.Error(),
@@ -565,8 +552,7 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 
 func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	manager := r.NewManager(req.State)
-	lc := NewResourceLifecycle(r.providerData.Client, r.managerName)
-	exists, err := lc.Read(ctx, manager)
+	exists, err := r.lifecycle.Read(ctx, manager)
 	if err != nil {
 		resp.Diagnostics.AddError(fmt.Sprintf("Read[%s]", r.managerName), err.Error())
 		logging.Error(ctx, fmt.Sprintf("Read[%s]: error reading resource: %s", r.managerName, err))
@@ -591,8 +577,7 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 	// Write-only attrs are null in Plan; load them from Config for the API request.
 	r.overlayWriteOnlyFromConfig(desired, req.Config)
 
-	lc := NewResourceLifecycle(r.providerData.Client, r.managerName)
-	if err := lc.Update(ctx, current, desired); err != nil {
+	if err := r.lifecycle.Update(ctx, current, desired); err != nil {
 		resp.Diagnostics.AddError(fmt.Sprintf("Update[%s].", r.managerName), err.Error())
 		return
 	}
@@ -606,15 +591,14 @@ func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, r
 
 func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	manager := r.NewManager(req.State)
-	lc := NewResourceLifecycle(r.providerData.Client, r.managerName)
-	if err := lc.Delete(ctx, manager); err != nil {
+	if err := r.lifecycle.Delete(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(fmt.Sprintf("Delete[%s]", r.managerName), err.Error())
 	}
 }
 
 func (r *Resource) validateConfigImpl(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
 	manager := r.NewManager(req.Config)
-	if imp, ok := findHook[ValidateResourceConfig](manager); ok {
+	if imp, ok := manager.(ValidateResourceConfig); ok {
 		if err := imp.ValidateResourceConfig(ctx); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ValidateResourceConfig[%q]", r.managerName),

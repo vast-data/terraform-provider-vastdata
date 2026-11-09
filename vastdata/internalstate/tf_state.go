@@ -74,18 +74,11 @@ type FieldSet struct {
 }
 
 func (fs *FieldSet) shouldInclude(field string) bool {
-	for _, ex := range fs.Exclude {
-		if ex == field {
-			return false
-		}
+	if slices.Contains(fs.Exclude, field) {
+		return false
 	}
 	if len(fs.Include) > 0 {
-		for _, in := range fs.Include {
-			if in == field {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(fs.Include, field)
 	}
 	return true
 }
@@ -144,12 +137,7 @@ func (meta attrMeta) satisfyFieldFilterFlag(comb FilterTagCombination, flags ...
 
 	switch comb {
 	case FilterOr:
-		for _, f := range flags {
-			if matches(f) {
-				return true
-			}
-		}
-		return false
+		return slices.ContainsFunc(flags, matches)
 
 	case FilterAnd:
 		for _, f := range flags {
@@ -250,9 +238,7 @@ func (s *TFState) CopyTFState() *TFState {
 	s.assertEnabled()
 
 	rawCopy := make(map[string]attr.Value, len(s.Raw))
-	for k, v := range s.Raw {
-		rawCopy[k] = v
-	}
+	maps.Copy(rawCopy, s.Raw)
 
 	return &TFState{
 		Raw:     rawCopy,

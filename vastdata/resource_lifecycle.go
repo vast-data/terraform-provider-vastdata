@@ -6,14 +6,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
-// ResourceLifecycle ----------------------------------
+// ResourceLifecycle ----------------
 // Framework-agnostic lifecycle
 // ----------------------------------
 //
@@ -26,7 +28,14 @@ import (
 // diagnostics, or tfsdk types. Inputs are managers whose ResourceState is already seeded.
 // Outputs are plain errors, and the manager's ResourceState is updated in place so the
 // caller can persist it through an is.StateSink.
+//
+// One lifecycle serves one resource kind for the whole session of its runtime: Terraform
+// builds it when the resource is configured, Crossplane when it connects. It drives Read
+// and whichever of Create, Update and Delete follow. The ResourceCallbacks it embeds are
+// therefore shared by every operation it runs (see components.go, "Resource callbacks").
 type ResourceLifecycle struct {
+	ResourceCallbacks
+
 	// Rest is the connected VAST client.
 	Rest *VMSRest
 	// Name is the manager's snake_case name, used in errors and logs.
@@ -110,9 +119,7 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 		}
 	}()
 
-	if err = forEachHook(manager, func(imp PrepareCreateResource) error {
-		return imp.PrepareCreateResource(ctx, rest)
-	}); err != nil {
+	if err = l.runPrepareCreateResource(ctx, manager); err != nil {
 		return l.stageErr("PrepareCreateResource", err)
 	}
 
@@ -121,25 +128,21 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 		createRetryOn = h.RetryOn.Create
 	}
 
-	if imp, ok := findHook[CreateResource](manager); ok {
-		createFn := imp.CreateResource
-		if createRetryOn != nil {
-			createFn = WithRetry(createRetryOn, "CreateResource", l.Name, imp.CreateResource)
-		}
-		record, err = createFn(ctx, rest)
-	} else {
+	var customCreate bool
+	record, customCreate, err = l.runCreateResource(ctx, manager, createRetryOn)
+	if !customCreate {
 		if err = l.checkSearchable(ctx, state); err != nil {
 			return err
 		}
 		createParams := state.GetCreateParams()
-		if transformer, ok := findHook[TransformRequestBody](manager); ok {
-			createParams = transformer.TransformRequestBody(createParams)
-		}
+		createParams = runTransformRequestBody(manager, createParams)
 
-		var lookupErr error
-		if lookup, ok := findHook[LookupForCreate](manager); ok {
-			record, lookupErr = lookup.LookupForCreate(ctx, rest)
-		} else {
+		var (
+			lookupErr    error
+			customLookup bool
+		)
+		record, customLookup, lookupErr = l.runLookupForCreate(ctx, manager)
+		if !customLookup {
 			record, lookupErr = getRecordBySearchParams(ctx, api, state, nil, l.Name, "Create")
 		}
 
@@ -162,12 +165,8 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 		default:
 			// Found an existing resource: take management of it.
 			existing := asRecord(record)
-			if transformer, ok := findHook[TransformResponseRecord](manager); ok {
-				existing = transformer.TransformResponseRecord(existing)
-			}
-			if normalizer, ok := findHook[NormalizeRecordForCreateAdopt](manager); ok {
-				existing = normalizer.NormalizeRecordForCreateAdopt(existing)
-			}
+			existing = runTransformResponseRecord(manager, existing)
+			existing = runNormalizeRecordForCreateAdopt(manager, existing)
 			record = existing
 			// NOTE: the default implementation only works for resources with an 'id' field.
 			// Resources without one must implement CreateResource.
@@ -195,11 +194,10 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 			return err
 		}
 
-		if err = forEachHook(manager, func(imp AfterCreateResource) error {
-			return imp.AfterCreateResource(ctx, rest, rec)
-		}); err != nil {
+		_, ownAfterCreate := manager.(AfterCreateResource)
+		if err = l.runAfterCreateResource(ctx, manager, rec); err != nil {
 			return l.stageErr("AfterCreateResource", err)
-		} else if !hasOwnHook[AfterCreateResource](manager) {
+		} else if !ownAfterCreate {
 			if h := state.StateHints(); h != nil && len(h.EditOnlyFields) > 0 {
 				// Fields that cannot be set on creation (e.g. "enabled") are applied via update.
 				if updateParams := state.GetReadEditOnlyParams(); len(updateParams) > 0 {
@@ -217,9 +215,7 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 			}
 		}
 
-		if transformer, ok := findHook[TransformResponseRecord](manager); ok {
-			rec = transformer.TransformResponseRecord(rec)
-		}
+		rec = runTransformResponseRecord(manager, rec)
 		if err = mergeSubResources(ctx, manager, rest, rec, l.Name); err != nil {
 			return l.stageErr("GetSubResources", err)
 		}
@@ -236,14 +232,12 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 
 func (l *ResourceLifecycle) rollbackCreate(ctx context.Context, manager ResourceManager) {
 	rest := l.Rest
-	if imp, ok := findHook[DeleteResource](manager); ok {
-		_ = imp.DeleteResource(ctx, rest)
-	} else if _, err := deleteRecordBySearchParams(ctx, manager.API(rest), manager.TfState(), l.Name, "TransactionDelete"); err != nil {
-		logging.Warn(ctx, fmt.Sprintf("TransactionDelete[%s]: error deleting resource after error: %s", l.Name, err))
+	if handled, _ := l.runDeleteResource(ctx, manager); !handled {
+		if _, err := deleteRecordBySearchParams(ctx, manager.API(rest), manager.TfState(), l.Name, "TransactionDelete"); err != nil {
+			logging.Warn(ctx, fmt.Sprintf("TransactionDelete[%s]: error deleting resource after error: %s", l.Name, err))
+		}
 	}
-	_ = forEachHook(manager, func(imp AfterDeleteResource) error {
-		return imp.AfterDeleteResource(ctx, rest)
-	})
+	_ = l.runAfterDeleteResource(ctx, manager)
 }
 
 // Read reads the external resource and refreshes manager's state from it.
@@ -255,15 +249,13 @@ func (l *ResourceLifecycle) Read(ctx context.Context, manager ResourceManager) (
 		record DisplayableRecord
 	)
 
-	if err = forEachHook(manager, func(imp PrepareReadResource) error {
-		return imp.PrepareReadResource(ctx, rest)
-	}); err != nil {
+	if err = l.runPrepareReadResource(ctx, manager); err != nil {
 		return false, l.stageErr("PrepareReadResource", err)
 	}
 
-	if imp, ok := findHook[ReadResource](manager); ok {
-		record, err = imp.ReadResource(ctx, rest)
-	} else {
+	var customRead bool
+	record, customRead, err = l.runReadResource(ctx, manager)
+	if !customRead {
 		if err = l.checkSearchable(ctx, state); err != nil {
 			return false, err
 		}
@@ -281,9 +273,7 @@ func (l *ResourceLifecycle) Read(ctx context.Context, manager ResourceManager) (
 	}
 
 	if rec := asRecord(record); rec != nil {
-		if transformer, ok := findHook[TransformResponseRecord](manager); ok {
-			rec = transformer.TransformResponseRecord(rec)
-		}
+		rec = runTransformResponseRecord(manager, rec)
 		PopulateIDFieldsFromNestedObjects(ctx, state, rec)
 		if err = mergeSubResources(ctx, manager, rest, rec, l.Name); err != nil {
 			return false, l.stageErr("GetSubResources", err)
@@ -293,9 +283,7 @@ func (l *ResourceLifecycle) Read(ctx context.Context, manager ResourceManager) (
 		}
 	}
 
-	if err = forEachHook(manager, func(imp AfterReadResource) error {
-		return imp.AfterReadResource(ctx, rest)
-	}); err != nil {
+	if err = l.runAfterReadResource(ctx, manager); err != nil {
 		return false, l.stageErr("AfterReadResource", err)
 	}
 	return true, nil
@@ -312,23 +300,13 @@ func (l *ResourceLifecycle) Update(ctx context.Context, current, desired Resourc
 		record       DisplayableRecord
 	)
 
-	desiredPrep, desiredPrepOK := findHook[PrepareUpdateResource](desired)
-	if err = forEachHook(current, func(imp PrepareUpdateResource) error {
-		if !desiredPrepOK {
-			return fmt.Errorf("desired manager %T does not implement PrepareUpdateResource", desired)
-		}
-		return imp.PrepareUpdateResource(ctx, desiredPrep, rest)
-	}); err != nil {
+	if err = l.runPrepareUpdateResource(ctx, current, desired); err != nil {
 		return l.stageErr("PrepareUpdateResource", err)
 	}
 
-	if imp, ok := findHook[UpdateResource](current); ok {
-		desiredUpd, ok := findHook[UpdateResource](desired)
-		if !ok {
-			return l.stageErr("UpdateResource", fmt.Errorf("desired manager %T does not implement UpdateResource", desired))
-		}
-		record, err = imp.UpdateResource(ctx, desiredUpd, rest)
-	} else {
+	var customUpdate bool
+	record, customUpdate, err = l.runUpdateResource(ctx, current, desired)
+	if !customUpdate {
 		if err = l.checkSearchable(ctx, desiredState); err != nil {
 			return err
 		}
@@ -341,9 +319,7 @@ func (l *ResourceLifecycle) Update(ctx context.Context, current, desired Resourc
 			return l.stageErr("update", fmt.Errorf("record does not have 'id' field; implement UpdateResource for this resource"))
 		}
 		updateParams := desiredState.GetUpdateParams(currentState)
-		if transformer, ok := findHook[TransformRequestBody](current); ok {
-			updateParams = transformer.TransformRequestBody(updateParams)
-		}
+		updateParams = runTransformRequestBody(current, updateParams)
 		delete(updateParams, "id") // The ID must never be updated.
 		if len(updateParams) > 0 {
 			record, err = api.UpdateWithContext(ctx, id, updateParams)
@@ -362,9 +338,7 @@ func (l *ResourceLifecycle) Update(ctx context.Context, current, desired Resourc
 		if rec, err = l.postProcessRecord(ctx, "update", current, rec); err != nil {
 			return err
 		}
-		if transformer, ok := findHook[TransformResponseRecord](current); ok {
-			rec = transformer.TransformResponseRecord(rec)
-		}
+		rec = runTransformResponseRecord(current, rec)
 		// Merge sub-resources using the desired manager so trigger fields reflect the
 		// wanted state, not the (potentially stale) current one.
 		if err = mergeSubResources(ctx, desired, rest, rec, l.Name); err != nil {
@@ -374,15 +348,10 @@ func (l *ResourceLifecycle) Update(ctx context.Context, current, desired Resourc
 			return l.stageErr("fill state", err)
 		}
 
-		desiredAfter, desiredAfterOK := findHook[AfterUpdateResource](desired)
-		if err = forEachHook(current, func(imp AfterUpdateResource) error {
-			if !desiredAfterOK {
-				return fmt.Errorf("desired manager %T does not implement AfterUpdateResource", desired)
-			}
-			return imp.AfterUpdateResource(ctx, desiredAfter, rest, rec)
-		}); err != nil {
+		_, ownAfterUpdate := current.(AfterUpdateResource)
+		if err = l.runAfterUpdateResource(ctx, current, desired, rec); err != nil {
 			return l.stageErr("AfterUpdateResource", err)
-		} else if !hasOwnHook[AfterUpdateResource](current) {
+		} else if !ownAfterUpdate {
 			if h := currentState.StateHints(); h != nil && len(h.EditOnlyFields) > 0 {
 				// If AfterUpdateResource is implemented it is assumed to handle edit-only fields itself.
 				if editOnlyParams := desiredState.GetChangedEditOnlyParams(currentState); len(editOnlyParams) > 0 {
@@ -395,13 +364,9 @@ func (l *ResourceLifecycle) Update(ctx context.Context, current, desired Resourc
 						return l.stageErr("update edit-only fields", editErr)
 					}
 					if er := asRecord(editRecord); er != nil && !er.Empty() {
-						for k, v := range er {
-							rec[k] = v
-						}
+						maps.Copy(rec, er)
 					} else {
-						for k, v := range editOnlyParams {
-							rec[k] = v
-						}
+						maps.Copy(rec, editOnlyParams)
 					}
 				}
 			}
@@ -421,9 +386,7 @@ func (l *ResourceLifecycle) Delete(ctx context.Context, manager ResourceManager)
 		state = manager.TfState()
 	)
 
-	if err = forEachHook(manager, func(imp PrepareDeleteResource) error {
-		return imp.PrepareDeleteResource(ctx, rest)
-	}); err != nil {
+	if err = l.runPrepareDeleteResource(ctx, manager); err != nil {
 		return l.stageErr("PrepareDeleteResource", err)
 	}
 
@@ -433,8 +396,8 @@ func (l *ResourceLifecycle) Delete(ctx context.Context, manager ResourceManager)
 	}
 
 	deleteFn := func(ctx context.Context, rest *VMSRest) error {
-		if imp, ok := findHook[DeleteResource](manager); ok {
-			return imp.DeleteResource(ctx, rest)
+		if handled, err := l.runDeleteResource(ctx, manager); handled {
+			return err
 		}
 		if err := l.checkSearchable(ctx, state); err != nil {
 			return err
@@ -464,10 +427,330 @@ func (l *ResourceLifecycle) Delete(ctx context.Context, manager ResourceManager)
 		return l.stageErr("delete", err)
 	}
 
-	if err = forEachHook(manager, func(imp AfterDeleteResource) error {
-		return imp.AfterDeleteResource(ctx, rest)
-	}); err != nil {
+	if err = l.runAfterDeleteResource(ctx, manager); err != nil {
 		return l.stageErr("AfterDeleteResource", err)
 	}
 	return nil
+}
+
+// -----------------
+// Stage runners for the regular hooks
+// -----------------
+//
+// Each runner hides the type assertion for one optional hook of a manager. The CRUD ones
+// report whether the manager implements the hook (handled): when it does not, the caller
+// falls back to the default API-backed behavior. The stages with callbacks are further down,
+// next to ResourceCallbacks.
+
+// runCreateResource runs the manager's CreateResource, retrying it with retryOn when set.
+func (l *ResourceLifecycle) runCreateResource(ctx context.Context, m ResourceManager, retryOn *is.RetryExpression) (DisplayableRecord, bool, error) {
+	imp, ok := m.(CreateResource)
+	if !ok {
+		return nil, false, nil
+	}
+	createFn := imp.CreateResource
+	if retryOn != nil {
+		createFn = WithRetry(retryOn, "CreateResource", l.Name, createFn)
+	}
+	record, err := createFn(ctx, l.Rest)
+	return record, true, err
+}
+
+// runLookupForCreate runs the manager's LookupForCreate, which finds an existing resource
+// to adopt before creating.
+func (l *ResourceLifecycle) runLookupForCreate(ctx context.Context, m ResourceManager) (DisplayableRecord, bool, error) {
+	imp, ok := m.(LookupForCreate)
+	if !ok {
+		return nil, false, nil
+	}
+	record, err := imp.LookupForCreate(ctx, l.Rest)
+	return record, true, err
+}
+
+// runReadResource runs the manager's ReadResource.
+func (l *ResourceLifecycle) runReadResource(ctx context.Context, m ResourceManager) (DisplayableRecord, bool, error) {
+	imp, ok := m.(ReadResource)
+	if !ok {
+		return nil, false, nil
+	}
+	record, err := imp.ReadResource(ctx, l.Rest)
+	return record, true, err
+}
+
+// runUpdateResource runs current's UpdateResource with desired as the plan. Both managers
+// must implement it.
+func (l *ResourceLifecycle) runUpdateResource(ctx context.Context, current, desired ResourceManager) (DisplayableRecord, bool, error) {
+	imp, ok := current.(UpdateResource)
+	if !ok {
+		return nil, false, nil
+	}
+	plan, ok := desired.(UpdateResource)
+	if !ok {
+		return nil, true, fmt.Errorf("desired manager %T does not implement UpdateResource", desired)
+	}
+	record, err := imp.UpdateResource(ctx, plan, l.Rest)
+	return record, true, err
+}
+
+// runDeleteResource runs the manager's DeleteResource.
+func (l *ResourceLifecycle) runDeleteResource(ctx context.Context, m ResourceManager) (bool, error) {
+	imp, ok := m.(DeleteResource)
+	if !ok {
+		return false, nil
+	}
+	return true, imp.DeleteResource(ctx, l.Rest)
+}
+
+// runPrepareImportResourceState runs the manager's PrepareImportResourceState, if any.
+func (l *ResourceLifecycle) runPrepareImportResourceState(ctx context.Context, m ResourceManager) error {
+	if imp, ok := m.(PrepareImportResourceState); ok {
+		return imp.PrepareImportResourceState(ctx, l.Rest)
+	}
+	return nil
+}
+
+// runImportResourceState runs the manager's ImportResourceState and reports whether it
+// has one. Without one, the caller imports with the default import ID parsing.
+func (l *ResourceLifecycle) runImportResourceState(ctx context.Context, req resource.ImportStateRequest, m ResourceManager) (bool, error) {
+	imp, ok := m.(ImportResourceState)
+	if !ok {
+		return false, nil
+	}
+	return true, imp.ImportResourceState(req, ctx, l.Rest)
+}
+
+// runAfterImportResourceState runs the manager's AfterImportResourceState, if any.
+func (l *ResourceLifecycle) runAfterImportResourceState(ctx context.Context, m ResourceManager) error {
+	if imp, ok := m.(AfterImportResourceState); ok {
+		return imp.AfterImportResourceState(ctx, l.Rest)
+	}
+	return nil
+}
+
+// -----------------
+// Transforms
+// -----------------
+//
+// Plain functions of the manager: the datasource read path uses them as well and has no
+// lifecycle. Without the hook the value is returned as it is.
+
+// runTransformRequestBody lets the manager rewrite the body of a create or update request.
+func runTransformRequestBody(m any, body params) params {
+	if imp, ok := m.(TransformRequestBody); ok {
+		return imp.TransformRequestBody(body)
+	}
+	return body
+}
+
+// runTransformResponseRecord lets the manager rewrite a record the API returned.
+func runTransformResponseRecord(m any, record Record) Record {
+	if imp, ok := m.(TransformResponseRecord); ok {
+		return imp.TransformResponseRecord(record)
+	}
+	return record
+}
+
+// runNormalizeRecordForCreateAdopt lets the manager normalize an existing record before
+// create adopts it.
+func runNormalizeRecordForCreateAdopt(m any, record Record) Record {
+	if imp, ok := m.(NormalizeRecordForCreateAdopt); ok {
+		return imp.NormalizeRecordForCreateAdopt(record)
+	}
+	return record
+}
+
+// -----------------
+// Resource callbacks
+// -----------------
+
+// ResourceCallbacks stores the callbacks of every stage. ResourceLifecycle embeds it, which
+// makes the lifecycle a ResourceCallbackExecutor. The zero value has no callbacks.
+type ResourceCallbacks struct {
+	prepareCreate []func(context.Context, *VMSRest) error
+	afterCreate   []func(context.Context, *VMSRest, Record) error
+	prepareRead   []func(context.Context, *VMSRest) error
+	afterRead     []func(context.Context, *VMSRest) error
+	prepareUpdate []func(context.Context, ResourceManager, *VMSRest) error
+	afterUpdate   []func(context.Context, ResourceManager, *VMSRest, Record) error
+	prepareDelete []func(context.Context, *VMSRest) error
+	afterDelete   []func(context.Context, *VMSRest) error
+}
+
+var _ ResourceCallbackExecutor = (*ResourceCallbacks)(nil)
+
+// runAll calls fn for every callback and returns the first error.
+func runAll[F any](callbacks []F, fn func(F) error) error {
+	for _, cb := range callbacks {
+		if err := fn(cb); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *ResourceCallbacks) AddPrepareCreateResourceCallback(fn func(context.Context, *VMSRest) error) {
+	c.prepareCreate = append(c.prepareCreate, fn)
+}
+
+func (c *ResourceCallbacks) ExecutePrepareCreateResourceCallbacks(ctx context.Context, rest *VMSRest) error {
+	return runAll(c.prepareCreate, func(fn func(context.Context, *VMSRest) error) error {
+		return fn(ctx, rest)
+	})
+}
+
+func (c *ResourceCallbacks) AddAfterCreateResourceCallback(fn func(context.Context, *VMSRest, Record) error) {
+	c.afterCreate = append(c.afterCreate, fn)
+}
+
+func (c *ResourceCallbacks) ExecuteAfterCreateResourceCallbacks(ctx context.Context, rest *VMSRest, record Record) error {
+	return runAll(c.afterCreate, func(fn func(context.Context, *VMSRest, Record) error) error {
+		return fn(ctx, rest, record)
+	})
+}
+
+func (c *ResourceCallbacks) AddPrepareReadResourceCallback(fn func(context.Context, *VMSRest) error) {
+	c.prepareRead = append(c.prepareRead, fn)
+}
+
+func (c *ResourceCallbacks) ExecutePrepareReadResourceCallbacks(ctx context.Context, rest *VMSRest) error {
+	return runAll(c.prepareRead, func(fn func(context.Context, *VMSRest) error) error {
+		return fn(ctx, rest)
+	})
+}
+
+func (c *ResourceCallbacks) AddAfterReadResourceCallback(fn func(context.Context, *VMSRest) error) {
+	c.afterRead = append(c.afterRead, fn)
+}
+
+func (c *ResourceCallbacks) ExecuteAfterReadResourceCallbacks(ctx context.Context, rest *VMSRest) error {
+	return runAll(c.afterRead, func(fn func(context.Context, *VMSRest) error) error {
+		return fn(ctx, rest)
+	})
+}
+
+func (c *ResourceCallbacks) AddPrepareUpdateResourceCallback(fn func(context.Context, ResourceManager, *VMSRest) error) {
+	c.prepareUpdate = append(c.prepareUpdate, fn)
+}
+
+func (c *ResourceCallbacks) ExecutePrepareUpdateResourceCallbacks(ctx context.Context, desired ResourceManager, rest *VMSRest) error {
+	return runAll(c.prepareUpdate, func(fn func(context.Context, ResourceManager, *VMSRest) error) error {
+		return fn(ctx, desired, rest)
+	})
+}
+
+func (c *ResourceCallbacks) AddAfterUpdateResourceCallback(fn func(context.Context, ResourceManager, *VMSRest, Record) error) {
+	c.afterUpdate = append(c.afterUpdate, fn)
+}
+
+func (c *ResourceCallbacks) ExecuteAfterUpdateResourceCallbacks(ctx context.Context, desired ResourceManager, rest *VMSRest, record Record) error {
+	return runAll(c.afterUpdate, func(fn func(context.Context, ResourceManager, *VMSRest, Record) error) error {
+		return fn(ctx, desired, rest, record)
+	})
+}
+
+func (c *ResourceCallbacks) AddPrepareDeleteResourceCallback(fn func(context.Context, *VMSRest) error) {
+	c.prepareDelete = append(c.prepareDelete, fn)
+}
+
+func (c *ResourceCallbacks) ExecutePrepareDeleteResourceCallbacks(ctx context.Context, rest *VMSRest) error {
+	return runAll(c.prepareDelete, func(fn func(context.Context, *VMSRest) error) error {
+		return fn(ctx, rest)
+	})
+}
+
+func (c *ResourceCallbacks) AddAfterDeleteResourceCallback(fn func(context.Context, *VMSRest) error) {
+	c.afterDelete = append(c.afterDelete, fn)
+}
+
+func (c *ResourceCallbacks) ExecuteAfterDeleteResourceCallbacks(ctx context.Context, rest *VMSRest) error {
+	return runAll(c.afterDelete, func(fn func(context.Context, *VMSRest) error) error {
+		return fn(ctx, rest)
+	})
+}
+
+// -----------------
+// Stage runners: the manager's own hook first, then the lifecycle's callbacks.
+// A failing hook is returned immediately, and no callback of that stage runs.
+// -----------------
+
+func (l *ResourceLifecycle) runPrepareCreateResource(ctx context.Context, m ResourceManager) error {
+	if imp, ok := m.(PrepareCreateResource); ok {
+		if err := imp.PrepareCreateResource(ctx, l.Rest); err != nil {
+			return err
+		}
+	}
+	return l.ExecutePrepareCreateResourceCallbacks(ctx, l.Rest)
+}
+
+func (l *ResourceLifecycle) runAfterCreateResource(ctx context.Context, m ResourceManager, record Record) error {
+	if imp, ok := m.(AfterCreateResource); ok {
+		if err := imp.AfterCreateResource(ctx, l.Rest, record); err != nil {
+			return err
+		}
+	}
+	return l.ExecuteAfterCreateResourceCallbacks(ctx, l.Rest, record)
+}
+
+func (l *ResourceLifecycle) runPrepareReadResource(ctx context.Context, m ResourceManager) error {
+	if imp, ok := m.(PrepareReadResource); ok {
+		if err := imp.PrepareReadResource(ctx, l.Rest); err != nil {
+			return err
+		}
+	}
+	return l.ExecutePrepareReadResourceCallbacks(ctx, l.Rest)
+}
+
+func (l *ResourceLifecycle) runAfterReadResource(ctx context.Context, m ResourceManager) error {
+	if imp, ok := m.(AfterReadResource); ok {
+		if err := imp.AfterReadResource(ctx, l.Rest); err != nil {
+			return err
+		}
+	}
+	return l.ExecuteAfterReadResourceCallbacks(ctx, l.Rest)
+}
+
+// runPrepareUpdateResource runs current's hook and the callbacks with desired as the plan.
+func (l *ResourceLifecycle) runPrepareUpdateResource(ctx context.Context, current, desired ResourceManager) error {
+	if imp, ok := current.(PrepareUpdateResource); ok {
+		plan, ok := desired.(PrepareUpdateResource)
+		if !ok {
+			return errors.New("desired manager does not implement PrepareUpdateResource")
+		}
+		if err := imp.PrepareUpdateResource(ctx, plan, l.Rest); err != nil {
+			return err
+		}
+	}
+	return l.ExecutePrepareUpdateResourceCallbacks(ctx, desired, l.Rest)
+}
+
+// runAfterUpdateResource runs current's hook and the callbacks with desired as the plan.
+func (l *ResourceLifecycle) runAfterUpdateResource(ctx context.Context, current, desired ResourceManager, record Record) error {
+	if imp, ok := current.(AfterUpdateResource); ok {
+		plan, ok := desired.(AfterUpdateResource)
+		if !ok {
+			return errors.New("desired manager does not implement AfterUpdateResource")
+		}
+		if err := imp.AfterUpdateResource(ctx, plan, l.Rest, record); err != nil {
+			return err
+		}
+	}
+	return l.ExecuteAfterUpdateResourceCallbacks(ctx, desired, l.Rest, record)
+}
+
+func (l *ResourceLifecycle) runPrepareDeleteResource(ctx context.Context, m ResourceManager) error {
+	if imp, ok := m.(PrepareDeleteResource); ok {
+		if err := imp.PrepareDeleteResource(ctx, l.Rest); err != nil {
+			return err
+		}
+	}
+	return l.ExecutePrepareDeleteResourceCallbacks(ctx, l.Rest)
+}
+
+func (l *ResourceLifecycle) runAfterDeleteResource(ctx context.Context, m ResourceManager) error {
+	if imp, ok := m.(AfterDeleteResource); ok {
+		if err := imp.AfterDeleteResource(ctx, l.Rest); err != nil {
+			return err
+		}
+	}
+	return l.ExecuteAfterDeleteResourceCallbacks(ctx, l.Rest)
 }

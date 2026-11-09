@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"reflect"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -323,10 +324,8 @@ func ValidateFieldIsOneOf[T string | int64 | float64](tfState is.ResourceState, 
 		return fmt.Errorf("unsupported type for validation: %T", value)
 	}
 
-	for _, validValue := range validValues {
-		if value == validValue {
-			return nil // Valid value found
-		}
+	if slices.Contains(validValues, value) {
+		return nil // Valid value found
 	}
 
 	return fmt.Errorf("field %q must be one of %v, but got '%v'", field, validValues, value)
@@ -350,10 +349,8 @@ func ValidateFieldIsNoneOf[T string | int64 | float64](tfState is.ResourceState,
 		return fmt.Errorf("unsupported type for validation: %T", value)
 	}
 
-	for _, invalidValue := range invalidValues {
-		if value == invalidValue {
-			return fmt.Errorf("field %q must not be one of %v, but got '%v'", field, invalidValues, value)
-		}
+	if slices.Contains(invalidValues, value) {
+		return fmt.Errorf("field %q must not be one of %v, but got '%v'", field, invalidValues, value)
 	}
 
 	return nil
@@ -821,7 +818,7 @@ func handleMaybeAsyncTask(ctx context.Context, rest *VMSRest, record Record, tim
 }
 
 func resolveRecordAfterAsyncTask(ctx context.Context, manager ResourceManager, rest *VMSRest, record Record, managerName string) (Record, error) {
-	resolver, ok := findHook[ResolveRecordAfterAsyncTask](manager)
+	resolver, ok := manager.(ResolveRecordAfterAsyncTask)
 	if !ok {
 		return record, nil
 	}
@@ -1106,7 +1103,7 @@ func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record D
 		}
 	}
 
-	imp, ok := findHook[GetSubResources](manager)
+	imp, ok := manager.(GetSubResources)
 	if !ok {
 		return nil
 	}

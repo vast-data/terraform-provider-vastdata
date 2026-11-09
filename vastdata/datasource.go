@@ -133,15 +133,15 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 		err         error
 	)
 
-	if err = forEachHook(manager, func(imp PrepareReadDatasource) error {
+	if imp, ok := manager.(PrepareReadDatasource); ok {
 		logging.Debug(ctx, fmt.Sprintf("PrepareReadDatasource[%s]: do.", managerName))
-		return imp.PrepareReadDatasource(ctx, rest)
-	}); err != nil {
-		resp.Diagnostics.AddError(
-			fmt.Sprintf("PrepareReadDatasource[%q]", managerName),
-			err.Error(),
-		)
-		return
+		if err = imp.PrepareReadDatasource(ctx, rest); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("PrepareReadDatasource[%q]", managerName),
+				err.Error(),
+			)
+			return
+		}
 	}
 
 	logging.Debug(
@@ -153,7 +153,7 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
-	if imp, ok := findHook[ReadDatasource](manager); ok {
+	if imp, ok := manager.(ReadDatasource); ok {
 		logging.Debug(ctx, fmt.Sprintf("ReadDatasource[%s]: do.", managerName))
 		record, err = imp.ReadDatasource(ctx, rest)
 	} else {
@@ -171,10 +171,7 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 	}
 
 	if record != nil {
-		if transformer, ok := findHook[TransformResponseRecord](manager); ok {
-			logging.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
+		record = runTransformResponseRecord(manager, record.(Record))
 
 		// Automatically populate _id fields from nested objects
 		// e.g., extract local_provider_id from local_provider.id
@@ -196,15 +193,15 @@ func (d *Datasource) readImpl(ctx context.Context, req datasource.ReadRequest, r
 		logging.Debug(ctx, fmt.Sprintf("Read[%s]: no record returned, skipping state update.", managerName))
 	}
 
-	if err = forEachHook(manager, func(imp AfterReadDatasource) error {
+	if imp, ok := manager.(AfterReadDatasource); ok {
 		logging.Debug(ctx, fmt.Sprintf("AfterReadDatasource[%s]: do.", managerName))
-		return imp.AfterReadDatasource(ctx, rest)
-	}); err != nil {
-		resp.Diagnostics.AddError(
-			fmt.Sprintf("AfterReadDatasource[%q]", managerName),
-			err.Error(),
-		)
-		return
+		if err = imp.AfterReadDatasource(ctx, rest); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("AfterReadDatasource[%q]", managerName),
+				err.Error(),
+			)
+			return
+		}
 	}
 
 	if err = is.NewTFSdkSink(&resp.State).WriteState(ctx, tfState); err != nil {

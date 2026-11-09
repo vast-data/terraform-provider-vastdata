@@ -592,96 +592,165 @@ func TestResourceLifecycle_Create_ErrorIsWrappedAndDoesNotRollbackCustomCreate(t
 	}
 }
 
-func TestFindHook_SetterOverridesAndKeepsInnerHook(t *testing.T) {
+func TestResourceLifecycle_CallbacksRunAfterOwnHookInOrder(t *testing.T) {
 	var log []string
-	inner := newHookManager(t, &log, "alpha")
-	wrapped := WithReadResource(inner, func(context.Context, *VMSRest) (DisplayableRecord, error) {
-		return Record{"id": int64(7), "name": "from-setter"}, nil
-	})
-	wrapped = WithAfterDeleteResource(wrapped, func(context.Context, *VMSRest) error {
-		inner.record("setter-after-delete")
+	lc := NewResourceLifecycle(nil, "hook")
+	m := newHookManager(t, &log, "alpha")
+	desired := newHookManager(t, &log, "beta")
+
+	add := func(name string) func(context.Context, *VMSRest) error {
+		return func(context.Context, *VMSRest) error { m.record(name); return nil }
+	}
+	lc.AddPrepareCreateResourceCallback(add("cb-PrepareCreate-1"))
+	lc.AddPrepareCreateResourceCallback(add("cb-PrepareCreate-2"))
+	lc.AddAfterCreateResourceCallback(func(context.Context, *VMSRest, Record) error {
+		m.record("cb-AfterCreate")
 		return nil
 	})
-	if _, ok := WithCreateResource(wrapped, nil).(createResourceHook); ok {
-		t.Fatal("a nil function must leave the manager unchanged")
-	}
+	lc.AddPrepareReadResourceCallback(add("cb-PrepareRead"))
+	lc.AddAfterReadResourceCallback(add("cb-AfterRead"))
+	lc.AddPrepareUpdateResourceCallback(func(_ context.Context, d ResourceManager, _ *VMSRest) error {
+		m.record("cb-PrepareUpdate->" + d.TfState().String("name"))
+		return nil
+	})
+	lc.AddAfterUpdateResourceCallback(func(_ context.Context, d ResourceManager, _ *VMSRest, _ Record) error {
+		m.record("cb-AfterUpdate->" + d.TfState().String("name"))
+		return nil
+	})
+	lc.AddPrepareDeleteResourceCallback(add("cb-PrepareDelete"))
+	lc.AddAfterDeleteResourceCallback(add("cb-AfterDelete"))
 
-	reader, ok := findHook[ReadResource](wrapped)
-	if !ok {
-		t.Fatal("ReadResource setter was not found")
+	ctx := context.Background()
+	if err := lc.Create(ctx, m); err != nil {
+		t.Fatalf("Create: %v", err)
 	}
-	rec, err := reader.ReadResource(context.Background(), nil)
-	if err != nil || rec.(Record)["name"] != "from-setter" {
-		t.Fatalf("setter read = (%v, %v)", rec, err)
+	if _, err := lc.Read(ctx, m); err != nil {
+		t.Fatalf("Read: %v", err)
 	}
-	if _, ok := findHook[CreateResource](wrapped); !ok {
-		t.Fatal("wrappers hid the inner CreateResource")
+	if err := lc.Update(ctx, m, desired); err != nil {
+		t.Fatalf("Update: %v", err)
 	}
-	after, ok := findHook[AfterDeleteResource](wrapped)
-	if !ok {
-		t.Fatal("AfterDeleteResource setter was not found")
+	if err := lc.Delete(ctx, m); err != nil {
+		t.Fatalf("Delete: %v", err)
 	}
-	if err := after.AfterDeleteResource(context.Background(), nil); err != nil {
-		t.Fatal(err)
+	want := []string{
+		"PrepareCreate", "cb-PrepareCreate-1", "cb-PrepareCreate-2", "Create", "AfterCreate", "cb-AfterCreate",
+		"cb-PrepareRead", "Read", "cb-AfterRead",
+		"cb-PrepareUpdate->beta", "Update->beta", "cb-AfterUpdate->beta",
+		"cb-PrepareDelete", "Delete", "AfterDelete", "cb-AfterDelete",
 	}
-	if len(log) != 1 || log[0] != "setter-after-delete" {
-		t.Fatalf("log = %v", log)
+	if !reflect.DeepEqual(log, want) {
+		t.Fatalf("order = %v\nwant  %v", log, want)
 	}
 }
 
-func TestHasOwnHook_IgnoresWrappers(t *testing.T) {
+// A failing callback is returned as it is, and the callbacks after it do not run.
+func TestResourceCallbacks_FirstErrorStopsTheRest(t *testing.T) {
 	var log []string
-	inner := newHookManager(t, &log, "alpha")
-	wrapped := WithAfterDeleteResource(inner, func(context.Context, *VMSRest) error { return nil })
+	lc := NewResourceLifecycle(nil, "hook")
+	m := newHookManager(t, &log, "alpha")
+	lc.AddAfterDeleteResourceCallback(func(context.Context, *VMSRest) error {
+		m.record("cb-1")
+		return errors.New("cb-1-boom")
+	})
+	lc.AddAfterDeleteResourceCallback(func(context.Context, *VMSRest) error {
+		m.record("cb-2")
+		return errors.New("cb-2-boom")
+	})
 
-	if !hasOwnHook[AfterDeleteResource](wrapped) {
-		t.Fatal("the original manager implements AfterDeleteResource")
+	err := lc.runAfterDeleteResource(context.Background(), m)
+	if got, want := log, []string{"AfterDelete", "cb-1"}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("order = %v, want %v", got, want)
 	}
-	// A manager that does not implement the hook must not look like it does just
-	// because a wrapper added one from outside.
+	if err == nil || err.Error() != "cb-1-boom" {
+		t.Fatalf("error = %v, want cb-1-boom", err)
+	}
+}
+
+// A failing own hook is returned immediately, and none of the stage's callbacks run.
+func TestResourceCallbacks_FailedHookSkipsCallbacks(t *testing.T) {
+	var log []string
+	lc := NewResourceLifecycle(nil, "hook")
+	m := newHookManager(t, &log, "alpha")
+	lc.AddAfterReadResourceCallback(func(context.Context, *VMSRest) error {
+		m.record("cb-AfterRead")
+		return nil
+	})
+	failing := failingAfterRead{hookManager: m, err: errors.New("hook-boom")}
+
+	err := lc.runAfterReadResource(context.Background(), failing)
+	if err == nil || err.Error() != "hook-boom" {
+		t.Fatalf("error = %v, want hook-boom", err)
+	}
+	if len(log) != 1 || log[0] != "AfterRead" {
+		t.Fatalf("log = %v, want only the failing hook", log)
+	}
+}
+
+// failingAfterRead implements AfterReadResource with an error. Everything else comes from
+// the embedded manager.
+type failingAfterRead struct {
+	*hookManager
+	err error
+}
+
+func (f failingAfterRead) AfterReadResource(context.Context, *VMSRest) error {
+	f.record("AfterRead")
+	return f.err
+}
+
+// The lifecycle carries the callbacks, so every resource kind accepts them without the
+// managers knowing about them.
+func TestResourceLifecycleIsACallbackExecutor(t *testing.T) {
+	var _ ResourceCallbackExecutor = NewResourceLifecycle(nil, "any")
+}
+
+// The regular runners say whether the manager has the hook, so callers know when to fall
+// back to the default behaviour.
+func TestStageRunners_ReportWhetherTheManagerHandlesTheStage(t *testing.T) {
+	ctx := context.Background()
+	lc := NewResourceLifecycle(nil, "hook")
+	var log []string
+	full := newHookManager(t, &log, "alpha")
+	bare := &customDeleteManager{} // implements DeleteResource only
+
+	if rec, handled, err := lc.runReadResource(ctx, full); !handled || err != nil || rec.(Record)["name"] != "observed" {
+		t.Fatalf("runReadResource(full) = (%v, %v, %v)", rec, handled, err)
+	}
+	if _, handled, err := lc.runReadResource(ctx, bare); handled || err != nil {
+		t.Fatalf("runReadResource(bare) handled=%v err=%v, want not handled", handled, err)
+	}
+	if _, handled, err := lc.runCreateResource(ctx, bare, nil); handled || err != nil {
+		t.Fatalf("runCreateResource(bare) handled=%v err=%v, want not handled", handled, err)
+	}
+	if _, handled, err := lc.runLookupForCreate(ctx, full); handled || err != nil {
+		t.Fatalf("runLookupForCreate(full) handled=%v err=%v, want not handled", handled, err)
+	}
+	if _, handled, err := lc.runUpdateResource(ctx, bare, bare); handled || err != nil {
+		t.Fatalf("runUpdateResource(bare) handled=%v err=%v, want not handled", handled, err)
+	}
+	if handled, err := lc.runDeleteResource(ctx, bare); !handled || err != nil || !bare.called {
+		t.Fatalf("runDeleteResource(bare) handled=%v err=%v called=%v", handled, err, bare.called)
+	}
+
+	// A manager that has UpdateResource while the plan does not is an error, not a fallback.
+	if _, handled, err := lc.runUpdateResource(ctx, full, bare); !handled || err == nil {
+		t.Fatalf("runUpdateResource(full, bare) handled=%v err=%v, want handled with an error", handled, err)
+	}
+}
+
+func TestStageRunners_TransformsPassThroughWithoutTheHook(t *testing.T) {
 	bare := &customDeleteManager{}
-	wrappedBare := WithAfterCreateResource(bare, func(context.Context, *VMSRest, Record) error { return nil })
-	if hasOwnHook[AfterCreateResource](wrappedBare) {
-		t.Fatal("a setter-provided hook must not count as the resource's own hook")
+	rec := Record{"a": 1}
+	if got := runTransformResponseRecord(bare, rec); !reflect.DeepEqual(got, rec) {
+		t.Fatalf("response transform changed the record: %v", got)
 	}
-	if _, ok := findHook[AfterCreateResource](wrappedBare); !ok {
-		t.Fatal("the setter hook must still be found")
+	if got := runNormalizeRecordForCreateAdopt(bare, rec); !reflect.DeepEqual(got, rec) {
+		t.Fatalf("normalize changed the record: %v", got)
 	}
-}
-
-func TestForEachHook_RunsSetterAndOriginalAndJoinsErrors(t *testing.T) {
-	var log []string
-	inner := newHookManager(t, &log, "alpha")
-	wrapped := WithReadResource(inner, func(context.Context, *VMSRest) (DisplayableRecord, error) {
-		return Record{"id": int64(7), "name": "from-setter"}, nil
-	})
-	wrapped = WithAfterDeleteResource(wrapped, func(context.Context, *VMSRest) error {
-		inner.record("setter-after-delete")
-		return errors.New("setter-boom")
-	})
-
-	err := forEachHook(wrapped, func(imp AfterDeleteResource) error {
-		return imp.AfterDeleteResource(context.Background(), nil)
-	})
-	if got, want := log, []string{"setter-after-delete", "AfterDelete"}; !reflect.DeepEqual(got, want) {
-		t.Fatalf("hook order = %v, want %v", got, want)
-	}
-	if err == nil || !strings.Contains(err.Error(), "setter-boom") {
-		t.Fatalf("expected joined setter error, got %v", err)
-	}
-
-	// Unrelated wrappers must not make forEachHook re-run promoted CRUD hooks.
-	var creates int
-	err = forEachHook(wrapped, func(imp CreateResource) error {
-		creates++
-		_, createErr := imp.CreateResource(context.Background(), nil)
-		return createErr
-	})
-	if err != nil {
-		t.Fatalf("CreateResource forEachHook: %v", err)
-	}
-	if creates != 1 {
-		t.Fatalf("CreateResource invocations = %d, want 1 (original only; no promotion duplicates)", creates)
+	body := params{"b": 2}
+	if got := runTransformRequestBody(bare, body); !reflect.DeepEqual(got, body) {
+		t.Fatalf("request transform changed the body: %v", got)
 	}
 }
 

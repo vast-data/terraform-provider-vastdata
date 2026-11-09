@@ -4,9 +4,7 @@ package provider
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"reflect"
 	"sort"
 
 	version "github.com/hashicorp/go-version"
@@ -312,6 +310,74 @@ type AfterDeleteResource interface {
 	AfterDeleteResource(context.Context, *VMSRest) error
 }
 
+// -----------------
+// Resource callbacks
+// -----------------
+//
+// A callback is an extra function attached to a manager instance from outside, e.g. by the
+// Crossplane provider. Each Prepare*/After* stage of Create, Read, Update and Delete first
+// runs the manager's own hook when it implements one. If that hook fails, its error is
+// returned and no callback runs. The callbacks then run in the order they were added, and
+// the first error stops the rest.
+//
+// Callbacks are not hooks: a manager does not implement PrepareCreateResource just because
+// a callback is added for that stage, so defaults that depend on the resource's own hook
+// (e.g. edit-only fields handled by the default After* behaviour) are not affected.
+
+type PrepareCreateResourceCallbackExecutor interface {
+	AddPrepareCreateResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareCreateResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterCreateResourceCallbackExecutor interface {
+	AddAfterCreateResourceCallback(func(context.Context, *VMSRest, Record) error)
+	ExecuteAfterCreateResourceCallbacks(context.Context, *VMSRest, Record) error
+}
+
+type PrepareReadResourceCallbackExecutor interface {
+	AddPrepareReadResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareReadResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterReadResourceCallbackExecutor interface {
+	AddAfterReadResourceCallback(func(context.Context, *VMSRest) error)
+	ExecuteAfterReadResourceCallbacks(context.Context, *VMSRest) error
+}
+
+// PrepareUpdateResourceCallbackExecutor callbacks receive the desired manager.
+type PrepareUpdateResourceCallbackExecutor interface {
+	AddPrepareUpdateResourceCallback(func(context.Context, ResourceManager, *VMSRest) error)
+	ExecutePrepareUpdateResourceCallbacks(context.Context, ResourceManager, *VMSRest) error
+}
+
+// AfterUpdateResourceCallbackExecutor callbacks receive the desired manager.
+type AfterUpdateResourceCallbackExecutor interface {
+	AddAfterUpdateResourceCallback(func(context.Context, ResourceManager, *VMSRest, Record) error)
+	ExecuteAfterUpdateResourceCallbacks(context.Context, ResourceManager, *VMSRest, Record) error
+}
+
+type PrepareDeleteResourceCallbackExecutor interface {
+	AddPrepareDeleteResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareDeleteResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterDeleteResourceCallbackExecutor interface {
+	AddAfterDeleteResourceCallback(func(context.Context, *VMSRest) error)
+	ExecuteAfterDeleteResourceCallbacks(context.Context, *VMSRest) error
+}
+
+// ResourceCallbackExecutor is every stage's callback executor.
+type ResourceCallbackExecutor interface {
+	PrepareCreateResourceCallbackExecutor
+	AfterCreateResourceCallbackExecutor
+	PrepareReadResourceCallbackExecutor
+	AfterReadResourceCallbackExecutor
+	PrepareUpdateResourceCallbackExecutor
+	AfterUpdateResourceCallbackExecutor
+	PrepareDeleteResourceCallbackExecutor
+	AfterDeleteResourceCallbackExecutor
+}
+
 type ResourceManager interface {
 	TFManager
 	NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager
@@ -397,579 +463,4 @@ type NormalizeRecordForCreateAdopt interface {
 // task id as record id) instead of the parent resource.
 type ResolveRecordAfterAsyncTask interface {
 	ResolveRecordAfterAsyncTask(context.Context, *VMSRest, Record) (Record, error)
-}
-
-// A setter wraps a manager with one hook.
-//
-// findHook returns the outermost implementation of T (first match). A later
-// setter for the same exclusive hook (Create/Read/Update/Delete, …) is the one
-// that runs.
-//
-// forEachHook walks the full wrapper chain and invokes every layer that
-// actually provides T, including the original manager. Errors from all
-// invocations are joined with errors.Join and returned at the end.
-//
-// Wrappers embed the inner manager, so they type-assert to every interface the
-// inner already implements (method promotion). hookProvider.providedHook
-// identifies which interface a wrapper layer itself adds, so forEachHook can
-// skip those false matches. A nil function leaves the manager unchanged.
-
-type hookUnwrapper interface {
-	unwrapHook() any
-}
-
-// hookProvider is implemented by With* wrappers. providedHook returns a typed
-// nil pointer of the interface this layer adds, e.g. (*AfterDeleteResource)(nil).
-type hookProvider interface {
-	providedHook() any
-}
-
-func findHook[T any](m any) (T, bool) {
-	var zero T
-	for i := 0; i < 64 && m != nil; i++ {
-		if v, ok := m.(T); ok {
-			return v, true
-		}
-		u, ok := m.(hookUnwrapper)
-		if !ok {
-			return zero, false
-		}
-		m = u.unwrapHook()
-	}
-	return zero, false
-}
-
-func forEachHook[T any](m any, fn func(T) error) error {
-	var errs []error
-	want := reflect.TypeFor[*T]()
-	for i := 0; i < 64 && m != nil; i++ {
-		if p, ok := m.(hookProvider); ok {
-			if reflect.TypeOf(p.providedHook()) == want {
-				if err := fn(m.(T)); err != nil {
-					errs = append(errs, err)
-				}
-			}
-		} else if _, wrapped := m.(hookUnwrapper); !wrapped {
-			if v, ok := m.(T); ok {
-				if err := fn(v); err != nil {
-					errs = append(errs, err)
-				}
-			}
-		}
-		u, ok := m.(hookUnwrapper)
-		if !ok {
-			break
-		}
-		m = u.unwrapHook()
-	}
-	return errors.Join(errs...)
-}
-
-// hasOwnHook reports whether the original manager, the innermost value of the
-// wrapper chain, implements T itself. Wrappers added by With* setters do not count.
-//
-// The default edit-only-fields handling in Create and Update is skipped when the
-// resource handles them in its own After hook. An extra After hook attached from
-// outside (for example by the Crossplane provider) must not disable that default.
-func hasOwnHook[T any](m any) bool {
-	for i := 0; i < 64 && m != nil; i++ {
-		if _, wrapper := m.(hookProvider); !wrapper {
-			if _, ok := m.(T); ok {
-				return true
-			}
-		}
-		u, ok := m.(hookUnwrapper)
-		if !ok {
-			return false
-		}
-		m = u.unwrapHook()
-	}
-	return false
-}
-
-func WithPrepareImportResourceState(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return prepareImportResourceStateHook{ResourceManager: m, fn: fn}
-}
-
-type prepareImportResourceStateHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h prepareImportResourceStateHook) unwrapHook() any   { return h.ResourceManager }
-func (h prepareImportResourceStateHook) providedHook() any { return (*PrepareImportResourceState)(nil) }
-func (h prepareImportResourceStateHook) PrepareImportResourceState(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithPrepareCreateResource(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return prepareCreateResourceHook{ResourceManager: m, fn: fn}
-}
-
-type prepareCreateResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h prepareCreateResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h prepareCreateResourceHook) providedHook() any { return (*PrepareCreateResource)(nil) }
-func (h prepareCreateResourceHook) PrepareCreateResource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithGetSubResources(m ResourceManager, fn func(context.Context, *VMSRest, Record, *version.Version) (Record, error)) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return getSubResourcesHook{ResourceManager: m, fn: fn}
-}
-
-type getSubResourcesHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest, Record, *version.Version) (Record, error)
-}
-
-func (h getSubResourcesHook) unwrapHook() any   { return h.ResourceManager }
-func (h getSubResourcesHook) providedHook() any { return (*GetSubResources)(nil) }
-func (h getSubResourcesHook) GetSubResources(ctx context.Context, rest *VMSRest, record Record, clusterVersion *version.Version) (Record, error) {
-	return h.fn(ctx, rest, record, clusterVersion)
-}
-
-func WithPrepareReadResource(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return prepareReadResourceHook{ResourceManager: m, fn: fn}
-}
-
-type prepareReadResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h prepareReadResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h prepareReadResourceHook) providedHook() any { return (*PrepareReadResource)(nil) }
-func (h prepareReadResourceHook) PrepareReadResource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithPrepareUpdateResource(m ResourceManager, fn func(context.Context, PrepareUpdateResource, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return prepareUpdateResourceHook{ResourceManager: m, fn: fn}
-}
-
-type prepareUpdateResourceHook struct {
-	ResourceManager
-	fn func(context.Context, PrepareUpdateResource, *VMSRest) error
-}
-
-func (h prepareUpdateResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h prepareUpdateResourceHook) providedHook() any { return (*PrepareUpdateResource)(nil) }
-func (h prepareUpdateResourceHook) PrepareUpdateResource(ctx context.Context, plan PrepareUpdateResource, rest *VMSRest) error {
-	return h.fn(ctx, plan, rest)
-}
-
-func WithPrepareDeleteResource(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return prepareDeleteResourceHook{ResourceManager: m, fn: fn}
-}
-
-type prepareDeleteResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h prepareDeleteResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h prepareDeleteResourceHook) providedHook() any { return (*PrepareDeleteResource)(nil) }
-func (h prepareDeleteResourceHook) PrepareDeleteResource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithModifyPlanResource(m ResourceManager, fn func(context.Context, resource.ModifyPlanRequest, *resource.ModifyPlanResponse) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return modifyPlanResourceHook{ResourceManager: m, fn: fn}
-}
-
-type modifyPlanResourceHook struct {
-	ResourceManager
-	fn func(context.Context, resource.ModifyPlanRequest, *resource.ModifyPlanResponse) error
-}
-
-func (h modifyPlanResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h modifyPlanResourceHook) providedHook() any { return (*ModifyPlanResource)(nil) }
-func (h modifyPlanResourceHook) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	return h.fn(ctx, req, resp)
-}
-
-func WithImportResourceState(m ResourceManager, fn func(resource.ImportStateRequest, context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return importResourceStateHook{ResourceManager: m, fn: fn}
-}
-
-type importResourceStateHook struct {
-	ResourceManager
-	fn func(resource.ImportStateRequest, context.Context, *VMSRest) error
-}
-
-func (h importResourceStateHook) unwrapHook() any   { return h.ResourceManager }
-func (h importResourceStateHook) providedHook() any { return (*ImportResourceState)(nil) }
-func (h importResourceStateHook) ImportResourceState(req resource.ImportStateRequest, ctx context.Context, rest *VMSRest) error {
-	return h.fn(req, ctx, rest)
-}
-
-func WithCreateResource(m ResourceManager, fn func(context.Context, *VMSRest) (DisplayableRecord, error)) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return createResourceHook{ResourceManager: m, fn: fn}
-}
-
-type createResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) (DisplayableRecord, error)
-}
-
-func (h createResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h createResourceHook) providedHook() any { return (*CreateResource)(nil) }
-func (h createResourceHook) CreateResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	return h.fn(ctx, rest)
-}
-
-func WithLookupForCreate(m ResourceManager, fn func(context.Context, *VMSRest) (DisplayableRecord, error)) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return lookupForCreateHook{ResourceManager: m, fn: fn}
-}
-
-type lookupForCreateHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) (DisplayableRecord, error)
-}
-
-func (h lookupForCreateHook) unwrapHook() any   { return h.ResourceManager }
-func (h lookupForCreateHook) providedHook() any { return (*LookupForCreate)(nil) }
-func (h lookupForCreateHook) LookupForCreate(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	return h.fn(ctx, rest)
-}
-
-func WithReadResource(m ResourceManager, fn func(context.Context, *VMSRest) (DisplayableRecord, error)) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return readResourceHook{ResourceManager: m, fn: fn}
-}
-
-type readResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) (DisplayableRecord, error)
-}
-
-func (h readResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h readResourceHook) providedHook() any { return (*ReadResource)(nil) }
-func (h readResourceHook) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	return h.fn(ctx, rest)
-}
-
-func WithUpdateResource(m ResourceManager, fn func(context.Context, UpdateResource, *VMSRest) (DisplayableRecord, error)) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return updateResourceHook{ResourceManager: m, fn: fn}
-}
-
-type updateResourceHook struct {
-	ResourceManager
-	fn func(context.Context, UpdateResource, *VMSRest) (DisplayableRecord, error)
-}
-
-func (h updateResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h updateResourceHook) providedHook() any { return (*UpdateResource)(nil) }
-func (h updateResourceHook) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
-	return h.fn(ctx, plan, rest)
-}
-
-func WithDeleteResource(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return deleteResourceHook{ResourceManager: m, fn: fn}
-}
-
-type deleteResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h deleteResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h deleteResourceHook) providedHook() any { return (*DeleteResource)(nil) }
-func (h deleteResourceHook) DeleteResource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithAfterImportResourceState(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return afterImportResourceStateHook{ResourceManager: m, fn: fn}
-}
-
-type afterImportResourceStateHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h afterImportResourceStateHook) unwrapHook() any   { return h.ResourceManager }
-func (h afterImportResourceStateHook) providedHook() any { return (*AfterImportResourceState)(nil) }
-func (h afterImportResourceStateHook) AfterImportResourceState(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithAfterCreateResource(m ResourceManager, fn func(context.Context, *VMSRest, Record) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return afterCreateResourceHook{ResourceManager: m, fn: fn}
-}
-
-type afterCreateResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest, Record) error
-}
-
-func (h afterCreateResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h afterCreateResourceHook) providedHook() any { return (*AfterCreateResource)(nil) }
-func (h afterCreateResourceHook) AfterCreateResource(ctx context.Context, rest *VMSRest, record Record) error {
-	return h.fn(ctx, rest, record)
-}
-
-func WithAfterReadResource(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return afterReadResourceHook{ResourceManager: m, fn: fn}
-}
-
-type afterReadResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h afterReadResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h afterReadResourceHook) providedHook() any { return (*AfterReadResource)(nil) }
-func (h afterReadResourceHook) AfterReadResource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithAfterUpdateResource(m ResourceManager, fn func(context.Context, AfterUpdateResource, *VMSRest, Record) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return afterUpdateResourceHook{ResourceManager: m, fn: fn}
-}
-
-type afterUpdateResourceHook struct {
-	ResourceManager
-	fn func(context.Context, AfterUpdateResource, *VMSRest, Record) error
-}
-
-func (h afterUpdateResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h afterUpdateResourceHook) providedHook() any { return (*AfterUpdateResource)(nil) }
-func (h afterUpdateResourceHook) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource, rest *VMSRest, record Record) error {
-	return h.fn(ctx, plan, rest, record)
-}
-
-func WithAfterDeleteResource(m ResourceManager, fn func(context.Context, *VMSRest) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return afterDeleteResourceHook{ResourceManager: m, fn: fn}
-}
-
-type afterDeleteResourceHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h afterDeleteResourceHook) unwrapHook() any   { return h.ResourceManager }
-func (h afterDeleteResourceHook) providedHook() any { return (*AfterDeleteResource)(nil) }
-func (h afterDeleteResourceHook) AfterDeleteResource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithPrepareReadDatasource(m DataSourceManager, fn func(context.Context, *VMSRest) error) DataSourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return prepareReadDatasourceHook{DataSourceManager: m, fn: fn}
-}
-
-type prepareReadDatasourceHook struct {
-	DataSourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h prepareReadDatasourceHook) unwrapHook() any   { return h.DataSourceManager }
-func (h prepareReadDatasourceHook) providedHook() any { return (*PrepareReadDatasource)(nil) }
-func (h prepareReadDatasourceHook) PrepareReadDatasource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithReadDatasource(m DataSourceManager, fn func(context.Context, *VMSRest) (DisplayableRecord, error)) DataSourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return readDatasourceHook{DataSourceManager: m, fn: fn}
-}
-
-type readDatasourceHook struct {
-	DataSourceManager
-	fn func(context.Context, *VMSRest) (DisplayableRecord, error)
-}
-
-func (h readDatasourceHook) unwrapHook() any   { return h.DataSourceManager }
-func (h readDatasourceHook) providedHook() any { return (*ReadDatasource)(nil) }
-func (h readDatasourceHook) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
-	return h.fn(ctx, rest)
-}
-
-func WithAfterReadDatasource(m DataSourceManager, fn func(context.Context, *VMSRest) error) DataSourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return afterReadDatasourceHook{DataSourceManager: m, fn: fn}
-}
-
-type afterReadDatasourceHook struct {
-	DataSourceManager
-	fn func(context.Context, *VMSRest) error
-}
-
-func (h afterReadDatasourceHook) unwrapHook() any   { return h.DataSourceManager }
-func (h afterReadDatasourceHook) providedHook() any { return (*AfterReadDatasource)(nil) }
-func (h afterReadDatasourceHook) AfterReadDatasource(ctx context.Context, rest *VMSRest) error {
-	return h.fn(ctx, rest)
-}
-
-func WithValidateResourceConfig(m ResourceManager, fn func(context.Context) error) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return validateResourceConfigHook{ResourceManager: m, fn: fn}
-}
-
-type validateResourceConfigHook struct {
-	ResourceManager
-	fn func(context.Context) error
-}
-
-func (h validateResourceConfigHook) unwrapHook() any   { return h.ResourceManager }
-func (h validateResourceConfigHook) providedHook() any { return (*ValidateResourceConfig)(nil) }
-func (h validateResourceConfigHook) ValidateResourceConfig(ctx context.Context) error {
-	return h.fn(ctx)
-}
-
-func WithMigrateModePassThroughUpdate(m ResourceManager) ResourceManager {
-	if m == nil {
-		return nil
-	}
-	return migrateModePassThroughUpdateHook{ResourceManager: m}
-}
-
-type migrateModePassThroughUpdateHook struct{ ResourceManager }
-
-func (h migrateModePassThroughUpdateHook) unwrapHook() any { return h.ResourceManager }
-func (h migrateModePassThroughUpdateHook) providedHook() any {
-	return (*MigrateModePassThroughUpdate)(nil)
-}
-func (migrateModePassThroughUpdateHook) MigrateModePassThroughUpdate() {}
-
-func WithTransformRequestBody(m ResourceManager, fn func(params) params) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return transformRequestBodyHook{ResourceManager: m, fn: fn}
-}
-
-type transformRequestBodyHook struct {
-	ResourceManager
-	fn func(params) params
-}
-
-func (h transformRequestBodyHook) unwrapHook() any   { return h.ResourceManager }
-func (h transformRequestBodyHook) providedHook() any { return (*TransformRequestBody)(nil) }
-func (h transformRequestBodyHook) TransformRequestBody(body params) params {
-	return h.fn(body)
-}
-
-func WithTransformResponseRecord(m ResourceManager, fn func(Record) Record) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return transformResponseRecordHook{ResourceManager: m, fn: fn}
-}
-
-type transformResponseRecordHook struct {
-	ResourceManager
-	fn func(Record) Record
-}
-
-func (h transformResponseRecordHook) unwrapHook() any   { return h.ResourceManager }
-func (h transformResponseRecordHook) providedHook() any { return (*TransformResponseRecord)(nil) }
-func (h transformResponseRecordHook) TransformResponseRecord(response Record) Record {
-	return h.fn(response)
-}
-
-func WithNormalizeRecordForCreateAdopt(m ResourceManager, fn func(Record) Record) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return normalizeRecordForCreateAdoptHook{ResourceManager: m, fn: fn}
-}
-
-type normalizeRecordForCreateAdoptHook struct {
-	ResourceManager
-	fn func(Record) Record
-}
-
-func (h normalizeRecordForCreateAdoptHook) unwrapHook() any { return h.ResourceManager }
-func (h normalizeRecordForCreateAdoptHook) providedHook() any {
-	return (*NormalizeRecordForCreateAdopt)(nil)
-}
-func (h normalizeRecordForCreateAdoptHook) NormalizeRecordForCreateAdopt(r Record) Record {
-	return h.fn(r)
-}
-
-func WithResolveRecordAfterAsyncTask(m ResourceManager, fn func(context.Context, *VMSRest, Record) (Record, error)) ResourceManager {
-	if m == nil || fn == nil {
-		return m
-	}
-	return resolveRecordAfterAsyncTaskHook{ResourceManager: m, fn: fn}
-}
-
-type resolveRecordAfterAsyncTaskHook struct {
-	ResourceManager
-	fn func(context.Context, *VMSRest, Record) (Record, error)
-}
-
-func (h resolveRecordAfterAsyncTaskHook) unwrapHook() any { return h.ResourceManager }
-func (h resolveRecordAfterAsyncTaskHook) providedHook() any {
-	return (*ResolveRecordAfterAsyncTask)(nil)
-}
-func (h resolveRecordAfterAsyncTaskHook) ResolveRecordAfterAsyncTask(ctx context.Context, rest *VMSRest, record Record) (Record, error) {
-	return h.fn(ctx, rest, record)
 }

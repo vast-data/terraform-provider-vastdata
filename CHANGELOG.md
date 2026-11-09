@@ -11,6 +11,7 @@ NEW RESOURCES:
 
 ENHANCEMENTS:
 
+* **Write-only secrets + `*_md5` fingerprints**: Sensitive fields such as passwords, keys, and PEM material are write-only (not stored in state). Matching computed `<field>_md5` attributes fingerprint the configured value so Terraform can detect changes and plan updates without keeping the secret in state. Applies across password/key/certificate resources (e.g. `vastdata_administrator_manager`, `vastdata_user`, `vastdata_ldap`, `vastdata_active_directory`, `vastdata_callhome_config`, `vastdata_certificate`, `vastdata_tls_certificate`, endpoint certificates, `vastdata_license`, `vastdata_bgp_config`, `vastdata_s3_replication_peer`, and related resources). (TERF-315)
 * **vastdata_cluster**: Removing the resource from configuration or running `terraform destroy` clears Terraform state only and does not call DELETE on the cluster.
 * **vastdata_tenant**: Added optional `delete_local_provider` to remove the VMS auto-created local provider on tenant destroy and on failed create rollback. Looks up the provider by tenant name or `provider-<tenant_name>`; skipped when `local_provider_id` is set in config during create rollback; missing providers are ignored (TERF-278).
 
