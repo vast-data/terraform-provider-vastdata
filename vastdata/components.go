@@ -106,6 +106,7 @@ var allTFComponents = []TFManager{
 	&VmsCertificate{},
 	&S3Certificate{},
 	&NfsCertificate{},
+	&VmsNetworkSettings{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate

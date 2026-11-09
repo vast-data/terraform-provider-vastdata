@@ -52,13 +52,19 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 		if readSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get schema for GET %q: %w", resourcePath, err)
 		}
+	case http.MethodPatch:
+		// Use PATCH request body when the GET response shape differs from the
+		// writable model (e.g. boxes vs hosts on /vms/{id}/network_settings/).
+		if readSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
+			return nil, fmt.Errorf("failed to get PATCH request schema for %q: %w", resourcePath, err)
+		}
 	default:
 		return nil, fmt.Errorf(
 			"not supported resource method %q for datasource schema generation", resourceMethod,
 		)
 	}
 
-	// Will be write-only fields (Query parameters) unless present in Response schema
+	// Query params always come from GET on the same path (search filters).
 	params, err := openapi_schema.GetQueryParameters(http.MethodGet, resourcePath)
 	if err != nil {
 		return nil, err
