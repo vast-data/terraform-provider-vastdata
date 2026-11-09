@@ -37,7 +37,7 @@ resource "vastdata_tls_certificate" "vastdb_tls_cert_with_crl" {
 
 > **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
-- `ca_certificate_file` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) CA certificate content (PEM/DER). Uploaded as a file to POST /tlscertificates/. Write-only: never stored in Terraform state.
+- `ca_certificate_file` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) CA certificate content (PEM/DER). Uploaded as a file to POST /tlscertificates/.
 
 ### Optional
 
@@ -48,7 +48,7 @@ resource "vastdata_tls_certificate" "vastdb_tls_cert_with_crl" {
 - `created` (String)
 - `expires_on` (String)
 - `protocols` (Set of String) Protocols for this tls certificate.
-- `revocation_file` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Certificate Revocation List (CRL) content. Write-only: never stored in Terraform state.
+- `revocation_file` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Certificate Revocation List (CRL) content.
 - `revocations_exist` (Boolean)
 - `revocations_expire_on` (String)
 - `revocations_name` (String)

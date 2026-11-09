@@ -62,14 +62,20 @@ resource "vastdata_callhome_config" "vastdb_callhome_config" {
 - `site` (String) Site name
 - `support_channel` (Boolean) Set to true to enable the VAST Support channel.
 - `test_mode` (Boolean) Set to true to enable test mode
-- `uplink_email` (String) VAST Uplink super user login email. Stored in state so changes trigger re-registration via PATCH /callhomeconfigs/{id}/register-cluster/ (with uplink_password/uplink_token).
-- `uplink_password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) VAST Uplink super user password. Write-only: never stored in Terraform state.
-- `uplink_token` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) VAST Uplink cluster registration token. Write-only: never stored in Terraform state.
+- `uplink_email` (String) VAST Uplink super user login email.
+- `uplink_password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) VAST Uplink super user password.
+- `uplink_token` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) VAST Uplink cluster registration token.
 - `upload_via_vms` (Boolean) If true, upload non-aggregated Callhome Bundle via VMS (requires proxy). Otherwise, upload from each node.
 - `verify_ssl` (Boolean) Set to true to enable SSL verification. Set to false to disable. VAST Cluster recognizes SSL certificates from a large range of widely recognized certificate authorities (CAs). VAST Cluster may not recognize an SSL certificate signed by your own in-house CA.
 
 ### Read-Only
 
+- `aws_s3_ak_md5` (String) MD5 of aws_s3_ak (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
+- `aws_s3_sk_md5` (String) MD5 of aws_s3_sk (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `callhome_upload_destination` (String) Callhome upload destination.
+- `cloud_api_key_md5` (String) MD5 of cloud_api_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `cloud_registered` (Boolean) Whether the cluster is registered with VAST Cloud Services / Uplink.
+- `proxy_password_md5` (String) MD5 of proxy_password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `ssl_certificate` (String) SSL Certificate file content, including the BEGIN CERTIFICATE and END CERTIFICATE lines.
+- `uplink_password_md5` (String) MD5 of uplink_password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
+- `uplink_token_md5` (String) MD5 of uplink_token (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.

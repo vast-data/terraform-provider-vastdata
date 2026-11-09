@@ -2902,6 +2902,32 @@ func TestGetCreateParams_WithOptionalWriteOnlyFields(t *testing.T) {
 	assert.Equal(t, "secret", result["password"])
 }
 
+func TestSeedWriteOnlyMD5FromSecrets(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"password":        rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"password_retype": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"password_md5":    rschema.StringAttribute{Computed: true},
+	}}
+	ts := NewTFStateMust(map[string]attr.Value{
+		"password":        types.StringValue("secret"),
+		"password_retype": types.StringValue("secret"),
+		"password_md5":    types.StringNull(),
+	}, schema, &TFStateHints{
+		WriteOnlyFields:    []string{"password", "password_retype"},
+		WriteOnlyMD5Fields: []string{"password"},
+	})
+
+	ts.SeedWriteOnlyMD5FromSecrets()
+	assert.Equal(t, contentMD5Hex("secret"), ts.String("password_md5"))
+	assert.Equal(t, "secret", ts.String("password"), "secret must remain until ClearWriteOnlyFields")
+
+	// Existing md5 must not be overwritten.
+	ts.Raw["password_md5"] = types.StringValue("already-set")
+	ts.Raw["password"] = types.StringValue("other")
+	ts.SeedWriteOnlyMD5FromSecrets()
+	assert.Equal(t, "already-set", ts.String("password_md5"))
+}
+
 func TestClearWriteOnlyFields(t *testing.T) {
 	t.Parallel()
 

@@ -1280,6 +1280,26 @@ func (s *TFState) ClearWriteOnlyFields() {
 	}
 }
 
+// SeedWriteOnlyMD5FromSecrets fills empty <field>_md5 companions from leftover
+// WriteOnly secret values. Used only by schema upgrades (concrete *TFState);
+// intentionally not on ResourceState.
+func (s *TFState) SeedWriteOnlyMD5FromSecrets() {
+	if s == nil || !s.Enabled || s.Hints == nil {
+		return
+	}
+	for _, field := range s.Hints.WriteOnlyMD5Fields {
+		md5Field := field + "_md5"
+		if existing, ok := attrValueString(s.Raw[md5Field]); ok && existing != "" {
+			continue
+		}
+		secret, ok := attrValueString(s.Raw[field])
+		if !ok || secret == "" {
+			continue
+		}
+		s.Raw[md5Field] = types.StringValue(contentMD5Hex(secret))
+	}
+}
+
 // listsHaveSameContentIgnoringOrder checks if two attr.Value instances are lists
 // with the same content, regardless of order. This is used to prevent drift when
 // the API returns list elements in a different order than the user's configuration.

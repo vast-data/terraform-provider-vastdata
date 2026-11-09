@@ -36,9 +36,9 @@ resource "vastdata_s3_certificate" "s3" {
 
 > **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
-- `certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded certificate (leaf plus optional chain). Write-only: never stored in Terraform state.
+- `certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded certificate (leaf plus optional chain).
 - `cluster_id` (Number) ID of the cluster that hosts the S3 service (typically 1).
-- `private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded private key. Write-only: never stored in Terraform state.
+- `private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded private key.
 
 ### Read-Only
 

@@ -89,13 +89,13 @@ func endpointCertificateHints(parentAttr, parentDesc, description, markdown stri
 					Required:    true,
 					Sensitive:   true,
 					WriteOnly:   true,
-					Description: "PEM-encoded certificate (leaf plus optional chain). Write-only: never stored in Terraform state.",
+					Description: "PEM-encoded certificate (leaf plus optional chain).",
 				},
 				attrPrivateKey: rschema.StringAttribute{
 					Required:    true,
 					Sensitive:   true,
 					WriteOnly:   true,
-					Description: "PEM-encoded private key. Write-only: never stored in Terraform state.",
+					Description: "PEM-encoded private key.",
 				},
 				attrCertificateMD5: rschema.StringAttribute{
 					Computed:    true,

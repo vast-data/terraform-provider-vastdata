@@ -55,7 +55,7 @@ func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema a
 					Sensitive:   true,
 					Optional:    true,
 					WriteOnly:   true,
-					Description: "The password for the specified Active Directory admin user. Write-only: never stored in Terraform state.",
+					Description: "The password for the specified Active Directory admin user.",
 				},
 				"bindpw_md5":       ContentMD5SchemaAttribute("bindpw", false),
 				"admin_passwd_md5": ContentMD5SchemaAttribute("admin_passwd", false),

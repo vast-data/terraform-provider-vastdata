@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -34,8 +35,16 @@ func (m *CallhomeConfig) NewResourceManager(raw map[string]attr.Value, schema an
 			SchemaRef:    CallhomeConfigSchemaRef,
 			ImportFields: []string{"id"},
 			// uplink_email is stored (not write-only) so changing it alone plans an
-			// update and re-runs register-cluster. Password/token stay write-only.
+			// update and re-runs register-cluster.
 			WriteOnlyFields: []string{
+				"proxy_password",
+				"aws_s3_ak",
+				"aws_s3_sk",
+				"cloud_api_key",
+				"uplink_password",
+				"uplink_token",
+			},
+			WriteOnlyMD5Fields: []string{
 				"proxy_password",
 				"aws_s3_ak",
 				"aws_s3_sk",
@@ -72,20 +81,26 @@ func (m *CallhomeConfig) NewResourceManager(raw map[string]attr.Value, schema an
 				},
 				"uplink_email": rschema.StringAttribute{
 					Optional:    true,
-					Description: "VAST Uplink super user login email. Stored in state so changes trigger re-registration via PATCH /callhomeconfigs/{id}/register-cluster/ (with uplink_password/uplink_token).",
+					Description: "VAST Uplink super user login email.",
 				},
 				"uplink_password": rschema.StringAttribute{
 					Optional:    true,
 					Sensitive:   true,
 					WriteOnly:   true,
-					Description: "VAST Uplink super user password. Write-only: never stored in Terraform state.",
+					Description: "VAST Uplink super user password.",
 				},
 				"uplink_token": rschema.StringAttribute{
 					Optional:    true,
 					Sensitive:   true,
 					WriteOnly:   true,
-					Description: "VAST Uplink cluster registration token. Write-only: never stored in Terraform state.",
+					Description: "VAST Uplink cluster registration token.",
 				},
+				"proxy_password_md5":  ContentMD5SchemaAttribute("proxy_password", false),
+				"aws_s3_ak_md5":       ContentMD5SchemaAttribute("aws_s3_ak", false),
+				"aws_s3_sk_md5":       ContentMD5SchemaAttribute("aws_s3_sk", false),
+				"cloud_api_key_md5":   ContentMD5SchemaAttribute("cloud_api_key", false),
+				"uplink_password_md5": ContentMD5SchemaAttribute("uplink_password", false),
+				"uplink_token_md5":    ContentMD5SchemaAttribute("uplink_token", false),
 			},
 		},
 	)}
@@ -113,6 +128,32 @@ func (m *CallhomeConfig) TfState() is.ResourceState {
 
 func (m *CallhomeConfig) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.CallhomeConfigs
+}
+
+// ModifyPlan fingerprints write-only secrets so rotations plan an update
+// (TERF-317: proxy_password and other secrets were invisible to the plan).
+func (m *CallhomeConfig) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5Fields(ctx, req, resp,
+		"proxy_password", "proxy_password_md5",
+		"aws_s3_ak", "aws_s3_ak_md5",
+		"aws_s3_sk", "aws_s3_sk_md5",
+		"cloud_api_key", "cloud_api_key_md5",
+		"uplink_password", "uplink_password_md5",
+		"uplink_token", "uplink_token_md5",
+	)
+	return nil
+}
+
+func (m *CallhomeConfig) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record,
+		"proxy_password",
+		"aws_s3_ak",
+		"aws_s3_sk",
+		"cloud_api_key",
+		"uplink_password",
+		"uplink_token",
+	)
+	return record
 }
 
 func (m *CallhomeConfig) ReadResource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
@@ -158,13 +199,21 @@ func ensureCallhomeConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs is.R
 
 	body := fieldsTs.GetCreateParams()
 	if stateTs != fieldsTs {
-		body = fieldsTs.GetChangedParams(stateTs)
+		// GetUpdateParams respects WriteOnlyMD5Fields so unchanged secrets are
+		// not re-PATCHed after overlayWriteOnlyFromConfig.
+		body = fieldsTs.GetUpdateParams(stateTs)
 	}
 	body.Without(
 		"id",
 		"uplink_email",
 		"uplink_password",
 		"uplink_token",
+		"proxy_password_md5",
+		"aws_s3_ak_md5",
+		"aws_s3_sk_md5",
+		"cloud_api_key_md5",
+		"uplink_password_md5",
+		"uplink_token_md5",
 	)
 	// Never PATCH null secrets — VMS rejects e.g. cloud_api_key=null.
 	for key, value := range body {

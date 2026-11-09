@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -702,6 +703,59 @@ func TestMigrateMode_NilProviderData_NoMigrate(t *testing.T) {
 		pd := r.providerData
 		_ = pd != nil && pd.MigrateMode
 	})
+}
+
+// TERF-315: upgrading pre-WriteOnly state must null secrets and seed *_md5.
+func TestUpgradeState_WriteOnlySecretsSeedMD5AndClear(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{
+		Version: 1,
+		Attributes: map[string]rschema.Attribute{
+			"name":            rschema.StringAttribute{Required: true},
+			"password":        rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_retype": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_md5":    rschema.StringAttribute{Computed: true},
+		},
+	}
+	hints := &is.TFStateHints{
+		WriteOnlyFields:    []string{"password", "password_retype"},
+		WriteOnlyMD5Fields: []string{"password"},
+		TFStateHintsForCustom: &is.TFStateHintsForCustom{
+			Description: "test",
+			SchemaAttributes: map[string]any{
+				"name":            schema.Attributes["name"],
+				"password":        schema.Attributes["password"],
+				"password_retype": schema.Attributes["password_retype"],
+				"password_md5":    schema.Attributes["password_md5"],
+			},
+		},
+	}
+	r := buildTestResourceWithSchema(schema, hints)
+
+	upgraders := r.UpgradeState(context.Background())
+	require.Contains(t, upgraders, int64(0))
+
+	priorJSON := []byte(`{"name":"admin","password":"s3cret","password_retype":"s3cret"}`)
+	req := resource.UpgradeStateRequest{
+		RawState: &tfprotov6.RawState{JSON: priorJSON},
+	}
+	resp := &resource.UpgradeStateResponse{
+		State: tfsdk.State{Schema: schema},
+	}
+	upgraders[0].StateUpgrader(context.Background(), req, resp)
+	require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+
+	var password, passwordRetype, passwordMD5, name types.String
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("name"), &name).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("password"), &password).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("password_retype"), &passwordRetype).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("password_md5"), &passwordMD5).HasError())
+
+	assert.Equal(t, "admin", name.ValueString())
+	assert.True(t, password.IsNull(), "password must be null after upgrade")
+	assert.True(t, passwordRetype.IsNull(), "password_retype must be null after upgrade")
+	assert.Equal(t, ContentMD5Hex("s3cret"), passwordMD5.ValueString())
 }
 
 // TERF-268: write-only values are null in Plan and only present in Config.

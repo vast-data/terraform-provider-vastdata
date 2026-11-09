@@ -127,7 +127,7 @@ resource "vastdata_active_directory" "active_dir3" {
 
 - `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check
 - `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check
-- `admin_passwd` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The password for the specified Active Directory admin user. Write-only: never stored in Terraform state.
+- `admin_passwd` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The password for the specified Active Directory admin user.
 - `admin_username` (String) An Active Directory admin user with permission to join the Active Directory server.
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
 - `bindpw` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The password used with the Bind DN to authenticate to the LDAP server.

@@ -33,8 +33,8 @@ resource "vastdata_vms_certificate" "vms" {
 
 > **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
-- `certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded certificate (leaf plus optional chain). Write-only: never stored in Terraform state.
-- `private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded private key. Write-only: never stored in Terraform state.
+- `certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded certificate (leaf plus optional chain).
+- `private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) PEM-encoded private key.
 - `vms_id` (Number) ID of the VMS object (typically 1).
 
 ### Read-Only
