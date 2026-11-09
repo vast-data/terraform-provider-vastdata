@@ -83,6 +83,13 @@ type TFStateHints struct {
 	// optional or required. Write-only fields cannot be computed.
 	WriteOnlyFields []string
 
+	// WriteOnlyMD5Fields lists write-only secrets that have a computed <field>_md5
+	// companion used for change detection (see ContentMD5SchemaAttribute).
+	// GetUpdateParams omits all WriteOnlyFields from the PATCH body unless one of
+	// these fingerprints changed between plan and prior state. Companion write-only
+	// fields (e.g. password_retype next to password) follow the same decision.
+	WriteOnlyMD5Fields []string
+
 	// CreateOnlyFields lists fields that may be set on create (POST) but must never
 	// be sent on update (PATCH). Omitting them from configuration after create must
 	// not plan a null clear. These fields are also treated as Computed so

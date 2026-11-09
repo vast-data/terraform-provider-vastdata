@@ -114,6 +114,7 @@ func addSchemaEntries(
 	hints *TFStateHints,
 	target map[string]*SchemaEntry,
 	required, optional, computed, writeOnly, sensitive, ordered bool,
+	applyWriteOnlyHints bool,
 ) {
 	for name, ref := range props {
 		schema := ref.Value
@@ -133,7 +134,7 @@ func addSchemaEntries(
 		fieldSensitive := sensitive
 		fieldOrdered := ordered
 
-		fieldRequired, fieldOptional, fieldComputed, fieldWriteOnly, fieldSensitive, fieldOrdered = flagsFromHintsForResource(name, hints, fieldRequired, fieldOptional, fieldComputed, fieldSensitive, fieldOrdered, fieldWriteOnly)
+		fieldRequired, fieldOptional, fieldComputed, fieldWriteOnly, fieldSensitive, fieldOrdered = flagsFromHintsForResource(name, hints, fieldRequired, fieldOptional, fieldComputed, fieldSensitive, fieldOrdered, fieldWriteOnly, applyWriteOnlyHints)
 
 		desc := schema.Description
 		if desc == "" {
@@ -161,8 +162,9 @@ func addSchemaEntries(
 
 		if isObject(schema) && schema.Properties != nil {
 			entry.Children = make(map[string]*SchemaEntry)
-			// Do NOT propagate parent required to children; children requiredness
-			// must be determined solely by the child object's own required array.
+			// Do NOT propagate parent required/write-only to children. WriteOnlyFields
+			// hints match by short name and must only apply at the resource top level
+			// (nested computed objects may reuse names like bindpw).
 			addSchemaEntries(
 				schema.Properties,
 				schema.Required,
@@ -171,9 +173,10 @@ func addSchemaEntries(
 				false, // required: do not inherit from parent
 				fieldOptional,
 				fieldComputed,
-				fieldWriteOnly,
+				false, // writeOnly: never inherit; TF forbids WriteOnly under Computed nested attrs
 				fieldSensitive,
 				fieldOrdered,
+				false, // applyWriteOnlyHints: top-level only
 			)
 		}
 
@@ -206,7 +209,7 @@ func buildTmpSchemaRefFromParam(p *openapi3.Parameter) *openapi3.SchemaRef {
 	}
 }
 
-func flagsFromHintsForResource(name string, hints *TFStateHints, required, optional, computed, sensitive, ordered, writeOnly bool) (bool, bool, bool, bool, bool, bool) {
+func flagsFromHintsForResource(name string, hints *TFStateHints, required, optional, computed, sensitive, ordered, writeOnly, applyWriteOnlyHints bool) (bool, bool, bool, bool, bool, bool) {
 	if hints != nil {
 		if contains(hints.RequiredSchemaFields, name) {
 			required, optional, computed = true, false, false
@@ -217,7 +220,10 @@ func flagsFromHintsForResource(name string, hints *TFStateHints, required, optio
 		if contains(hints.ComputedSchemaFields, name) {
 			computed = true
 		}
-		if contains(hints.WriteOnlyFields, name) {
+		// WriteOnlyFields match by attribute name; only apply at the top level so
+		// nested objects that reuse the same short name (e.g. ldap.bindpw) are not
+		// marked WriteOnly under a Computed parent (invalid TF schema).
+		if applyWriteOnlyHints && contains(hints.WriteOnlyFields, name) {
 			writeOnly = true
 			computed = false
 			optional = true

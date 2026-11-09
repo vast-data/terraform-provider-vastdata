@@ -123,12 +123,14 @@ resource "vastdata_active_directory" "active_dir3" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check
 - `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check
-- `admin_passwd` (String, Sensitive) The password for the specified Active Directory admin user.
+- `admin_passwd` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The password for the specified Active Directory admin user. Write-only: never stored in Terraform state.
 - `admin_username` (String) An Active Directory admin user with permission to join the Active Directory server.
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
-- `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
+- `bindpw` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The password used with the Bind DN to authenticate to the LDAP server.
 - `domain_name` (String) The fully qualified domain name (FQDN) of the Active Directory domain to join. This parameter is required unless ldap_id is provided.
 - `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes
 in case posix_attributes_source is set to SPECIFIC_DOMAINS.
@@ -181,6 +183,8 @@ Applicable only with Active Directory and NFSv4.
 
 ### Read-Only
 
+- `admin_passwd_md5` (String) MD5 of admin_passwd (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
+- `bindpw_md5` (String) MD5 of bindpw (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `guid` (String) GUID
 - `id` (Number) The ID of this resource.
 - `last_ma_pwd_renewal_status` (Attributes) Last Active Directory machine account password renewal status (see [below for nested schema](#nestedatt--last_ma_pwd_renewal_status))
@@ -218,7 +222,7 @@ Read-Only:
 - `active_directory_id` (Number)
 - `advanced_filter` (String) Manual filters for the BaseDN. This is useful when accounts are distributed across OUs and the baseDN needs to be wide to include all accounts, while there are also accounts that you would like to exclude from user queries.
 - `binddn` (String) Distinguished name of LDAP superuser
-- `bindpw` (String) Password for the LDAP superuser
+- `bindpw` (String, Sensitive) Password for the LDAP superuser
 - `domain_name` (String) FQDN of the domain.
 - `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes
 in case posix_attributes_source is set to SPECIFIC_DOMAINS.

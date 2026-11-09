@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -27,8 +28,11 @@ func (m *KerberosKeytab) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			Importable: &notImportable,
-			SchemaRef:  KerberosKeytabSchemaRef,
+			Importable:         &notImportable,
+			SchemaRef:          KerberosKeytabSchemaRef,
+			WriteOnlyFields:    []string{"admin_password"},
+			WriteOnlyMD5Fields: []string{"admin_password"},
+			SensitiveFields:    []string{"admin_password"},
 			AdditionalSchemaAttributes: map[string]any{
 				"kerberos_id": rschema.Int64Attribute{
 					Required:    true,
@@ -42,6 +46,7 @@ func (m *KerberosKeytab) NewResourceManager(raw map[string]attr.Value, schema an
 					Optional:    true,
 					Description: "Custom filename for the keytab file",
 				},
+				"admin_password_md5": ContentMD5SchemaAttribute("admin_password", false),
 			},
 		},
 	)}
@@ -53,6 +58,16 @@ func (m *KerberosKeytab) TfState() is.ResourceState {
 
 func (m *KerberosKeytab) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Kerberos
+}
+
+func (m *KerberosKeytab) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5(ctx, req, resp, "admin_password", "admin_password_md5")
+	return nil
+}
+
+func (m *KerberosKeytab) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "admin_password")
+	return record
 }
 
 func (m *KerberosKeytab) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
@@ -71,6 +86,11 @@ func (m *KerberosKeytab) UpdateResource(ctx context.Context, plan UpdateResource
 	kerberosId := m.tfstate.Int64("kerberos_id")
 	planTs := plan.(*KerberosKeytab).TfState()
 	changedParams := planTs.GetChangedParams(m.tfstate)
+	// Write-only admin_password always diffs against null state; use md5 instead.
+	delete(changedParams, "admin_password")
+	if planTs.String("admin_password_md5") != m.tfstate.String("admin_password_md5") {
+		changedParams["admin_password"] = planTs.String("admin_password")
+	}
 
 	return processKerberosKeytab(ctx, kerberosId, planTs, changedParams, rest)
 }
@@ -87,7 +107,7 @@ func processKerberosKeytab(ctx context.Context, kerberosId int64, tfstate is.Res
 		return nil, fmt.Errorf("failed to get kerberos ID: kerberos ID is empty")
 	}
 
-	// Check if we need to generate keytab (admin credentials changed or this is a create operation)
+	// Check if we need to generate keytab (admin credentials changed or this is a create operation).
 	needsGeneration := false
 	if _, hasUsername := changedParams["admin_username"]; hasUsername {
 		needsGeneration = true

@@ -2931,6 +2931,138 @@ func TestClearWriteOnlyFields(t *testing.T) {
 	assert.Equal(t, "c", create["name"])
 }
 
+// TERF-315: write-only secrets overlaid from Config always look "changed"
+// (plan=value, state=null). Gate them on <field>_md5 so unrelated updates
+// do not re-send the secret.
+func TestGetUpdateParams_OmitsWriteOnlyUnlessMD5Changed(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":              rschema.Int64Attribute{Optional: true},
+			"username":        rschema.StringAttribute{Optional: true},
+			"password":        rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_retype": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_md5":    rschema.StringAttribute{Computed: true},
+		},
+	}
+	hints := &TFStateHints{
+		WriteOnlyFields:    []string{"password", "password_retype"},
+		WriteOnlyMD5Fields: []string{"password"},
+		SensitiveFields:    []string{"password", "password_retype"},
+	}
+
+	md5Same := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	md5New := "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"id":              types.Int64Value(1),
+		"username":        types.StringValue("admin"),
+		"password":        types.StringNull(),
+		"password_retype": types.StringNull(),
+		"password_md5":    types.StringValue(md5Same),
+	}, schema, hints)
+
+	t.Run("md5 unchanged omits secrets", func(t *testing.T) {
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin-renamed"),
+			"password":        types.StringValue("secret"), // overlaid from config
+			"password_retype": types.StringValue("secret"),
+			"password_md5":    types.StringValue(md5Same),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(currentState)
+		assert.Contains(t, updateParams, "username")
+		assert.Equal(t, "admin-renamed", updateParams["username"])
+		assert.NotContains(t, updateParams, "password", "unchanged password_md5 must not re-send password")
+		assert.NotContains(t, updateParams, "password_retype", "companion write-only must also be omitted")
+		assert.NotContains(t, updateParams, "password_md5")
+	})
+
+	t.Run("md5 changed includes secrets", func(t *testing.T) {
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("new-secret"),
+			"password_retype": types.StringValue("new-secret"),
+			"password_md5":    types.StringValue(md5New),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(currentState)
+		assert.Contains(t, updateParams, "password")
+		assert.Equal(t, "new-secret", updateParams["password"])
+		assert.Contains(t, updateParams, "password_retype")
+		assert.Equal(t, "new-secret", updateParams["password_retype"])
+	})
+
+	t.Run("md5 newly set after import includes secrets", func(t *testing.T) {
+		importedState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringNull(),
+			"password_retype": types.StringNull(),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("from-config"),
+			"password_retype": types.StringValue("from-config"),
+			"password_md5":    types.StringValue(md5New),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(importedState)
+		assert.Contains(t, updateParams, "password")
+		assert.Contains(t, updateParams, "password_retype")
+	})
+
+	t.Run("upgrade seeds md5 without re-sending unchanged password", func(t *testing.T) {
+		// Pre-WriteOnly state still has the secret; new schema adds password_md5.
+		oldPassword := "same-secret"
+		upgradeState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue(oldPassword),
+			"password_retype": types.StringNull(),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue(oldPassword), // overlaid from config
+			"password_retype": types.StringValue(oldPassword),
+			"password_md5":    types.StringValue(contentMD5Hex(oldPassword)),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(upgradeState)
+		assert.NotContains(t, updateParams, "password", "matching pre-upgrade secret must not be re-sent")
+		assert.NotContains(t, updateParams, "password_retype")
+	})
+
+	t.Run("upgrade with rotated password includes secrets", func(t *testing.T) {
+		upgradeState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("old-secret"),
+			"password_retype": types.StringNull(),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("new-secret"),
+			"password_retype": types.StringValue("new-secret"),
+			"password_md5":    types.StringValue(contentMD5Hex("new-secret")),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(upgradeState)
+		assert.Contains(t, updateParams, "password")
+		assert.Equal(t, "new-secret", updateParams["password"])
+		assert.Contains(t, updateParams, "password_retype")
+	})
+}
+
 // TestListsHaveSameContentIgnoringOrder_SimpleStrings tests order-independent comparison for simple string lists
 func TestListsHaveSameContentIgnoringOrder_SimpleStrings(t *testing.T) {
 	// Same content, different order

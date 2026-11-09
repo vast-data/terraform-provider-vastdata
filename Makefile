@@ -220,7 +220,7 @@ test-profile-mem:
 	@echo "View with: go tool pprof profiles/mem.prof"
 
 # Generate docs and copywrite headers
-generate-docs:
+generate-docs: fmt
 	@echo "Generating documentation and headers..."
 	@go run $(CURDIR)/misc/generate_examples.go
 	cd tools; go generate ./...; cd -

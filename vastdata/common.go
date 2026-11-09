@@ -704,8 +704,8 @@ func allPrimitiveScalars(vals []any) bool {
 //  4. On read/transform, call SetRecordContentMD5 when the API still returns the
 //     secret (or clear the md5 when it does not) so state stays in sync.
 //
-// Used by vastdata_license today; the same helpers apply to any future
-// write-only string that needs replace/update detection.
+// Used by vastdata_license (replace on md5 change) and
+// vastdata_administrator_manager (update on md5 change via WriteOnlyMD5Fields).
 
 // ContentMD5Hex returns the lowercase hex MD5 of s.
 //
@@ -781,6 +781,29 @@ func SetRecordContentMD5(record Record, sourceField, md5Field string) {
 	}
 	if key, ok := record[sourceField].(string); ok && key != "" {
 		record[md5Field] = ContentMD5Hex(key)
+	}
+}
+
+// SetPlanContentMD5Fields calls SetPlanContentMD5 for each source→md5 pair.
+// pairs must be even: source1, md5_1, source2, md5_2, ...
+func SetPlanContentMD5Fields(
+	ctx context.Context,
+	req resource.ModifyPlanRequest,
+	resp *resource.ModifyPlanResponse,
+	pairs ...string,
+) {
+	for i := 0; i+1 < len(pairs); i += 2 {
+		SetPlanContentMD5(ctx, req, resp, pairs[i], pairs[i+1])
+	}
+}
+
+// DeleteRecordFields removes keys from an API record before it is written to state.
+func DeleteRecordFields(record Record, fields ...string) {
+	if record == nil {
+		return
+	}
+	for _, f := range fields {
+		delete(record, f)
 	}
 }
 

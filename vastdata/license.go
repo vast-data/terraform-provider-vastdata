@@ -30,10 +30,10 @@ func (m *License) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 			ImportFields:         []string{"id"},
 			RequiredSchemaFields: []string{"license_key"},
 			WriteOnlyFields:      []string{"license_key"},
+			WriteOnlyMD5Fields:   []string{"license_key"},
 			SensitiveFields:      []string{"license_key"},
 			// license_key is write-only (not in state).
-			//Track a computed MD5 of the key and
-			// force replace when that changes.
+			// Track a computed MD5 of the key and force replace when that changes.
 			AdditionalSchemaAttributes: map[string]any{
 				"license_key_md5": ContentMD5SchemaAttribute("license_key", true),
 			},

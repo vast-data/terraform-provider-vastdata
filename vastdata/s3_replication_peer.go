@@ -2,9 +2,11 @@
 package provider
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -24,8 +26,14 @@ func (m *S3ReplicationPeer) NewResourceManager(raw map[string]attr.Value, schema
 		raw,
 		schema,
 		&is.TFStateHints{
-			PreserveUserValueFields: []string{"access_key"},
-			SchemaRef:               S3ReplicationPeerSchemaRef,
+			SchemaRef:          S3ReplicationPeerSchemaRef,
+			WriteOnlyFields:    []string{"access_key", "secret_key"},
+			WriteOnlyMD5Fields: []string{"access_key", "secret_key"},
+			SensitiveFields:    []string{"access_key", "secret_key"},
+			AdditionalSchemaAttributes: map[string]any{
+				"access_key_md5": ContentMD5SchemaAttribute("access_key", false),
+				"secret_key_md5": ContentMD5SchemaAttribute("secret_key", false),
+			},
 		},
 	)}
 }
@@ -46,4 +54,17 @@ func (m *S3ReplicationPeer) TfState() is.ResourceState {
 
 func (m *S3ReplicationPeer) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.S3replicationPeers
+}
+
+func (m *S3ReplicationPeer) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5Fields(ctx, req, resp,
+		"access_key", "access_key_md5",
+		"secret_key", "secret_key_md5",
+	)
+	return nil
+}
+
+func (m *S3ReplicationPeer) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "access_key", "secret_key")
+	return record
 }

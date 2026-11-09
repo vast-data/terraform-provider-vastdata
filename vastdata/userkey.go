@@ -9,6 +9,7 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -33,7 +34,10 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 			Importable:              &notImportable,
 			SchemaRef:               UserKeySchemaRef,
 			OptionalSchemaFields:    []string{"access_key", "secret_key"},
-			PreserveUserValueFields: []string{"access_key", "secret_key"},
+			PreserveUserValueFields: []string{"access_key"},
+			WriteOnlyFields:         []string{"secret_key"},
+			WriteOnlyMD5Fields:      []string{"secret_key"},
+			SensitiveFields:         []string{"secret_key"},
 			AdditionalSchemaAttributes: map[string]any{
 				"user_id": rschema.Int64Attribute{
 					Optional:    true,
@@ -54,19 +58,30 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 					Computed:    true,
 					Description: "The encrypted secret key, returned if pgp_public_key is used",
 				},
+				"secret_key_md5": ContentMD5SchemaAttribute("secret_key", false),
 				"enabled": rschema.BoolAttribute{
 					Optional:    true,
 					Description: "Whether the key is enabled.",
 				},
 			},
 			SearchableFields: []string{"user_id", "username"},
-			SensitiveFields:  []string{"secret_key"},
 		},
 	)}
 }
 
 func (m *UserKey) TfState() is.ResourceState {
 	return m.tfstate
+}
+
+func (m *UserKey) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5(ctx, req, resp, "secret_key", "secret_key_md5")
+	return nil
+}
+
+func (m *UserKey) TransformResponseRecord(record Record) Record {
+	SetRecordContentMD5(record, "secret_key", "secret_key_md5")
+	DeleteRecordFields(record, "secret_key")
+	return record
 }
 
 // MigrateModePassThroughUpdate allows schema-reconciliation updates during
@@ -119,15 +134,20 @@ func finalizeUserKeyRecord(record Record, ts is.ResourceState) (Record, error) {
 			return nil, err
 		}
 		record["encrypted_secret_key"] = encrypted
+		SetRecordContentMD5(record, "secret_key", "secret_key_md5")
 		record["secret_key"] = types.StringNull()
 	} else {
 		record["encrypted_secret_key"] = types.StringNull()
+		SetRecordContentMD5(record, "secret_key", "secret_key_md5")
+		// Prefer configured secret for md5 when user-supplied; then drop plaintext.
+		if ts.IsKnownAndNotNull("secret_key") {
+			record["secret_key"] = ts.String("secret_key")
+			SetRecordContentMD5(record, "secret_key", "secret_key_md5")
+		}
+		DeleteRecordFields(record, "secret_key")
 	}
 	if ts.IsKnownAndNotNull("access_key") {
 		record["access_key"] = ts.String("access_key")
-	}
-	if ts.IsKnownAndNotNull("secret_key") {
-		record["secret_key"] = ts.String("secret_key")
 	}
 	return record, nil
 }
@@ -135,7 +155,16 @@ func finalizeUserKeyRecord(record Record, ts is.ResourceState) (Record, error) {
 func userKeyCredentialsChanged(planTs, stateTs is.ResourceState) bool {
 	changed := planTs.GetChangedParams(stateTs)
 	_, accessKeyChanged := changed["access_key"]
-	_, secretKeyChanged := changed["secret_key"]
+	planMD5 := planTs.String("secret_key_md5")
+	stateMD5 := stateTs.String("secret_key_md5")
+	secretKeyChanged := planMD5 != stateMD5 && (planMD5 != "" || stateMD5 != "")
+	// Fallback for pre-md5 state during upgrade: treat leftover state secret hash.
+	if !secretKeyChanged && planMD5 != "" && stateMD5 == "" && stateTs.IsKnownAndNotNull("secret_key") {
+		secretKeyChanged = ContentMD5Hex(stateTs.String("secret_key")) != planMD5
+	} else if planMD5 != "" && stateMD5 == "" && !stateTs.IsKnownAndNotNull("secret_key") {
+		// Import / first user-supplied secret.
+		secretKeyChanged = planTs.IsKnownAndNotNull("secret_key")
+	}
 	return accessKeyChanged || secretKeyChanged
 }
 

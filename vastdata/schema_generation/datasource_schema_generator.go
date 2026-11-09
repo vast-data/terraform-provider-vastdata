@@ -101,11 +101,11 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 	}
 
 	// Add query parameters with proper required status
-	addSchemaEntries(paramSchemas, requiredParams, hints, allProps, false, true, false, false, false, false)
+	addSchemaEntries(paramSchemas, requiredParams, hints, allProps, false, true, false, false, false, false, true)
 
 	// Then, add response schema properties as computed fields (ignore response required fields)
 	if readSchemaRef.Value != nil {
-		addSchemaEntries(readSchemaRef.Value.Properties, []string{}, hints, allProps, false, true, true, false, false, false)
+		addSchemaEntries(readSchemaRef.Value.Properties, []string{}, hints, allProps, false, true, true, false, false, false, true)
 	}
 
 	attrs := buildDatasourceAttributesFromMap(ctx, allProps, hints)
@@ -318,7 +318,7 @@ func buildDatasourceAttribute(
 		switch (*itemSchema.Type)[0] {
 		case openapi3.TypeObject:
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, false, false, true, false, false, entry.Ordered)
+			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, false, false, true, false, false, entry.Ordered, false)
 			attrs := buildDatasourceAttributesFromMap(ctx, nested, hints)
 
 			if isOrdered {
@@ -389,7 +389,7 @@ func buildDatasourceAttribute(
 
 			if valSchema.Type != nil && (*valSchema.Type)[0] == openapi3.TypeObject && len(valSchema.Properties) > 0 {
 				nested := make(map[string]*SchemaEntry)
-				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 
 				return dschema.MapNestedAttribute{
 					NestedObject: dschema.NestedAttributeObject{
@@ -417,7 +417,7 @@ func buildDatasourceAttribute(
 
 		if len(schema.Properties) > 0 {
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 
 			return dschema.SingleNestedAttribute{
 				Attributes:          buildDatasourceAttributesFromMap(ctx, nested, hints),

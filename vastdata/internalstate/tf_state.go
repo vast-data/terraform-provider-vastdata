@@ -4,6 +4,8 @@ package internalstate
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"maps"
@@ -1059,6 +1061,8 @@ func (s *TFState) GetChangedParams(otherState ResourceState) vast_client.Params 
 //  3. Excludes CreateOnlyFields - fields that may be set on create but must never be PATCH'd
 //  4. Excludes DeleteOnlyBodyFields - fields only used during delete operations
 //  5. Excludes DeleteOnlyParamFields - query params only used during delete operations
+//  6. When WriteOnlyMD5Fields is set, omits WriteOnlyFields unless a <field>_md5
+//     fingerprint changed (avoids re-sending secrets after overlayWriteOnlyFromConfig)
 //
 // EditOnlyFields should be handled separately after the main update operation.
 func (s *TFState) GetUpdateParams(otherState ResourceState) vast_client.Params {
@@ -1080,7 +1084,71 @@ func (s *TFState) GetUpdateParams(otherState ResourceState) vast_client.Params {
 		delete(diffParams, excludeField)
 	}
 
+	// Write-only secrets are overlaid from Config onto the plan, so DiffFields
+	// always sees plan=value vs state=null. Only send them when their MD5
+	// fingerprint actually changed.
+	if s.Hints != nil && len(s.Hints.WriteOnlyMD5Fields) > 0 && !s.writeOnlyMD5Changed(otherState) {
+		for _, field := range s.Hints.WriteOnlyFields {
+			delete(diffParams, field)
+		}
+	}
+
 	return diffParams
+}
+
+// writeOnlyMD5Changed reports whether any WriteOnlyMD5Fields fingerprint
+// (<field>_md5) differs between this plan state and otherState.
+//
+// Upgrade path: when state has no <field>_md5 yet (provider just added the
+// companion) but still holds the pre-WriteOnly secret, compare MD5(state secret)
+// to the plan fingerprint. Matching means the password did not change — only
+// seed md5 into state; do not re-send the secret. Import (no state secret, no
+// md5) still counts as changed so the configured secret is applied once.
+func (s *TFState) writeOnlyMD5Changed(otherState ResourceState) bool {
+	if s.Hints == nil || len(s.Hints.WriteOnlyMD5Fields) == 0 {
+		return false
+	}
+	otherRaw := otherState.RawValues()
+	for _, field := range s.Hints.WriteOnlyMD5Fields {
+		md5Field := field + "_md5"
+		planMD5, planOK := attrValueString(s.Raw[md5Field])
+		if !planOK || planMD5 == "" {
+			continue
+		}
+		if stateMD5, ok := attrValueString(otherRaw[md5Field]); ok {
+			if stateMD5 == planMD5 {
+				continue
+			}
+			return true
+		}
+		// State md5 missing: prefer hashing a leftover state secret (upgrade).
+		if stateSecret, ok := attrValueString(otherRaw[field]); ok && stateSecret != "" {
+			if contentMD5Hex(stateSecret) == planMD5 {
+				continue
+			}
+			return true
+		}
+		// No state md5 and no state secret (e.g. import) → treat as new secret.
+		return true
+	}
+	return false
+}
+
+func attrValueString(v attr.Value) (string, bool) {
+	if v == nil || v.IsNull() || v.IsUnknown() {
+		return "", false
+	}
+	s, ok := v.(types.String)
+	if !ok {
+		return "", false
+	}
+	return s.ValueString(), true
+}
+
+//nolint:gosec // plan/state equality fingerprint, not a security control
+func contentMD5Hex(s string) string {
+	sum := md5.Sum([]byte(s))
+	return hex.EncodeToString(sum[:])
 }
 
 // GetDeleteOnlyBodyParams returns a map of parameters used exclusively for delete operations (delete-only).

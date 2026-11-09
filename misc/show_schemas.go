@@ -51,7 +51,7 @@ func printDataSourceSchemas(filter string, automation bool) {
 		var ctx context.Context
 		manager := d.EmptyManager()
 		tfState := manager.TfState()
-		hints := tfState.Hints
+		hints := tfState.StateHints()
 		resourceName := fmt.Sprintf("vastdata_%s", is.SnakeCaseName(manager))
 
 		if filter != "" && !containsIgnoreCase(resourceName, filter) {
@@ -94,7 +94,7 @@ func printResourceSchemas(filter string, automation bool) {
 		var ctx context.Context
 		manager := r.EmptyManager()
 		tfState := manager.TfState()
-		hints := tfState.Hints
+		hints := tfState.StateHints()
 		resourceName := fmt.Sprintf("vastdata_%s", is.SnakeCaseName(manager))
 
 		if filter != "" && !containsIgnoreCase(resourceName, filter) {

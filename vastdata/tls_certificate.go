@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -32,28 +33,33 @@ func (m *TlsCertificate) NewResourceManager(raw map[string]attr.Value, schema an
 		raw,
 		schema,
 		&is.TFStateHints{
-			Importable: &notImportable,
-			SchemaRef:  TlsCertificateSchemaRef,
+			Importable:         &notImportable,
+			SchemaRef:          TlsCertificateSchemaRef,
+			WriteOnlyFields:    []string{"ca_certificate_file", "revocation_file"},
+			WriteOnlyMD5Fields: []string{"ca_certificate_file", "revocation_file"},
+			SensitiveFields:    []string{"ca_certificate_file", "revocation_file"},
 			AdditionalSchemaAttributes: map[string]any{
 				// File-upload fields not present in the GET response schema.
 				"ca_certificate_file": rschema.StringAttribute{
 					Required:    true,
 					Sensitive:   true,
-					Description: "CA certificate content (PEM/DER). Uploaded as a file to POST /tlscertificates/.",
+					WriteOnly:   true,
+					Description: "CA certificate content (PEM/DER). Uploaded as a file to POST /tlscertificates/. Write-only: never stored in Terraform state.",
 				},
 				"revocation_file": rschema.StringAttribute{
 					Optional:    true,
 					Sensitive:   true,
-					Description: "Certificate Revocation List (CRL) content. When cleared, the CRL is deleted via DELETE /tlscertificates/{id}/crl/.",
+					WriteOnly:   true,
+					Description: "Certificate Revocation List (CRL) content. Write-only: never stored in Terraform state.",
 				},
+				"ca_certificate_file_md5": ContentMD5SchemaAttribute("ca_certificate_file", false),
+				"revocation_file_md5":     ContentMD5SchemaAttribute("revocation_file", false),
 				"tenant_id": rschema.Int64Attribute{
 					Optional:    true,
 					Computed:    true,
 					Description: "Tenant ID to associate with the TLS certificate.",
 				},
 			},
-			SensitiveFields:         []string{"ca_certificate_file", "revocation_file"},
-			PreserveUserValueFields: []string{"ca_certificate_file", "revocation_file"},
 		},
 	)}
 }
@@ -74,6 +80,19 @@ func (m *TlsCertificate) TfState() is.ResourceState {
 
 func (m *TlsCertificate) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.TlsCertificates
+}
+
+func (m *TlsCertificate) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5Fields(ctx, req, resp,
+		"ca_certificate_file", "ca_certificate_file_md5",
+		"revocation_file", "revocation_file_md5",
+	)
+	return nil
+}
+
+func (m *TlsCertificate) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "ca_certificate_file", "revocation_file")
+	return record
 }
 
 // PrepareCreateResource calls POST /tlscertificates/is_operation_healthy/ to
@@ -134,12 +153,12 @@ func (m *TlsCertificate) CreateResource(ctx context.Context, rest *VMSRest) (Dis
 	return result, nil
 }
 
-// AfterUpdateResource deletes the CRL when revocation_file is cleared.
+// AfterUpdateResource deletes the CRL when revocation_file_md5 is cleared.
 func (m *TlsCertificate) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource, rest *VMSRest, record Record) error {
 	planTs := plan.(*TlsCertificate).TfState()
-
-	// If revocation_file was previously set and is now cleared, delete the CRL.
-	if m.tfstate.IsKnownAndNotNull("revocation_file") && !planTs.IsKnownAndNotNull("revocation_file") {
+	stateHad := m.tfstate.IsKnownAndNotNull("revocation_file_md5") && m.tfstate.String("revocation_file_md5") != ""
+	planHas := planTs.IsKnownAndNotNull("revocation_file_md5") && planTs.String("revocation_file_md5") != ""
+	if stateHad && !planHas {
 		id := record.RecordID()
 		return rest.TlsCertificates.TlsCertificateCrlWithContext_DELETE(ctx, id)
 	}

@@ -144,7 +144,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		// Add fields from the POST request schema.
 		// fields are optional=true - means fields can be passed via POST request.
 		// fields are computed=false - at this stage we don't know if fields are returned by API or not. Might be overridden later.
-		addSchemaEntries(createSchemaRef.Value.Properties, requiredFields, hints, allProps, false, true, false, false, false, false)
+		addSchemaEntries(createSchemaRef.Value.Properties, requiredFields, hints, allProps, false, true, false, false, false, false, true)
 	}
 
 	if _, ok := allProps["id"]; ok {
@@ -198,7 +198,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			}
 			// optional false - field is part of response schema only so cannot be passed via POST request.
 			// computed true - field is returned by API so it is computed.
-			addSchemaEntries(map[string]*openapi3.SchemaRef{name: ref}, requiredFields, hints, allProps, false, false, true, false, false, false)
+			addSchemaEntries(map[string]*openapi3.SchemaRef{name: ref}, requiredFields, hints, allProps, false, false, true, false, false, false, true)
 		}
 	}
 
@@ -231,7 +231,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 				" but is not listed in ReadOnlyFields or ExcludedSchemaFields."+
 				" Such fields cannot be used in context of create/update but only as search query params", name, resourcePath)
 		}
-		addSchemaEntries(map[string]*openapi3.SchemaRef{name: buildTmpSchemaRefFromParam(p)}, nil, hints, allProps, false, true, false, false, false, false)
+		addSchemaEntries(map[string]*openapi3.SchemaRef{name: buildTmpSchemaRefFromParam(p)}, nil, hints, allProps, false, true, false, false, false, false, true)
 	}
 
 	// ---- NOTE: Just for printing information about searchable fields ----
@@ -528,7 +528,7 @@ func buildResourceAttribute(
 		switch (*itemSchema.Type)[0] {
 		case openapi3.TypeObject:
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 			attributes := buildResourceAttributesFromMap(ctx, nested, hints)
 
 			if isOrdered {
@@ -627,7 +627,7 @@ func buildResourceAttribute(
 
 			if valSchema.Type != nil && (*valSchema.Type)[0] == openapi3.TypeObject && len(valSchema.Properties) > 0 {
 				nested := make(map[string]*SchemaEntry)
-				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 				return rschema.MapNestedAttribute{
 					NestedObject: rschema.NestedAttributeObject{
 						Attributes: buildResourceAttributesFromMap(ctx, nested, hints),
@@ -655,7 +655,7 @@ func buildResourceAttribute(
 
 		if len(schema.Properties) > 0 {
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 			att := rschema.SingleNestedAttribute{
 				Attributes:          buildResourceAttributesFromMap(ctx, nested, hints),
 				Required:            entry.Required,

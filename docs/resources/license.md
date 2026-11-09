@@ -35,7 +35,7 @@ resource "vastdata_license" "example" {
 - `expiration_date` (String) The date on which the license expired or will expire. This is calculated by VMS from the start date and period.
 - `guid` (String)
 - `id` (Number) The ID of this resource.
-- `license_key_md5` (String) MD5 of license_key (lowercase hex). Computed from the configured key at plan time so replacing license_key is detected. Not settable.
+- `license_key_md5` (String) MD5 of license_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `name` (String)
 - `period` (String) The period, in months, for which the license is valid. The period begins on the start date. Unlimited means that the license does not expire.
 - `start_date` (String) The start date of the license period.

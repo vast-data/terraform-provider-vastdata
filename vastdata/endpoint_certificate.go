@@ -70,9 +70,10 @@ func looksLikePEMCertificate(s string) bool {
 
 func endpointCertificateHints(parentAttr, parentDesc, description, markdown string) *is.TFStateHints {
 	return &is.TFStateHints{
-		Importable:      &notImportable,
-		WriteOnlyFields: []string{attrCertificate, attrPrivateKey},
-		SensitiveFields: []string{attrCertificate, attrPrivateKey},
+		Importable:         &notImportable,
+		WriteOnlyFields:    []string{attrCertificate, attrPrivateKey},
+		WriteOnlyMD5Fields: []string{attrCertificate},
+		SensitiveFields:    []string{attrCertificate, attrPrivateKey},
 		TFStateHintsForCustom: &is.TFStateHintsForCustom{
 			Description:         description,
 			MarkdownDescription: markdown,

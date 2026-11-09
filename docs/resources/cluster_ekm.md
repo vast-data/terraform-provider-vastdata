@@ -66,12 +66,20 @@ resource "vastdata_cluster_ekm" "vastdb_cluster_ekm" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `ekm_auth_domain` (String) Auth domain (Thales)
 - `ekm_bypass_validation` (Boolean) Bypass key and cert validation (VMS)
-- `ekm_ca_certificate` (String) EKM CA certificate
-- `ekm_certificate` (String) EKM certificate
+- `ekm_ca_certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) EKM CA certificate
+- `ekm_certificate` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) EKM certificate
 - `ekm_domain` (String) Domain (Thales)
-- `ekm_private_key` (String) EKM private key
+- `ekm_private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) EKM private key
 - `ekm_proxy_address` (String) Thales EKM proxy address: https://proxy-address:port
 - `ekm_servers` (String) List of EKM servers: 10.0.0.1:5696,11.0.0.1:5697
 - `encryption_type` (String) Encryption type
+
+### Read-Only
+
+- `ekm_ca_certificate_md5` (String) MD5 of ekm_ca_certificate (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
+- `ekm_certificate_md5` (String) MD5 of ekm_certificate (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
+- `ekm_private_key_md5` (String) MD5 of ekm_private_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.

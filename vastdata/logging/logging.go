@@ -1,3 +1,5 @@
+// Copyright (c) HashiCorp, Inc.
+
 // Package logging is the single logging entry point of the provider's resource logic.
 package logging
 

@@ -23,4 +23,10 @@ resource "vastdata_manager_password" "example" {
 
 ### Required
 
-- `password` (String, Sensitive) New password.
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) New password.
+
+### Read-Only
+
+- `password_md5` (String) MD5 of password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.

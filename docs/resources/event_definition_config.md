@@ -29,6 +29,8 @@ resource "vastdata_event_definition_config" "vastdb_event_definition_config" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `audit_logs_retention` (Number) Audit logs retention in days
 - `critical_value` (String) Maps CRITICAL severity to a different value. Default: CRITICAL
 - `disable_actions` (Boolean) Set to true to disable default actions for events.
@@ -44,7 +46,7 @@ resource "vastdata_event_definition_config" "vastdb_event_definition_config" {
 - `quota_email_provider` (String) Specify which query context should be used to query providers for user quota alert emails. 'Aggregated' will perform an aggregated query of all providers. Alternatively, you can specify a specific provider if connected to the cluster.
 - `quota_email_suffix` (String) A default suffix to add to append to user names to form an email address. This is used as the email recipient address for sending a user user quota alert emails. It is only used if an email address is not found for the user on a provider.
 - `smtp_host` (String) SMTP server host name for alert emails.
-- `smtp_password` (String) Password for SMTP authentication
+- `smtp_password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Password for SMTP authentication
 - `smtp_port` (String) The port used by the SMTP server to send outgoing emails.
 - `smtp_use_tls` (Boolean) Set to true to send email over a TLS connection.
 - `smtp_user` (String) User for SMTP authentication
@@ -55,3 +57,7 @@ resource "vastdata_event_definition_config" "vastdb_event_definition_config" {
 - `syslog_secure_audit` (Boolean) /var/log/secure logs audit
 - `syslog_shell_audit` (Boolean) CNode and DNode shell commands
 - `syslog_vms_audit` (Boolean) VMS audit
+
+### Read-Only
+
+- `smtp_password_md5` (String) MD5 of smtp_password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -29,11 +30,23 @@ func (m *ClusterEkm) NewResourceManager(raw map[string]attr.Value, schema any) R
 		&is.TFStateHints{
 			Importable: &notImportable,
 			SchemaRef:  ClusterEkmSchemaRef,
+			WriteOnlyFields: []string{
+				"ekm_private_key", "ekm_certificate", "ekm_ca_certificate",
+			},
+			WriteOnlyMD5Fields: []string{
+				"ekm_private_key", "ekm_certificate", "ekm_ca_certificate",
+			},
+			SensitiveFields: []string{
+				"ekm_private_key", "ekm_certificate", "ekm_ca_certificate",
+			},
 			AdditionalSchemaAttributes: map[string]any{
 				"cluster_id": rschema.Int64Attribute{
 					Required:    true,
 					Description: "Cluster ID to which the EKM should be added",
 				},
+				"ekm_private_key_md5":    ContentMD5SchemaAttribute("ekm_private_key", false),
+				"ekm_certificate_md5":    ContentMD5SchemaAttribute("ekm_certificate", false),
+				"ekm_ca_certificate_md5": ContentMD5SchemaAttribute("ekm_ca_certificate", false),
 			},
 		},
 	)}
@@ -41,6 +54,20 @@ func (m *ClusterEkm) NewResourceManager(raw map[string]attr.Value, schema any) R
 
 func (m *ClusterEkm) TfState() is.ResourceState {
 	return m.tfstate
+}
+
+func (m *ClusterEkm) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5Fields(ctx, req, resp,
+		"ekm_private_key", "ekm_private_key_md5",
+		"ekm_certificate", "ekm_certificate_md5",
+		"ekm_ca_certificate", "ekm_ca_certificate_md5",
+	)
+	return nil
+}
+
+func (m *ClusterEkm) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "ekm_private_key", "ekm_certificate", "ekm_ca_certificate")
+	return record
 }
 
 func (m *ClusterEkm) API(rest *VMSRest) VastResourceAPIWithContext {
@@ -62,7 +89,8 @@ func (m *ClusterEkm) CreateResource(ctx context.Context, rest *VMSRest) (Display
 func (m *ClusterEkm) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
 	clusterId := m.tfstate.Int64("cluster_id")
 	planTs := plan.(*ClusterEkm).TfState()
-	params := planTs.GetChangedParams(m.tfstate)
+	// GetUpdateParams respects WriteOnlyMD5Fields so unchanged secrets are not re-sent.
+	params := planTs.GetUpdateParams(m.tfstate)
 	params.Without("cluster_id") // Remove cluster_id from params, as it's part of the URL
 
 	return addClusterEkm(ctx, clusterId, params, rest)
