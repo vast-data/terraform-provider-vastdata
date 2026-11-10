@@ -32,6 +32,13 @@ func (m *ViewPolicy) NewResourceManager(raw map[string]attr.Value, schema any) R
 				"nfs_no_squash",
 				"nfs_root_squash",
 				"nfs_all_squash",
+				"read_only",
+				"read_write",
+				"s3_read_only",
+				"s3_read_write",
+				"smb_read_only",
+				"smb_read_write",
+				"trash_access",
 			},
 			PreserveUserValueFields: []string{
 				"protocols_audit",

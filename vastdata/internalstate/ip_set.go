@@ -3,49 +3,79 @@
 package internalstate
 
 import (
-	"encoding/binary"
 	"fmt"
-	"net"
+	"net/netip"
+	"slices"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// expandIPSet parses a list of IP addresses and CIDR notations and returns
-// the full set of individual host IP strings they collectively cover.
-// Both IPv4 and IPv6 are supported.
+// ipRange is an inclusive [start, end] address range within one IP family.
+type ipRange struct{ start, end netip.Addr }
+
+// mergeIPRanges parses a list of IP addresses and CIDR notations and returns
+// the sorted, minimal list of disjoint, non-adjacent ranges they cover, so two
+// lists cover the same addresses iff their merged ranges are equal.
+// Both IPv4 and IPv6 are supported; IPv4-mapped IPv6 addresses are unmapped.
 // Returns an error if any entry cannot be parsed.
-func expandIPSet(entries []string) (map[string]struct{}, error) {
-	result := make(map[string]struct{})
+func mergeIPRanges(entries []string) ([]ipRange, error) {
+	ranges := make([]ipRange, 0, len(entries))
 	for _, entry := range entries {
 		entry = strings.TrimSpace(entry)
 		if entry == "" {
 			continue
 		}
+		var prefix netip.Prefix
 		if strings.Contains(entry, "/") {
-			_, ipNet, err := net.ParseCIDR(entry)
+			p, err := netip.ParsePrefix(entry)
 			if err != nil {
 				return nil, fmt.Errorf("invalid CIDR %q: %w", entry, err)
 			}
-			for ip := cloneIP(ipNet.IP); ipNet.Contains(ip); incrementIP(ip) {
-				result[ip.String()] = struct{}{}
-			}
+			prefix = p
 		} else {
-			ip := net.ParseIP(entry)
-			if ip == nil {
-				return nil, fmt.Errorf("invalid IP address %q", entry)
+			a, err := netip.ParseAddr(entry)
+			if err != nil {
+				return nil, fmt.Errorf("invalid IP address %q: %w", entry, err)
 			}
-			// Normalise to canonical string form so IPv4-mapped IPv6 addresses
-			// don't cause false mismatches.
-			if v4 := ip.To4(); v4 != nil {
-				result[v4.String()] = struct{}{}
-			} else {
-				result[ip.String()] = struct{}{}
+			prefix = netip.PrefixFrom(a, a.BitLen())
+		}
+		// A mapped prefix shorter than /96 extends beyond ::ffff:0:0/96, so it stays IPv6.
+		if a := prefix.Addr(); a.Is4In6() && prefix.Bits() >= 96 {
+			prefix = netip.PrefixFrom(a.Unmap(), prefix.Bits()-96)
+		}
+		prefix = prefix.Masked()
+		ranges = append(ranges, ipRange{prefix.Addr(), lastAddr(prefix)})
+	}
+
+	slices.SortFunc(ranges, func(x, y ipRange) int { return x.start.Compare(y.start) })
+	merged := ranges[:0]
+	for _, r := range ranges {
+		if n := len(merged); n > 0 {
+			cur := &merged[n-1]
+			// Compare orders IPv4 before IPv6, and Next() of a family's last address is
+			// the zero Addr, so ranges never merge across families.
+			if r.start.Compare(cur.end) <= 0 || r.start == cur.end.Next() {
+				if r.end.Compare(cur.end) > 0 {
+					cur.end = r.end
+				}
+				continue
 			}
 		}
+		merged = append(merged, r)
 	}
-	return result, nil
+	return merged, nil
+}
+
+// lastAddr returns the highest address inside a masked prefix.
+func lastAddr(p netip.Prefix) netip.Addr {
+	b := p.Addr().AsSlice()
+	for i := p.Bits(); i < len(b)*8; i++ {
+		b[i/8] |= 0x80 >> (i % 8)
+	}
+	a, _ := netip.AddrFromSlice(b)
+	return a
 }
 
 // IPSetsEquivalent returns true when two lists of IPs / CIDRs cover exactly
@@ -53,23 +83,15 @@ func expandIPSet(entries []string) (map[string]struct{}, error) {
 // Parsing errors on either side are treated as non-equivalent so the caller
 // falls back to a full state update.
 func IPSetsEquivalent(a, b []string) bool {
-	setA, err := expandIPSet(a)
+	rangesA, err := mergeIPRanges(a)
 	if err != nil {
 		return false
 	}
-	setB, err := expandIPSet(b)
+	rangesB, err := mergeIPRanges(b)
 	if err != nil {
 		return false
 	}
-	if len(setA) != len(setB) {
-		return false
-	}
-	for ip := range setA {
-		if _, ok := setB[ip]; !ok {
-			return false
-		}
-	}
-	return true
+	return slices.Equal(rangesA, rangesB)
 }
 
 // attrValueToStringSlice extracts a []string from a Terraform list or set of
@@ -107,27 +129,4 @@ func IPSetsEquivalentAttrs(existing, incoming attr.Value) bool {
 		return false
 	}
 	return IPSetsEquivalent(a, b)
-}
-
-// cloneIP returns a copy of the IP so we can safely mutate it while iterating.
-func cloneIP(ip net.IP) net.IP {
-	dup := make(net.IP, len(ip))
-	copy(dup, ip)
-	return dup
-}
-
-// incrementIP adds 1 to the lowest-order byte of ip (big-endian).
-func incrementIP(ip net.IP) {
-	if len(ip) == 4 {
-		n := binary.BigEndian.Uint32(ip)
-		binary.BigEndian.PutUint32(ip, n+1)
-	} else {
-		// IPv6: treat the 16-byte slice as a 128-bit big-endian integer.
-		for i := len(ip) - 1; i >= 0; i-- {
-			ip[i]++
-			if ip[i] != 0 {
-				break
-			}
-		}
-	}
 }
