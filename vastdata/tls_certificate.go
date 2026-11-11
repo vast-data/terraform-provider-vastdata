@@ -158,9 +158,14 @@ func (m *TlsCertificate) AfterUpdateResource(ctx context.Context, plan AfterUpda
 	planTs := plan.(*TlsCertificate).TfState()
 	stateHad := m.tfstate.IsKnownAndNotNull("revocation_file_md5") && m.tfstate.String("revocation_file_md5") != ""
 	planHas := planTs.IsKnownAndNotNull("revocation_file_md5") && planTs.String("revocation_file_md5") != ""
-	if stateHad && !planHas {
-		id := record.RecordID()
-		return rest.TlsCertificates.TlsCertificateCrlWithContext_DELETE(ctx, id)
+	if !stateHad || planHas {
+		return nil
 	}
-	return nil
+	if exist, ok := record["revocations_exist"].(bool); ok && !exist {
+		return nil
+	}
+	id := record.RecordID()
+	err := rest.TlsCertificates.TlsCertificateCrlWithContext_DELETE(ctx, id)
+	// Already removed (e.g. prior apply deleted CRL but failed to clear md5).
+	return ignoreStatusCodes(err, http.StatusNotFound, http.StatusBadRequest)
 }

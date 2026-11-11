@@ -1038,6 +1038,37 @@ func TestTFState_CopyKnownFieldsTo_SkipsNullComputedFields(t *testing.T) {
 		"required should be updated from plan")
 }
 
+// TERF-320: clearing an optional write-only secret nulls its *_md5 in the plan;
+// that null must overwrite the prior fingerprint in state.
+func TestTFState_CopyKnownFieldsTo_ClearsWriteOnlyMD5Companions(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":                  rschema.Int64Attribute{Optional: true, Computed: true},
+		"revocation_file":     rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"revocation_file_md5": rschema.StringAttribute{Computed: true},
+	}}
+	hints := &TFStateHints{
+		WriteOnlyFields:    []string{"revocation_file"},
+		WriteOnlyMD5Fields: []string{"revocation_file"},
+	}
+
+	plan := NewTFStateMust(map[string]attr.Value{
+		"id":                  types.Int64Null(),
+		"revocation_file":     types.StringNull(),
+		"revocation_file_md5": types.StringNull(),
+	}, schema, hints)
+	state := NewTFStateMust(map[string]attr.Value{
+		"id":                  types.Int64Value(1),
+		"revocation_file":     types.StringNull(),
+		"revocation_file_md5": types.StringValue("66dac1f56349274cf9f37e2068b32eee"),
+	}, schema, hints)
+
+	plan.CopyKnownFieldsTo(state)
+
+	assert.Equal(t, int64(1), state.Raw["id"].(types.Int64).ValueInt64())
+	assert.True(t, state.Raw["revocation_file_md5"].IsNull(),
+		"revocation_file_md5 must be cleared when removed from config")
+}
+
 // TestTFState_CopyKnownFieldsTo_CopiesNonNullComputedFields verifies that non-null
 // computed fields ARE copied (user-specified values should be preserved).
 func TestTFState_CopyKnownFieldsTo_CopiesNonNullComputedFields(t *testing.T) {
@@ -3020,6 +3051,23 @@ func TestGetUpdateParams_OmitsWriteOnlyUnlessMD5Changed(t *testing.T) {
 		assert.Equal(t, "new-secret", updateParams["password"])
 		assert.Contains(t, updateParams, "password_retype")
 		assert.Equal(t, "new-secret", updateParams["password_retype"])
+	})
+
+	t.Run("md5 cleared does not re-send secrets", func(t *testing.T) {
+		// TERF-320: clearing *_md5 must plan an update, but must not re-send
+		// unrelated write-only fields (e.g. ca_certificate_file as non-file JSON).
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("secret"), // overlaid from config
+			"password_retype": types.StringValue("secret"),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+
+		assert.False(t, planState.writeOnlyMD5Changed(currentState))
+		updateParams := planState.GetUpdateParams(currentState)
+		assert.NotContains(t, updateParams, "password")
+		assert.NotContains(t, updateParams, "password_retype")
 	})
 
 	t.Run("md5 newly set after import includes secrets", func(t *testing.T) {

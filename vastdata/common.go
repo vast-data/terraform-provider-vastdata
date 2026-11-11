@@ -741,7 +741,8 @@ func ContentMD5SchemaAttribute(sourceField string, requiresReplace bool) rschema
 }
 
 // SetPlanContentMD5 reads sourceField from config and sets md5Field on the plan
-// to ContentMD5Hex(value). No-op when the plan is null or the source is null/empty.
+// to ContentMD5Hex(value). When the source is null/empty (removed from config),
+// clears md5Field so Terraform detects the removal (TERF-320).
 func SetPlanContentMD5(
 	ctx context.Context,
 	req resource.ModifyPlanRequest,
@@ -761,6 +762,9 @@ func SetPlanContentMD5(
 		return
 	}
 	if src.IsNull() || src.ValueString() == "" {
+		// Clear fingerprint left by UseStateForUnknown when the write-only
+		// optional secret is omitted from config.
+		resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(md5Field), types.StringNull())...)
 		return
 	}
 	resp.Diagnostics.Append(resp.Plan.SetAttribute(

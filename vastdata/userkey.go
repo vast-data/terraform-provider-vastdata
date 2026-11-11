@@ -6,14 +6,18 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"regexp"
+	"slices"
 
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
+
+// VMS rejects secrets that are not exactly 40 chars of [A-Za-z0-9/+].
+var userKeySecretKeyPattern = regexp.MustCompile(`^[A-Za-z0-9/+]{40}$`)
 
 var UserKeySchemaRef = is.NewSchemaReference(
 	http.MethodPost,
@@ -34,10 +38,12 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 			Importable:              &notImportable,
 			SchemaRef:               UserKeySchemaRef,
 			OptionalSchemaFields:    []string{"access_key", "secret_key"},
-			PreserveUserValueFields: []string{"access_key"},
-			WriteOnlyFields:         []string{"secret_key"},
-			WriteOnlyMD5Fields:      []string{"secret_key"},
-			SensitiveFields:         []string{"secret_key"},
+			ComputedSchemaFields:    []string{"access_key", "secret_key"},
+			PreserveUserValueFields: []string{"access_key", "secret_key"},
+			// Not WriteOnly: cluster-generated secrets must remain readable in state
+			// (TERF-318). User-supplied secrets stay in state too — Terraform forbids
+			// nulling a non-write-only sensitive plan value after apply.
+			SensitiveFields: []string{"secret_key"},
 			AdditionalSchemaAttributes: map[string]any{
 				"user_id": rschema.Int64Attribute{
 					Optional:    true,
@@ -58,7 +64,6 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 					Computed:    true,
 					Description: "The encrypted secret key, returned if pgp_public_key is used",
 				},
-				"secret_key_md5": ContentMD5SchemaAttribute("secret_key", false),
 				"enabled": rschema.BoolAttribute{
 					Optional:    true,
 					Description: "Whether the key is enabled.",
@@ -71,17 +76,6 @@ func (m *UserKey) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 
 func (m *UserKey) TfState() is.ResourceState {
 	return m.tfstate
-}
-
-func (m *UserKey) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "secret_key", "secret_key_md5")
-	return nil
-}
-
-func (m *UserKey) TransformResponseRecord(record Record) Record {
-	SetRecordContentMD5(record, "secret_key", "secret_key_md5")
-	DeleteRecordFields(record, "secret_key")
-	return record
 }
 
 // MigrateModePassThroughUpdate allows schema-reconciliation updates during
@@ -113,6 +107,13 @@ func validatePgpPublicKey(ts is.ResourceState) error {
 	return err
 }
 
+func validateSecretKeyFormat(secretKey string) error {
+	if !userKeySecretKeyPattern.MatchString(secretKey) {
+		return fmt.Errorf("secret_key must be 40 characters long and can include alphanumeric characters, '/', and '+'")
+	}
+	return nil
+}
+
 func validateCustomUserKeyPair(ts is.ResourceState) error {
 	hasAccessKey := ts.IsKnownAndNotNull("access_key")
 	hasSecretKey := ts.IsKnownAndNotNull("secret_key")
@@ -122,7 +123,25 @@ func validateCustomUserKeyPair(ts is.ResourceState) error {
 	if hasSecretKey && ts.IsKnownAndNotNull("pgp_public_key") {
 		return fmt.Errorf("pgp_public_key cannot be used when secret_key is specified")
 	}
+	if hasSecretKey {
+		if err := validateSecretKeyFormat(ts.String("secret_key")); err != nil {
+			return err
+		}
+	}
 	return validatePgpPublicKey(ts)
+}
+
+// markUserSuppliedSecretKeyEphemeral asks ClearWriteOnlyFields to drop secret_key
+// after CopyNonEmptyFieldsTo would otherwise copy a user-supplied secret back
+// into state. Generated secrets never call this, so they remain in state.
+func markUserSuppliedSecretKeyEphemeral(ts is.ResourceState) {
+	hints := ts.StateHints()
+	if hints == nil {
+		return
+	}
+	if !slices.Contains(hints.WriteOnlyFields, "secret_key") {
+		hints.WriteOnlyFields = append(hints.WriteOnlyFields, "secret_key")
+	}
 }
 
 func finalizeUserKeyRecord(record Record, ts is.ResourceState) (Record, error) {
@@ -134,17 +153,15 @@ func finalizeUserKeyRecord(record Record, ts is.ResourceState) (Record, error) {
 			return nil, err
 		}
 		record["encrypted_secret_key"] = encrypted
-		SetRecordContentMD5(record, "secret_key", "secret_key_md5")
 		record["secret_key"] = types.StringNull()
-	} else {
+		markUserSuppliedSecretKeyEphemeral(ts)
+	} else if ts.IsKnownAndNotNull("secret_key") {
+		// User-supplied: keep plaintext in state (same attribute as generated).
 		record["encrypted_secret_key"] = types.StringNull()
-		SetRecordContentMD5(record, "secret_key", "secret_key_md5")
-		// Prefer configured secret for md5 when user-supplied; then drop plaintext.
-		if ts.IsKnownAndNotNull("secret_key") {
-			record["secret_key"] = ts.String("secret_key")
-			SetRecordContentMD5(record, "secret_key", "secret_key_md5")
-		}
-		DeleteRecordFields(record, "secret_key")
+		record["secret_key"] = ts.String("secret_key")
+	} else {
+		// Cluster-generated: keep the one-shot secret in state for S3 clients.
+		record["encrypted_secret_key"] = types.StringNull()
 	}
 	if ts.IsKnownAndNotNull("access_key") {
 		record["access_key"] = ts.String("access_key")
@@ -155,28 +172,11 @@ func finalizeUserKeyRecord(record Record, ts is.ResourceState) (Record, error) {
 func userKeyCredentialsChanged(planTs, stateTs is.ResourceState) bool {
 	changed := planTs.GetChangedParams(stateTs)
 	_, accessKeyChanged := changed["access_key"]
-	planMD5 := planTs.String("secret_key_md5")
-	stateMD5 := stateTs.String("secret_key_md5")
-	secretKeyChanged := planMD5 != stateMD5 && (planMD5 != "" || stateMD5 != "")
-	// Fallback for pre-md5 state during upgrade: treat leftover state secret hash.
-	if !secretKeyChanged && planMD5 != "" && stateMD5 == "" && stateTs.IsKnownAndNotNull("secret_key") {
-		secretKeyChanged = ContentMD5Hex(stateTs.String("secret_key")) != planMD5
-	} else if planMD5 != "" && stateMD5 == "" && !stateTs.IsKnownAndNotNull("secret_key") {
-		// Import / first user-supplied secret.
-		secretKeyChanged = planTs.IsKnownAndNotNull("secret_key")
-	}
+	_, secretKeyChanged := changed["secret_key"]
 	return accessKeyChanged || secretKeyChanged
 }
 
-func replaceUserKeyCredentials(ctx context.Context, rest *VMSRest, userId int64, stateTs, planTs is.ResourceState) (Record, error) {
-	oldAccessKey := stateTs.String("access_key")
-	if oldAccessKey == "" {
-		return nil, errors.New("cannot update credentials: existing access_key is unknown in state")
-	}
-	if err := rest.Users.UserAccessKeysWithContext_DELETE(ctx, userId, params{"access_key": oldAccessKey}); err != nil {
-		return nil, err
-	}
-
+func userKeyCreateParams(stateTs, planTs is.ResourceState) params {
 	createParams := params{}
 	if planTs.IsKnownAndNotNull("tenant_id") {
 		createParams["tenant_id"] = planTs.Int64("tenant_id")
@@ -184,10 +184,74 @@ func replaceUserKeyCredentials(ctx context.Context, rest *VMSRest, userId int64,
 		createParams["tenant_id"] = stateTs.Int64("tenant_id")
 	}
 	planTs.SetToMapIfAvailable(createParams, "access_key", "secret_key")
+	return createParams
+}
+
+func restoreUserKeyCredentials(ctx context.Context, rest *VMSRest, userId int64, accessKey, secretKey string, tenantId any) error {
+	if accessKey == "" || secretKey == "" {
+		return errors.New("cannot restore previous access key: prior secret_key is not available in state")
+	}
+	body := params{"access_key": accessKey, "secret_key": secretKey}
+	if tenantId != nil {
+		body["tenant_id"] = tenantId
+	}
+	_, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, body)
+	return err
+}
+
+// replaceUserKeyCredentials rotates credentials without leaving the user keyless
+// when the new key is rejected (TERF-321). Prefer create-before-delete when the
+// access_key changes; when it stays the same, validate first, delete, create,
+// and restore the prior key from state if create fails.
+func replaceUserKeyCredentials(ctx context.Context, rest *VMSRest, userId int64, stateTs, planTs is.ResourceState) (Record, error) {
+	oldAccessKey := stateTs.String("access_key")
+	if oldAccessKey == "" {
+		return nil, errors.New("cannot update credentials: existing access_key is unknown in state")
+	}
+	oldSecretKey := ""
+	if stateTs.IsKnownAndNotNull("secret_key") {
+		oldSecretKey = stateTs.String("secret_key")
+	}
+	if planTs.IsKnownAndNotNull("secret_key") {
+		if err := validateSecretKeyFormat(planTs.String("secret_key")); err != nil {
+			return nil, err
+		}
+	}
+
+	createParams := userKeyCreateParams(stateTs, planTs)
+	newAccessKey := ""
+	if v, ok := createParams["access_key"].(string); ok {
+		newAccessKey = v
+	}
+
+	// Different access_key: create the new key first so a rejected create leaves
+	// the old key intact, then delete the old one.
+	if newAccessKey != "" && newAccessKey != oldAccessKey {
+		record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, createParams)
+		if err != nil {
+			return nil, err
+		}
+		if delErr := rest.Users.UserAccessKeysWithContext_DELETE(ctx, userId, params{"access_key": oldAccessKey}); delErr != nil {
+			return nil, fmt.Errorf("created new access key %q but failed to delete previous access key %q: %w", newAccessKey, oldAccessKey, delErr)
+		}
+		return finalizeUserKeyRecord(record, planTs)
+	}
+
+	// Same access_key (or cluster-generated): must delete before recreate.
+	if err := rest.Users.UserAccessKeysWithContext_DELETE(ctx, userId, params{"access_key": oldAccessKey}); err != nil {
+		return nil, err
+	}
 
 	record, err := rest.Users.UserAccessKeysWithContext_POST(ctx, userId, createParams)
 	if err != nil {
-		return nil, err
+		var tenantId any
+		if v, ok := createParams["tenant_id"]; ok {
+			tenantId = v
+		}
+		if restoreErr := restoreUserKeyCredentials(ctx, rest, userId, oldAccessKey, oldSecretKey, tenantId); restoreErr != nil {
+			return nil, fmt.Errorf("failed to create replacement access key after deleting %q: %v; additionally failed to restore previous key: %w", oldAccessKey, err, restoreErr)
+		}
+		return nil, fmt.Errorf("failed to create replacement access key after deleting %q (previous key restored): %w", oldAccessKey, err)
 	}
 	return finalizeUserKeyRecord(record, planTs)
 }
@@ -286,6 +350,7 @@ func (m *UserKey) UpdateResource(ctx context.Context, plan UpdateResource, rest 
 		}
 		ts.Set("encrypted_secret_key", encrypted)
 		ts.Set("secret_key", types.StringNull())
+		markUserSuppliedSecretKeyEphemeral(ts)
 	}
 	if record != nil {
 		record["user_id"] = userId

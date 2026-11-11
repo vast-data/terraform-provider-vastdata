@@ -739,10 +739,14 @@ func (s *TFState) CopyKnownFieldsTo(other ResourceState) {
 
 		// Skip null values for computed fields to avoid overwriting values from API responses
 		// Example: During update, id=5 is set by FillFromRecord from API, but plan has id=null
-		// We should NOT overwrite the API value with null from the plan
+		// We should NOT overwrite the API value with null from the plan.
+		// Exception: <field>_md5 companions for WriteOnlyMD5Fields — a null plan
+		// fingerprint means the write-only secret was removed from config (TERF-320).
 		meta, ok := s.Meta[k]
 		if ok && meta.Computed && v.IsNull() {
-			continue
+			if s.Hints == nil || !isWriteOnlyMD5Companion(s.Hints, k) {
+				continue
+			}
 		}
 		// Create-only: omit from config must not wipe the value from Terraform state.
 		if v.IsNull() && s.Hints != nil && slices.Contains(s.Hints.CreateOnlyFields, k) {
@@ -1099,6 +1103,9 @@ func (s *TFState) writeOnlyMD5Changed(otherState ResourceState) bool {
 		md5Field := field + "_md5"
 		planMD5, planOK := attrValueString(s.Raw[md5Field])
 		if !planOK || planMD5 == "" {
+			// Cleared optional write-only secret (TERF-320): do not treat as a
+			// secret re-send. Resources that need side effects on clear (e.g.
+			// tls_certificate CRL delete) handle that in AfterUpdateResource.
 			continue
 		}
 		if stateMD5, ok := attrValueString(otherRaw[md5Field]); ok {
@@ -1135,6 +1142,16 @@ func attrValueString(v attr.Value) (string, bool) {
 func contentMD5Hex(s string) string {
 	sum := md5.Sum([]byte(s))
 	return hex.EncodeToString(sum[:])
+}
+
+// isWriteOnlyMD5Companion reports whether attrName is <field>_md5 for a field
+// listed in hints.WriteOnlyMD5Fields.
+func isWriteOnlyMD5Companion(hints *TFStateHints, attrName string) bool {
+	if hints == nil || !strings.HasSuffix(attrName, "_md5") {
+		return false
+	}
+	field := strings.TrimSuffix(attrName, "_md5")
+	return slices.Contains(hints.WriteOnlyMD5Fields, field)
 }
 
 // GetDeleteOnlyBodyParams returns a map of parameters used exclusively for delete operations (delete-only).

@@ -119,12 +119,10 @@ resource "vastdata_user_key" "vastdb_user_key" {
 
 ### Optional
 
-> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
-
 - `access_key` (String) S3 access key, needed to authenticate S3 client requests
 - `enabled` (Boolean) Whether the key is enabled.
 - `pgp_public_key` (String, Sensitive) Optional PGP public key to encrypt the secret key.
-- `secret_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) S3 secret key, needed to authenticate S3 client requests
+- `secret_key` (String, Sensitive) S3 secret key, needed to authenticate S3 client requests
 - `tenant_id` (Number) Tenant ID
 - `user_id` (Number) The ID of the user to which this key belongs. If not provided, it will be derived from the username.
 - `username` (String) The username of the user to which this key belongs.
@@ -132,4 +130,3 @@ resource "vastdata_user_key" "vastdb_user_key" {
 ### Read-Only
 
 - `encrypted_secret_key` (String) The encrypted secret key, returned if pgp_public_key is used
-- `secret_key_md5` (String) MD5 of secret_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.

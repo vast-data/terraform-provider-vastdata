@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLicense_TransformResponseRecord_SetsMD5AndDropsKey(t *testing.T) {
+func TestLicense_TransformResponseRecord_DropsKeyWithoutSettingMD5(t *testing.T) {
 	m := &License{}
 	key := "gAAAAABq7b3_test-license-key"
 	out := m.TransformResponseRecord(Record{
@@ -18,7 +18,8 @@ func TestLicense_TransformResponseRecord_SetsMD5AndDropsKey(t *testing.T) {
 	})
 	_, hasKey := out["license_key"]
 	assert.False(t, hasKey, "license_key must not remain in the record")
-	assert.Equal(t, ContentMD5Hex(key), out["license_key_md5"])
+	_, hasMD5 := out["license_key_md5"]
+	assert.False(t, hasMD5, "license_key_md5 must come from ModifyPlan/config, not the API record")
 	assert.Equal(t, "ACTIVE", out["state"])
 }
 

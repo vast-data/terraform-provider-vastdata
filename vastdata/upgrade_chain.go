@@ -19,7 +19,7 @@ import (
 // does not reject non-null write-only values during state upgrade.
 func (r *Resource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
 	hints := r.EmptyManager().TfState().StateHints()
-	if hints == nil || len(hints.WriteOnlyFields) == 0 {
+	if hints == nil || (len(hints.WriteOnlyFields) == 0 && len(hints.WriteOnlyMD5Fields) == 0) {
 		return nil
 	}
 	return map[int64]resource.StateUpgrader{

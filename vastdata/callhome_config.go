@@ -35,7 +35,8 @@ func (m *CallhomeConfig) NewResourceManager(raw map[string]attr.Value, schema an
 			SchemaRef:  CallhomeConfigSchemaRef,
 			Importable: &notImportable, // write-only secrets (*_md5) cannot be restored from the API
 			// uplink_email is stored (not write-only) so changing it alone plans an
-			// update and re-runs register-cluster.
+			// update; register-cluster runs when email/password/token actually change
+			// and password or token is present in this apply.
 			WriteOnlyFields: []string{
 				"proxy_password",
 				"aws_s3_ak",
@@ -227,25 +228,33 @@ func ensureCallhomeConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs is.R
 		}
 	}
 
-	if err := registerCallhomeClusterIfNeeded(ctx, id, fieldsTs, rest); err != nil {
+	if err := registerCallhomeClusterIfNeeded(ctx, id, stateTs, fieldsTs, rest); err != nil {
 		return nil, err
 	}
 
 	return rest.CallhomeConfigs.GetByIdWithContext(ctx, id)
 }
 
-func registerCallhomeClusterIfNeeded(ctx context.Context, id int64, ts is.ResourceState, rest *VMSRest) error {
+// registerCallhomeClusterIfNeeded registers with Uplink only when uplink
+// credentials are present for this apply and (on update) when they actually
+// changed. Unrelated callhome PATCHes must not re-register; email alone without
+// a password/token in config must not either.
+func registerCallhomeClusterIfNeeded(ctx context.Context, id int64, stateTs, fieldsTs is.ResourceState, rest *VMSRest) error {
 	email, password, token := "", "", ""
-	if ts.IsKnownAndNotNull("uplink_email") {
-		email = ts.String("uplink_email")
+	if fieldsTs.IsKnownAndNotNull("uplink_email") {
+		email = fieldsTs.String("uplink_email")
 	}
-	if ts.IsKnownAndNotNull("uplink_password") {
-		password = ts.String("uplink_password")
+	if fieldsTs.IsKnownAndNotNull("uplink_password") {
+		password = fieldsTs.String("uplink_password")
 	}
-	if ts.IsKnownAndNotNull("uplink_token") {
-		token = ts.String("uplink_token")
+	if fieldsTs.IsKnownAndNotNull("uplink_token") {
+		token = fieldsTs.String("uplink_token")
 	}
-	if email == "" && password == "" && token == "" {
+	if password == "" && token == "" {
+		return nil
+	}
+	// Update: skip unless email or write-only uplink fingerprints changed.
+	if stateTs != fieldsTs && !uplinkRegistrationNeeded(stateTs, fieldsTs) {
 		return nil
 	}
 
@@ -270,4 +279,24 @@ func registerCallhomeClusterIfNeeded(ctx context.Context, id int64, ts is.Resour
 		return fmt.Errorf("Uplink register-cluster task failed: %v", asyncResult.Err)
 	}
 	return nil
+}
+
+func uplinkRegistrationNeeded(stateTs, fieldsTs is.ResourceState) bool {
+	if optionalString(fieldsTs, "uplink_email") != optionalString(stateTs, "uplink_email") {
+		return true
+	}
+	if optionalString(fieldsTs, "uplink_password_md5") != optionalString(stateTs, "uplink_password_md5") {
+		return true
+	}
+	if optionalString(fieldsTs, "uplink_token_md5") != optionalString(stateTs, "uplink_token_md5") {
+		return true
+	}
+	return false
+}
+
+func optionalString(ts is.ResourceState, field string) string {
+	if ts.IsKnownAndNotNull(field) {
+		return ts.String(field)
+	}
+	return ""
 }

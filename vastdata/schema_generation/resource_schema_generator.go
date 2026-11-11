@@ -362,12 +362,13 @@ func getResourceSchemaForCustom(hints *TFStateHints) (*rschema.Schema, error) {
 
 }
 
-// schemaVersionForHints returns schema version 1 when WriteOnlyFields are
-// present so Terraform invokes UpgradeState. Framework v1.15 passthrough
-// (same version) does not nullify write-only attrs, so leftover secrets from
-// pre-WriteOnly state would otherwise fail with "Invalid resource state upgrade".
+// schemaVersionForHints returns schema version 1 when WriteOnlyFields or
+// WriteOnlyMD5Fields are present so Terraform invokes UpgradeState.
+// Framework v1.15 passthrough (same version) does not nullify write-only attrs,
+// so leftover secrets from pre-WriteOnly state would otherwise fail with
+// "Invalid resource state upgrade".
 func schemaVersionForHints(hints *TFStateHints) int64 {
-	if hints != nil && len(hints.WriteOnlyFields) > 0 {
+	if hints != nil && (len(hints.WriteOnlyFields) > 0 || len(hints.WriteOnlyMD5Fields) > 0) {
 		return 1
 	}
 	return 0

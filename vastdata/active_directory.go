@@ -43,9 +43,12 @@ func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema a
 			SchemaRef:          ActiveDirectorySchemaRef,
 			SearchableFields:   []string{"ldap_id", "domain_name", "machine_account_name"},
 			EditOnlyFields:     []string{"admin_username", "admin_passwd", "enabled"},
-			WriteOnlyFields:    []string{"bindpw", "admin_passwd"},
-			WriteOnlyMD5Fields: []string{"bindpw", "admin_passwd"},
+			WriteOnlyFields:    []string{"bindpw"},
+			WriteOnlyMD5Fields: []string{"bindpw"},
 			SensitiveFields:    []string{"bindpw", "admin_passwd"},
+			PreserveUserValueFields: []string{
+				"admin_passwd",
+			},
 			AdditionalSchemaAttributes: map[string]any{
 				"admin_username": rschema.StringAttribute{
 					Optional:    true,
@@ -54,11 +57,9 @@ func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema a
 				"admin_passwd": rschema.StringAttribute{
 					Sensitive:   true,
 					Optional:    true,
-					WriteOnly:   true,
 					Description: "The password for the specified Active Directory admin user.",
 				},
-				"bindpw_md5":       ContentMD5SchemaAttribute("bindpw", false),
-				"admin_passwd_md5": ContentMD5SchemaAttribute("admin_passwd", false),
+				"bindpw_md5": ContentMD5SchemaAttribute("bindpw", false),
 				"enabled": rschema.BoolAttribute{
 					Optional:    true,
 					Description: "Set to true to join Active Directory. Set to false to leave Active Directory.",
@@ -87,10 +88,7 @@ func (m *ActiveDirectory) API(rest *VMSRest) VastResourceAPIWithContext {
 }
 
 func (m *ActiveDirectory) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"bindpw", "bindpw_md5",
-		"admin_passwd", "admin_passwd_md5",
-	)
+	SetPlanContentMD5(ctx, req, resp, "bindpw", "bindpw_md5")
 	return nil
 }
 
