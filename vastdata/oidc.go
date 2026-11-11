@@ -16,11 +16,11 @@ var OidcSchemaRef = is.NewSchemaReference(
 )
 
 type Oidc struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Oidc) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Oidc{tfstate: is.NewTFStateMust(
+	return &Oidc{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -30,7 +30,7 @@ func (m *Oidc) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 }
 
 func (m *Oidc) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Oidc{tfstate: is.NewTFStateMust(
+	return &Oidc{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -39,7 +39,7 @@ func (m *Oidc) NewDatasourceManager(raw map[string]attr.Value, schema any) DataS
 	)}
 }
 
-func (m *Oidc) TfState() *is.TFState {
+func (m *Oidc) TfState() is.ResourceState {
 	return m.tfstate
 }
 

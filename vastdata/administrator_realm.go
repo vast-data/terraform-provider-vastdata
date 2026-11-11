@@ -15,11 +15,11 @@ var AdministratorRealmSchemaRef = is.NewSchemaReference(
 )
 
 type AdministratorRealm struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *AdministratorRealm) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &AdministratorRealm{tfstate: is.NewTFStateMust(
+	return &AdministratorRealm{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -29,7 +29,7 @@ func (m *AdministratorRealm) NewResourceManager(raw map[string]attr.Value, schem
 }
 
 func (m *AdministratorRealm) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &AdministratorRealm{tfstate: is.NewTFStateMust(
+	return &AdministratorRealm{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *AdministratorRealm) NewDatasourceManager(raw map[string]attr.Value, sch
 	)}
 }
 
-func (m *AdministratorRealm) TfState() *is.TFState {
+func (m *AdministratorRealm) TfState() is.ResourceState {
 	return m.tfstate
 }
 

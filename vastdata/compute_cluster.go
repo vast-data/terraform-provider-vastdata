@@ -14,8 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 var ComputeClusterSchemaRef = is.NewSchemaReference(
@@ -202,11 +202,11 @@ var computeClusterSubResourceRetryOn = &is.RetryExpression{
 }
 
 type ComputeCluster struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ComputeCluster{tfstate: is.NewTFStateMust(
+	return &ComputeCluster{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -228,7 +228,7 @@ func (m *ComputeCluster) NewResourceManager(raw map[string]attr.Value, schema an
 }
 
 func (m *ComputeCluster) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ComputeCluster{tfstate: is.NewTFStateMust(
+	return &ComputeCluster{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -273,7 +273,7 @@ func (m *ComputeCluster) LookupForCreate(ctx context.Context, rest *VMSRest) (Di
 	return rest.ComputeClusters.GetByIdWithContext(ctx, found.RecordID())
 }
 
-func (m *ComputeCluster) TfState() *is.TFState {
+func (m *ComputeCluster) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -393,7 +393,7 @@ func int64FromAny(v any) int64 {
 
 func (m *ComputeCluster) GetSubResources(ctx context.Context, rest *VMSRest, record Record, _ *version.Version) (Record, error) {
 	if isComputeClusterK8sSubResourceFetchUnavailable(clusterStateFromRecord(record)) {
-		tflog.Debug(ctx, fmt.Sprintf(
+		logging.Debug(ctx, fmt.Sprintf(
 			"GetSubResources[compute_cluster]: cluster state %q — reusing sub-resources from tfstate",
 			record["state"],
 		))
@@ -481,13 +481,13 @@ func isComputeClusterK8sSubResourceFetchUnavailable(state string) bool {
 	}
 }
 
-func computeClusterSubResourcesFromTFState(tfstate *is.TFState) Record {
-	if tfstate == nil || tfstate.Hints == nil {
+func computeClusterSubResourcesFromTFState(tfstate is.ResourceState) Record {
+	if tfstate == nil || tfstate.StateHints() == nil {
 		return Record{}
 	}
 	all := tfstate.GetAllValues()
 	result := Record{}
-	for _, sr := range tfstate.Hints.SubResources {
+	for _, sr := range tfstate.StateHints().SubResources {
 		if sr.SchemaKey != "" {
 			if v, ok := all[sr.SchemaKey]; ok {
 				result[sr.SchemaKey] = v
@@ -569,7 +569,7 @@ func computeClusterLookupSchemaAttributes() map[string]any {
 	}
 }
 
-func lookupComputeCluster(ctx context.Context, rest *VMSRest, tfstate *is.TFState) (Record, error) {
+func lookupComputeCluster(ctx context.Context, rest *VMSRest, tfstate is.ResourceState) (Record, error) {
 	if tfstate.IsKnownAndNotNull("compute_cluster_id") {
 		id := tfstate.Int64("compute_cluster_id")
 		if id != 0 {
@@ -602,7 +602,7 @@ func computeClusterBaseFromRecord(cluster Record) (int64, Record) {
 	return id, base
 }
 
-func resolveComputeClusterContext(ctx context.Context, rest *VMSRest, tfstate *is.TFState) (int64, Record, error) {
+func resolveComputeClusterContext(ctx context.Context, rest *VMSRest, tfstate is.ResourceState) (int64, Record, error) {
 	cluster, err := lookupComputeCluster(ctx, rest, tfstate)
 	if err != nil {
 		return 0, nil, err
@@ -969,12 +969,12 @@ func newComputeClusterSubresourceTFState(
 	schema any,
 	description string,
 	attrs map[string]any,
-) *is.TFState {
+) is.ResourceState {
 	merged := computeClusterLookupSchemaAttributes()
 	for k, v := range attrs {
 		merged[k] = v
 	}
-	return is.NewTFStateMust(raw, schema, &is.TFStateHints{
+	return is.NewResourceState(raw, schema, &is.TFStateHints{
 		TFStateHintsForCustom: &is.TFStateHintsForCustom{
 			Description:      description,
 			SchemaAttributes: merged,
@@ -983,10 +983,10 @@ func newComputeClusterSubresourceTFState(
 }
 
 type computeClusterSubresourceDatasource struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
-func (m *computeClusterSubresourceDatasource) TfState() *is.TFState { return m.tfstate }
+func (m *computeClusterSubresourceDatasource) TfState() is.ResourceState { return m.tfstate }
 
 func (m *computeClusterSubresourceDatasource) API(_ *VMSRest) VastResourceAPIWithContext { return nil }
 
@@ -1173,7 +1173,7 @@ func (m *ComputeClusterDashboard) NewDatasourceManager(raw map[string]attr.Value
 			"dashboard": computeClusterDashboardObjectSchema(),
 		})
 	// Cluster-wide read is valid with no selector (GET /computeclusters/dashboard/).
-	tfstate.Hints.AllowEmptySearchParams = true
+	tfstate.StateHints().AllowEmptySearchParams = true
 	return &ComputeClusterDashboard{computeClusterSubresourceDatasource{tfstate: tfstate}}
 }
 

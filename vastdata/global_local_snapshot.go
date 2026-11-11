@@ -18,11 +18,11 @@ var GlobalLocalSnapshotSchemaRef = is.NewSchemaReference(
 )
 
 type GlobalLocalSnapshot struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *GlobalLocalSnapshot) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &GlobalLocalSnapshot{tfstate: is.NewTFStateMust(
+	return &GlobalLocalSnapshot{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -34,7 +34,7 @@ func (m *GlobalLocalSnapshot) NewResourceManager(raw map[string]attr.Value, sche
 }
 
 func (m *GlobalLocalSnapshot) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &GlobalLocalSnapshot{tfstate: is.NewTFStateMust(
+	return &GlobalLocalSnapshot{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -43,7 +43,7 @@ func (m *GlobalLocalSnapshot) NewDatasourceManager(raw map[string]attr.Value, sc
 	}
 }
 
-func (m *GlobalLocalSnapshot) TfState() *is.TFState {
+func (m *GlobalLocalSnapshot) TfState() is.ResourceState {
 	return m.tfstate
 }
 

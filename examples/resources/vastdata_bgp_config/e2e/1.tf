@@ -1,3 +1,4 @@
+# ignore:e2e - POST /bgpconfigs/ returns 403 for non-root users
 resource "vastdata_bgp_config" "vastdb_bgp_config" {
   name                           = "bgp-config-1"
   self_asn                       = 65001

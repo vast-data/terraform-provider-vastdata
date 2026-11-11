@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
-	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
 var ManagerPasswordSchemaRef = is.NewSchemaReference(
@@ -19,28 +19,40 @@ var ManagerPasswordSchemaRef = is.NewSchemaReference(
 )
 
 type ManagerPassword struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ManagerPassword) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ManagerPassword{tfstate: is.NewTFStateMust(
+	return &ManagerPassword{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
-			SensitiveFields: []string{"password"},
-			SchemaRef:       ManagerPasswordSchemaRef,
-			CommonModifiersMapping: map[string]string{
-				"password": schema_generation.ModifierForceNew,
+			SchemaRef:          ManagerPasswordSchemaRef,
+			WriteOnlyFields:    []string{"password"},
+			WriteOnlyMD5Fields: []string{"password"},
+			SensitiveFields:    []string{"password"},
+			AdditionalSchemaAttributes: map[string]any{
+				"password_md5": ContentMD5SchemaAttribute("password", true),
 			},
 		},
 	)}
 }
-func (m *ManagerPassword) TfState() *is.TFState {
+func (m *ManagerPassword) TfState() is.ResourceState {
 	return m.tfstate
 }
 
 func (m *ManagerPassword) API(_ *VMSRest) VastResourceAPIWithContext {
 	return nil
+}
+
+func (m *ManagerPassword) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5(ctx, req, resp, "password", "password_md5")
+	return nil
+}
+
+func (m *ManagerPassword) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "password")
+	return record
 }
 
 func (m *ManagerPassword) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
@@ -54,9 +66,7 @@ func (m *ManagerPassword) CreateResource(ctx context.Context, rest *VMSRest) (Di
 }
 
 func (m *ManagerPassword) UpdateResource(_ context.Context, plan UpdateResource, _ *VMSRest) (DisplayableRecord, error) {
-	// With force_new modifiers, Terraform will handle replacements automatically
-	// This method should not be called for updates since all fields have RequiresReplace()
-	// But we'll keep it as a safety net in case it's called
+	// password_md5 has RequiresReplace; Terraform should replace, not update.
 	return nil, fmt.Errorf("manager password operations should be replaced, not updated")
 }
 

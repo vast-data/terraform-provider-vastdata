@@ -19,11 +19,11 @@ var VmsSchemaRef = is.NewSchemaReference(
 )
 
 type Vms struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Vms) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Vms{tfstate: is.NewTFStateMust(
+	return &Vms{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -52,7 +52,7 @@ func (m *Vms) NewResourceManager(raw map[string]attr.Value, schema any) Resource
 }
 
 func (m *Vms) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Vms{tfstate: is.NewTFStateMust(
+	return &Vms{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -61,7 +61,7 @@ func (m *Vms) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSo
 	}
 }
 
-func (m *Vms) TfState() *is.TFState {
+func (m *Vms) TfState() is.ResourceState {
 	return m.tfstate
 }
 

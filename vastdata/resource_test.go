@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -266,7 +267,7 @@ func TestParseComposite_SingleToken_TreatAsID_String(t *testing.T) {
 }
 
 // Helpers for default import tests
-type testManager struct{ tf *is.TFState }
+type testManager struct{ tf is.ResourceState }
 
 func (t *testManager) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return t
@@ -274,7 +275,7 @@ func (t *testManager) NewResourceManager(raw map[string]attr.Value, schema any) 
 func (t *testManager) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return nil
 }
-func (t *testManager) TfState() *is.TFState                      { return t.tf }
+func (t *testManager) TfState() is.ResourceState                 { return t.tf }
 func (t *testManager) API(_ *VMSRest) VastResourceAPIWithContext { return nil }
 func (t *testManager) ReadResource(_ context.Context, _ *VMSRest) (DisplayableRecord, error) {
 	// Return a record based on current state for testing
@@ -492,12 +493,12 @@ func TestResource_ManagerWithSchemaOnly_FillsZeroRaw(t *testing.T) {
 	require.True(t, tf.IsNull("name"))
 }
 
-type testDSManager struct{ tf *is.TFState }
+type testDSManager struct{ tf is.ResourceState }
 
 func (t *testDSManager) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
 	return t
 }
-func (t *testDSManager) TfState() *is.TFState                      { return t.tf }
+func (t *testDSManager) TfState() is.ResourceState                 { return t.tf }
 func (t *testDSManager) API(_ *VMSRest) VastResourceAPIWithContext { return nil }
 
 func buildTestDatasourceWithSchema(schema dschema.Schema, hints *is.TFStateHints) *Datasource {
@@ -704,6 +705,59 @@ func TestMigrateMode_NilProviderData_NoMigrate(t *testing.T) {
 	})
 }
 
+// TERF-315: upgrading pre-WriteOnly state must null secrets and seed *_md5.
+func TestUpgradeState_WriteOnlySecretsSeedMD5AndClear(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{
+		Version: 1,
+		Attributes: map[string]rschema.Attribute{
+			"name":            rschema.StringAttribute{Required: true},
+			"password":        rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_retype": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_md5":    rschema.StringAttribute{Computed: true},
+		},
+	}
+	hints := &is.TFStateHints{
+		WriteOnlyFields:    []string{"password", "password_retype"},
+		WriteOnlyMD5Fields: []string{"password"},
+		TFStateHintsForCustom: &is.TFStateHintsForCustom{
+			Description: "test",
+			SchemaAttributes: map[string]any{
+				"name":            schema.Attributes["name"],
+				"password":        schema.Attributes["password"],
+				"password_retype": schema.Attributes["password_retype"],
+				"password_md5":    schema.Attributes["password_md5"],
+			},
+		},
+	}
+	r := buildTestResourceWithSchema(schema, hints)
+
+	upgraders := r.UpgradeState(context.Background())
+	require.Contains(t, upgraders, int64(0))
+
+	priorJSON := []byte(`{"name":"admin","password":"s3cret","password_retype":"s3cret"}`)
+	req := resource.UpgradeStateRequest{
+		RawState: &tfprotov6.RawState{JSON: priorJSON},
+	}
+	resp := &resource.UpgradeStateResponse{
+		State: tfsdk.State{Schema: schema},
+	}
+	upgraders[0].StateUpgrader(context.Background(), req, resp)
+	require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+
+	var password, passwordRetype, passwordMD5, name types.String
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("name"), &name).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("password"), &password).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("password_retype"), &passwordRetype).HasError())
+	require.False(t, resp.State.GetAttribute(context.Background(), path.Root("password_md5"), &passwordMD5).HasError())
+
+	assert.Equal(t, "admin", name.ValueString())
+	assert.True(t, password.IsNull(), "password must be null after upgrade")
+	assert.True(t, passwordRetype.IsNull(), "password_retype must be null after upgrade")
+	assert.Equal(t, ContentMD5Hex("s3cret"), passwordMD5.ValueString())
+}
+
 // TERF-268: write-only values are null in Plan and only present in Config.
 func TestOverlayWriteOnlyFromConfig_IncludedInCreateParams(t *testing.T) {
 	t.Parallel()
@@ -778,24 +832,27 @@ type deleteErrorAPI struct {
 func (m *deleteErrorAPI) Session() core.RESTSession { return nil }
 func (m *deleteErrorAPI) GetResourceType() string   { return "test" }
 func (m *deleteErrorAPI) GetResourcePath() string   { return "test" }
+func (m *deleteErrorAPI) GetApiRoot() string        { return "" }
 func (m *deleteErrorAPI) List(vast_client.Params) (RecordSet, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) Create(vast_client.Params) (Record, error) { return nil, nil }
-func (m *deleteErrorAPI) Update(any, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) Create(...vast_client.Params) (Record, error) { return nil, nil }
+func (m *deleteErrorAPI) Update(any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) Delete(vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) Delete(vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) DeleteById(any, vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) DeleteById(any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) Ensure(vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) Ensure(vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
 func (m *deleteErrorAPI) Get(vast_client.Params) (Record, error) { return nil, nil }
-func (m *deleteErrorAPI) GetById(any) (Record, error)            { return nil, nil }
+func (m *deleteErrorAPI) GetById(any, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
 func (m *deleteErrorAPI) Exists(vast_client.Params) (bool, error) {
 	return false, nil
 }
@@ -807,25 +864,25 @@ func (m *deleteErrorAPI) Lock(...any) func() { return func() {} }
 func (m *deleteErrorAPI) ListWithContext(context.Context, vast_client.Params) (RecordSet, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) CreateWithContext(context.Context, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) CreateWithContext(context.Context, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) UpdateWithContext(context.Context, any, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) UpdateWithContext(context.Context, any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) DeleteWithContext(context.Context, vast_client.Params, vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) DeleteWithContext(context.Context, vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) DeleteByIdWithContext(_ context.Context, _ any, _, _ vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) DeleteByIdWithContext(_ context.Context, _ any, _ ...vast_client.Params) (Record, error) {
 	return nil, m.deleteErr
 }
-func (m *deleteErrorAPI) EnsureWithContext(context.Context, vast_client.Params, vast_client.Params) (Record, error) {
+func (m *deleteErrorAPI) EnsureWithContext(context.Context, vast_client.Params, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
 func (m *deleteErrorAPI) GetWithContext(context.Context, vast_client.Params) (Record, error) {
 	return nil, nil
 }
-func (m *deleteErrorAPI) GetByIdWithContext(context.Context, any) (Record, error) {
+func (m *deleteErrorAPI) GetByIdWithContext(context.Context, any, ...vast_client.Params) (Record, error) {
 	return nil, nil
 }
 func (m *deleteErrorAPI) ExistsWithContext(context.Context, vast_client.Params) (bool, error) {

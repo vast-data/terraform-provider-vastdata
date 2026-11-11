@@ -39,11 +39,11 @@ var tenantViewsCountSubResource = is.SubResourceHint{
 }
 
 type Tenant struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Tenant) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Tenant{tfstate: is.NewTFStateMust(
+	return &Tenant{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -72,7 +72,7 @@ func (m *Tenant) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 }
 
 func (m *Tenant) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Tenant{tfstate: is.NewTFStateMust(
+	return &Tenant{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -83,7 +83,7 @@ func (m *Tenant) NewDatasourceManager(raw map[string]attr.Value, schema any) Dat
 	}
 }
 
-func (m *Tenant) TfState() *is.TFState {
+func (m *Tenant) TfState() is.ResourceState {
 	return m.tfstate
 }
 

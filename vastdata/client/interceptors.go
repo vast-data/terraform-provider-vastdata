@@ -7,14 +7,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
-	vast_client "github.com/vast-data/go-vast-client"
 	"io"
 	"math"
 	"math/rand"
 	"net/http"
 	"strings"
 	"sync/atomic"
+
+	vast_client "github.com/vast-data/go-vast-client"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 type contextKey string
@@ -37,7 +38,7 @@ func BeforeRequestFnCallback(ctx context.Context, _ *http.Request, verb, url str
 	if body != nil {
 		bodyBytes, err := io.ReadAll(body)
 		if err != nil {
-			tflog.Error(ctx, "failed to read request body", map[string]any{
+			logging.Error(ctx, "failed to read request body", map[string]any{
 				"error": err.Error(),
 			})
 			return err
@@ -54,7 +55,7 @@ func BeforeRequestFnCallback(ctx context.Context, _ *http.Request, verb, url str
 		}
 	}
 
-	tflog.Info(ctx, logMsg.String())
+	logging.Info(ctx, logMsg.String())
 	return nil
 }
 
@@ -62,10 +63,19 @@ func BeforeRequestFnCallback(ctx context.Context, _ *http.Request, verb, url str
 // It uses the response's PrettyTable method to render a formatted table,
 // and includes the request ID from context.
 // For more details see: https://github.com/vast-data/go-vast-client
-func AfterRequestFnCallback(ctx context.Context, response vast_client.Renderable) (vast_client.Renderable, error) {
+func AfterRequestFnCallback(ctx context.Context, response vast_client.Renderable, statusCode int) (vast_client.Renderable, error) {
 	uid, _ := ctx.Value(requestIDKey).(string)
-	tflog.Info(ctx, fmt.Sprintf("%s end: req_id=%s | ", response.PrettyTable(), uid))
+	logging.Info(ctx, fmt.Sprintf("end: req_id=%s status_code=%d | %s", uid, statusCode, formatResponseBody(response)))
 	return response, nil
+}
+
+// formatResponseBody renders the response for logs. nil means the request failed
+// (do not call PrettyTable); empty Record{} is a successful empty body ("<>").
+func formatResponseBody(response vast_client.Renderable) string {
+	if response == nil {
+		return "<unsuccessful>"
+	}
+	return response.PrettyTable()
 }
 
 // ContextWithRequestID returns a new context containing a generated request ID.
@@ -74,4 +84,10 @@ func AfterRequestFnCallback(ctx context.Context, response vast_client.Renderable
 func ContextWithRequestID(ctx context.Context) context.Context {
 	newID := atomic.AddUint32(&reqIDCounter, 1)
 	return context.WithValue(ctx, requestIDKey, fmt.Sprintf("0x%08x", newID))
+}
+
+// RequestIDFromContext returns the request ID set by ContextWithRequestID, or "".
+func RequestIDFromContext(ctx context.Context) string {
+	id, _ := ctx.Value(requestIDKey).(string)
+	return id
 }

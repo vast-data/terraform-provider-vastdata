@@ -15,11 +15,11 @@ var EncryptionGroupSchemaRef = is.NewSchemaReference(
 )
 
 type EncryptionGroup struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *EncryptionGroup) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &EncryptionGroup{tfstate: is.NewTFStateMust(
+	return &EncryptionGroup{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -28,7 +28,7 @@ func (m *EncryptionGroup) NewDatasourceManager(raw map[string]attr.Value, schema
 	)}
 }
 
-func (m *EncryptionGroup) TfState() *is.TFState {
+func (m *EncryptionGroup) TfState() is.ResourceState {
 	return m.tfstate
 }
 

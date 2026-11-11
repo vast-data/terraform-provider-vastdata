@@ -85,7 +85,11 @@ func extractAttrsRecursive(meta map[string]attrMeta, prefix string, attrs map[st
 
 				if hints.SchemaRef != nil && hints.SchemaRef.Read != nil && prefix == "" {
 					// Top-level attributes.
-					searchableQueryParams, err := openapi_schema.SearchableQueryParams(hints.SchemaRef.Read.Path)
+					pack := openapi_schema.PackVMS
+					if hints.SchemaRef.Pack != "" {
+						pack = openapi_schema.Pack(hints.SchemaRef.Pack)
+					}
+					searchableQueryParams, err := openapi_schema.SearchableQueryParams(pack, hints.SchemaRef.Read.Path)
 					if err == nil && len(searchableQueryParams) > 0 {
 						searchableFields = append(searchableFields, searchableQueryParams...)
 					}

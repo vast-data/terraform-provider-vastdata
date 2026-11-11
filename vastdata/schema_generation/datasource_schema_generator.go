@@ -33,6 +33,8 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 		return nil, fmt.Errorf("read schema reference is required but was nil")
 	}
 
+	defer beginSchemaPack(hints)()
+
 	resourcePath := hints.SchemaRef.Read.Path
 	resourceMethod := hints.SchemaRef.Read.Method
 	if resourcePath == "" {
@@ -49,13 +51,13 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 
 	switch resourceMethod {
 	case http.MethodGet:
-		if readSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
+		if readSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get schema for GET %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
 		// Use PATCH request body when the GET response shape differs from the
 		// writable model (e.g. boxes vs hosts on /vms/{id}/network_settings/).
-		if readSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
+		if readSchemaRef, err = openapi_schema.GetRequestBodySchema(schemaPack, http.MethodPatch, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get PATCH request schema for %q: %w", resourcePath, err)
 		}
 	default:
@@ -65,7 +67,7 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 	}
 
 	// Query params always come from GET on the same path (search filters).
-	params, err := openapi_schema.GetQueryParameters(http.MethodGet, resourcePath)
+	params, err := openapi_schema.GetQueryParameters(schemaPack, http.MethodGet, resourcePath)
 	if err != nil {
 		return nil, err
 	}
@@ -99,11 +101,11 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 	}
 
 	// Add query parameters with proper required status
-	addSchemaEntries(paramSchemas, requiredParams, hints, allProps, false, true, false, false, false, false)
+	addSchemaEntries(paramSchemas, requiredParams, hints, allProps, false, true, false, false, false, false, true)
 
 	// Then, add response schema properties as computed fields (ignore response required fields)
 	if readSchemaRef.Value != nil {
-		addSchemaEntries(readSchemaRef.Value.Properties, []string{}, hints, allProps, false, true, true, false, false, false)
+		addSchemaEntries(readSchemaRef.Value.Properties, []string{}, hints, allProps, false, true, true, false, false, false, true)
 	}
 
 	attrs := buildDatasourceAttributesFromMap(ctx, allProps, hints)
@@ -316,7 +318,7 @@ func buildDatasourceAttribute(
 		switch (*itemSchema.Type)[0] {
 		case openapi3.TypeObject:
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, false, false, true, false, false, entry.Ordered)
+			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, false, false, true, false, false, entry.Ordered, false)
 			attrs := buildDatasourceAttributesFromMap(ctx, nested, hints)
 
 			if isOrdered {
@@ -387,7 +389,7 @@ func buildDatasourceAttribute(
 
 			if valSchema.Type != nil && (*valSchema.Type)[0] == openapi3.TypeObject && len(valSchema.Properties) > 0 {
 				nested := make(map[string]*SchemaEntry)
-				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 
 				return dschema.MapNestedAttribute{
 					NestedObject: dschema.NestedAttributeObject{
@@ -415,7 +417,7 @@ func buildDatasourceAttribute(
 
 		if len(schema.Properties) > 0 {
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 
 			return dschema.SingleNestedAttribute{
 				Attributes:          buildDatasourceAttributesFromMap(ctx, nested, hints),

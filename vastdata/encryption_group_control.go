@@ -14,11 +14,11 @@ import (
 )
 
 type EncryptionGroupControl struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *EncryptionGroupControl) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &EncryptionGroupControl{tfstate: is.NewTFStateMust(
+	return &EncryptionGroupControl{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -45,7 +45,7 @@ func (m *EncryptionGroupControl) NewResourceManager(raw map[string]attr.Value, s
 	)}
 }
 
-func (m *EncryptionGroupControl) TfState() *is.TFState {
+func (m *EncryptionGroupControl) TfState() is.ResourceState {
 	return m.tfstate
 }
 

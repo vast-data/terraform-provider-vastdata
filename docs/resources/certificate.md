@@ -245,7 +245,10 @@ resource "vastdata_certificate" "kafka_mtls_pgp" {
 
 ### Read-Only
 
+- `ca_certificate_md5` (String) MD5 of ca_certificate (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
+- `certificate_md5` (String) MD5 of certificate (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `created` (String)
 - `encrypted_private_key` (String) The PGP-encrypted private key, populated when pgp_public_key is provided.
 - `id` (Number) The ID of this resource.
+- `private_key_md5` (String) MD5 of private_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `state` (String)

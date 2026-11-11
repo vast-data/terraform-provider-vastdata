@@ -141,7 +141,7 @@ func BenchmarkAddSchemaEntries(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		target := make(map[string]*SchemaEntry)
-		addSchemaEntries(props, requiredFields, hints, target, false, true, false, false, false, false)
+		addSchemaEntries(props, requiredFields, hints, target, false, true, false, false, false, false, true)
 		if len(target) == 0 {
 			b.Fatal("Expected entries to be added")
 		}

@@ -16,11 +16,11 @@ var RackSchemaRef = is.NewSchemaReference(
 )
 
 type Rack struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Rack) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Rack{tfstate: is.NewTFStateMust(
+	return &Rack{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -31,7 +31,7 @@ func (m *Rack) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 }
 
 func (m *Rack) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Rack{tfstate: is.NewTFStateMust(
+	return &Rack{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -40,7 +40,7 @@ func (m *Rack) NewDatasourceManager(raw map[string]attr.Value, schema any) DataS
 	)}
 }
 
-func (m *Rack) TfState() *is.TFState {
+func (m *Rack) TfState() is.ResourceState {
 	return m.tfstate
 }
 

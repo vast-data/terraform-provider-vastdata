@@ -332,6 +332,22 @@ func Test_injectModifiers_OptionalComputedGetsUseState(t *testing.T) {
 	require.True(t, containsUseStateForUnknown(mod.PlanModifiers), "Should apply UseStateForUnknown to optional+computed field to prevent 'known after apply' noise")
 }
 
+func Test_injectModifiers_SensitiveComputedGetsUseState(t *testing.T) {
+	// CreateOnly sensitive PEMs (e.g. mTLS) are optional+computed+sensitive; omitting
+	// UseStateForUnknown for Sensitive caused destroy/recreate on unrelated updates.
+	att := rschema.StringAttribute{
+		Optional:  true,
+		Computed:  true,
+		Sensitive: true,
+	}
+
+	modified := injectModifiers(att, "client_key_b64", &TFStateHints{})
+	mod, ok := modified.(rschema.StringAttribute)
+	require.True(t, ok)
+	require.True(t, containsUseStateForUnknown(mod.PlanModifiers),
+		"Sensitive create-only/computed fields must keep prior state when omitted from config")
+}
+
 func Test_injectModifiers_FromHints(t *testing.T) {
 	att := rschema.StringAttribute{
 		Optional: true,

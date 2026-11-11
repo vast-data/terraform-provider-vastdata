@@ -15,11 +15,11 @@ var LocalS3KeySchemaRef = is.NewSchemaReference(
 )
 
 type LocalS3Key struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *LocalS3Key) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &LocalS3Key{tfstate: is.NewTFStateMust(
+	return &LocalS3Key{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -28,7 +28,7 @@ func (m *LocalS3Key) NewDatasourceManager(raw map[string]attr.Value, schema any)
 	)}
 }
 
-func (m *LocalS3Key) TfState() *is.TFState {
+func (m *LocalS3Key) TfState() is.ResourceState {
 	return m.tfstate
 }
 

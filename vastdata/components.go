@@ -4,6 +4,8 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"sort"
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -106,6 +108,8 @@ var allTFComponents = []TFManager{
 	&VmsCertificate{},
 	&S3Certificate{},
 	&NfsCertificate{},
+	&License{},
+	&CallhomeConfig{},
 	&VmsNetworkSettings{},
 }
 
@@ -156,6 +160,54 @@ func GetDatasourceFactories() []func() datasource.DataSource {
 
 }
 
+// -----------------
+// Runtime-agnostic registry
+// -----------------
+
+// ResourceManagerPrototypes returns every component that can be managed as a resource,
+// keyed by its snake_case name (for example "vip_pool"). The returned managers are
+// prototypes: use NewResourceManagerByName to obtain a usable manager.
+//
+// This is the same component list Terraform registers via GetResourceFactories, so any
+// other runtime (e.g. Crossplane) automatically sees the same set of resources.
+// The map is built once and then shared, so callers must not modify it.
+var ResourceManagerPrototypes = cached(resourceManagerPrototypes)
+
+func resourceManagerPrototypes() map[string]ResourceManager {
+	out := make(map[string]ResourceManager)
+	for _, f := range allTFComponents {
+		if manager, ok := f.(ResourceManager); ok {
+			out[is.SnakeCaseName(f)] = manager
+		}
+	}
+	return out
+}
+
+// ResourceNames returns the registry names of every resource the provider manages,
+// sorted. It is exactly the set of resources the Terraform provider exposes.
+var ResourceNames = cached(resourceNames)
+
+func resourceNames() []string {
+	protos := ResourceManagerPrototypes()
+	names := make([]string, 0, len(protos))
+	for name := range protos {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// NewResourceManagerByName builds a manager for the named resource. Its state carries the
+// generated schema and a zeroed (all-null) attribute map, ready to be seeded by the caller.
+// No Terraform request/response types are involved.
+func NewResourceManagerByName(ctx context.Context, name string) (ResourceManager, error) {
+	prototype, ok := ResourceManagerPrototypes()[name]
+	if !ok {
+		return nil, fmt.Errorf("unknown resource %q", name)
+	}
+	return newManagerWithSchemaOnly(ctx, prototype.NewResourceManager)
+}
+
 type ResourceFactoryFn func(raw map[string]attr.Value, schema any) ResourceManager
 type DatasourceFactoryFn func(raw map[string]attr.Value, schema any) DataSourceManager
 
@@ -173,7 +225,7 @@ type VastAPIGetter interface {
 
 type TFManager interface {
 	VastAPIGetter
-	TfState() *is.TFState
+	TfState() is.ResourceState
 }
 
 type PrepareImportResourceState interface {
@@ -256,6 +308,74 @@ type AfterUpdateResource interface {
 
 type AfterDeleteResource interface {
 	AfterDeleteResource(context.Context, *VMSRest) error
+}
+
+// -----------------
+// Resource callbacks
+// -----------------
+//
+// A callback is an extra function attached to a manager instance from outside, e.g. by the
+// Crossplane provider. Each Prepare*/After* stage of Create, Read, Update and Delete first
+// runs the manager's own hook when it implements one. If that hook fails, its error is
+// returned and no callback runs. The callbacks then run in the order they were added, and
+// the first error stops the rest.
+//
+// Callbacks are not hooks: a manager does not implement PrepareCreateResource just because
+// a callback is added for that stage, so defaults that depend on the resource's own hook
+// (e.g. edit-only fields handled by the default After* behaviour) are not affected.
+
+type PrepareCreateResourceCallbackExecutor interface {
+	AddPrepareCreateResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareCreateResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterCreateResourceCallbackExecutor interface {
+	AddAfterCreateResourceCallback(func(context.Context, *VMSRest, Record) error)
+	ExecuteAfterCreateResourceCallbacks(context.Context, *VMSRest, Record) error
+}
+
+type PrepareReadResourceCallbackExecutor interface {
+	AddPrepareReadResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareReadResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterReadResourceCallbackExecutor interface {
+	AddAfterReadResourceCallback(func(context.Context, *VMSRest) error)
+	ExecuteAfterReadResourceCallbacks(context.Context, *VMSRest) error
+}
+
+// PrepareUpdateResourceCallbackExecutor callbacks receive the desired manager.
+type PrepareUpdateResourceCallbackExecutor interface {
+	AddPrepareUpdateResourceCallback(func(context.Context, ResourceManager, *VMSRest) error)
+	ExecutePrepareUpdateResourceCallbacks(context.Context, ResourceManager, *VMSRest) error
+}
+
+// AfterUpdateResourceCallbackExecutor callbacks receive the desired manager.
+type AfterUpdateResourceCallbackExecutor interface {
+	AddAfterUpdateResourceCallback(func(context.Context, ResourceManager, *VMSRest, Record) error)
+	ExecuteAfterUpdateResourceCallbacks(context.Context, ResourceManager, *VMSRest, Record) error
+}
+
+type PrepareDeleteResourceCallbackExecutor interface {
+	AddPrepareDeleteResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareDeleteResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterDeleteResourceCallbackExecutor interface {
+	AddAfterDeleteResourceCallback(func(context.Context, *VMSRest) error)
+	ExecuteAfterDeleteResourceCallbacks(context.Context, *VMSRest) error
+}
+
+// ResourceCallbackExecutor is every stage's callback executor.
+type ResourceCallbackExecutor interface {
+	PrepareCreateResourceCallbackExecutor
+	AfterCreateResourceCallbackExecutor
+	PrepareReadResourceCallbackExecutor
+	AfterReadResourceCallbackExecutor
+	PrepareUpdateResourceCallbackExecutor
+	AfterUpdateResourceCallbackExecutor
+	PrepareDeleteResourceCallbackExecutor
+	AfterDeleteResourceCallbackExecutor
 }
 
 type ResourceManager interface {

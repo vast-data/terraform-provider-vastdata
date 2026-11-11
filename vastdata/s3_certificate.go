@@ -12,8 +12,7 @@ import (
 var s3CertificateHints = endpointCertificateHints(
 	"cluster_id",
 	"ID of the cluster that hosts the S3 service (typically 1).",
-	"Installs the S3 HTTPS server certificate on a cluster via PATCH /clusters/{id}/. "+
-		"The PEM certificate and private key are write-only and are never stored in Terraform state.",
+	"Installs the S3 HTTPS server certificate on a cluster via PATCH /clusters/{id}/.",
 	"Manages the **S3** HTTPS endpoint certificate.\n\n"+
 		"Uses `PATCH /clusters/{id}/` (`s3_certificate`, `s3_private_key`). Available on VAST 5.4+.\n\n"+
 		"Destroy is a no-op: removing this resource does not clear the S3 certificate.\n\n"+
@@ -21,14 +20,14 @@ var s3CertificateHints = endpointCertificateHints(
 )
 
 type S3Certificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *S3Certificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &S3Certificate{tfstate: newResourceTFState(raw, schema, s3CertificateHints)}
 }
 
-func (m *S3Certificate) TfState() *is.TFState {
+func (m *S3Certificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 

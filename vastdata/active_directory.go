@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -31,17 +32,23 @@ var ActiveDirectorySchemaRef = is.NewSchemaReference(
 )
 
 type ActiveDirectory struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ActiveDirectory{tfstate: is.NewTFStateMust(
+	return &ActiveDirectory{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:        ActiveDirectorySchemaRef,
-			SearchableFields: []string{"ldap_id", "domain_name", "machine_account_name"},
-			EditOnlyFields:   []string{"admin_username", "admin_passwd", "enabled"},
+			SchemaRef:          ActiveDirectorySchemaRef,
+			SearchableFields:   []string{"ldap_id", "domain_name", "machine_account_name"},
+			EditOnlyFields:     []string{"admin_username", "admin_passwd", "enabled"},
+			WriteOnlyFields:    []string{"bindpw"},
+			WriteOnlyMD5Fields: []string{"bindpw"},
+			SensitiveFields:    []string{"bindpw", "admin_passwd"},
+			PreserveUserValueFields: []string{
+				"admin_passwd",
+			},
 			AdditionalSchemaAttributes: map[string]any{
 				"admin_username": rschema.StringAttribute{
 					Optional:    true,
@@ -52,6 +59,7 @@ func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema a
 					Optional:    true,
 					Description: "The password for the specified Active Directory admin user.",
 				},
+				"bindpw_md5": ContentMD5SchemaAttribute("bindpw", false),
 				"enabled": rschema.BoolAttribute{
 					Optional:    true,
 					Description: "Set to true to join Active Directory. Set to false to leave Active Directory.",
@@ -62,7 +70,7 @@ func (m *ActiveDirectory) NewResourceManager(raw map[string]attr.Value, schema a
 }
 
 func (m *ActiveDirectory) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ActiveDirectory{tfstate: is.NewTFStateMust(
+	return &ActiveDirectory{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -71,12 +79,22 @@ func (m *ActiveDirectory) NewDatasourceManager(raw map[string]attr.Value, schema
 	)}
 }
 
-func (m *ActiveDirectory) TfState() *is.TFState {
+func (m *ActiveDirectory) TfState() is.ResourceState {
 	return m.tfstate
 }
 
 func (m *ActiveDirectory) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.ActiveDirectories
+}
+
+func (m *ActiveDirectory) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5(ctx, req, resp, "bindpw", "bindpw_md5")
+	return nil
+}
+
+func (m *ActiveDirectory) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "bindpw", "admin_passwd")
+	return record
 }
 
 func (m *ActiveDirectory) AfterCreateResource(ctx context.Context, rest *VMSRest, record Record) error {
@@ -150,7 +168,7 @@ func (m *ActiveDirectory) shouldLeaveAD(currentState string, enabled bool) bool 
 // Takes both state and plan TFStates (plan can be nil) and uses fallback pattern
 // to get values from plan first, then state
 // forceEnabled can be used to override the enabled value (e.g., for deletion to force leave)
-func (m *ActiveDirectory) processADJoinLeave(ctx context.Context, stateTs, planTs *is.TFState, rest *VMSRest, record Record, forceEnabled *bool) error {
+func (m *ActiveDirectory) processADJoinLeave(ctx context.Context, stateTs, planTs is.ResourceState, rest *VMSRest, record Record, forceEnabled *bool) error {
 	// Get enabled from plan first, fallback to state, or use forced value
 	var enabled bool
 	var hasEnabled bool

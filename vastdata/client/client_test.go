@@ -6,10 +6,16 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	vast_client "github.com/vast-data/go-vast-client"
 )
@@ -146,16 +152,29 @@ func (m MockResponse) PrettyJson(prefix ...string) string {
 func TestAfterRequestFnCallback(t *testing.T) {
 
 	tests := []struct {
-		name     string
-		response vast_client.Renderable
+		name       string
+		response   vast_client.Renderable
+		statusCode int
 	}{
 		{
-			name:     "simple_response",
-			response: MockResponse{data: map[string]interface{}{"id": 123, "name": "test"}},
+			name:       "simple_response",
+			response:   MockResponse{data: map[string]interface{}{"id": 123, "name": "test"}},
+			statusCode: http.StatusOK,
 		},
 		{
-			name:     "empty_response",
-			response: MockResponse{data: map[string]interface{}{}},
+			name:       "empty_success_body",
+			response:   vast_client.Record{},
+			statusCode: http.StatusNoContent,
+		},
+		{
+			name:       "nil_on_error",
+			response:   nil,
+			statusCode: http.StatusServiceUnavailable,
+		},
+		{
+			name:       "nil_on_transport_error",
+			response:   nil,
+			statusCode: 0,
 		},
 		{
 			name: "complex_response",
@@ -165,6 +184,7 @@ func TestAfterRequestFnCallback(t *testing.T) {
 					map[string]interface{}{"id": 2, "name": "user2"},
 				},
 			}},
+			statusCode: http.StatusOK,
 		},
 	}
 
@@ -172,12 +192,18 @@ func TestAfterRequestFnCallback(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := ContextWithRequestID(context.Background())
 
-			result, err := AfterRequestFnCallback(ctx, tt.response)
+			result, err := AfterRequestFnCallback(ctx, tt.response, tt.statusCode)
 
 			require.NoError(t, err)
 			require.Equal(t, tt.response, result)
 		})
 	}
+}
+
+func TestFormatResponseBody(t *testing.T) {
+	require.Equal(t, "<unsuccessful>", formatResponseBody(nil))
+	require.Equal(t, "<>", formatResponseBody(vast_client.Record{}))
+	require.NotEqual(t, "<>", formatResponseBody(MockResponse{data: map[string]interface{}{"id": 1}}))
 }
 
 func TestContextWithRequestID(t *testing.T) {
@@ -353,4 +379,62 @@ func TestClientErrorScenarios(t *testing.T) {
 			require.NotNil(t, client)
 		}
 	})
+}
+
+// A host can replace the interceptors, and they see the real request and response.
+func TestNewRestWithHooks_CustomInterceptorsAreInvoked(t *testing.T) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`[{"id": 7, "name": "pool-a"}]`))
+	}))
+	defer srv.Close()
+	u, err := url.Parse(srv.URL)
+	require.NoError(t, err)
+	port, err := strconv.ParseInt(u.Port(), 10, 64)
+	require.NoError(t, err)
+
+	var before, after atomic.Int32
+	var gotVerb, gotURL string
+	var gotStatus int
+	rest, err := NewRestWithHooks(u.Hostname(), port, "", "", "token", "", false, "test", 10*time.Second, Hooks{
+		BeforeRequest: func(_ context.Context, _ *http.Request, verb, url string, _ io.Reader) error {
+			before.Add(1)
+			gotVerb, gotURL = verb, url
+			return nil
+		},
+		AfterRequest: func(_ context.Context, resp vast_client.Renderable, status int) (vast_client.Renderable, error) {
+			after.Add(1)
+			gotStatus = status
+			return resp, nil
+		},
+	})
+	require.NoError(t, err)
+
+	_, err = rest.VipPools.ListWithContext(context.Background(), vast_client.Params{})
+	require.NoError(t, err)
+
+	assert.EqualValues(t, 1, before.Load())
+	assert.EqualValues(t, 1, after.Load())
+	assert.Equal(t, "GET", gotVerb)
+	assert.Contains(t, gotURL, "/vippools")
+	assert.Equal(t, http.StatusOK, gotStatus)
+}
+
+func TestNewRestWithHooks_NilHooksAreAllowed(t *testing.T) {
+	rest, err := NewRestWithHooks("127.0.0.1", 1, "", "", "token", "", false, "test", time.Second, Hooks{})
+	require.NoError(t, err)
+	assert.NotNil(t, rest)
+}
+
+func TestDefaultHooks_AreTheTerraformInterceptors(t *testing.T) {
+	h := DefaultHooks()
+	assert.NotNil(t, h.BeforeRequest)
+	assert.NotNil(t, h.AfterRequest)
+}
+
+func TestRequestIDFromContext(t *testing.T) {
+	assert.Equal(t, "", RequestIDFromContext(context.Background()))
+	ctx := ContextWithRequestID(context.Background())
+	assert.Equal(t, ctx.Value(requestIDKey), RequestIDFromContext(ctx))
+	assert.NotEmpty(t, RequestIDFromContext(ctx))
 }

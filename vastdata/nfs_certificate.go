@@ -12,8 +12,7 @@ import (
 var nfsCertificateHints = endpointCertificateHints(
 	"cluster_id",
 	"ID of the cluster that hosts NFSv4 (typically 1).",
-	"Installs the NFSv4 RPC-with-TLS certificate on a cluster via PATCH /clusters/{id}/. "+
-		"The PEM certificate and private key are write-only and are never stored in Terraform state.",
+	"Installs the NFSv4 RPC-with-TLS certificate on a cluster via PATCH /clusters/{id}/.",
 	"Manages the **NFS** (NFSv4 RPC-with-TLS) server certificate.\n\n"+
 		"Uses `PATCH /clusters/{id}/` (`nfs4_certificate`, `nfs4_private_key`). Available on VAST 5.4+.\n\n"+
 		"Destroy is a no-op: removing this resource does not clear the NFS certificate.\n\n"+
@@ -21,14 +20,14 @@ var nfsCertificateHints = endpointCertificateHints(
 )
 
 type NfsCertificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *NfsCertificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &NfsCertificate{tfstate: newResourceTFState(raw, schema, nfsCertificateHints)}
 }
 
-func (m *NfsCertificate) TfState() *is.TFState {
+func (m *NfsCertificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 

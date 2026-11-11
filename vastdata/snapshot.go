@@ -15,11 +15,11 @@ var SnapshotSchemaRef = is.NewSchemaReference(
 )
 
 type Snapshot struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Snapshot) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Snapshot{tfstate: is.NewTFStateMust(
+	return &Snapshot{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -34,7 +34,7 @@ func (m *Snapshot) NewResourceManager(raw map[string]attr.Value, schema any) Res
 }
 
 func (m *Snapshot) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Snapshot{tfstate: is.NewTFStateMust(
+	return &Snapshot{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -43,7 +43,7 @@ func (m *Snapshot) NewDatasourceManager(raw map[string]attr.Value, schema any) D
 	}
 }
 
-func (m *Snapshot) TfState() *is.TFState {
+func (m *Snapshot) TfState() is.ResourceState {
 	return m.tfstate
 }
 

@@ -15,11 +15,11 @@ var KafkaBrokerSchemaRef = is.NewSchemaReference(
 )
 
 type KafkaBroker struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *KafkaBroker) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &KafkaBroker{tfstate: is.NewTFStateMust(
+	return &KafkaBroker{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -29,7 +29,7 @@ func (m *KafkaBroker) NewResourceManager(raw map[string]attr.Value, schema any) 
 }
 
 func (m *KafkaBroker) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &KafkaBroker{tfstate: is.NewTFStateMust(
+	return &KafkaBroker{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *KafkaBroker) NewDatasourceManager(raw map[string]attr.Value, schema any
 	)}
 }
 
-func (m *KafkaBroker) TfState() *is.TFState {
+func (m *KafkaBroker) TfState() is.ResourceState {
 	return m.tfstate
 }
 

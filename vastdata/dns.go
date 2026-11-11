@@ -20,11 +20,11 @@ var DnsSchemaRef = is.NewSchemaReference(
 )
 
 type Dns struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Dns) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Dns{tfstate: is.NewTFStateMust(
+	return &Dns{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -47,7 +47,7 @@ func (m *Dns) NewResourceManager(raw map[string]attr.Value, schema any) Resource
 }
 
 func (m *Dns) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Dns{tfstate: is.NewTFStateMust(
+	return &Dns{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -56,7 +56,7 @@ func (m *Dns) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSo
 	}
 }
 
-func (m *Dns) TfState() *is.TFState {
+func (m *Dns) TfState() is.ResourceState {
 	return m.tfstate
 }
 

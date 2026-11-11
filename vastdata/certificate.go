@@ -7,6 +7,7 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -20,23 +21,28 @@ var CertificateSchemaRef = is.NewSchemaReference(
 )
 
 type Certificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Certificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Certificate{tfstate: is.NewTFStateMust(
+	return &Certificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
 			SchemaRef:      CertificateSchemaRef,
+			Importable:     &notImportable, // write-only PEMs / pgp fields cannot be restored from the API
 			ReadOnlyFields: []string{"id", "created", "guid", "state"},
 			// API GET returns redacted placeholders for PEM material, not the real
 			// values. Treat as write-only so they are not stored in state and cannot
-			// create perpetual drift after import/refresh.
+			// create perpetual drift after refresh.
 			WriteOnlyFields:    []string{"ca_certificate", "certificate", "private_key"},
+			WriteOnlyMD5Fields: []string{"ca_certificate", "certificate", "private_key"},
 			SensitiveFields:    []string{"ca_certificate", "certificate", "private_key"},
 			SkipRefreshAPICall: true,
 			AdditionalSchemaAttributes: map[string]any{
+				"ca_certificate_md5": ContentMD5SchemaAttribute("ca_certificate", false),
+				"certificate_md5":    ContentMD5SchemaAttribute("certificate", false),
+				"private_key_md5":    ContentMD5SchemaAttribute("private_key", false),
 				"pgp_public_key": rschema.StringAttribute{
 					Optional:    true,
 					Sensitive:   true,
@@ -56,7 +62,7 @@ func (m *Certificate) NewResourceManager(raw map[string]attr.Value, schema any) 
 }
 
 func (m *Certificate) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Certificate{tfstate: is.NewTFStateMust(
+	return &Certificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -65,7 +71,7 @@ func (m *Certificate) NewDatasourceManager(raw map[string]attr.Value, schema any
 	)}
 }
 
-func (m *Certificate) TfState() *is.TFState {
+func (m *Certificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -89,12 +95,20 @@ func (m *Certificate) PrepareCreateResource(ctx context.Context, rest *VMSRest) 
 	return err
 }
 
+// ModifyPlan fingerprints write-only PEM fields so rotations plan an update.
+func (m *Certificate) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5Fields(ctx, req, resp,
+		"ca_certificate", "ca_certificate_md5",
+		"certificate", "certificate_md5",
+		"private_key", "private_key_md5",
+	)
+	return nil
+}
+
 // TransformResponseRecord drops PEM fields from GET responses. The API returns
 // redacted placeholders that must not be written into Terraform state.
 func (m *Certificate) TransformResponseRecord(record Record) Record {
-	delete(record, "ca_certificate")
-	delete(record, "certificate")
-	delete(record, "private_key")
+	DeleteRecordFields(record, "ca_certificate", "certificate", "private_key")
 	return record
 }
 

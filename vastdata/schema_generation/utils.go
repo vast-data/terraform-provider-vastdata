@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -19,24 +20,54 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/go-vast-client/openapi_schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 type TFStateHints = is.TFStateHints
 
+// schemaPack is the OpenAPI pack used by resolveComposedSchema/resolveAllRefs
+// while a schema is being built. GetResourceSchema and GetDatasourceSchema set it.
+var (
+	schemaPackMu sync.Mutex
+	schemaPack   = openapi_schema.PackVMS
+)
+
+func beginSchemaPack(hints *TFStateHints) func() {
+	schemaPackMu.Lock()
+	prev := schemaPack
+	schemaPack = openAPIPack(hints)
+	return func() {
+		schemaPack = prev
+		schemaPackMu.Unlock()
+	}
+}
+
+func openAPIPack(hints *TFStateHints) openapi_schema.Pack {
+	if hints != nil && hints.SchemaRef != nil && hints.SchemaRef.Pack != "" {
+		return openapi_schema.Pack(hints.SchemaRef.Pack)
+	}
+	return openapi_schema.PackVMS
+}
+
+func resolveComposedSchema(schema *openapi3.Schema) *openapi3.Schema {
+	return openapi_schema.ResolveComposedSchema(schemaPack, schema)
+}
+
+func resolveAllRefs(ref *openapi3.SchemaRef) *openapi3.Schema {
+	return openapi_schema.ResolveAllRefs(schemaPack, ref)
+}
+
 // Aliases to shared OpenAPI schema utilities from go-vast-client/openapi_schema
 var (
-	resolveComposedSchema = openapi_schema.ResolveComposedSchema
-	resolveAllRefs        = openapi_schema.ResolveAllRefs
-	isObject              = openapi_schema.IsObject
-	isAmbiguousObject     = openapi_schema.IsAmbiguousObject
-	isPrimitive           = openapi_schema.IsPrimitive
-	isStringOrInteger     = openapi_schema.IsStringOrInteger
-	IsEmptySchema         = openapi_schema.IsEmptySchema
-	compareSchemaValues   = openapi_schema.CompareSchemaValues
-	getSchemaType         = openapi_schema.GetSchemaType
+	isObject            = openapi_schema.IsObject
+	isAmbiguousObject   = openapi_schema.IsAmbiguousObject
+	isPrimitive         = openapi_schema.IsPrimitive
+	isStringOrInteger   = openapi_schema.IsStringOrInteger
+	IsEmptySchema       = openapi_schema.IsEmptySchema
+	compareSchemaValues = openapi_schema.CompareSchemaValues
+	getSchemaType       = openapi_schema.GetSchemaType
 )
 
 // getKnownDescription returns known descriptions for properties that lost their descriptions
@@ -83,6 +114,7 @@ func addSchemaEntries(
 	hints *TFStateHints,
 	target map[string]*SchemaEntry,
 	required, optional, computed, writeOnly, sensitive, ordered bool,
+	applyWriteOnlyHints bool,
 ) {
 	for name, ref := range props {
 		schema := ref.Value
@@ -102,7 +134,7 @@ func addSchemaEntries(
 		fieldSensitive := sensitive
 		fieldOrdered := ordered
 
-		fieldRequired, fieldOptional, fieldComputed, fieldWriteOnly, fieldSensitive, fieldOrdered = flagsFromHintsForResource(name, hints, fieldRequired, fieldOptional, fieldComputed, fieldSensitive, fieldOrdered, fieldWriteOnly)
+		fieldRequired, fieldOptional, fieldComputed, fieldWriteOnly, fieldSensitive, fieldOrdered = flagsFromHintsForResource(name, hints, fieldRequired, fieldOptional, fieldComputed, fieldSensitive, fieldOrdered, fieldWriteOnly, applyWriteOnlyHints)
 
 		desc := schema.Description
 		if desc == "" {
@@ -130,8 +162,9 @@ func addSchemaEntries(
 
 		if isObject(schema) && schema.Properties != nil {
 			entry.Children = make(map[string]*SchemaEntry)
-			// Do NOT propagate parent required to children; children requiredness
-			// must be determined solely by the child object's own required array.
+			// Do NOT propagate parent required/write-only to children. WriteOnlyFields
+			// hints match by short name and must only apply at the resource top level
+			// (nested computed objects may reuse names like bindpw).
 			addSchemaEntries(
 				schema.Properties,
 				schema.Required,
@@ -140,9 +173,10 @@ func addSchemaEntries(
 				false, // required: do not inherit from parent
 				fieldOptional,
 				fieldComputed,
-				fieldWriteOnly,
+				false, // writeOnly: never inherit; TF forbids WriteOnly under Computed nested attrs
 				fieldSensitive,
 				fieldOrdered,
+				false, // applyWriteOnlyHints: top-level only
 			)
 		}
 
@@ -175,7 +209,7 @@ func buildTmpSchemaRefFromParam(p *openapi3.Parameter) *openapi3.SchemaRef {
 	}
 }
 
-func flagsFromHintsForResource(name string, hints *TFStateHints, required, optional, computed, sensitive, ordered, writeOnly bool) (bool, bool, bool, bool, bool, bool) {
+func flagsFromHintsForResource(name string, hints *TFStateHints, required, optional, computed, sensitive, ordered, writeOnly, applyWriteOnlyHints bool) (bool, bool, bool, bool, bool, bool) {
 	if hints != nil {
 		if contains(hints.RequiredSchemaFields, name) {
 			required, optional, computed = true, false, false
@@ -186,7 +220,10 @@ func flagsFromHintsForResource(name string, hints *TFStateHints, required, optio
 		if contains(hints.ComputedSchemaFields, name) {
 			computed = true
 		}
-		if contains(hints.WriteOnlyFields, name) {
+		// WriteOnlyFields match by attribute name; only apply at the top level so
+		// nested objects that reuse the same short name (e.g. ldap.bindpw) are not
+		// marked WriteOnly under a Computed parent (invalid TF schema).
+		if applyWriteOnlyHints && contains(hints.WriteOnlyFields, name) {
 			writeOnly = true
 			computed = false
 			optional = true
@@ -269,7 +306,7 @@ func buildAttrTypeFromSchema(schema *openapi3.Schema) attr.Type {
 
 func warnWithContext(ctx context.Context, message string) {
 	if ctx != nil {
-		tflog.Debug(ctx, fmt.Sprintf("⚠  %s", message))
+		logging.Debug(ctx, fmt.Sprintf("⚠  %s", message))
 	} else {
 		fmt.Printf("#===> ⚠️  %s\n", message)
 	}
@@ -277,7 +314,7 @@ func warnWithContext(ctx context.Context, message string) {
 
 func infoWithContext(ctx context.Context, message string) {
 	if ctx != nil {
-		tflog.Debug(ctx, fmt.Sprintf("◉  %s", message))
+		logging.Debug(ctx, fmt.Sprintf("◉  %s", message))
 	} else {
 		fmt.Printf("#===> 🟢  %s\n", message)
 	}
@@ -297,9 +334,7 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		// Add UseStateForUnknown for all computed attributes (optional+computed or computed-only)
-		// This prevents "known after apply" noise when the field hasn't changed
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, stringplanmodifier.UseStateForUnknown())
 		}
 		return a
@@ -312,7 +347,7 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, int64planmodifier.UseStateForUnknown())
 		}
 		return a
@@ -325,55 +360,55 @@ func injectModifiers(attr schema.Attribute, name string, hints *TFStateHints) sc
 				}
 			}
 		}
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, float64planmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.BoolAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, boolplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.ListAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, listplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.SetAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, setplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.MapAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, mapplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.SingleNestedAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, objectplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.ObjectAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, objectplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.ListNestedAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, listplanmodifier.UseStateForUnknown())
 		}
 		return a
 
 	case schema.SetNestedAttribute:
-		if a.Computed && !a.Required && !a.Sensitive {
+		if a.Computed && !a.Required {
 			a.PlanModifiers = append(a.PlanModifiers, setplanmodifier.UseStateForUnknown())
 		}
 		return a

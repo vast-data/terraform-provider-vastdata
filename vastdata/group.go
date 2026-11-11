@@ -16,11 +16,11 @@ var GroupSchemaRef = is.NewSchemaReference(
 )
 
 type Group struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Group) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Group{tfstate: is.NewTFStateMust(
+	return &Group{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -31,7 +31,7 @@ func (m *Group) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 }
 
 func (m *Group) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Group{tfstate: is.NewTFStateMust(
+	return &Group{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -41,7 +41,7 @@ func (m *Group) NewDatasourceManager(raw map[string]attr.Value, schema any) Data
 	)}
 }
 
-func (m *Group) TfState() *is.TFState {
+func (m *Group) TfState() is.ResourceState {
 	return m.tfstate
 }
 

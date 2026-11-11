@@ -18,11 +18,11 @@ var RackBgpConfigSchemaRef = is.NewSchemaReference(
 )
 
 type RackBgpConfig struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *RackBgpConfig) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &RackBgpConfig{tfstate: is.NewTFStateMust(
+	return &RackBgpConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -37,7 +37,7 @@ func (m *RackBgpConfig) NewResourceManager(raw map[string]attr.Value, schema any
 	)}
 }
 
-func (m *RackBgpConfig) TfState() *is.TFState {
+func (m *RackBgpConfig) TfState() is.ResourceState {
 	return m.tfstate
 }
 

@@ -17,11 +17,11 @@ var AdministratorRoleSchemaRef = is.NewSchemaReference(
 )
 
 type AdministratorRole struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *AdministratorRole) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &AdministratorRole{tfstate: is.NewTFStateMust(
+	return &AdministratorRole{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -32,7 +32,7 @@ func (m *AdministratorRole) NewResourceManager(raw map[string]attr.Value, schema
 }
 
 func (m *AdministratorRole) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &AdministratorRole{tfstate: is.NewTFStateMust(
+	return &AdministratorRole{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -41,7 +41,7 @@ func (m *AdministratorRole) NewDatasourceManager(raw map[string]attr.Value, sche
 	)}
 }
 
-func (m *AdministratorRole) TfState() *is.TFState {
+func (m *AdministratorRole) TfState() is.ResourceState {
 	return m.tfstate
 }
 

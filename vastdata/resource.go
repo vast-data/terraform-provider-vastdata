@@ -6,21 +6,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
-	"strconv"
 	"strings"
-	"time"
 
-	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
 )
 
@@ -38,15 +31,14 @@ const (
 	OpModifyPlan     = "ModifyPlan"
 )
 
-const (
-	defaultRetryTimes        = 5
-	defaultRetrySleepSeconds = 10
-)
-
 type Resource struct {
 	newManager   ResourceFactoryFn
 	providerData *ProviderData
 	managerName  string
+	// lifecycle drives the CRUD operations of this resource kind. It is built in Configure.
+	// The framework creates a new Resource and calls Configure for every RPC, so it lives for
+	// one RPC, not for the provider process: add callbacks right after it is built.
+	lifecycle *ResourceLifecycle
 }
 
 func (r *Resource) EmptyManager() ResourceManager {
@@ -54,15 +46,22 @@ func (r *Resource) EmptyManager() ResourceManager {
 }
 
 func (r *Resource) ManagerWithSchemaOnly(ctx context.Context) (ResourceManager, error) {
+	return newManagerWithSchemaOnly(ctx, r.newManager)
+}
+
+// newManagerWithSchemaOnly builds a manager whose state carries the generated resource
+// schema and a zeroed (all-null) attribute map matching it. It does not depend on any
+// Terraform request/response types, so Terraform and Crossplane share it.
+func newManagerWithSchemaOnly(ctx context.Context, newManager ResourceFactoryFn) (ResourceManager, error) {
 	// Get schema for the resource to create a proper manager
-	emptyManager := r.newManager(nil, nil)
-	hints := emptyManager.TfState().Hints
+	emptyManager := newManager(nil, nil)
+	hints := emptyManager.TfState().StateHints()
 	schema, err := schema_generation.GetResourceSchema(ctx, hints)
 	if err != nil {
 		return nil, err
 	}
 	// Create a new manager with the schema and empty Raw filled according to schema types
-	// Build a zeroed attr map matching the schema so TFState has all keys with Null values
+	// Build a zeroed attr map matching the schema so the state has all keys with Null values
 	zeroRaw := make(map[string]attr.Value)
 	switch sch := any(*schema).(type) {
 	case rschema.Schema:
@@ -72,7 +71,7 @@ func (r *Resource) ManagerWithSchemaOnly(ctx context.Context) (ResourceManager, 
 	default:
 		// Fallback to passing nil Raw if schema kind unexpected
 	}
-	return r.newManager(zeroRaw, *schema), nil
+	return newManager(zeroRaw, *schema), nil
 }
 
 func (r *Resource) NewManager(state any) ResourceManager {
@@ -106,16 +105,16 @@ func (r *Resource) NewManager(state any) ResourceManager {
 // secrets such as certificate PEMs from the API body (TERF-268).
 func (r *Resource) overlayWriteOnlyFromConfig(manager ResourceManager, config tfsdk.Config) {
 	ts := manager.TfState()
-	if ts == nil || !ts.Enabled || ts.Hints == nil || len(ts.Hints.WriteOnlyFields) == 0 {
+	if ts == nil || !ts.IsEnabled() || ts.StateHints() == nil || len(ts.StateHints().WriteOnlyFields) == 0 {
 		return
 	}
 	cfgTs := r.NewManager(config).TfState()
-	for _, key := range ts.Hints.WriteOnlyFields {
-		v, ok := cfgTs.Raw[key]
+	for _, key := range ts.StateHints().WriteOnlyFields {
+		v, ok := cfgTs.RawValues()[key]
 		if !ok || v == nil || v.IsNull() || v.IsUnknown() {
 			continue
 		}
-		ts.Raw[key] = v
+		ts.RawValues()[key] = v
 	}
 }
 
@@ -171,8 +170,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 			// provider, causing a schema-reconciliation update.  Resources that
 			// implement MigrateModePassThroughUpdate opt in to allowing that
 			// update instead of being blocked.
-			manager := r.NewManager(req.Plan)
-			if _, ok := manager.(MigrateModePassThroughUpdate); !ok {
+			if _, ok := r.EmptyManager().(MigrateModePassThroughUpdate); !ok {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("MigrateMode[%s]: update operation blocked.", r.managerName),
 					"VASTDATA_MIGRATE_MODE is intended for populating an EMPTY state from existing infrastructure. "+
@@ -182,7 +180,7 @@ func (r *Resource) Update(ctx context.Context, req resource.UpdateRequest, resp 
 				)
 				return
 			}
-			tflog.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: allowing schema-reconciliation update for non-importable resource.", r.managerName))
+			logging.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: allowing schema-reconciliation update for non-importable resource.", r.managerName))
 		}
 		r.updateImpl(ctx, req, resp)
 	})
@@ -225,7 +223,7 @@ func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRe
 	if !ok {
 		return
 	}
-	tflog.Debug(ctx, fmt.Sprintf("ModifyPlanResource[%s]: do.", r.managerName))
+	logging.Debug(ctx, fmt.Sprintf("ModifyPlanResource[%s]: do.", r.managerName))
 	if err := imp.ModifyPlan(ctx, req, resp); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("ModifyPlanResource[%q]", r.managerName),
@@ -250,7 +248,7 @@ func (r *Resource) schemaImpl(ctx context.Context, _ resource.SchemaRequest, res
 		return
 	}
 
-	resp.Schema = manager.TfState().Schema.(rschema.Schema)
+	resp.Schema = manager.TfState().SchemaDefinition().(rschema.Schema)
 }
 
 func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -270,13 +268,14 @@ func (r *Resource) configureImpl(_ context.Context, req resource.ConfigureReques
 	}
 
 	r.providerData = providerData
+	r.lifecycle = NewResourceLifecycle(providerData.Client, r.managerName)
 }
 
 func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	manager, _ := r.ManagerWithSchemaOnly(ctx)
 	managerName := r.managerName
 	tfState := manager.TfState()
-	hints := tfState.Hints
+	hints := tfState.StateHints()
 
 	// Check importable flag (defaults to true) before touching provider/client.
 	if hints != nil && hints.Importable != nil && !*hints.Importable {
@@ -301,32 +300,30 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		return
 	}
 
-	if imp, ok := manager.(PrepareImportResourceState); ok {
-		tflog.Debug(ctx, fmt.Sprintf("PrepareImportResourceState[%s]: do.", managerName))
-		if err = imp.PrepareImportResourceState(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("PrepareImportResourceState[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	logging.Debug(ctx, fmt.Sprintf("PrepareImportResourceState[%s]: do.", managerName))
+	if err = r.lifecycle.runPrepareImportResourceState(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("PrepareImportResourceState[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
-	tflog.Debug(
+	logging.Debug(
 		ctx,
 		fmt.Sprintf("ImportState[%q] - state:\n%s\n", managerName, tfState.Pretty()),
 	)
 
-	if imp, ok := manager.(ImportResourceState); ok {
-		tflog.Debug(ctx, fmt.Sprintf("ImportResourceState[%s]: do.", managerName))
-		if err := imp.ImportResourceState(req, ctx, rest); err != nil {
+	if customImport, err := r.lifecycle.runImportResourceState(ctx, req, manager); customImport {
+		logging.Debug(ctx, fmt.Sprintf("ImportResourceState[%s]: do.", managerName))
+		if err != nil {
 			if errors.As(err, &CustomImportOnly{}) {
-				tflog.Debug(
+				logging.Debug(
 					ctx,
 					fmt.Sprintf("ImportResourceState[%s]: custom import only - stopping.", managerName),
 				)
 				// Finally, persist state
-				if err = tfState.SetState(ctx, &resp.State); err != nil {
+				if err = is.NewTFSdkSink(&resp.State).WriteState(ctx, tfState); err != nil {
 					resp.Diagnostics.AddError(
 						fmt.Sprintf("ImportState[%s]: failed to set state.", managerName),
 						fmt.Sprintf("Failed to set the imported state: %s", err.Error()),
@@ -345,7 +342,7 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 
 	} else {
 		// Use default import implementation
-		tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: use default import implementation.", managerName))
+		logging.Debug(ctx, fmt.Sprintf("ImportState[%s]: use default import implementation.", managerName))
 		if err := parseImportId(importID, tfState); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: invalid import ID.", managerName),
@@ -356,22 +353,23 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 	}
 
 	// Before reading, allow resource to prepare read (same as in readImpl)
-	if prep, ok := manager.(PrepareReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("PrepareReadResource[%s]: do.", managerName))
-		if err = prep.PrepareReadResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("PrepareReadResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	logging.Debug(ctx, fmt.Sprintf("PrepareReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runPrepareReadResource(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("PrepareReadResource[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
 	// Populate full state from backend using the same logic as read (without SDK response wrapper)
-	var record DisplayableRecord
-	if reader, ok := manager.(ReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: reading resource after key parsing.", managerName))
-		record, err = reader.ReadResource(ctx, rest)
+	var (
+		record     DisplayableRecord
+		customRead bool
+	)
+	record, customRead, err = r.lifecycle.runReadResource(ctx, manager)
+	if customRead {
+		logging.Debug(ctx, fmt.Sprintf("ImportState[%s]: read resource after key parsing with ReadResource.", managerName))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("ImportState[%s]: failed to read imported resource.", managerName),
@@ -387,7 +385,7 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 			return
 		}
 	} else {
-		tflog.Debug(ctx, fmt.Sprintf("ImportState[%s]: default read after key parsing.", managerName))
+		logging.Debug(ctx, fmt.Sprintf("ImportState[%s]: default read after key parsing.", managerName))
 		record, err = r.getRecordBySearchParams(ctx, manager, nil, "Import")
 		if err != nil {
 			resp.Diagnostics.AddError(
@@ -399,10 +397,7 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 	}
 
 	if record != nil {
-		if transformer, ok := manager.(TransformResponseRecord); ok {
-			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
+		record = runTransformResponseRecord(manager, record.(Record))
 
 		// Automatically populate _id fields from nested objects
 		// e.g., extract local_provider_id from local_provider.id
@@ -424,19 +419,17 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 	}
 
 	// After read hook (same as in readImpl)
-	if aft, ok := manager.(AfterReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterReadResource[%s]: do.", managerName))
-		if err = aft.AfterReadResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterReadResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	logging.Debug(ctx, fmt.Sprintf("AfterReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runAfterReadResource(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("AfterReadResource[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
 	// Finally, persist state
-	if err = tfState.SetState(ctx, &resp.State); err != nil {
+	if err = is.NewTFSdkSink(&resp.State).WriteState(ctx, tfState); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("ImportState[%s]: failed to set state.", managerName),
 			fmt.Sprintf("Failed to set the imported state: %s", err.Error()),
@@ -444,270 +437,39 @@ func (r *Resource) importStateImpl(ctx context.Context, req resource.ImportState
 		return
 	}
 
-	if imp, ok := manager.(AfterImportResourceState); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterImportResourceState[%s]: do.", managerName))
-		if err = imp.AfterImportResourceState(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterImportResourceState[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	logging.Debug(ctx, fmt.Sprintf("AfterImportResourceState[%s]: do.", managerName))
+	if err = r.lifecycle.runAfterImportResourceState(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("AfterImportResourceState[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
 }
 
 func (r *Resource) createImpl(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var (
-		rest              = r.providerData.Client
-		manager           = r.NewManager(req.Plan)
-		api               = manager.API(rest)
-		managerName       = r.managerName
-		record            DisplayableRecord
-		tfState           = manager.TfState()
-		tsStateCopy       = tfState.Copy() // Original values from plan (write-only still null).
-		err               error
-		transactionDelete = func() {
-			if resp.Diagnostics.HasError() {
-				if imp, ok := manager.(DeleteResource); ok {
-					imp.DeleteResource(ctx, rest)
-				} else {
-					if _, err = r.deleteRecordBySearchParams(ctx, manager, "TransactionDelete"); err != nil {
-						tflog.Warn(
-							ctx,
-							fmt.Sprintf("TransactionDelete[%s]:"+
-								" error deleting resource after error: %s",
-								managerName,
-								err.Error(),
-							),
-						)
-					}
-				}
-				if imp, ok := manager.(AfterDeleteResource); ok {
-					tflog.Debug(ctx, fmt.Sprintf("AfterDeleteResource[%s]: create rollback cleanup.", managerName))
-					_ = imp.AfterDeleteResource(ctx, rest)
-				}
-			}
-		}
-	)
-
+	manager := r.NewManager(req.Plan)
 	// Write-only attrs are null in Plan; load them from Config for the API request.
 	r.overlayWriteOnlyFromConfig(manager, req.Config)
 
-	if imp, ok := manager.(PrepareCreateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("PrepareCreateResource[%s]: do.", managerName))
-		if err = imp.PrepareCreateResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("PrepareCreateResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
-	}
-
-	tflog.Debug(
-		ctx,
-		fmt.Sprintf("Create[%q] - plan:\n%s\n", managerName, tfState.Pretty()),
-	)
-
-	var createRetryOn *is.RetryExpression
-	if tfState.Hints != nil && tfState.Hints.RetryOn != nil {
-		createRetryOn = tfState.Hints.RetryOn.Create
-	}
-	if imp, ok := manager.(CreateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("CreateResource[%s]: do.", managerName))
-		createFn := imp.CreateResource
-		if createRetryOn != nil {
-			createFn = WithRetry(createRetryOn, "CreateResource", managerName, imp.CreateResource)
-		}
-		record, err = createFn(ctx, rest)
-	} else {
-		// Delegate to the default create implementation
-		tflog.Debug(ctx, fmt.Sprintf("Create[%s]: use default implementation.", managerName))
-
-		if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
-			return
-		}
-
-		// Get all params required + optional for creation.
-		createParams := tfState.GetCreateParams()
-		if transformer, ok := manager.(TransformRequestBody); ok {
-			tflog.Debug(ctx, fmt.Sprintf("TransformRequestBody[%s]: do.", managerName))
-			createParams = transformer.TransformRequestBody(createParams)
-		}
-
-		if lookup, ok := manager.(LookupForCreate); ok {
-			tflog.Debug(ctx, fmt.Sprintf("LookupForCreate[%s]: use custom lookup.", managerName))
-			record, err = lookup.LookupForCreate(ctx, rest)
-		} else {
-			record, err = r.getRecordBySearchParams(ctx, manager, nil, "Create")
-		}
-		if err != nil {
-			// Something not expected happened, we should not continue.
-			if !isNotFoundErr(err) {
-				resp.Diagnostics.AddError(
-					fmt.Sprintf("error reading %q resource.", managerName),
-					err.Error(),
-				)
-				return
-			} else {
-				tflog.Debug(
-					ctx, fmt.Sprintf("Create[%s]: no existing resource found, proceeding to create.", managerName),
-				)
-
-				defer transactionDelete()
-				defaultCreate := func(ctx context.Context, _ *VMSRest) (DisplayableRecord, error) {
-					return api.CreateWithContext(ctx, createParams)
-				}
-				if createRetryOn != nil {
-					defaultCreate = WithRetry(createRetryOn, "CreateResource", managerName, defaultCreate)
-				}
-				if record, err = defaultCreate(ctx, rest); err == nil {
-					r.checkIntegrity(ctx, record.(Record), createParams)
-				}
-			}
-		} else {
-			tflog.Debug(ctx, fmt.Sprintf("Create[%s]: found existing resource - taking management.", managerName))
-			if transformer, ok := manager.(TransformResponseRecord); ok {
-				tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
-				record = transformer.TransformResponseRecord(record.(Record))
-			}
-			if normalizer, ok := manager.(NormalizeRecordForCreateAdopt); ok {
-				tflog.Debug(ctx, fmt.Sprintf("NormalizeRecordForCreateAdopt[%s]: do.", managerName))
-				record = normalizer.NormalizeRecordForCreateAdopt(record.(Record))
-			}
-			// !NOTE: default implementation works only for resources with 'id' field.
-			// For other resources please implement CreateResource to avoid entering this branch.
-			createParamsDiff := diffMap(createParams, record.(Record))
-			if len(createParamsDiff) > 0 {
-				id, exists := record.(Record)["id"]
-				if !exists {
-					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
-				}
-				// Send only difference between current record from vast and createParams.
-				if record, err = api.UpdateWithContext(ctx, id, createParamsDiff); err == nil {
-					r.checkIntegrity(ctx, record.(Record), createParamsDiff)
-				}
-			} else {
-				tflog.Debug(ctx, fmt.Sprintf("Create[%s]: no changes detected.", managerName))
-			}
-		}
-	}
-
-	if err != nil {
+	if err := r.lifecycle.Create(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("error creating %q resource.", managerName),
+			fmt.Sprintf("error creating %q resource.", r.managerName),
 			err.Error(),
 		)
 		return
 	}
-
-	// Ensure record is not empty, otherwise set to nil.
-	if record, ok := record.(Record); ok && record.Empty() {
-		record = nil
-	}
-
-	if record != nil {
-		// In case record is AsyncTask
-		var asyncTimeout *time.Duration
-		if tfState.Hints != nil {
-			asyncTimeout = tfState.Hints.AsyncTaskTimeout
-		}
-		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), asyncTimeout); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AsyncTask - create[%s].", managerName),
-				err.Error(),
-			)
-			return
-		}
-
-		if resolved, resolveErr := resolveRecordAfterAsyncTask(ctx, manager, rest, record.(Record), managerName); resolveErr != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("ResolveRecordAfterAsyncTask - create[%s].", managerName),
-				resolveErr.Error(),
-			)
-			return
-		} else {
-			record = resolved
-		}
-
-		// Handle AfterCreateResource hook
-		if imp, ok := manager.(AfterCreateResource); ok {
-			tflog.Debug(ctx, fmt.Sprintf("AfterCreateResource[%s]: do.", managerName))
-			if err = imp.AfterCreateResource(ctx, rest, record.(Record)); err != nil {
-				resp.Diagnostics.AddError(
-					fmt.Sprintf("AfterCreateResource[%q]", managerName),
-					err.Error(),
-				)
-				return
-			}
-		} else if len(tfState.Hints.EditOnlyFields) > 0 {
-			// Update fields on resource that cannot be set on creation. For instance "enabled" field for some resources.
-			updateParams := tfState.GetReadEditOnlyParams()
-			if len(updateParams) > 0 {
-				tflog.Debug(ctx, fmt.Sprintf("Create[%s]: Update 'EditOnly' fields.", managerName))
-				id, exists := record.(Record)["id"]
-				if !exists {
-					panic(fmt.Sprintf("Create[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
-				}
-				_, err = api.UpdateWithContext(ctx, id, updateParams)
-				for k, v := range updateParams {
-					record.(Record)[k] = v // Update record with new values.
-				}
-			}
-		}
-
-		// Handle response transformation
-		if transformer, ok := manager.(TransformResponseRecord); ok {
-			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
-
-		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
-			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
-			return
-		}
-
-		// In particular scenarios we might want to populate all internalstate in custom handler.
-		// In this case we might want to return nil to avoid this population.
-		if err = tfState.FillFromRecord(record.(Record)); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("error filling %q resource.", managerName),
-				err.Error(),
-			)
-		}
-	} else {
-		tflog.Debug(
-			ctx,
-			fmt.Sprintf("CreateResource[%s]: no record returned, skipping internalstate update.",
-				managerName,
-			),
-		)
-	}
-
-	// Need to align original plan state with the current state in case response returned inconsistent data.
-	// IOW you set fieldA as optional to valueA but backend returned valueB.
-	tsStateCopy.CopyNonEmptyFieldsTo(tfState)
-	// Never persist write-only values (always null in Terraform state).
-	tfState.ClearWriteOnlyFields()
-
-	if err = tfState.SetState(ctx, &resp.State); err != nil {
+	if err := is.NewTFSdkSink(&resp.State).WriteState(ctx, manager.TfState()); err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("error setting internalstate for %q resource.", managerName),
+			fmt.Sprintf("error setting internalstate for %q resource.", r.managerName),
 			err.Error(),
 		)
-		return
 	}
 }
 
-// createMigrateImpl handles resource "creation" in migrate mode.
-// Instead of creating the resource on the VAST cluster, it reads the existing resource
-// by its search parameters (name, id, etc.) and populates the Terraform state.
-// This allows users to populate a new state file from existing infrastructure by running
-// `VASTDATA_MIGRATE_MODE=1 terraform apply` with their .tf configuration files.
 func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var (
-		rest        = r.providerData.Client
 		manager     = r.NewManager(req.Plan)
 		managerName = r.managerName
 		tfState     = manager.TfState()
@@ -715,26 +477,23 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 		err         error
 	)
 
-	tflog.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: reading existing resource instead of creating.", managerName))
+	logging.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: reading existing resource instead of creating.", managerName))
 
 	// Prepare read hooks (same as in readImpl/importStateImpl)
-	if prep, ok := manager.(PrepareReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("MigrateMode/PrepareReadResource[%s]: do.", managerName))
-		if err = prep.PrepareReadResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("MigrateMode/PrepareReadResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	logging.Debug(ctx, fmt.Sprintf("MigrateMode/PrepareReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runPrepareReadResource(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("MigrateMode/PrepareReadResource[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
 	// Read the resource using the same logic as import
-	if reader, ok := manager.(ReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("MigrateMode[%s]: using custom ReadResource.", managerName))
-		record, err = reader.ReadResource(ctx, rest)
-	} else {
-		tflog.Debug(ctx, fmt.Sprintf("MigrateMode[%s]: using default read by search params.", managerName))
+	var customRead bool
+	record, customRead, err = r.lifecycle.runReadResource(ctx, manager)
+	if !customRead {
+		logging.Debug(ctx, fmt.Sprintf("MigrateMode[%s]: using default read by search params.", managerName))
 		record, err = r.getRecordBySearchParams(ctx, manager, nil, "MigrateCreate")
 	}
 
@@ -748,10 +507,7 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 
 	if record != nil {
 		// Transform response if needed
-		if transformer, ok := manager.(TransformResponseRecord); ok {
-			tflog.Debug(ctx, fmt.Sprintf("MigrateMode/TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
+		record = runTransformResponseRecord(manager, record.(Record))
 
 		// Populate _id fields from nested objects (same as import)
 		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
@@ -773,19 +529,17 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 	}
 
 	// After read hook
-	if aft, ok := manager.(AfterReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("MigrateMode/AfterReadResource[%s]: do.", managerName))
-		if err = aft.AfterReadResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("MigrateMode/AfterReadResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	logging.Debug(ctx, fmt.Sprintf("MigrateMode/AfterReadResource[%s]: do.", managerName))
+	if err = r.lifecycle.runAfterReadResource(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("MigrateMode/AfterReadResource[%q]", managerName),
+			err.Error(),
+		)
+		return
 	}
 
 	// Persist state
-	if err = tfState.SetState(ctx, &resp.State); err != nil {
+	if err = is.NewTFSdkSink(&resp.State).WriteState(ctx, tfState); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("MigrateMode[%s]: failed to set state.", managerName),
 			err.Error(),
@@ -793,415 +547,53 @@ func (r *Resource) createMigrateImpl(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	tflog.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: successfully populated state from existing cluster resource.", managerName))
+	logging.Warn(ctx, fmt.Sprintf("MigrateMode[%s]: successfully populated state from existing cluster resource.", managerName))
 }
 
 func (r *Resource) readImpl(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var (
-		rest        = r.providerData.Client
-		manager     = r.NewManager(req.State)
-		managerName = r.managerName
-		tfState     = manager.TfState()
-		record      DisplayableRecord
-		err         error
-	)
-
-	if imp, ok := manager.(PrepareReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("PrepareReadResource[%s]: do.", managerName))
-		if err = imp.PrepareReadResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("PrepareReadResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
-	}
-
-	tflog.Debug(
-		ctx,
-		fmt.Sprintf("Read[%q] - state:\n%s\n", managerName, tfState.Pretty()),
-	)
-
-	if imp, ok := manager.(ReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("ReadResource[%s]: do.", managerName))
-		record, err = imp.ReadResource(ctx, rest)
-	} else {
-		if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
-			return
-		}
-
-		// Check if we should skip API calls and use current tfstate
-		if tfState.Hints.SkipRefreshAPICall {
-			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: skip API call, using current tfstate as record.", managerName))
-			// Convert current tfstate to map[string]any and use as record
-			record = Record(tfState.GetAllValues())
-		} else {
-			// Delegate to the default read implementation
-			tflog.Debug(ctx, fmt.Sprintf("Read[%s]: use default implementation.", managerName))
-			record, err = r.getRecordBySearchParams(ctx, manager, nil, "Read")
-		}
-	}
-
+	manager := r.NewManager(req.State)
+	exists, err := r.lifecycle.Read(ctx, manager)
 	if err != nil {
-		if isNotFoundErr(err) || expectStatusCodes(err, http.StatusNotFound) || errors.As(err, &ForceCleanState{}) {
-			// Ignore not found errors.
-			// The next terraform plan will recreate the resource.
-			tflog.Warn(ctx,
-				fmt.Sprintf("Read[%s]: no such resource. err: %s", managerName, err),
-			)
-			resp.State.RemoveResource(ctx)
-		} else {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("Read[%s]", managerName),
-				err.Error(),
-			)
-			tflog.Error(ctx, fmt.Sprintf("Read[%s]: error reading resource: %s", managerName, err))
-		}
+		resp.Diagnostics.AddError(fmt.Sprintf("Read[%s]", r.managerName), err.Error())
+		logging.Error(ctx, fmt.Sprintf("Read[%s]: error reading resource: %s", r.managerName, err))
 		return
 	}
-
-	if record != nil {
-		if transformer, ok := manager.(TransformResponseRecord); ok {
-			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
-
-		// Automatically populate _id fields from nested objects
-		// e.g., extract local_provider_id from local_provider.id
-		PopulateIDFieldsFromNestedObjects(ctx, tfState, record.(Record))
-
-		if err = mergeSubResources(ctx, manager, rest, record, managerName); err != nil {
-			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
-			return
-		}
-
-		// In particular scenarios we might want to populate all internalstate in custom handler.
-		// In this case we might want to return nil to avoid this population.
-		if err = tfState.FillFromRecordIncludingRequired(record.(Record), true); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("Read[%s] error filling resource.", managerName),
-				err.Error(),
-			)
-			return
-		}
-	} else {
-		tflog.Debug(ctx, fmt.Sprintf("Read[%s]: no record found, skipping internalstate update.", managerName))
+	if !exists {
+		logging.Warn(ctx, fmt.Sprintf("Read[%s]: no such resource.", r.managerName))
+		resp.State.RemoveResource(ctx)
+		return
 	}
-
-	if imp, ok := manager.(AfterReadResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterReadResource[%s]: do.", managerName))
-		if err = imp.AfterReadResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterReadResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
-	}
-
-	if err = tfState.SetState(ctx, &resp.State); err != nil {
+	if err := is.NewTFSdkSink(&resp.State).WriteState(ctx, manager.TfState()); err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("Read[%s]: error setting internalstate.", managerName),
+			fmt.Sprintf("Read[%s]: error setting internalstate.", r.managerName),
 			err.Error(),
 		)
-		return
 	}
-
 }
 
 func (r *Resource) updateImpl(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var (
-		rest        = r.providerData.Client
-		stateManger = r.NewManager(req.State)
-		planManager = r.NewManager(req.Plan) // Planned changes to the resource (only diff fields)
-		tfState     = stateManger.TfState()
-		planTfState = planManager.TfState()
-		managerName = r.managerName
-		api         = stateManger.API(rest)
-		record      DisplayableRecord
-		err         error
-	)
-
+	current := r.NewManager(req.State)
+	desired := r.NewManager(req.Plan)
 	// Write-only attrs are null in Plan; load them from Config for the API request.
-	r.overlayWriteOnlyFromConfig(planManager, req.Config)
+	r.overlayWriteOnlyFromConfig(desired, req.Config)
 
-	if imp, ok := stateManger.(PrepareUpdateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("PrepareUpdateResource[%s]: do.", managerName))
-		if err = imp.PrepareUpdateResource(ctx, planManager.(PrepareUpdateResource), rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("PrepareUpdateResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
-	}
-
-	tflog.Debug(
-		ctx,
-		fmt.Sprintf("Update[%q] - plan:\n%s\n", managerName, planTfState.Pretty()),
-	)
-
-	if imp, ok := stateManger.(UpdateResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("UpdateResource[%s]: do.", managerName))
-		record, err = imp.UpdateResource(ctx, planManager.(UpdateResource), rest)
-	} else {
-		// Delegate to the default update implementation
-		tflog.Debug(ctx, fmt.Sprintf("Update[%s]: use default implementation.", managerName))
-
-		if !r.checkNonEmptyFields(ctx, planManager, &resp.Diagnostics) {
-			return
-		}
-
-		record, err = r.getRecordBySearchParams(ctx, stateManger, planManager, "Update")
-		if err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("Update[%s]", managerName),
-				err.Error(),
-			)
-			return
-		}
-		// !NOTE: default implementation works only for resources with 'id' field.
-		// For other resources please implement CreateResource to avoid entering this branch.
-		id, exists := record.(Record)["id"]
-		if !exists {
-			panic(fmt.Sprintf("Update[%s]: record does not have 'id' field. Record: %s", managerName, record.(Record).PrettyJson("  ")))
-		}
-
-		// Get update params excluding edit-only and delete-only fields
-		updateParams := planTfState.GetUpdateParams(tfState)
-		if transformer, ok := stateManger.(TransformRequestBody); ok {
-			tflog.Debug(ctx, fmt.Sprintf("TransformRequestBody[%s]: do.", managerName))
-			updateParams = transformer.TransformRequestBody(updateParams)
-		}
-
-		delete(updateParams, "id") // Remove ID from update parameters, as it should not be updated.
-		if len(updateParams) == 0 {
-			tflog.Debug(
-				ctx, fmt.Sprintf("Update[%s]: no update request parameters. Skipping update...", managerName),
-			)
-		} else {
-			if record, err = api.UpdateWithContext(ctx, id, updateParams); err == nil {
-				r.checkIntegrity(ctx, record.(Record), updateParams)
-			}
-		}
-	}
-
-	if err != nil {
-		resp.Diagnostics.AddError(
-			fmt.Sprintf("Update[%s].", managerName),
-			err.Error(),
-		)
+	if err := r.lifecycle.Update(ctx, current, desired); err != nil {
+		resp.Diagnostics.AddError(fmt.Sprintf("Update[%s].", r.managerName), err.Error())
 		return
 	}
-
-	// Ensure record is not empty, otherwise set to nil.
-	if record, ok := record.(Record); ok && record.Empty() {
-		record = nil
-	}
-
-	if record != nil {
-		// In case record is AsyncTask
-		var asyncTimeout *time.Duration
-		if tfState.Hints != nil {
-			asyncTimeout = tfState.Hints.AsyncTaskTimeout
-		}
-		if err := handleMaybeAsyncTask(ctx, rest, record.(Record), asyncTimeout); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AsyncTask - update[%s].", managerName),
-				err.Error(),
-			)
-			return
-		}
-
-		if resolved, resolveErr := resolveRecordAfterAsyncTask(ctx, stateManger, rest, record.(Record), managerName); resolveErr != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("ResolveRecordAfterAsyncTask - update[%s].", managerName),
-				resolveErr.Error(),
-			)
-			return
-		} else {
-			record = resolved
-		}
-
-		if transformer, ok := stateManger.(TransformResponseRecord); ok {
-			tflog.Debug(ctx, fmt.Sprintf("TransformResponseRecord[%s]: do.", managerName))
-			record = transformer.TransformResponseRecord(record.(Record))
-		}
-
-		// Merge sub-resources using plan manager so the trigger fields reflect
-		// the desired plan state, not the (potentially stale) current state.
-		if err = mergeSubResources(ctx, planManager, rest, record, managerName); err != nil {
-			resp.Diagnostics.AddError(fmt.Sprintf("GetSubResources[%q]", managerName), err.Error())
-			return
-		}
-
-		// In particular scenarios we might want to populate all internalstate in custom handler.
-		// In this case we might want to return nil to avoid this population.
-		if err = tfState.FillFromRecord(record.(Record)); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("Update[%s]: error filling resource.", managerName),
-				err.Error(),
-			)
-			return
-		}
-
-		if imp, ok := stateManger.(AfterUpdateResource); ok {
-			tflog.Debug(ctx, fmt.Sprintf("AfterUpdateResource[%s]: do.", managerName))
-			if err = imp.AfterUpdateResource(ctx, planManager.(AfterUpdateResource), rest, record.(Record)); err != nil {
-				resp.Diagnostics.AddError(
-					fmt.Sprintf("AfterUpdateResource[%q]", managerName),
-					err.Error(),
-				)
-				return
-			}
-		} else if len(tfState.Hints.EditOnlyFields) > 0 {
-			// Only handle edit-only fields automatically if AfterUpdateResource is not implemented
-			// If AfterUpdateResource is implemented, it's assumed to handle edit-only fields itself
-			editOnlyParams := planTfState.GetChangedEditOnlyParams(tfState)
-			if len(editOnlyParams) > 0 {
-				tflog.Debug(ctx, fmt.Sprintf("Update[%s]: Updating 'EditOnly' fields.", managerName))
-				id, exists := record.(Record)["id"]
-				if !exists {
-					resp.Diagnostics.AddError(
-						fmt.Sprintf("Update[%s]: cannot update edit-only fields.", managerName),
-						"Record does not have 'id' field",
-					)
-					return
-				}
-				var editRecord DisplayableRecord
-				if editRecord, err = api.UpdateWithContext(ctx, id, editOnlyParams); err != nil {
-					resp.Diagnostics.AddError(
-						fmt.Sprintf("Update[%s]: error updating edit-only fields.", managerName),
-						err.Error(),
-					)
-					return
-				}
-				// Update the record with edit-only values
-				if editRecord != nil && !editRecord.(Record).Empty() {
-					for k, v := range editRecord.(Record) {
-						record.(Record)[k] = v
-					}
-				} else {
-					for k, v := range editOnlyParams {
-						record.(Record)[k] = v
-					}
-				}
-			}
-		}
-
-	} else {
-		tflog.Debug(ctx, fmt.Sprintf("Update[%s]: no record returned, skipping internalstate update.", managerName))
-	}
-
-	// Copy changes from plan to state.
-	planTfState.CopyKnownFieldsTo(tfState)
-	// Never persist write-only values (always null in Terraform state).
-	tfState.ClearWriteOnlyFields()
-
-	if err = tfState.SetState(ctx, &resp.State); err != nil {
+	if err := is.NewTFSdkSink(&resp.State).WriteState(ctx, current.TfState()); err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("Update[%s]: error setting internalstate.", managerName),
+			fmt.Sprintf("Update[%s]: error setting internalstate.", r.managerName),
 			err.Error(),
 		)
-		return
 	}
 }
 
 func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var (
-		rest        = r.providerData.Client
-		manager     = r.NewManager(req.State)
-		tfState     = manager.TfState()
-		managerName = r.managerName
-		err         error
-	)
-
-	if imp, ok := manager.(PrepareDeleteResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("PrepareDeleteResource[%s]: do.", managerName))
-		if err = imp.PrepareDeleteResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("PrepareDeleteResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
+	manager := r.NewManager(req.State)
+	if err := r.lifecycle.Delete(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(fmt.Sprintf("Delete[%s]", r.managerName), err.Error())
 	}
-
-	tflog.Debug(
-		ctx,
-		fmt.Sprintf("Delete[%q] - state:\n%s\n", managerName, tfState.Pretty()),
-	)
-
-	var deleteRetryOn *is.RetryExpression
-	if tfState.Hints != nil && tfState.Hints.RetryOn != nil {
-		deleteRetryOn = tfState.Hints.RetryOn.Delete
-	}
-
-	if imp, ok := manager.(DeleteResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("DeleteResource[%s]: do.", managerName))
-		deleteFn := imp.DeleteResource
-		if deleteRetryOn != nil {
-			_, err = WithRetry(deleteRetryOn, "DeleteResource", managerName, func(ctx context.Context, rest *VMSRest) (struct{}, error) {
-				return struct{}{}, deleteFn(ctx, rest)
-			})(ctx, rest)
-		} else {
-			err = deleteFn(ctx, rest)
-		}
-	} else {
-		// Delegate to the default delete implementation
-		tflog.Debug(ctx, fmt.Sprintf("Delete[%s]: use default implementation.", managerName))
-
-		if !r.checkNonEmptyFields(ctx, manager, &resp.Diagnostics) {
-			return
-		}
-
-		defaultDelete := func(ctx context.Context, rest *VMSRest) error {
-			var record Record
-			var delErr error
-			record, delErr = r.deleteRecordBySearchParams(ctx, manager, "Delete")
-			if delErr != nil {
-				return delErr
-			}
-			if record != nil {
-				var asyncTimeout *time.Duration
-				if tfState.Hints != nil {
-					asyncTimeout = tfState.Hints.AsyncTaskTimeout
-				}
-				if asyncErr := handleMaybeAsyncTask(ctx, rest, record, asyncTimeout); asyncErr != nil {
-					return asyncErr
-				}
-			}
-			return nil
-		}
-
-		if deleteRetryOn != nil {
-			_, err = WithRetry(deleteRetryOn, "DeleteResource", managerName, func(ctx context.Context, rest *VMSRest) (struct{}, error) {
-				return struct{}{}, defaultDelete(ctx, rest)
-			})(ctx, rest)
-		} else {
-			err = defaultDelete(ctx, rest)
-		}
-	}
-
-	if err != nil {
-		resp.Diagnostics.AddError(
-			fmt.Sprintf("Delete[%s]", managerName),
-			err.Error(),
-		)
-		return
-	}
-
-	if imp, ok := manager.(AfterDeleteResource); ok {
-		tflog.Debug(ctx, fmt.Sprintf("AfterDeleteResource[%s]: do.", managerName))
-		if err = imp.AfterDeleteResource(ctx, rest); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("AfterDeleteResource[%q]", managerName),
-				err.Error(),
-			)
-			return
-		}
-	}
-
 }
 
 func (r *Resource) validateConfigImpl(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
@@ -1216,380 +608,4 @@ func (r *Resource) validateConfigImpl(ctx context.Context, req resource.Validate
 		}
 	}
 
-}
-
-// ---------------------------------------
-//      HELPER FUNCTIONS
-// ---------------------------------------
-
-// parseAndApplyCompositeImport parses a composite import string into values for the given fields
-// and invokes set(key, value) with properly typed Terraform attr values.
-// Accepted formats:
-//   - key=value pairs separated by ',' (e.g., "gid=1001,tenant_id=22,context=ad")
-//   - ordered values separated by '|' matching fields order
-func parseAndApplyCompositeImport(importID string, fields []string, tfState *is.TFState, set func(string, attr.Value)) error {
-	kv := make(map[string]string)
-	s := strings.TrimSpace(importID)
-	if s == "" {
-		return fmt.Errorf("empty import id")
-	}
-
-	if strings.Contains(s, "=") {
-		// Handle key=value comma-separated format
-		sep := ","
-		if strings.Contains(s, ";") {
-			sep = ";"
-		}
-		parts := strings.Split(s, sep)
-		for _, p := range parts {
-			p = strings.TrimSpace(p)
-			if p == "" {
-				continue
-			}
-			kvPair := strings.SplitN(p, "=", 2)
-			if len(kvPair) != 2 {
-				return fmt.Errorf("segment %q is not in key=value form", p)
-			}
-			key := strings.TrimSpace(kvPair[0])
-			val := strings.TrimSpace(kvPair[1])
-			kv[key] = val
-		}
-	} else if strings.Contains(s, "|") {
-		// Handle ordered pipe-separated values
-		values := strings.Split(s, "|")
-		if len(values) != len(fields) {
-			return fmt.Errorf("expected %d values for fields %v, got %d", len(fields), fields, len(values))
-		}
-		for i, f := range fields {
-			kv[f] = strings.TrimSpace(values[i])
-		}
-	} else {
-		// Handle single token - treat as "id" field
-		if tfState.HasAttribute("id") {
-			kv["id"] = s
-		} else {
-			return fmt.Errorf("single token provided but no 'id' field available in schema")
-		}
-	}
-
-	// Set parsed fields with type coercion and schema validation
-	for f, val := range kv {
-		if !tfState.HasAttribute(f) {
-			return fmt.Errorf("field %q is not present in the schema", f)
-		}
-		t := tfState.Type(f)
-		switch {
-		case t.Equal(types.Int64Type):
-			n, perr := strconv.ParseInt(val, 10, 64)
-			if perr != nil {
-				return fmt.Errorf("invalid int64 for %q: %v", f, perr)
-			}
-			set(f, types.Int64Value(n))
-		case t.Equal(types.StringType):
-			set(f, types.StringValue(val))
-		case t.Equal(types.BoolType):
-			bv := strings.EqualFold(val, "true") || val == "1"
-			set(f, types.BoolValue(bv))
-		default:
-			// fallback: attempt passthrough as string
-			set(f, types.StringValue(val))
-		}
-	}
-	return nil
-}
-
-func (r *Resource) getRecordBySearchParams(ctx context.Context, manager, planManager ResourceManager, op string) (DisplayableRecord, error) {
-	var (
-		rest                    = r.providerData.Client
-		managerName             = r.managerName
-		tfState                 = manager.TfState()
-		planTfState *is.TFState = nil
-		api                     = manager.API(rest)
-	)
-	if planManager != nil {
-		planTfState = planManager.TfState()
-	}
-
-	return getRecordBySearchParams(ctx, api, tfState, planTfState, managerName, op)
-
-}
-
-func (r *Resource) deleteRecordBySearchParams(ctx context.Context, manager ResourceManager, op string) (Record, error) {
-	var (
-		rest        = r.providerData.Client
-		managerName = r.managerName
-		tfState     = manager.TfState()
-		api         = manager.API(rest)
-	)
-	return deleteRecordBySearchParams(ctx, api, tfState, managerName, op)
-}
-
-func (r *Resource) checkNonEmptyFields(ctx context.Context, manager ResourceManager, dg *diag.Diagnostics) bool {
-	ok := true
-	tfState := manager.TfState()
-	searchParams := getSearchParams(ctx, tfState, nil)
-	if len(searchParams) == 0 {
-		ok = false
-		availableParams := tfState.GetFilteredValues(
-			is.FilterOr,
-			nil,
-			is.SearchEmpty,
-			is.SearchRequired,
-			is.SearchSearchable,
-		)
-		keys := make([]string, 0, len(availableParams))
-		for k := range availableParams {
-			keys = append(keys, k)
-		}
-		visualization := is.BuildResourceAttributesString(tfState.Schema.(rschema.Schema).Attributes, false, 2)
-		managerName := r.managerName
-		if len(keys) > 0 {
-			dg.AddAttributeError(
-				path.Root(""),
-				fmt.Sprintf("No searchable fields provided for %q resource.", managerName),
-				fmt.Sprintf(
-					"Schema:\n%s\nAt least one of the following fields must be set: %+v",
-					visualization,
-					keys,
-				),
-			)
-		} else {
-			dg.AddAttributeError(
-				path.Root(""),
-				fmt.Sprintf("No searchable fields provided for %q resource.", managerName),
-				fmt.Sprintf(
-					"Schema:\n%s\nNone of the fields are marked as required or searchable in the OpenAPI schema for %q.\n"+
-						"This typically indicates a missing or incomplete schema definition.",
-					visualization,
-					managerName,
-				),
-			)
-		}
-	}
-	return ok
-}
-
-func (r *Resource) checkIntegrity(
-	ctx context.Context,
-	record Record,
-	expected map[string]any,
-) {
-	// Wait consistency of the response.
-	// Mismatched fields are not error state.
-
-	var mismatches []string
-
-	for key, expectedVal := range expected {
-		actualVal, ok := record[key]
-		if !ok {
-			continue // treat missing as consistent
-		}
-
-		expectedVal = normalizeNumber(expectedVal)
-		actualVal = normalizeNumber(actualVal)
-
-		diff, panicked := safeDeepEqual(expectedVal, actualVal)
-		if panicked {
-			tflog.Debug(ctx, fmt.Sprintf("skipping deep.Equal (unhashable) for key: %q", key))
-			continue
-		}
-		if diff != nil {
-			mismatches = append(mismatches, diff...)
-		}
-	}
-
-	if len(mismatches) > 0 {
-		// Most likely it is VMS bug or OpenAPI schema mismatch.
-		//IOW field that should not be marked as available for request are actually marked. (RequestBody model)
-		tflog.Warn(
-			ctx,
-			"Record integrity check failed.",
-		)
-		for _, mismatch := range mismatches {
-			tflog.Warn(ctx, mismatch)
-		}
-	} else {
-		tflog.Debug(
-			ctx,
-			"Record integrity check passed.",
-		)
-	}
-}
-
-// WithRetry wraps fn with retry logic driven by expr.
-// operation is used for log messages (e.g. "CreateResource", "DeleteResource").
-//
-// A retry is attempted when:
-//  1. The call returns an *ApiError whose StatusCode is listed in expr.StatusCodes, AND
-//  2. If expr.BodyContains is non-empty, at least one substring is present in the response body.
-//
-// Any other error type is returned immediately without retrying.
-func WithRetry[T any](
-	expr *is.RetryExpression,
-	operation, managerName string,
-	fn func(context.Context, *VMSRest) (T, error),
-) func(context.Context, *VMSRest) (T, error) {
-	return func(ctx context.Context, rest *VMSRest) (T, error) {
-		return retryOnExpression(ctx, expr, operation, managerName, func() (T, error) {
-			return fn(ctx, rest)
-		})
-	}
-}
-
-// retryOnExpression retries fn when it returns an error matching expr.
-func retryOnExpression[T any](
-	ctx context.Context,
-	expr *is.RetryExpression,
-	operation string,
-	scope string,
-	fn func() (T, error),
-) (T, error) {
-	var zero T
-	maxAttempts := expr.Times
-	if maxAttempts <= 0 {
-		maxAttempts = defaultRetryTimes
-	}
-	sleepSecs := expr.SleepSeconds
-	if sleepSecs <= 0 {
-		sleepSecs = defaultRetrySleepSeconds
-	}
-
-	var lastErr error
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		result, err := fn()
-		if err == nil {
-			if attempt > 1 {
-				tflog.Info(ctx, fmt.Sprintf(
-					"%s[%s]: succeeded on attempt %d/%d.",
-					operation, scope, attempt, maxAttempts,
-				))
-			}
-			return result, nil
-		}
-
-		lastErr = err
-		if !shouldRetry(expr, err) {
-			return zero, err
-		}
-
-		tflog.Warn(ctx, fmt.Sprintf(
-			"%s[%s]: attempt %d/%d failed (%s), retrying in %ds...",
-			operation, scope, attempt, maxAttempts, err.Error(), sleepSecs,
-		))
-
-		if attempt < maxAttempts {
-			time.Sleep(time.Duration(sleepSecs) * time.Second)
-		}
-	}
-
-	return zero, fmt.Errorf(
-		"%s[%s]: all %d attempts failed, last error: %w",
-		operation, scope, maxAttempts, lastErr,
-	)
-}
-
-// shouldRetry returns true when err satisfies the retry conditions defined in expr.
-func shouldRetry(expr *is.RetryExpression, err error) bool {
-	if !expectStatusCodes(err, expr.StatusCodes...) {
-		return false
-	}
-
-	if len(expr.BodyContains) == 0 {
-		return true
-	}
-	var apiErr *ApiError
-	if !errors.As(err, &apiErr) {
-		return true
-	}
-	for _, pattern := range expr.BodyContains {
-		if strings.Contains(apiErr.Body, pattern) {
-			return true
-		}
-	}
-	return false
-}
-
-// mergeSubResources calls GetSubResources (if implemented) and merges the
-// returned Record into the main record before FillFromRecord is called.
-// This keeps sub-resource data out of tfstate manipulation: the merged record
-// is the single source used to populate state.
-// manager may be a ResourceManager or a DataSourceManager — only the
-// GetSubResources interface is required.
-//
-// If at least one sub-resource hint declares MinVastVersion, the cluster version
-// is retrieved once (using the process-level cache) and passed to GetSubResources.
-// The implementation is then responsible for using clusterVersion to gate fetches.
-// When no hint uses MinVastVersion, nil is passed — implementations must tolerate nil.
-type hasTFState interface {
-	TfState() *is.TFState
-}
-
-func mergeSubResources(ctx context.Context, manager any, rest *VMSRest, record DisplayableRecord, managerName string) error {
-	if record == nil {
-		return nil
-	}
-
-	var hints *is.TFStateHints
-	if hts, ok := manager.(hasTFState); ok {
-		hints = hts.TfState().Hints
-		if hints == nil || len(hints.SubResources) == 0 {
-			return nil
-		}
-	}
-
-	imp, ok := manager.(GetSubResources)
-	if !ok {
-		return nil
-	}
-
-	// Fetch cluster version exactly once if any hint requires it.
-	// The result is passed into GetSubResources so implementations
-	// don't need to call GetCachedClusterVersion themselves.
-	var clusterVersion *version.Version
-	if hints != nil {
-		for _, sr := range hints.SubResources {
-			if sr.MinVastVersion != nil {
-				v, err := GetCachedClusterVersion(ctx, rest)
-				if err != nil {
-					tflog.Warn(ctx, fmt.Sprintf(
-						"mergeSubResources[%s]: cannot retrieve cluster version for MinVastVersion check: %v",
-						managerName, err,
-					))
-				} else {
-					clusterVersion = v
-				}
-				break
-			}
-		}
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("GetSubResources[%s]: do.", managerName))
-	sub, err := imp.GetSubResources(ctx, rest, record.(Record), clusterVersion)
-	if err != nil {
-		return err
-	}
-	if sub != nil {
-		for k, v := range sub {
-			record.(Record)[k] = v
-		}
-		return nil
-	}
-
-	// GetSubResources returned nil — the trigger is off or fetch was skipped.
-	if rm, ok := manager.(ResourceManager); ok {
-		if h := rm.TfState().Hints; h != nil {
-			for _, sr := range h.SubResources {
-				if sr.SchemaKey != "" {
-					// Nested sub-resource: null the top-level key.
-					record.(Record)[sr.SchemaKey] = nil
-				} else {
-					// Flat sub-resource: null each declared attribute individually.
-					for k := range sr.SchemaAttributes {
-						record.(Record)[k] = nil
-					}
-				}
-			}
-		}
-	}
-	return nil
 }

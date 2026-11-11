@@ -1,16 +1,23 @@
 ## 4.1.0
 
+BREAKING CHANGES:
+
+* **Write-only secrets + `*_md5` fingerprints**: Selected sensitive attributes are now **write-only** and are **removed from Terraform state** on first upgrade. A computed `<field>_md5` fingerprint is stored instead so changes can still be planned. Anyone reading those secrets from state (outputs, remote state data sources, automation) will break — keep the real values in config/variables/secret stores, not state.
+  * Affected (secret cleared from state; `*_md5` kept): `vastdata_administrator_manager.password` (+ `password_retype`), `vastdata_user.password`, `vastdata_manager_password.password`, `vastdata_ldap.bindpw`, `vastdata_active_directory.bindpw`, `vastdata_kerberos_keytab.admin_password`, `vastdata_bgp_config.md5_password`, `vastdata_event_definition_config.smtp_password`, `vastdata_callhome_config` (`proxy_password`, `aws_s3_ak`, `aws_s3_sk`, `cloud_api_key`, `uplink_password`, `uplink_token`), `vastdata_s3_replication_peer` (`access_key`, `secret_key`), `vastdata_support_bundles_queue` (`access_key`, `secret_key`), `vastdata_license.license_key`, `vastdata_certificate` / `vastdata_tls_certificate` / `vastdata_vms_certificate` / `vastdata_s3_certificate` / `vastdata_nfs_certificate` PEM fields, `vastdata_cluster` / `vastdata_cluster_ekm` private-key and cert material.
+
 NEW RESOURCES:
 
 * **vastdata_vms_certificate**: Manage the VMS web/API TLS certificate with write-only PEM certificate and private key.
 * **vastdata_s3_certificate**: Manage the S3 HTTPS endpoint certificate with write-only PEM certificate and private key (VAST 5.4+).
 * **vastdata_nfs_certificate**: Manage the NFSv4 RPC-with-TLS certificate with write-only PEM certificate and private key (VAST 5.4+).
-* **vastdata_vms_network_settings**: Manage VMS network settings (upstream DNS, NTP, gateways, MTUs, hosts, management VIPs) via `/vms/{id}/network_settings/` (TERF-306).
+* **vastdata_callhome_config**: Manage Call Home / Uplink settings (`obfuscated`, `cloud_enabled`, proxy, etc.) via `/callhomeconfigs/{id}/`. Create adopts the existing config (no POST); destroy is a no-op. Optional `uplink_email` / `uplink_password` / `uplink_token` register the cluster with VAST Uplink.
+* **vastdata_license**: Apply and manage capacity license keys via POST/GET/DELETE `/licenses/` (write-only `license_key`).
+* **vastdata_vms_network_settings**: Manage VMS network settings (upstream DNS, NTP, gateways, MTUs, hosts, management VIPs) via `/vms/{id}/network_settings/`.
 
 ENHANCEMENTS:
 
 * **vastdata_cluster**: Removing the resource from configuration or running `terraform destroy` clears Terraform state only and does not call DELETE on the cluster.
-* **vastdata_tenant**: Added optional `delete_local_provider` to remove the VMS auto-created local provider on tenant destroy and on failed create rollback. Looks up the provider by tenant name or `provider-<tenant_name>`; skipped when `local_provider_id` is set in config during create rollback; missing providers are ignored (TERF-278).
+* **vastdata_tenant**: Added optional `delete_local_provider` to remove the VMS auto-created local provider on tenant destroy and on failed create rollback. Looks up the provider by tenant name or `provider-<tenant_name>`; skipped when `local_provider_id` is set in config during create rollback; missing providers are ignored.
 
 ## 4.0.1
 

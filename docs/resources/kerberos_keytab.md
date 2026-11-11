@@ -119,7 +119,9 @@ resource "vastdata_kerberos_keytab" "staging_keytab" {
 
 ### Required
 
-- `admin_password` (String)
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `admin_password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments))
 - `admin_username` (String)
 - `kerberos_id` (Number) ID of the Kerberos configuration
 
@@ -130,6 +132,7 @@ resource "vastdata_kerberos_keytab" "staging_keytab" {
 
 ### Read-Only
 
+- `admin_password_md5` (String) MD5 of admin_password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `service_principals` (Attributes Set) (see [below for nested schema](#nestedatt--service_principals))
 
 <a id="nestedatt--service_principals"></a>

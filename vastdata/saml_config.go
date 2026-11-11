@@ -20,11 +20,11 @@ var SamlConfigSchemaRef = is.NewSchemaReference(
 )
 
 type SamlConfig struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *SamlConfig) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &SamlConfig{tfstate: is.NewTFStateMust(
+	return &SamlConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -44,7 +44,7 @@ func (m *SamlConfig) NewResourceManager(raw map[string]attr.Value, schema any) R
 }
 
 func (m *SamlConfig) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &SamlConfig{tfstate: is.NewTFStateMust(
+	return &SamlConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -63,7 +63,7 @@ func (m *SamlConfig) NewDatasourceManager(raw map[string]attr.Value, schema any)
 	)}
 }
 
-func (m *SamlConfig) TfState() *is.TFState {
+func (m *SamlConfig) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -109,7 +109,7 @@ func (m *SamlConfig) DeleteResource(ctx context.Context, rest *VMSRest) error {
 // needs to be updated with new fields and performs the update if necessary.
 //
 // This is used in both CreateResource and UpdateResource for SamlConfig.
-func ensureSamlConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
+func ensureSamlConfigUpdatedWith(ctx context.Context, stateTs, fieldsTs is.ResourceState, rest *VMSRest) (DisplayableRecord, error) {
 	vmsId := stateTs.Int64("vms_id")
 	if vmsId == 0 {
 		return nil, fmt.Errorf("failed to get VMS ID: VMS ID cannot be 0")

@@ -12,8 +12,7 @@ import (
 var vmsCertificateHints = endpointCertificateHints(
 	"vms_id",
 	"ID of the VMS object (typically 1).",
-	"Installs the VMS web/API TLS certificate via PATCH /vms/{id}/set_certificate/. "+
-		"The PEM certificate and private key are write-only and are never stored in Terraform state.",
+	"Installs the VMS web/API TLS certificate via PATCH /vms/{id}/set_certificate/.",
 	"Manages the **VMS** (web UI / API) TLS certificate.\n\n"+
 		"Uses `PATCH /vms/{id}/set_certificate/` (`ssl_certificate`, `ssl_keyfile`). "+
 		"Destroy is a no-op: removing this resource does not reset the VMS certificate.\n\n"+
@@ -21,14 +20,14 @@ var vmsCertificateHints = endpointCertificateHints(
 )
 
 type VmsCertificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *VmsCertificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
 	return &VmsCertificate{tfstate: newResourceTFState(raw, schema, vmsCertificateHints)}
 }
 
-func (m *VmsCertificate) TfState() *is.TFState {
+func (m *VmsCertificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 
