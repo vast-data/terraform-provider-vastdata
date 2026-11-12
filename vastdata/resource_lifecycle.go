@@ -21,8 +21,8 @@ import (
 //
 // ResourceLifecycle drives a ResourceManager's CRUD hooks (PrepareX / CreateResource /
 // ReadResource / UpdateResource / DeleteResource / AfterX, LookupForCreate,
-// TransformRequestBody, GetSubResources, ...) and the default API-backed behaviour used
-// when a manager does not implement a hook.
+// TransformRequestBody, GetSubResources, UpgradeResourceSchema, ...) and the default
+// API-backed behaviour used when a manager does not implement a hook.
 //
 // It deliberately knows nothing about Terraform: no plan, config, state requests,
 // diagnostics, or tfsdk types. Inputs are managers whose ResourceState is already seeded.
@@ -574,6 +574,7 @@ type ResourceCallbacks struct {
 	afterUpdate   []func(context.Context, ResourceManager, *VMSRest, Record) error
 	prepareDelete []func(context.Context, *VMSRest) error
 	afterDelete   []func(context.Context, *VMSRest) error
+	upgradeSchema []func(ctx context.Context, fromVersion int64, ts *is.TFState) error
 }
 
 var _ ResourceCallbackExecutor = (*ResourceCallbacks)(nil)
@@ -668,6 +669,29 @@ func (c *ResourceCallbacks) ExecuteAfterDeleteResourceCallbacks(ctx context.Cont
 	})
 }
 
+func (c *ResourceCallbacks) AddUpgradeResourceSchemaCallback(fn func(ctx context.Context, fromVersion int64, ts *is.TFState) error) {
+	c.upgradeSchema = append(c.upgradeSchema, fn)
+}
+
+func (c *ResourceCallbacks) ExecuteUpgradeResourceSchemaCallbacks(ctx context.Context, fromVersion int64, ts *is.TFState) error {
+	return runAll(c.upgradeSchema, func(fn func(context.Context, int64, *is.TFState) error) error {
+		return fn(ctx, fromVersion, ts)
+	})
+}
+
+// UpgradeResourceSchema runs the manager's UpgradeResourceSchema hook.
+func (l *ResourceLifecycle) UpgradeResourceSchema(
+	ctx context.Context,
+	fromVersion int64,
+	manager ResourceManager,
+	ts *is.TFState,
+) error {
+	if err := l.runUpgradeResourceSchema(ctx, fromVersion, manager, ts); err != nil {
+		return l.stageErr("UpgradeResourceSchema", err)
+	}
+	return nil
+}
+
 // -----------------
 // Stage runners: the manager's own hook first, then the lifecycle's callbacks.
 // A failing hook is returned immediately, and no callback of that stage runs.
@@ -753,4 +777,18 @@ func (l *ResourceLifecycle) runAfterDeleteResource(ctx context.Context, m Resour
 		}
 	}
 	return l.ExecuteAfterDeleteResourceCallbacks(ctx, l.Rest)
+}
+
+func (l *ResourceLifecycle) runUpgradeResourceSchema(
+	ctx context.Context,
+	fromVersion int64,
+	m ResourceManager,
+	ts *is.TFState,
+) error {
+	if imp, ok := m.(UpgradeResourceSchema); ok {
+		if err := imp.UpgradeResourceSchema(ctx, fromVersion, ts); err != nil {
+			return err
+		}
+	}
+	return l.ExecuteUpgradeResourceSchemaCallbacks(ctx, fromVersion, ts)
 }

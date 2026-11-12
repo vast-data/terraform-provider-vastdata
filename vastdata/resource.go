@@ -12,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/schema_generation"
@@ -23,6 +25,7 @@ const (
 	OpSchema         = "Schema"
 	OpConfigure      = "Configure"
 	OpImportState    = "ImportState"
+	OpUpgradeState   = "UpgradeState"
 	OpCreate         = "Create"
 	OpRead           = "Read"
 	OpUpdate         = "Update"
@@ -59,6 +62,11 @@ func newManagerWithSchemaOnly(ctx context.Context, newManager ResourceFactoryFn)
 	schema, err := schema_generation.GetResourceSchema(ctx, hints)
 	if err != nil {
 		return nil, err
+	}
+	if u, ok := emptyManager.(UpgradeResourceSchema); ok {
+		if v := u.SchemaVersion(); v > schema.Version {
+			schema.Version = v
+		}
 	}
 	// Create a new manager with the schema and empty Raw filled according to schema types
 	// Build a zeroed attr map matching the schema so the state has all keys with Null values
@@ -212,6 +220,19 @@ func (r *Resource) ModifyPlan(ctx context.Context, req resource.ModifyPlanReques
 	withContext(ctx, OpModifyPlan, r.managerName, func(ctx context.Context) {
 		r.modifyPlanImpl(ctx, req, resp)
 	})
+}
+
+// UpgradeState registers schema state upgraders when the resource uses WriteOnly
+// / *_md5 hints and/or implements UpgradeResourceSchema. Prior versions
+// 0..Version-1 each get an upgrader that decodes into the current schema, runs
+// shared WriteOnly migration when applicable, then ResourceLifecycle.UpgradeResourceSchema
+// (manager hook + external callbacks).
+func (r *Resource) UpgradeState(ctx context.Context) map[int64]resource.StateUpgrader {
+	var out map[int64]resource.StateUpgrader
+	withContext(ctx, OpUpgradeState, r.managerName, func(ctx context.Context) {
+		out = r.upgradeStateImpl(ctx)
+	})
+	return out
 }
 
 func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
@@ -608,4 +629,138 @@ func (r *Resource) validateConfigImpl(ctx context.Context, req resource.Validate
 		}
 	}
 
+}
+
+func (r *Resource) upgradeStateImpl(ctx context.Context) map[int64]resource.StateUpgrader {
+	empty := r.EmptyManager()
+	hints := empty.TfState().StateHints()
+	writeOnly := hints != nil && (len(hints.WriteOnlyFields) > 0 || len(hints.WriteOnlyMD5Fields) > 0)
+
+	version := int64(0)
+	if writeOnly {
+		version = 1
+	}
+	if u, ok := empty.(UpgradeResourceSchema); ok {
+		if v := u.SchemaVersion(); v > version {
+			version = v
+		}
+	}
+	if version == 0 {
+		return nil
+	}
+
+	out := make(map[int64]resource.StateUpgrader, version)
+	for from := int64(0); from < version; from++ {
+		fromVersion := from
+		out[fromVersion] = resource.StateUpgrader{
+			StateUpgrader: func(ctx context.Context, req resource.UpgradeStateRequest, resp *resource.UpgradeStateResponse) {
+				withContext(ctx, OpUpgradeState, r.managerName, func(ctx context.Context) {
+					r.upgradeStateFromImpl(ctx, fromVersion, writeOnly, req, resp)
+				})
+			},
+		}
+	}
+	return out
+}
+
+func (r *Resource) upgradeStateFromImpl(
+	ctx context.Context,
+	fromVersion int64,
+	writeOnly bool,
+	req resource.UpgradeStateRequest,
+	resp *resource.UpgradeStateResponse,
+) {
+	if req.RawState == nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("UpgradeState[%s]", r.managerName),
+			"missing prior RawState",
+		)
+		return
+	}
+
+	manager, err := r.ManagerWithSchemaOnly(ctx)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("UpgradeState[%s]: schema", r.managerName),
+			err.Error(),
+		)
+		return
+	}
+
+	sch := manager.TfState().SchemaDefinition().(rschema.Schema)
+	hints := manager.TfState().StateHints()
+
+	rawVal, err := req.RawState.UnmarshalWithOpts(sch.Type().TerraformType(ctx), tfprotov6.UnmarshalOpts{
+		ValueFromJSONOpts: tftypes.ValueFromJSONOpts{IgnoreUndefinedAttributes: true},
+	})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("UpgradeState[%s]: unmarshal prior state", r.managerName),
+			err.Error(),
+		)
+		return
+	}
+
+	attrMap, err := is.FillFrameworkValues(rawVal, sch)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("UpgradeState[%s]: decode prior state", r.managerName),
+			err.Error(),
+		)
+		return
+	}
+
+	// Concrete *TFState: SeedWriteOnlyMD5FromSecrets is upgrade-only and not
+	// part of ResourceState (managers/lifecycle never need it).
+	ts := is.NewTFStateMust(attrMap, sch, hints)
+	if writeOnly {
+		ts.SeedWriteOnlyMD5FromSecrets()
+		ts.ClearWriteOnlyFields()
+	}
+
+	lc := r.lifecycle
+	if lc == nil {
+		// UpgradeState can run before Configure in some hosts/tests; still run
+		// the manager hook via a throwaway lifecycle (no external callbacks).
+		lc = NewResourceLifecycle(nil, r.managerName)
+	}
+	if err := lc.UpgradeResourceSchema(ctx, fromVersion, manager, ts); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("UpgradeState[%s]", r.managerName),
+			err.Error(),
+		)
+		return
+	}
+
+	objType, ok := sch.Type().TerraformType(ctx).(tftypes.Object)
+	if !ok {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("UpgradeState[%s]", r.managerName),
+			fmt.Sprintf("expected object schema type, got %T", sch.Type().TerraformType(ctx)),
+		)
+		return
+	}
+
+	vals := make(map[string]tftypes.Value, len(objType.AttributeTypes))
+	for name, typ := range objType.AttributeTypes {
+		v, present := ts.RawValues()[name]
+		if !present || v == nil {
+			vals[name] = tftypes.NewValue(typ, nil)
+			continue
+		}
+		tv, convErr := v.ToTerraformValue(ctx)
+		if convErr != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("UpgradeState[%s]: encode %q", r.managerName, name),
+				convErr.Error(),
+			)
+			return
+		}
+		vals[name] = tv
+	}
+
+	resp.State = tfsdk.State{
+		Schema: sch,
+		Raw:    tftypes.NewValue(objType, vals),
+	}
 }

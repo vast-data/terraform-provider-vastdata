@@ -5,8 +5,7 @@ go 1.25.0
 require (
 	github.com/ProtonMail/gopenpgp/v2 v2.9.0
 	github.com/fatih/color v1.16.0
-	github.com/getkin/kin-openapi v0.149.0
-	github.com/go-test/deep v1.1.1
+	github.com/getkin/kin-openapi v0.152.0
 	github.com/google/go-cmp v0.7.0
 	github.com/hashicorp/go-version v1.9.0
 	github.com/hashicorp/terraform-plugin-framework v1.15.0
@@ -14,7 +13,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.27.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/stretchr/testify v1.10.0
-	github.com/vast-data/go-vast-client v0.167.0
+	github.com/vast-data/go-vast-client v0.168.0
 )
 
 require (
