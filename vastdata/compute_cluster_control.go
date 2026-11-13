@@ -242,10 +242,11 @@ func computeClusterControlActionSatisfied(state, action string) bool {
 }
 
 func isComputeClusterControlAlreadyAppliedError(err error, action string) bool {
-	if !isApiError(err) {
+	apiErr, ok := asApiError(err)
+	if !ok {
 		return false
 	}
-	body := strings.ToLower(err.(*ApiError).Body)
+	body := strings.ToLower(apiErr.Body)
 	if expectStatusCodes(err, http.StatusBadRequest) {
 		switch action {
 		case "start":

@@ -4,6 +4,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -938,6 +939,51 @@ func TestRetryOnExpression_DeleteRetriesTransient503(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Equal(t, 3, attempts)
+}
+
+func TestRetryOnExpression_RetriesWrappedApiError(t *testing.T) {
+	// Async deletes go through WaitAPICondition, which wraps the API error
+	// with %w. shouldRetry must see through the wrapping instead of panicking.
+	attempts := 0
+	expr := &is.RetryExpression{
+		StatusCodes:  []int{http.StatusServiceUnavailable},
+		Times:        3,
+		SleepSeconds: 0,
+	}
+
+	_, err := retryOnExpression(context.Background(), expr, "Delete", "vastdata_vip_pool", func() (struct{}, error) {
+		attempts++
+		if attempts < 3 {
+			return struct{}{}, fmt.Errorf("WaitAPICondition API call failed: %w",
+				&ApiError{StatusCode: http.StatusServiceUnavailable, Body: "SERVICE_UNAVAILABLE"})
+		}
+		return struct{}{}, nil
+	})
+
+	require.NoError(t, err)
+	require.Equal(t, 3, attempts)
+}
+
+func TestRetryOnExpression_WrappedNonMatchingErrorIsReturned(t *testing.T) {
+	expr := &is.RetryExpression{
+		StatusCodes:  []int{http.StatusServiceUnavailable},
+		Times:        3,
+		SleepSeconds: 0,
+	}
+	wrapped := fmt.Errorf("WaitAPICondition API call failed: %w", &ApiError{StatusCode: http.StatusNotFound})
+
+	attempts := 0
+	_, err := retryOnExpression(context.Background(), expr, "Delete", "vastdata_vip_pool", func() (struct{}, error) {
+		attempts++
+		return struct{}{}, wrapped
+	})
+
+	require.ErrorIs(t, err, wrapped)
+	require.Equal(t, 1, attempts)
+	require.False(t, expectStatusCodes(wrapped, http.StatusServiceUnavailable))
+	require.True(t, expectStatusCodes(wrapped, http.StatusNotFound))
+	require.NoError(t, ignoreStatusCodes(wrapped, http.StatusNotFound))
+	require.Equal(t, wrapped, ignoreStatusCodes(wrapped, http.StatusServiceUnavailable))
 }
 
 func TestRetryOnExpression_DeleteRetriesReplicationPeerProtectionPolicyConflict(t *testing.T) {
