@@ -366,6 +366,13 @@ type AfterDeleteResourceCallbackExecutor interface {
 	ExecuteAfterDeleteResourceCallbacks(context.Context, *VMSRest) error
 }
 
+// UpgradeResourceSchemaCallbackExecutor lets external integrations (e.g. Crossplane)
+// append schema-migration steps after the manager's own UpgradeResourceSchema hook.
+type UpgradeResourceSchemaCallbackExecutor interface {
+	AddUpgradeResourceSchemaCallback(func(ctx context.Context, fromVersion int64, ts *is.TFState) error)
+	ExecuteUpgradeResourceSchemaCallbacks(ctx context.Context, fromVersion int64, ts *is.TFState) error
+}
+
 // ResourceCallbackExecutor is every stage's callback executor.
 type ResourceCallbackExecutor interface {
 	PrepareCreateResourceCallbackExecutor
@@ -376,6 +383,7 @@ type ResourceCallbackExecutor interface {
 	AfterUpdateResourceCallbackExecutor
 	PrepareDeleteResourceCallbackExecutor
 	AfterDeleteResourceCallbackExecutor
+	UpgradeResourceSchemaCallbackExecutor
 }
 
 type ResourceManager interface {
@@ -441,6 +449,20 @@ type MigrateModePassThroughUpdate interface {
 // The `params` type is assumed to be a map[string]any.
 type TransformRequestBody interface {
 	TransformRequestBody(body params) params
+}
+
+// UpgradeResourceSchema lets a resource manager opt into a schema Version bump and
+// supply resource-specific state migration. ResourceLifecycle.UpgradeResourceSchema
+// runs the manager hook first, then any AddUpgradeResourceSchemaCallback listeners
+// (same pattern as Prepare*/After*). Terraform's Resource.UpgradeState uses that
+// lifecycle path after shared WriteOnly / *_md5 handling.
+type UpgradeResourceSchema interface {
+	// SchemaVersion is the Schema.Version for this resource (must be >= 1 to
+	// register state upgraders from prior versions).
+	SchemaVersion() int64
+	// UpgradeResourceSchema migrates decoded prior state to the current schema.
+	// fromVersion is the schema version Terraform is upgrading from.
+	UpgradeResourceSchema(ctx context.Context, fromVersion int64, ts *is.TFState) error
 }
 
 // TransformResponseRecord allows a resource to modify the backend response

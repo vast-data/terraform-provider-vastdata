@@ -1,3 +1,9 @@
+## 4.1.1
+
+BUG FIXES:
+
+* **vastdata_quota**: Stop sending `is_group` inside embedded `user_quotas` / `group_quotas` (VMS upsert fails with `column "is_group" of relation "permissions_userquota" does not exist`).
+
 ## 4.1.0
 
 BREAKING CHANGES:
