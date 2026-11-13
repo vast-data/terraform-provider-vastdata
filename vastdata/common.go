@@ -72,12 +72,45 @@ type (
 )
 
 var (
-	isNotFoundErr     = vast_client.IsNotFoundErr
-	ignoreNotFound    = vast_client.IgnoreNotFound
-	ignoreStatusCodes = vast_client.IgnoreStatusCodes
-	expectStatusCodes = vast_client.ExpectStatusCodes
-	isApiError        = vast_client.IsApiError
+	isNotFoundErr  = vast_client.IsNotFoundErr
+	ignoreNotFound = vast_client.IgnoreNotFound
+	isApiError     = vast_client.IsApiError
 )
+
+// asApiError returns the *ApiError in err's chain, if any. API errors are
+// often wrapped (for example by WaitAPICondition when an async task fails),
+// so a direct err.(*ApiError) assertion can panic even when isApiError is true.
+func asApiError(err error) (*ApiError, bool) {
+	var apiErr *ApiError
+	if errors.As(err, &apiErr) {
+		return apiErr, true
+	}
+	return nil, false
+}
+
+// ignoreStatusCodes returns nil when err is an API error (possibly wrapped)
+// with one of the given status codes, and err otherwise.
+func ignoreStatusCodes(err error, codes ...int) error {
+	if expectStatusCodes(err, codes...) {
+		return nil
+	}
+	return err
+}
+
+// expectStatusCodes reports whether err is an API error (possibly wrapped)
+// with one of the given status codes.
+func expectStatusCodes(err error, codes ...int) bool {
+	apiErr, ok := asApiError(err)
+	if !ok {
+		return false
+	}
+	for _, code := range codes {
+		if apiErr.StatusCode == code {
+			return true
+		}
+	}
+	return false
+}
 
 type ForceCleanState struct{}
 

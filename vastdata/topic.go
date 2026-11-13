@@ -53,8 +53,8 @@ func (m *Topic) API(rest *VMSRest) VastResourceAPIWithContext {
 func (m *Topic) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams, _ := m.tfstate.SetIfAvailable("database_name", "name")
 	record, err := rest.Topics.TopicShowWithContext_GET(ctx, searchParams)
-	if isApiError(err) {
-		if strings.Contains(err.(*ApiError).Body, "UNKNOWN_TOPIC_OR_PARTITION") {
+	if apiErr, ok := asApiError(err); ok {
+		if strings.Contains(apiErr.Body, "UNKNOWN_TOPIC_OR_PARTITION") {
 			return nil, nil
 		}
 	}
