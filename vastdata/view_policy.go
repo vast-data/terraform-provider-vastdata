@@ -16,11 +16,11 @@ var ViewPolicySchemaRef = is.NewSchemaReference(
 )
 
 type ViewPolicy struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ViewPolicy) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ViewPolicy{tfstate: is.NewTFStateMust(
+	return &ViewPolicy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -50,7 +50,7 @@ func (m *ViewPolicy) NewResourceManager(raw map[string]attr.Value, schema any) R
 }
 
 func (m *ViewPolicy) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ViewPolicy{tfstate: is.NewTFStateMust(
+	return &ViewPolicy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -59,7 +59,7 @@ func (m *ViewPolicy) NewDatasourceManager(raw map[string]attr.Value, schema any)
 	}
 }
 
-func (m *ViewPolicy) TfState() *is.TFState {
+func (m *ViewPolicy) TfState() is.ResourceState {
 	return m.tfstate
 }
 

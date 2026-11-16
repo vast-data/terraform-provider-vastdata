@@ -91,11 +91,13 @@ resource "vastdata_ldap" "vastdb_ldap" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `abac_read_only_value_name` (String) The attribute to use when querying a provider for a read only attribute access check.
 - `abac_read_write_value_name` (String) The attribute to use when querying a provider for a read-write attribute access check.
 - `advanced_filter` (String) Use this parameter to specify manual filters for the BaseDN. This is useful when accounts are distributed across OUs and the baseDN needs to be wide to include all accounts, while there are also accounts that you would like to exclude from user queries.
 - `binddn` (String) The bind DN for authenticating to the LDAP domain. You can specify any user account that has read access to the domain.
-- `bindpw` (String) The password used with the Bind DN to authenticate to the LDAP server.
+- `bindpw` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The password used with the Bind DN to authenticate to the LDAP server.
 - `domain_name` (String) FQDN of Active Directory domain. Must be resolvable in DNS.
 - `domains_with_posix_attributes` (Set of String) Allows to enumerate specific domains for POSIX attributes
 in case posix_attributes_source is set to SPECIFIC_DOMAINS.
@@ -136,6 +138,7 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 
 - `active_directory` (String)
 - `active_directory_id` (Number)
+- `bindpw_md5` (String) MD5 of bindpw (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `guid` (String)
 - `id` (Number) The ID of this resource.
 - `posix_primary_provider` (Boolean) POSIX primary provider

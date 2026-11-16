@@ -4,6 +4,8 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"sort"
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -106,6 +108,9 @@ var allTFComponents = []TFManager{
 	&VmsCertificate{},
 	&S3Certificate{},
 	&NfsCertificate{},
+	&License{},
+	&CallhomeConfig{},
+	&VmsNetworkSettings{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
@@ -155,6 +160,54 @@ func GetDatasourceFactories() []func() datasource.DataSource {
 
 }
 
+// -----------------
+// Runtime-agnostic registry
+// -----------------
+
+// ResourceManagerPrototypes returns every component that can be managed as a resource,
+// keyed by its snake_case name (for example "vip_pool"). The returned managers are
+// prototypes: use NewResourceManagerByName to obtain a usable manager.
+//
+// This is the same component list Terraform registers via GetResourceFactories, so any
+// other runtime (e.g. Crossplane) automatically sees the same set of resources.
+// The map is built once and then shared, so callers must not modify it.
+var ResourceManagerPrototypes = cached(resourceManagerPrototypes)
+
+func resourceManagerPrototypes() map[string]ResourceManager {
+	out := make(map[string]ResourceManager)
+	for _, f := range allTFComponents {
+		if manager, ok := f.(ResourceManager); ok {
+			out[is.SnakeCaseName(f)] = manager
+		}
+	}
+	return out
+}
+
+// ResourceNames returns the registry names of every resource the provider manages,
+// sorted. It is exactly the set of resources the Terraform provider exposes.
+var ResourceNames = cached(resourceNames)
+
+func resourceNames() []string {
+	protos := ResourceManagerPrototypes()
+	names := make([]string, 0, len(protos))
+	for name := range protos {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return names
+}
+
+// NewResourceManagerByName builds a manager for the named resource. Its state carries the
+// generated schema and a zeroed (all-null) attribute map, ready to be seeded by the caller.
+// No Terraform request/response types are involved.
+func NewResourceManagerByName(ctx context.Context, name string) (ResourceManager, error) {
+	prototype, ok := ResourceManagerPrototypes()[name]
+	if !ok {
+		return nil, fmt.Errorf("unknown resource %q", name)
+	}
+	return newManagerWithSchemaOnly(ctx, prototype.NewResourceManager)
+}
+
 type ResourceFactoryFn func(raw map[string]attr.Value, schema any) ResourceManager
 type DatasourceFactoryFn func(raw map[string]attr.Value, schema any) DataSourceManager
 
@@ -172,7 +225,7 @@ type VastAPIGetter interface {
 
 type TFManager interface {
 	VastAPIGetter
-	TfState() *is.TFState
+	TfState() is.ResourceState
 }
 
 type PrepareImportResourceState interface {
@@ -257,6 +310,82 @@ type AfterDeleteResource interface {
 	AfterDeleteResource(context.Context, *VMSRest) error
 }
 
+// -----------------
+// Resource callbacks
+// -----------------
+//
+// A callback is an extra function attached to a manager instance from outside, e.g. by the
+// Crossplane provider. Each Prepare*/After* stage of Create, Read, Update and Delete first
+// runs the manager's own hook when it implements one. If that hook fails, its error is
+// returned and no callback runs. The callbacks then run in the order they were added, and
+// the first error stops the rest.
+//
+// Callbacks are not hooks: a manager does not implement PrepareCreateResource just because
+// a callback is added for that stage, so defaults that depend on the resource's own hook
+// (e.g. edit-only fields handled by the default After* behaviour) are not affected.
+
+type PrepareCreateResourceCallbackExecutor interface {
+	AddPrepareCreateResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareCreateResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterCreateResourceCallbackExecutor interface {
+	AddAfterCreateResourceCallback(func(context.Context, *VMSRest, Record) error)
+	ExecuteAfterCreateResourceCallbacks(context.Context, *VMSRest, Record) error
+}
+
+type PrepareReadResourceCallbackExecutor interface {
+	AddPrepareReadResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareReadResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterReadResourceCallbackExecutor interface {
+	AddAfterReadResourceCallback(func(context.Context, *VMSRest) error)
+	ExecuteAfterReadResourceCallbacks(context.Context, *VMSRest) error
+}
+
+// PrepareUpdateResourceCallbackExecutor callbacks receive the desired manager.
+type PrepareUpdateResourceCallbackExecutor interface {
+	AddPrepareUpdateResourceCallback(func(context.Context, ResourceManager, *VMSRest) error)
+	ExecutePrepareUpdateResourceCallbacks(context.Context, ResourceManager, *VMSRest) error
+}
+
+// AfterUpdateResourceCallbackExecutor callbacks receive the desired manager.
+type AfterUpdateResourceCallbackExecutor interface {
+	AddAfterUpdateResourceCallback(func(context.Context, ResourceManager, *VMSRest, Record) error)
+	ExecuteAfterUpdateResourceCallbacks(context.Context, ResourceManager, *VMSRest, Record) error
+}
+
+type PrepareDeleteResourceCallbackExecutor interface {
+	AddPrepareDeleteResourceCallback(func(context.Context, *VMSRest) error)
+	ExecutePrepareDeleteResourceCallbacks(context.Context, *VMSRest) error
+}
+
+type AfterDeleteResourceCallbackExecutor interface {
+	AddAfterDeleteResourceCallback(func(context.Context, *VMSRest) error)
+	ExecuteAfterDeleteResourceCallbacks(context.Context, *VMSRest) error
+}
+
+// UpgradeResourceSchemaCallbackExecutor lets external integrations (e.g. Crossplane)
+// append schema-migration steps after the manager's own UpgradeResourceSchema hook.
+type UpgradeResourceSchemaCallbackExecutor interface {
+	AddUpgradeResourceSchemaCallback(func(ctx context.Context, fromVersion int64, ts *is.TFState) error)
+	ExecuteUpgradeResourceSchemaCallbacks(ctx context.Context, fromVersion int64, ts *is.TFState) error
+}
+
+// ResourceCallbackExecutor is every stage's callback executor.
+type ResourceCallbackExecutor interface {
+	PrepareCreateResourceCallbackExecutor
+	AfterCreateResourceCallbackExecutor
+	PrepareReadResourceCallbackExecutor
+	AfterReadResourceCallbackExecutor
+	PrepareUpdateResourceCallbackExecutor
+	AfterUpdateResourceCallbackExecutor
+	PrepareDeleteResourceCallbackExecutor
+	AfterDeleteResourceCallbackExecutor
+	UpgradeResourceSchemaCallbackExecutor
+}
+
 type ResourceManager interface {
 	TFManager
 	NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager
@@ -320,6 +449,20 @@ type MigrateModePassThroughUpdate interface {
 // The `params` type is assumed to be a map[string]any.
 type TransformRequestBody interface {
 	TransformRequestBody(body params) params
+}
+
+// UpgradeResourceSchema lets a resource manager opt into a schema Version bump and
+// supply resource-specific state migration. ResourceLifecycle.UpgradeResourceSchema
+// runs the manager hook first, then any AddUpgradeResourceSchemaCallback listeners
+// (same pattern as Prepare*/After*). Terraform's Resource.UpgradeState uses that
+// lifecycle path after shared WriteOnly / *_md5 handling.
+type UpgradeResourceSchema interface {
+	// SchemaVersion is the Schema.Version for this resource (must be >= 1 to
+	// register state upgraders from prior versions).
+	SchemaVersion() int64
+	// UpgradeResourceSchema migrates decoded prior state to the current schema.
+	// fromVersion is the schema version Terraform is upgrading from.
+	UpgradeResourceSchema(ctx context.Context, fromVersion int64, ts *is.TFState) error
 }
 
 // TransformResponseRecord allows a resource to modify the backend response

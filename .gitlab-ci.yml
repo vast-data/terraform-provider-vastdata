@@ -18,6 +18,9 @@ image: 110450271409.dkr.ecr.eu-west-1.amazonaws.com/dev/terraform-plugin:CI-2025
 variables:
   ORION_BRANCH: SKIPCI/vlad/terraform_check_drifts
   INSTALL_IMAGE: "prev_version"
+  # go.mod / go-vast-client require Go >= 1.25; CI image ships 1.24 with
+  # GOTOOLCHAIN=local, which would refuse to run. Allow downloading the toolchain.
+  GOTOOLCHAIN: "auto"
 
 
 build_terraform_provider: &build_terraform_provider

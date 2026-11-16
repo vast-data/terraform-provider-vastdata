@@ -17,11 +17,11 @@ var SupportedDriversSchemaRef = is.NewSchemaReference(
 )
 
 type SupportedDrives struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *SupportedDrives) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &SupportedDrives{tfstate: is.NewTFStateMust(
+	return &SupportedDrives{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -33,7 +33,7 @@ func (m *SupportedDrives) NewResourceManager(raw map[string]attr.Value, schema a
 }
 
 func (m *SupportedDrives) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &SupportedDrives{tfstate: is.NewTFStateMust(
+	return &SupportedDrives{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -44,7 +44,7 @@ func (m *SupportedDrives) NewDatasourceManager(raw map[string]attr.Value, schema
 	)}
 }
 
-func (m *SupportedDrives) TfState() *is.TFState {
+func (m *SupportedDrives) TfState() is.ResourceState {
 	return m.tfstate
 }
 

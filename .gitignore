@@ -34,6 +34,8 @@ go.work.sum
 .env
 /artifacts/
 /venv/
+/terraform.tfstate
+/terraform.tfstate.backup
 /examples/terraform.tfstate
 /examples/terraform.tfstate.backup
 

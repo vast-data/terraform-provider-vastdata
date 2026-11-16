@@ -22,11 +22,11 @@ var UserTenantDataSchemaRef = is.NewSchemaReference(
 )
 
 type UserTenantData struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *UserTenantData) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &UserTenantData{tfstate: is.NewTFStateMust(
+	return &UserTenantData{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -48,7 +48,7 @@ func (m *UserTenantData) NewResourceManager(raw map[string]attr.Value, schema an
 }
 
 func (m *UserTenantData) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &UserTenantData{tfstate: is.NewTFStateMust(
+	return &UserTenantData{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -63,7 +63,7 @@ func (m *UserTenantData) NewDatasourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *UserTenantData) TfState() *is.TFState {
+func (m *UserTenantData) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -107,7 +107,7 @@ func (m *UserTenantData) DeleteResource(ctx context.Context, rest *VMSRest) erro
 // needs to be updated with new fields and performs the update if necessary.
 //
 // This is used in both CreateResource and UpdateResource for UserTenantData.
-func ensureUserTenantDataUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
+func ensureUserTenantDataUpdatedWith(ctx context.Context, stateTs, fieldsTs is.ResourceState, rest *VMSRest) (DisplayableRecord, error) {
 	// Get user ID from tfstate
 	userID := stateTs.Int64("user_id")
 	if userID == 0 {

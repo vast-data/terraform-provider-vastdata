@@ -35,16 +35,20 @@ resource "vastdata_tls_certificate" "vastdb_tls_cert_with_crl" {
 
 ### Required
 
-- `ca_certificate_file` (String, Sensitive) CA certificate content (PEM/DER). Uploaded as a file to POST /tlscertificates/.
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `ca_certificate_file` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) CA certificate content (PEM/DER). Uploaded as a file to POST /tlscertificates/.
 
 ### Optional
+
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
 
 - `ca_certificate_name` (String)
 - `ca_certificate_uploaded` (String)
 - `created` (String)
 - `expires_on` (String)
 - `protocols` (Set of String) Protocols for this tls certificate.
-- `revocation_file` (String, Sensitive) Certificate Revocation List (CRL) content. When cleared, the CRL is deleted via DELETE /tlscertificates/{id}/crl/.
+- `revocation_file` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Certificate Revocation List (CRL) content.
 - `revocations_exist` (Boolean)
 - `revocations_expire_on` (String)
 - `revocations_name` (String)
@@ -55,7 +59,9 @@ resource "vastdata_tls_certificate" "vastdb_tls_cert_with_crl" {
 
 ### Read-Only
 
+- `ca_certificate_file_md5` (String) MD5 of ca_certificate_file (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `id` (Number) The ID of this resource.
+- `revocation_file_md5` (String) MD5 of revocation_file (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 
 <a id="nestedatt--tenant"></a>
 ### Nested Schema for `tenant`

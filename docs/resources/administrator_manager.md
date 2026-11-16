@@ -81,16 +81,21 @@ resource "vastdata_administrator_manager" "vastdb_manager" {
 
 ### Required
 
-- `password` (String, Sensitive) Manager's password
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Manager's password
 - `roles` (Set of Number) Joins manager to specified roles. Specify as an array of role IDs, separated by commas.
 - `username` (String) Manager's user name
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `first_name` (String) Manager's first name
 - `is_temporary_password` (Boolean) Sets the password to be temporary. Expiration of temporary passwords is controlled by the tmp_pwd_expiration_timeout setting, which you can modify and retrieve through the /vms/{id}/pwd_settings/ path.
 - `last_name` (String) Manager's last name
 - `password_expiration_disabled` (Boolean) Password expiration is disabled
+- `password_retype` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Retype the password
 - `permissions_list` (Set of String) Specify permissions list as an array of permission codenames in the format PERMISSION-REALM.
 To list permission codenames, run /permissions/get.
 - `tenant_id` (Number) Tenant ID. If user_type is TENANT_ADMIN, specify the ID of the tenant to which to grant admin access.
@@ -106,7 +111,7 @@ To list permission codenames, run /permissions/get.
 - `is_default` (Boolean) Sets the manager to be the default manager
 - `last_login` (String) Last login time
 - `password_expiration` (String) Password expiration
-- `password_retype` (String) Retype the password
+- `password_md5` (String) MD5 of password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `tenant` (Attributes) (see [below for nested schema](#nestedatt--tenant))
 
 <a id="nestedatt--tenant"></a>

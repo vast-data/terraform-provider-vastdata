@@ -32,11 +32,11 @@ var quotaGroupActionFields = []string{
 }
 
 type QuotaGroup struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *QuotaGroup) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &QuotaGroup{tfstate: is.NewTFStateMust(
+	return &QuotaGroup{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -83,7 +83,7 @@ func (m *QuotaGroup) NewResourceManager(raw map[string]attr.Value, schema any) R
 }
 
 func (m *QuotaGroup) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &QuotaGroup{tfstate: is.NewTFStateMust(
+	return &QuotaGroup{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -107,7 +107,7 @@ func (m *QuotaGroup) NewDatasourceManager(raw map[string]attr.Value, schema any)
 	}
 }
 
-func (m *QuotaGroup) TfState() *is.TFState {
+func (m *QuotaGroup) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -146,7 +146,7 @@ func (m *QuotaGroup) TransformRequestBody(body params) params {
 
 // runActions calls assign_quotas, refresh_user_quotas, and reset_grace_period
 // endpoints when their corresponding trigger fields are set.
-func (m *QuotaGroup) runActions(ctx context.Context, rest *VMSRest, ts *is.TFState, record Record) error {
+func (m *QuotaGroup) runActions(ctx context.Context, rest *VMSRest, ts is.ResourceState, record Record) error {
 	id := record.RecordID()
 
 	// Assign quotas when quotas_ids is provided.

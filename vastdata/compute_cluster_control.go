@@ -14,9 +14,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 // ComputeClusterControl is a custom action resource that triggers lifecycle
@@ -28,14 +28,14 @@ import (
 // All fields are RequiresReplace so any change to action or id will destroy
 // the old "execution" and re-trigger the new one.
 type ComputeClusterControl struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 // stop/start transitions can run up to ~35 minutes (VTask timeout_in_seconds: 2100).
 var computeClusterControlAsyncTaskTimeout = 40 * time.Minute
 
 func (m *ComputeClusterControl) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ComputeClusterControl{tfstate: is.NewTFStateMust(
+	return &ComputeClusterControl{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -105,7 +105,7 @@ func (m *ComputeClusterControl) NewResourceManager(raw map[string]attr.Value, sc
 	)}
 }
 
-func (m *ComputeClusterControl) TfState() *is.TFState {
+func (m *ComputeClusterControl) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -155,7 +155,7 @@ func (m *ComputeClusterControl) performAction(ctx context.Context, rest *VMSRest
 		}
 		state, _ := cluster["state"].(string)
 		if computeClusterControlActionSatisfied(state, action) {
-			tflog.Debug(ctx, fmt.Sprintf(
+			logging.Debug(ctx, fmt.Sprintf(
 				"ComputeClusterControl: skipping %q on cluster %d — already %s",
 				action, id, state,
 			))
@@ -220,7 +220,7 @@ func (m *ComputeClusterControl) performAction(ctx context.Context, rest *VMSRest
 	}
 
 	if err != nil && isComputeClusterControlAlreadyAppliedError(err, action) {
-		tflog.Debug(ctx, fmt.Sprintf(
+		logging.Debug(ctx, fmt.Sprintf(
 			"ComputeClusterControl: treating %q on cluster %d as no-op — %v",
 			action, id, err,
 		))

@@ -70,11 +70,11 @@ var viewS3CorsSubResource = is.SubResourceHint{
 }
 
 type View struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &View{tfstate: is.NewTFStateMust(
+	return &View{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -111,7 +111,7 @@ func (m *View) NewResourceManager(raw map[string]attr.Value, schema any) Resourc
 }
 
 func (m *View) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &View{tfstate: is.NewTFStateMust(
+	return &View{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -121,7 +121,7 @@ func (m *View) NewDatasourceManager(raw map[string]attr.Value, schema any) DataS
 	}
 }
 
-func (m *View) TfState() *is.TFState {
+func (m *View) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -223,7 +223,7 @@ func (m *View) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource
 		return nil
 	}
 
-	rawCors, hasCors := planView.tfstate.Raw["s3cors_configuration"]
+	rawCors, hasCors := planView.tfstate.RawValues()["s3cors_configuration"]
 	if !hasCors || rawCors.IsNull() || rawCors.IsUnknown() {
 		// Only delete when prior state actually had CORS configured.
 		// Otherwise every update of a view without CORS would hit DELETE
@@ -279,7 +279,7 @@ func isS3View(record Record) bool {
 
 // hasCorsConfigured reports whether s3cors_configuration is present and non-null in tfstate.
 func (m *View) hasCorsConfigured() bool {
-	return m.tfstate != nil && m.tfstate.Enabled && m.tfstate.IsKnownAndNotNull("s3cors_configuration")
+	return m.tfstate != nil && m.tfstate.IsEnabled() && m.tfstate.IsKnownAndNotNull("s3cors_configuration")
 }
 
 // corsBody converts the s3cors_configuration from tfstate into a params map
@@ -287,7 +287,7 @@ func (m *View) hasCorsConfigured() bool {
 // Returns (nil, false) when s3cors_configuration is absent/null,
 // (nil, true) when present but has no rules, and (body, true) otherwise.
 func (m *View) corsBody() (params, bool) {
-	rawCors, hasCors := m.tfstate.Raw["s3cors_configuration"]
+	rawCors, hasCors := m.tfstate.RawValues()["s3cors_configuration"]
 	if !hasCors || rawCors.IsNull() || rawCors.IsUnknown() {
 		return nil, false
 	}

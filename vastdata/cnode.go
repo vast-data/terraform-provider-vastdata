@@ -16,11 +16,11 @@ var CnodeSchemaRef = is.NewSchemaReference(
 )
 
 type Cnode struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Cnode) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Cnode{tfstate: is.NewTFStateMust(
+	return &Cnode{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -31,7 +31,7 @@ func (m *Cnode) NewResourceManager(raw map[string]attr.Value, schema any) Resour
 }
 
 func (m *Cnode) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Cnode{tfstate: is.NewTFStateMust(
+	return &Cnode{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -40,7 +40,7 @@ func (m *Cnode) NewDatasourceManager(raw map[string]attr.Value, schema any) Data
 	)}
 }
 
-func (m *Cnode) TfState() *is.TFState {
+func (m *Cnode) TfState() is.ResourceState {
 	return m.tfstate
 }
 

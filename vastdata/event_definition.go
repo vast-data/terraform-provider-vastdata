@@ -3,8 +3,9 @@ package provider
 
 import (
 	"context"
-	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"net/http"
+
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -19,11 +20,11 @@ var EventDefinitionSchemaRef = is.NewSchemaReference(
 )
 
 type EventDefinition struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *EventDefinition) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &EventDefinition{tfstate: is.NewTFStateMust(
+	return &EventDefinition{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -44,7 +45,7 @@ func (m *EventDefinition) NewResourceManager(raw map[string]attr.Value, schema a
 }
 
 func (m *EventDefinition) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &EventDefinition{tfstate: is.NewTFStateMust(
+	return &EventDefinition{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -59,7 +60,7 @@ func (m *EventDefinition) NewDatasourceManager(raw map[string]attr.Value, schema
 	)}
 }
 
-func (m *EventDefinition) TfState() *is.TFState {
+func (m *EventDefinition) TfState() is.ResourceState {
 	return m.tfstate
 }
 

@@ -18,11 +18,11 @@ var ProtectionPolicySchemaRef = is.NewSchemaReference(
 )
 
 type ProtectionPolicy struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ProtectionPolicy) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ProtectionPolicy{tfstate: is.NewTFStateMust(
+	return &ProtectionPolicy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -66,7 +66,7 @@ func (m *ProtectionPolicy) NewResourceManager(raw map[string]attr.Value, schema 
 }
 
 func (m *ProtectionPolicy) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ProtectionPolicy{tfstate: is.NewTFStateMust(
+	return &ProtectionPolicy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -103,7 +103,7 @@ func (m *ProtectionPolicy) NewDatasourceManager(raw map[string]attr.Value, schem
 	)}
 }
 
-func (m *ProtectionPolicy) TfState() *is.TFState {
+func (m *ProtectionPolicy) TfState() is.ResourceState {
 	return m.tfstate
 }
 

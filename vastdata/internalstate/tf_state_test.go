@@ -10,7 +10,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/stretchr/testify/assert"
@@ -1036,6 +1038,37 @@ func TestTFState_CopyKnownFieldsTo_SkipsNullComputedFields(t *testing.T) {
 		"required should be updated from plan")
 }
 
+// TERF-320: clearing an optional write-only secret nulls its *_md5 in the plan;
+// that null must overwrite the prior fingerprint in state.
+func TestTFState_CopyKnownFieldsTo_ClearsWriteOnlyMD5Companions(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":                  rschema.Int64Attribute{Optional: true, Computed: true},
+		"revocation_file":     rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"revocation_file_md5": rschema.StringAttribute{Computed: true},
+	}}
+	hints := &TFStateHints{
+		WriteOnlyFields:    []string{"revocation_file"},
+		WriteOnlyMD5Fields: []string{"revocation_file"},
+	}
+
+	plan := NewTFStateMust(map[string]attr.Value{
+		"id":                  types.Int64Null(),
+		"revocation_file":     types.StringNull(),
+		"revocation_file_md5": types.StringNull(),
+	}, schema, hints)
+	state := NewTFStateMust(map[string]attr.Value{
+		"id":                  types.Int64Value(1),
+		"revocation_file":     types.StringNull(),
+		"revocation_file_md5": types.StringValue("66dac1f56349274cf9f37e2068b32eee"),
+	}, schema, hints)
+
+	plan.CopyKnownFieldsTo(state)
+
+	assert.Equal(t, int64(1), state.Raw["id"].(types.Int64).ValueInt64())
+	assert.True(t, state.Raw["revocation_file_md5"].IsNull(),
+		"revocation_file_md5 must be cleared when removed from config")
+}
+
 // TestTFState_CopyKnownFieldsTo_CopiesNonNullComputedFields verifies that non-null
 // computed fields ARE copied (user-specified values should be preserved).
 func TestTFState_CopyKnownFieldsTo_CopiesNonNullComputedFields(t *testing.T) {
@@ -1391,6 +1424,7 @@ func TestGetGenericSearchParams(t *testing.T) {
 			"guid": "abc-def",
 		}, got)
 	})
+
 }
 
 func TestGetSearchParams_BothGenericAndReadOnly(t *testing.T) {
@@ -2899,6 +2933,32 @@ func TestGetCreateParams_WithOptionalWriteOnlyFields(t *testing.T) {
 	assert.Equal(t, "secret", result["password"])
 }
 
+func TestSeedWriteOnlyMD5FromSecrets(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"password":        rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"password_retype": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"password_md5":    rschema.StringAttribute{Computed: true},
+	}}
+	ts := NewTFStateMust(map[string]attr.Value{
+		"password":        types.StringValue("secret"),
+		"password_retype": types.StringValue("secret"),
+		"password_md5":    types.StringNull(),
+	}, schema, &TFStateHints{
+		WriteOnlyFields:    []string{"password", "password_retype"},
+		WriteOnlyMD5Fields: []string{"password"},
+	})
+
+	ts.SeedWriteOnlyMD5FromSecrets()
+	assert.Equal(t, contentMD5Hex("secret"), ts.String("password_md5"))
+	assert.Equal(t, "secret", ts.String("password"), "secret must remain until ClearWriteOnlyFields")
+
+	// Existing md5 must not be overwritten.
+	ts.Raw["password_md5"] = types.StringValue("already-set")
+	ts.Raw["password"] = types.StringValue("other")
+	ts.SeedWriteOnlyMD5FromSecrets()
+	assert.Equal(t, "already-set", ts.String("password_md5"))
+}
+
 func TestClearWriteOnlyFields(t *testing.T) {
 	t.Parallel()
 
@@ -2926,6 +2986,155 @@ func TestClearWriteOnlyFields(t *testing.T) {
 	assert.NotContains(t, create, "certificate")
 	assert.NotContains(t, create, "private_key")
 	assert.Equal(t, "c", create["name"])
+}
+
+// TERF-315: write-only secrets overlaid from Config always look "changed"
+// (plan=value, state=null). Gate them on <field>_md5 so unrelated updates
+// do not re-send the secret.
+func TestGetUpdateParams_OmitsWriteOnlyUnlessMD5Changed(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{
+		Attributes: map[string]rschema.Attribute{
+			"id":              rschema.Int64Attribute{Optional: true},
+			"username":        rschema.StringAttribute{Optional: true},
+			"password":        rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_retype": rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+			"password_md5":    rschema.StringAttribute{Computed: true},
+		},
+	}
+	hints := &TFStateHints{
+		WriteOnlyFields:    []string{"password", "password_retype"},
+		WriteOnlyMD5Fields: []string{"password"},
+		SensitiveFields:    []string{"password", "password_retype"},
+	}
+
+	md5Same := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	md5New := "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+	currentState := NewTFStateMust(map[string]attr.Value{
+		"id":              types.Int64Value(1),
+		"username":        types.StringValue("admin"),
+		"password":        types.StringNull(),
+		"password_retype": types.StringNull(),
+		"password_md5":    types.StringValue(md5Same),
+	}, schema, hints)
+
+	t.Run("md5 unchanged omits secrets", func(t *testing.T) {
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin-renamed"),
+			"password":        types.StringValue("secret"), // overlaid from config
+			"password_retype": types.StringValue("secret"),
+			"password_md5":    types.StringValue(md5Same),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(currentState)
+		assert.Contains(t, updateParams, "username")
+		assert.Equal(t, "admin-renamed", updateParams["username"])
+		assert.NotContains(t, updateParams, "password", "unchanged password_md5 must not re-send password")
+		assert.NotContains(t, updateParams, "password_retype", "companion write-only must also be omitted")
+		assert.NotContains(t, updateParams, "password_md5")
+	})
+
+	t.Run("md5 changed includes secrets", func(t *testing.T) {
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("new-secret"),
+			"password_retype": types.StringValue("new-secret"),
+			"password_md5":    types.StringValue(md5New),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(currentState)
+		assert.Contains(t, updateParams, "password")
+		assert.Equal(t, "new-secret", updateParams["password"])
+		assert.Contains(t, updateParams, "password_retype")
+		assert.Equal(t, "new-secret", updateParams["password_retype"])
+	})
+
+	t.Run("md5 cleared does not re-send secrets", func(t *testing.T) {
+		// TERF-320: clearing *_md5 must plan an update, but must not re-send
+		// unrelated write-only fields (e.g. ca_certificate_file as non-file JSON).
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("secret"), // overlaid from config
+			"password_retype": types.StringValue("secret"),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+
+		assert.False(t, planState.writeOnlyMD5Changed(currentState))
+		updateParams := planState.GetUpdateParams(currentState)
+		assert.NotContains(t, updateParams, "password")
+		assert.NotContains(t, updateParams, "password_retype")
+	})
+
+	t.Run("md5 newly set after import includes secrets", func(t *testing.T) {
+		importedState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringNull(),
+			"password_retype": types.StringNull(),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("from-config"),
+			"password_retype": types.StringValue("from-config"),
+			"password_md5":    types.StringValue(md5New),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(importedState)
+		assert.Contains(t, updateParams, "password")
+		assert.Contains(t, updateParams, "password_retype")
+	})
+
+	t.Run("upgrade seeds md5 without re-sending unchanged password", func(t *testing.T) {
+		// Pre-WriteOnly state still has the secret; new schema adds password_md5.
+		oldPassword := "same-secret"
+		upgradeState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue(oldPassword),
+			"password_retype": types.StringNull(),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue(oldPassword), // overlaid from config
+			"password_retype": types.StringValue(oldPassword),
+			"password_md5":    types.StringValue(contentMD5Hex(oldPassword)),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(upgradeState)
+		assert.NotContains(t, updateParams, "password", "matching pre-upgrade secret must not be re-sent")
+		assert.NotContains(t, updateParams, "password_retype")
+	})
+
+	t.Run("upgrade with rotated password includes secrets", func(t *testing.T) {
+		upgradeState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("old-secret"),
+			"password_retype": types.StringNull(),
+			"password_md5":    types.StringNull(),
+		}, schema, hints)
+		planState := NewTFStateMust(map[string]attr.Value{
+			"id":              types.Int64Value(1),
+			"username":        types.StringValue("admin"),
+			"password":        types.StringValue("new-secret"),
+			"password_retype": types.StringValue("new-secret"),
+			"password_md5":    types.StringValue(contentMD5Hex("new-secret")),
+		}, schema, hints)
+
+		updateParams := planState.GetUpdateParams(upgradeState)
+		assert.Contains(t, updateParams, "password")
+		assert.Equal(t, "new-secret", updateParams["password"])
+		assert.Contains(t, updateParams, "password_retype")
+	})
 }
 
 // TestListsHaveSameContentIgnoringOrder_SimpleStrings tests order-independent comparison for simple string lists
@@ -3126,4 +3335,147 @@ func TestListsHaveSameContentIgnoringOrder_NullAndUnknown(t *testing.T) {
 	})
 
 	assert.False(t, listsHaveSameContentIgnoringOrder(listA, listC), "null and unknown should not be equal")
+}
+
+// ==========================================
+// Tests for the ResourceState abstraction
+// ==========================================
+
+// zeroRaw seeds every schema attribute with a null value, exactly like the
+// production schema-only manager does.
+func zeroRaw(schema rschema.Schema) map[string]attr.Value {
+	raw := make(map[string]attr.Value, len(schema.Attributes))
+	for k, a := range schema.Attributes {
+		raw[k], _, _ = BuildAttrValueFromAny(a.GetType(), nil)
+	}
+	return raw
+}
+
+func resourceStateTestSchema() rschema.Schema {
+	return rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"id":   rschema.Int64Attribute{Computed: true},
+		"name": rschema.StringAttribute{Required: true},
+		"note": rschema.StringAttribute{Optional: true},
+	}}
+}
+
+// crossplaneLikeState mimics a non-Terraform implementation: it embeds *TFState and
+// overrides only what differs (unknown semantics and Copy).
+type crossplaneLikeState struct{ *TFState }
+
+func (c *crossplaneLikeState) IsUnknown(string) bool { return false }
+func (c *crossplaneLikeState) Copy() ResourceState {
+	return &crossplaneLikeState{TFState: c.TFState.CopyTFState()}
+}
+
+func TestResourceState_TFStateImplementsInterface(t *testing.T) {
+	var s ResourceState = NewTFStateMust(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)
+	assert.True(t, s.IsEnabled())
+	assert.True(t, s.HasAttribute("name"))
+	assert.NotNil(t, s.RawValues())
+	assert.Equal(t, resourceStateTestSchema(), s.SchemaDefinition())
+	assert.Nil(t, s.StateHints())
+}
+
+func TestResourceState_NewResourceState_DefaultIsTFState(t *testing.T) {
+	s := NewResourceState(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)
+	_, ok := s.(*TFState)
+	assert.True(t, ok, "default factory must return *TFState, got %T", s)
+}
+
+func TestResourceState_SetStateFactory_OverridesImplementation(t *testing.T) {
+	SetStateFactory(func(raw map[string]attr.Value, schema any, hints *TFStateHints) (ResourceState, error) {
+		base, err := NewTFState(raw, schema, SchemaForResource, hints)
+		if err != nil {
+			return nil, err
+		}
+		return &crossplaneLikeState{TFState: base}, nil
+	})
+	t.Cleanup(func() { SetStateFactory(nil) })
+
+	s := NewResourceState(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)
+	cp, ok := s.(*crossplaneLikeState)
+	require.True(t, ok, "factory override must be used, got %T", s)
+
+	// Unknown-values are never reported by the override...
+	cp.Raw["name"] = types.StringUnknown()
+	assert.False(t, s.IsUnknown("name"))
+	// ...while the embedded TFState behaviour is unchanged.
+	assert.True(t, cp.TFState.IsUnknown("name"))
+
+	// Copy keeps the implementation type.
+	_, ok = s.Copy().(*crossplaneLikeState)
+	assert.True(t, ok, "Copy must preserve the wrapper type")
+
+	// Restoring the factory restores Terraform behaviour.
+	SetStateFactory(nil)
+	_, ok = NewResourceState(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil).(*TFState)
+	assert.True(t, ok)
+}
+
+func TestResourceState_CopyToWorksAcrossImplementations(t *testing.T) {
+	schema := resourceStateTestSchema()
+	tf := NewTFStateMust(zeroRaw(schema), schema, nil)
+	tf.SetOrAdd("name", "from-tf")
+	tf.SetOrAdd("note", "n1")
+
+	var other ResourceState = &crossplaneLikeState{TFState: NewTFStateMust(zeroRaw(schema), schema, nil)}
+	other.SetOrAdd("name", "old")
+
+	tf.CopyKnownFieldsTo(other)
+	assert.Equal(t, "from-tf", other.String("name"))
+	assert.Equal(t, "n1", other.String("note"))
+
+	// DiffFields/GetUpdateParams accept any implementation as "current state".
+	tf.SetOrAdd("name", "changed")
+	diff := tf.GetUpdateParams(other)
+	assert.Equal(t, "changed", diff["name"])
+}
+
+func TestResourceState_FallbackAcceptsInterfaceAndTypedNil(t *testing.T) {
+	schema := resourceStateTestSchema()
+	s := NewTFStateMust(zeroRaw(schema), schema, nil)
+	fb := NewTFStateMust(zeroRaw(schema), schema, nil)
+	fb.SetOrAdd("name", "fallback")
+
+	got, ok := s.StringWithFallback(fb, "name")
+	assert.True(t, ok)
+	assert.Equal(t, "fallback", got)
+
+	// A typed-nil *TFState boxed into the interface must be treated as "no fallback".
+	var typedNil *TFState
+	got, ok = s.StringWithFallback(typedNil, "name")
+	assert.False(t, ok)
+	assert.Equal(t, "", got)
+}
+
+func TestIsNilState(t *testing.T) {
+	var typedNil *TFState
+	assert.True(t, IsNilState(nil))
+	assert.True(t, IsNilState(typedNil))
+	assert.False(t, IsNilState(NewTFStateMust(zeroRaw(resourceStateTestSchema()), resourceStateTestSchema(), nil)))
+}
+
+func TestTFSdkSink_WritesAttributesIntoFrameworkState(t *testing.T) {
+	schema := resourceStateTestSchema()
+	ts := NewTFStateMust(zeroRaw(schema), schema, nil)
+	ts.SetOrAdd("id", int64(7))
+	ts.SetOrAdd("name", "vip")
+
+	objType := schema.Type().TerraformType(context.Background())
+	state := tfsdk.State{Schema: schema, Raw: tftypes.NewValue(objType, nil)}
+
+	require.NoError(t, NewTFSdkSink(&state).WriteState(context.Background(), ts))
+
+	var id types.Int64
+	var name types.String
+	require.False(t, state.GetAttribute(context.Background(), path.Root("id"), &id).HasError())
+	require.False(t, state.GetAttribute(context.Background(), path.Root("name"), &name).HasError())
+	assert.Equal(t, int64(7), id.ValueInt64())
+	assert.Equal(t, "vip", name.ValueString())
+
+	// The legacy SetState entry point must behave identically.
+	state2 := tfsdk.State{Schema: schema, Raw: tftypes.NewValue(objType, nil)}
+	require.NoError(t, ts.SetState(context.Background(), &state2))
+	assert.True(t, state.Raw.Equal(state2.Raw))
 }

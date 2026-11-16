@@ -15,11 +15,11 @@ var BlockHostSchemaRef = is.NewSchemaReference(
 )
 
 type BlockHost struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *BlockHost) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &BlockHost{tfstate: is.NewTFStateMust(
+	return &BlockHost{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -29,7 +29,7 @@ func (m *BlockHost) NewResourceManager(raw map[string]attr.Value, schema any) Re
 }
 
 func (m *BlockHost) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &BlockHost{tfstate: is.NewTFStateMust(
+	return &BlockHost{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *BlockHost) NewDatasourceManager(raw map[string]attr.Value, schema any) 
 	)}
 }
 
-func (m *BlockHost) TfState() *is.TFState {
+func (m *BlockHost) TfState() is.ResourceState {
 	return m.tfstate
 }
 

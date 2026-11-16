@@ -17,7 +17,9 @@ description: |-
 
 ### Optional
 
-- `access_key` (String) S3 Bucket access key
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `access_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) S3 Bucket access key
 - `aggregated` (Boolean) Aggregate harvests into final bundle (deprecated)
 - `astron_args` (String)
 - `bucket_name` (String) S3 Bucket for upload
@@ -56,7 +58,7 @@ description: |-
 - `position_in_queue` (Number) Position of the support bundle in the queue
 - `prefix` (String) Identifying label included in the bundle file name as a prefix
 - `preset` (String) Type of predefined preset bundle
-- `secret_key` (String) S3 Bucket secret key
+- `secret_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) S3 Bucket secret key
 - `send_now` (Boolean) Upload support bundle after creation
 - `start_time` (String) Start time of logs in UTC+3
 - `state` (String) State of the bundle
@@ -68,4 +70,6 @@ description: |-
 
 ### Read-Only
 
+- `access_key_md5` (String) MD5 of access_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `id` (Number) The ID of this resource.
+- `secret_key_md5` (String) MD5 of secret_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.

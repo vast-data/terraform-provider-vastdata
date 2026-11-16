@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -19,21 +20,26 @@ var SupportBundlesQueueSchemaRef = is.NewSchemaReference(
 )
 
 type SupportBundlesQueue struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *SupportBundlesQueue) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &SupportBundlesQueue{tfstate: is.NewTFStateMust(
+	return &SupportBundlesQueue{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: SupportBundlesQueueSchemaRef,
+			SchemaRef:          SupportBundlesQueueSchemaRef,
+			WriteOnlyFields:    []string{"access_key", "secret_key"},
+			WriteOnlyMD5Fields: []string{"access_key", "secret_key"},
+			SensitiveFields:    []string{"access_key", "secret_key"},
 			AdditionalSchemaAttributes: map[string]any{
 				"position": rschema.Int64Attribute{
 					Optional:    true,
 					Computed:    true,
 					Description: "Position of the support bundle in the queue (1 = first). Use this to reorder via PATCH /supportbundlesqueue/{id}/move/.",
 				},
+				"access_key_md5": ContentMD5SchemaAttribute("access_key", false),
+				"secret_key_md5": ContentMD5SchemaAttribute("secret_key", false),
 			},
 			PreserveUserValueFields: []string{"position"},
 		},
@@ -41,7 +47,7 @@ func (m *SupportBundlesQueue) NewResourceManager(raw map[string]attr.Value, sche
 }
 
 func (m *SupportBundlesQueue) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &SupportBundlesQueue{tfstate: is.NewTFStateMust(
+	return &SupportBundlesQueue{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -50,12 +56,25 @@ func (m *SupportBundlesQueue) NewDatasourceManager(raw map[string]attr.Value, sc
 	)}
 }
 
-func (m *SupportBundlesQueue) TfState() *is.TFState {
+func (m *SupportBundlesQueue) TfState() is.ResourceState {
 	return m.tfstate
 }
 
 func (m *SupportBundlesQueue) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.SupportBundlesQueue
+}
+
+func (m *SupportBundlesQueue) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5Fields(ctx, req, resp,
+		"access_key", "access_key_md5",
+		"secret_key", "secret_key_md5",
+	)
+	return nil
+}
+
+func (m *SupportBundlesQueue) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "access_key", "secret_key")
+	return record
 }
 
 // CreateResource adopts an existing queue entry — bundles enter the queue when

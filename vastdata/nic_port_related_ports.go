@@ -12,11 +12,11 @@ import (
 )
 
 type NicPortRelatedPorts struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *NicPortRelatedPorts) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &NicPortRelatedPorts{tfstate: is.NewTFStateMust(
+	return &NicPortRelatedPorts{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *NicPortRelatedPorts) NewDatasourceManager(raw map[string]attr.Value, sc
 	)}
 }
 
-func (m *NicPortRelatedPorts) TfState() *is.TFState {
+func (m *NicPortRelatedPorts) TfState() is.ResourceState {
 	return m.tfstate
 }
 

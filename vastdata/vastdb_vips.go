@@ -10,11 +10,11 @@ import (
 )
 
 type VastDbVips struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *VastDbVips) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &VastDbVips{tfstate: is.NewTFStateMust(
+	return &VastDbVips{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -51,7 +51,7 @@ func (m *VastDbVips) NewDatasourceManager(raw map[string]attr.Value, schema any)
 	)}
 }
 
-func (m *VastDbVips) TfState() *is.TFState {
+func (m *VastDbVips) TfState() is.ResourceState {
 	return m.tfstate
 }
 

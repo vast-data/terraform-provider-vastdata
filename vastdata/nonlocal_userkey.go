@@ -22,11 +22,11 @@ var NonlocalUserKeySchemaRef = is.NewSchemaReference(
 )
 
 type NonlocalUserKey struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *NonlocalUserKey) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &NonlocalUserKey{tfstate: is.NewTFStateMust(
+	return &NonlocalUserKey{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -56,7 +56,7 @@ func (m *NonlocalUserKey) NewResourceManager(raw map[string]attr.Value, schema a
 	)}
 }
 
-func (m *NonlocalUserKey) TfState() *is.TFState {
+func (m *NonlocalUserKey) TfState() is.ResourceState {
 	return m.tfstate
 }
 
