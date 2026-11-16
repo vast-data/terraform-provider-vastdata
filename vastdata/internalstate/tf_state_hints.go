@@ -130,9 +130,9 @@ type TFStateHints struct {
 	// IPSetEquivalenceFields lists fields that contain lists/sets of IP addresses or CIDR
 	// ranges.  During read/refresh the API may return a semantically equivalent but
 	// differently-formatted value (e.g. individual IPs collapsed into a CIDR block).
-	// For these fields the provider compares the address ranges covered by the user's
-	// current state value and the API response.  If they are identical the user's
-	// original form is preserved in state (no spurious drift).
+	// For these fields the provider expands both the user's current state value and the
+	// API response to their full constituent IP sets and compares them.  If the sets are
+	// identical the user's original form is preserved in state (no spurious drift).
 	// If the sets genuinely differ (e.g. someone added or removed an IP via the UI)
 	// the API value is written to state so Terraform correctly detects the change.
 	IPSetEquivalenceFields []string

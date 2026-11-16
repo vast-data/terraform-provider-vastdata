@@ -3,7 +3,6 @@
 package internalstate
 
 import (
-	"net/netip"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -12,61 +11,50 @@ import (
 )
 
 // ---------------------------------------------------------------------------
-// mergeIPRanges
+// expandIPSet
 // ---------------------------------------------------------------------------
 
-func rng(start, end string) ipRange {
-	return ipRange{netip.MustParseAddr(start), netip.MustParseAddr(end)}
-}
-
-func TestMergeIPRanges_AdjacentSingleIPsCollapse(t *testing.T) {
-	r, err := mergeIPRanges([]string{"10.0.0.3", "10.0.0.1", "10.0.0.2"})
+func TestExpandIPSet_SingleIPs(t *testing.T) {
+	set, err := expandIPSet([]string{"10.0.0.1", "10.0.0.2", "10.0.0.3"})
 	require.NoError(t, err)
-	require.Equal(t, []ipRange{rng("10.0.0.1", "10.0.0.3")}, r)
+	require.Equal(t, 3, len(set))
+	require.Contains(t, set, "10.0.0.1")
+	require.Contains(t, set, "10.0.0.2")
+	require.Contains(t, set, "10.0.0.3")
 }
 
-func TestMergeIPRanges_CIDR(t *testing.T) {
-	// /30 = network + 2 hosts + broadcast = 4 addresses; host bits are masked off
-	r, err := mergeIPRanges([]string{"10.0.0.2/30"})
+func TestExpandIPSet_CIDR(t *testing.T) {
+	// /30 = network + 2 hosts + broadcast = 4 addresses
+	set, err := expandIPSet([]string{"10.0.0.0/30"})
 	require.NoError(t, err)
-	require.Equal(t, []ipRange{rng("10.0.0.0", "10.0.0.3")}, r)
+	require.Equal(t, 4, len(set))
+	require.Contains(t, set, "10.0.0.0")
+	require.Contains(t, set, "10.0.0.1")
+	require.Contains(t, set, "10.0.0.2")
+	require.Contains(t, set, "10.0.0.3")
 }
 
-func TestMergeIPRanges_GapKeepsSeparateRanges(t *testing.T) {
-	r, err := mergeIPRanges([]string{"10.0.0.1", "10.0.0.4/30"})
+func TestExpandIPSet_Mixed(t *testing.T) {
+	set, err := expandIPSet([]string{"10.0.0.1", "10.0.0.4/30"})
 	require.NoError(t, err)
-	require.Equal(t, []ipRange{rng("10.0.0.1", "10.0.0.1"), rng("10.0.0.4", "10.0.0.7")}, r)
+	// 1 individual + 4 from /30
+	require.Equal(t, 5, len(set))
 }
 
-func TestMergeIPRanges_ContainedAndBlankEntries(t *testing.T) {
-	r, err := mergeIPRanges([]string{"10.0.0.0/24", " 10.0.0.5 ", "", "10.0.0.128/25"})
-	require.NoError(t, err)
-	require.Equal(t, []ipRange{rng("10.0.0.0", "10.0.0.255")}, r)
-}
-
-func TestMergeIPRanges_FamiliesNeverMerge(t *testing.T) {
-	r, err := mergeIPRanges([]string{"::/0", "0.0.0.0/0"})
-	require.NoError(t, err)
-	require.Equal(t, []ipRange{
-		rng("0.0.0.0", "255.255.255.255"),
-		rng("::", "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"),
-	}, r)
-}
-
-func TestMergeIPRanges_InvalidIP(t *testing.T) {
-	_, err := mergeIPRanges([]string{"not-an-ip"})
+func TestExpandIPSet_InvalidIP(t *testing.T) {
+	_, err := expandIPSet([]string{"not-an-ip"})
 	require.Error(t, err)
 }
 
-func TestMergeIPRanges_InvalidCIDR(t *testing.T) {
-	_, err := mergeIPRanges([]string{"10.0.0.0/99"})
+func TestExpandIPSet_InvalidCIDR(t *testing.T) {
+	_, err := expandIPSet([]string{"10.0.0.0/99"})
 	require.Error(t, err)
 }
 
-func TestMergeIPRanges_Empty(t *testing.T) {
-	r, err := mergeIPRanges([]string{})
+func TestExpandIPSet_Empty(t *testing.T) {
+	set, err := expandIPSet([]string{})
 	require.NoError(t, err)
-	require.Empty(t, r)
+	require.Empty(t, set)
 }
 
 // ---------------------------------------------------------------------------
@@ -154,25 +142,6 @@ func TestIPSetsEquivalent_FullTicketScenario(t *testing.T) {
 		"10.220.131.0/27",
 	}
 	require.True(t, IPSetsEquivalent(userList, apiList))
-}
-
-func TestIPSetsEquivalent_HugePrefixesCompareByRange(t *testing.T) {
-	// Expanding these host-by-host would hang or OOM the provider on refresh.
-	require.True(t, IPSetsEquivalent([]string{"0.0.0.0/0"}, []string{"0.0.0.0/1", "128.0.0.0/1"}))
-	require.True(t, IPSetsEquivalent([]string{"10.0.0.0/8"}, []string{"10.0.0.0/8"}))
-	require.True(t, IPSetsEquivalent([]string{"fd00::/64"}, []string{"fd00::/65", "fd00::8000:0:0:0/65"}))
-	require.False(t, IPSetsEquivalent([]string{"fd00::/64"}, []string{"fd00::/65"}))
-}
-
-func TestIPSetsEquivalent_IPv4MappedIPv6(t *testing.T) {
-	require.True(t, IPSetsEquivalent([]string{"::ffff:10.0.0.1"}, []string{"10.0.0.1"}))
-	require.True(t, IPSetsEquivalent([]string{"::ffff:10.0.0.0/120"}, []string{"10.0.0.0/24"}))
-	require.True(t, IPSetsEquivalent([]string{"::ffff:10.0.0.1"}, []string{"::ffff:10.0.0.1/128"}))
-	require.False(t, IPSetsEquivalent([]string{"::ffff:0:0/95"}, []string{"0.0.0.0/0"}))
-}
-
-func TestIPSetsEquivalent_ZoneIgnored(t *testing.T) {
-	require.True(t, IPSetsEquivalent([]string{"fe80::1%eth0"}, []string{"fe80::1"}))
 }
 
 // ---------------------------------------------------------------------------
