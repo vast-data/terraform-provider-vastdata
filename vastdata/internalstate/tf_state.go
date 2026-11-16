@@ -680,8 +680,8 @@ func (s *TFState) fillFromRecordInternal(record Record, includeRequired bool, in
 					}
 				}
 
-				// IPSetEquivalenceFields: compare the address ranges both sides
-				// cover.  If they are identical the API has
+				// IPSetEquivalenceFields: compare by expanding both sides to their
+				// full constituent IP sets.  If the sets are identical the API has
 				// merely re-formatted the addresses (e.g. collapsed adjacent IPs
 				// into a CIDR) — keep the user's original form so Terraform does
 				// not generate a spurious diff.
