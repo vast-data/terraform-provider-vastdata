@@ -117,7 +117,6 @@ Read-Only:
 - `identifier` (String)
 - `identifier_type` (String)
 - `is_accountable` (Boolean)
-- `is_group` (Boolean) True for a group quota. False for a user quota.
 - `is_iam_role` (Boolean)
 - `name` (String) A user or group name
 - `percent_capacity` (Number)
@@ -144,7 +143,6 @@ Read-Only:
 - `identifier` (String)
 - `identifier_type` (String)
 - `is_accountable` (Boolean)
-- `is_group` (Boolean) True for a group quota. False for a user quota.
 - `is_iam_role` (Boolean)
 - `name` (String) A user or group name
 - `percent_capacity` (Number)

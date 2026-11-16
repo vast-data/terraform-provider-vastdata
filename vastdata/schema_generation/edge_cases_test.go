@@ -265,7 +265,7 @@ func TestAddSchemaEntries_WithExclusions(t *testing.T) {
 
 	target := make(map[string]*SchemaEntry)
 
-	addSchemaEntries(props, []string{}, hints, target, false, true, false, false, false, false)
+	addSchemaEntries(props, []string{}, hints, target, false, true, false, false, false, false, true)
 
 	require.Contains(t, target, "included_field")
 	require.NotContains(t, target, "excluded_field")
@@ -438,6 +438,7 @@ func TestFlagsFromHintsForResource_OverrideLogic(t *testing.T) {
 				tt.fieldName, hints,
 				tt.initialRequired, tt.initialOptional, tt.initialComputed,
 				tt.expectedSensitive, tt.expectedOrdered, tt.expectedWriteOnly,
+				true,
 			)
 
 			require.Equal(t, tt.expectedRequired, required, "Required flag mismatch")

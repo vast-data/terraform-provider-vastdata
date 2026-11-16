@@ -15,11 +15,11 @@ import (
 )
 
 type BlockHostMapping struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *BlockHostMapping) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &BlockHostMapping{tfstate: is.NewTFStateMust(
+	return &BlockHostMapping{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -50,7 +50,7 @@ func (m *BlockHostMapping) NewResourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *BlockHostMapping) TfState() *is.TFState {
+func (m *BlockHostMapping) TfState() is.ResourceState {
 	return m.tfstate
 }
 

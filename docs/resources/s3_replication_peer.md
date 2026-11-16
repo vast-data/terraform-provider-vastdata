@@ -47,7 +47,9 @@ resource "vastdata_s3_replication_peer" "vastdb_s3_replication_peer" {
 
 ### Required
 
-- `access_key` (String) Access key of a valid key pair for accessing the named S3 bucket
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
+- `access_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Access key of a valid key pair for accessing the named S3 bucket
 - `bucket_name` (String) The S3 bucket name of an existing S3 bucket that you want to configure as the replication target
 - `http_protocol` (String) For custom S3 buckets (not AWS), specifies which protocol to use to connect to the bucket
 - `name` (String)
@@ -55,19 +57,23 @@ resource "vastdata_s3_replication_peer" "vastdb_s3_replication_peer" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `aws_account_id` (String) Not in use
 - `aws_region` (String) If the target is an AWS S3 bucket, use this parameter to specify the AWS region of the bucket
 - `aws_role` (String) Not in use
 - `custom_bucket_url` (String) If the target is a custom S3 bucket, use this parameter to specify the URL of the bucket
 - `proxies` (Set of String) If configured, replication traffic is routed via proxies. Separate with commas. Format: http://USERNAME:PASSWORD@IP:PORT
-- `secret_key` (String) The secret key of a valid key pair for accessing the destination S3 bucket
+- `secret_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The secret key of a valid key pair for accessing the destination S3 bucket
 
 ### Read-Only
 
+- `access_key_md5` (String) MD5 of access_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `created` (String)
 - `decoded_access_key` (String)
 - `guid` (String) unique identifier
 - `id` (Number) The ID of this resource.
+- `secret_key_md5` (String) MD5 of secret_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `state` (String)
 - `state_description` (String)
 - `url` (String)

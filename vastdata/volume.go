@@ -16,11 +16,11 @@ var VolumeSchemaRef = is.NewSchemaReference(
 )
 
 type Volume struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Volume) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Volume{tfstate: is.NewTFStateMust(
+	return &Volume{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -33,7 +33,7 @@ func (m *Volume) NewResourceManager(raw map[string]attr.Value, schema any) Resou
 }
 
 func (m *Volume) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Volume{tfstate: is.NewTFStateMust(
+	return &Volume{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -42,7 +42,7 @@ func (m *Volume) NewDatasourceManager(raw map[string]attr.Value, schema any) Dat
 	}
 }
 
-func (m *Volume) TfState() *is.TFState {
+func (m *Volume) TfState() is.ResourceState {
 	return m.tfstate
 }
 

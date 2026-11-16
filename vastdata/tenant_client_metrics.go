@@ -21,11 +21,11 @@ var TenantClientMetricsSchemaRef = is.NewSchemaReference(
 )
 
 type TenantClientMetrics struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *TenantClientMetrics) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &TenantClientMetrics{tfstate: is.NewTFStateMust(
+	return &TenantClientMetrics{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -41,7 +41,7 @@ func (m *TenantClientMetrics) NewResourceManager(raw map[string]attr.Value, sche
 }
 
 func (m *TenantClientMetrics) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TenantClientMetrics{tfstate: is.NewTFStateMust(
+	return &TenantClientMetrics{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -56,7 +56,7 @@ func (m *TenantClientMetrics) NewDatasourceManager(raw map[string]attr.Value, sc
 	}
 }
 
-func (m *TenantClientMetrics) TfState() *is.TFState {
+func (m *TenantClientMetrics) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -93,7 +93,7 @@ func (m *TenantClientMetrics) DeleteResource(ctx context.Context, rest *VMSRest)
 // needs to be updated with new fields and performs the update if necessary.
 //
 // This is used in both CreateResource and UpdateResource for TenantClientMetrics.
-func ensureTenantClientMetricsUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
+func ensureTenantClientMetricsUpdatedWith(ctx context.Context, stateTs, fieldsTs is.ResourceState, rest *VMSRest) (DisplayableRecord, error) {
 	// Get tenant ID from tfstate
 	tenantId := stateTs.Int64("tenant_id")
 	if tenantId == 0 {

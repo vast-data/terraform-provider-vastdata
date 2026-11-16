@@ -174,8 +174,9 @@ func appendCleaned(builder *strings.Builder, path string) (bool, error) {
 			continue
 		}
 
-		// Skip test-specific markers (these are for pytest, not docs)
-		if trimmed == "# ignore:e2e" {
+		// Skip test-specific markers (these are for pytest, not docs).
+		// A reason may follow the marker: "# ignore:e2e - POST /bgpconfigs/ returns 403".
+		if strings.HasPrefix(trimmed, "# ignore:e2e") {
 			continue
 		}
 

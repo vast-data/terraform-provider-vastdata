@@ -16,11 +16,11 @@ var S3PolicySchemaRef = is.NewSchemaReference(
 )
 
 type S3Policy struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *S3Policy) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &S3Policy{tfstate: is.NewTFStateMust(
+	return &S3Policy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -33,7 +33,7 @@ func (m *S3Policy) NewResourceManager(raw map[string]attr.Value, schema any) Res
 }
 
 func (m *S3Policy) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &S3Policy{tfstate: is.NewTFStateMust(
+	return &S3Policy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -42,7 +42,7 @@ func (m *S3Policy) NewDatasourceManager(raw map[string]attr.Value, schema any) D
 	}
 }
 
-func (m *S3Policy) TfState() *is.TFState {
+func (m *S3Policy) TfState() is.ResourceState {
 	return m.tfstate
 }
 

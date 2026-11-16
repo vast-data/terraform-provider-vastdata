@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -17,23 +18,29 @@ var AdministratorManagerSchemaRef = is.NewSchemaReference(
 )
 
 type AdministratorManager struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *AdministratorManager) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &AdministratorManager{tfstate: is.NewTFStateMust(
+	return &AdministratorManager{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef:       AdministratorManagerSchemaRef,
-			SensitiveFields: []string{"password"},
-			PreserveUserValueFieldsWhenApiReturnsNull: []string{"password"},
+			SchemaRef:          AdministratorManagerSchemaRef,
+			WriteOnlyFields:    []string{"password", "password_retype"},
+			WriteOnlyMD5Fields: []string{"password"},
+			SensitiveFields:    []string{"password", "password_retype"},
+			// password is write-only (not in state). Track a computed MD5 so
+			// password rotations plan an update without storing the secret.
+			AdditionalSchemaAttributes: map[string]any{
+				"password_md5": ContentMD5SchemaAttribute("password", false),
+			},
 		},
 	)}
 }
 
 func (m *AdministratorManager) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &AdministratorManager{tfstate: is.NewTFStateMust(
+	return &AdministratorManager{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -43,12 +50,27 @@ func (m *AdministratorManager) NewDatasourceManager(raw map[string]attr.Value, s
 	)}
 }
 
-func (m *AdministratorManager) TfState() *is.TFState {
+func (m *AdministratorManager) TfState() is.ResourceState {
 	return m.tfstate
 }
 
 func (m *AdministratorManager) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Managers
+}
+
+// ModifyPlan sets password_md5 from the write-only password in config so
+// Terraform can detect password changes without storing the secret in state.
+func (m *AdministratorManager) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5(ctx, req, resp, "password", "password_md5")
+	return nil
+}
+
+// TransformResponseRecord drops password material if the API ever returns it
+// so the secret cannot land in Terraform state.
+func (m *AdministratorManager) TransformResponseRecord(record Record) Record {
+	delete(record, "password")
+	delete(record, "password_retype")
+	return record
 }
 
 func (m *AdministratorManager) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {

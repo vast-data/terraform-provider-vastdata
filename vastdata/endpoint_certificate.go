@@ -3,9 +3,9 @@ package provider
 
 import (
 	"context"
-	"crypto/md5"
 	"crypto/sha256"
 	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
@@ -55,12 +55,11 @@ func parsePEMCertificateInfo(pemData string) (*pemCertificateInfo, error) {
 			return nil, fmt.Errorf("parse certificate: %w", err)
 		}
 		sum := sha256.Sum256(cert.Raw)
-		md5sum := md5.Sum(cert.Raw) //nolint:gosec // stored hash for Terraform plan equality, not a security control
 		return &pemCertificateInfo{
 			NotAfter:          cert.NotAfter.UTC().Format(time.RFC3339),
 			Subject:           cert.Subject.String(),
 			FingerprintSHA256: hex.EncodeToString(sum[:]),
-			MD5:               hex.EncodeToString(md5sum[:]),
+			MD5:               BytesMD5Hex(cert.Raw),
 		}, nil
 	}
 }
@@ -71,9 +70,10 @@ func looksLikePEMCertificate(s string) bool {
 
 func endpointCertificateHints(parentAttr, parentDesc, description, markdown string) *is.TFStateHints {
 	return &is.TFStateHints{
-		Importable:      &notImportable,
-		WriteOnlyFields: []string{attrCertificate, attrPrivateKey},
-		SensitiveFields: []string{attrCertificate, attrPrivateKey},
+		Importable:         &notImportable,
+		WriteOnlyFields:    []string{attrCertificate, attrPrivateKey},
+		WriteOnlyMD5Fields: []string{attrCertificate},
+		SensitiveFields:    []string{attrCertificate, attrPrivateKey},
 		TFStateHintsForCustom: &is.TFStateHintsForCustom{
 			Description:         description,
 			MarkdownDescription: markdown,
@@ -89,13 +89,13 @@ func endpointCertificateHints(parentAttr, parentDesc, description, markdown stri
 					Required:    true,
 					Sensitive:   true,
 					WriteOnly:   true,
-					Description: "PEM-encoded certificate (leaf plus optional chain). Write-only: never stored in Terraform state.",
+					Description: "PEM-encoded certificate (leaf plus optional chain).",
 				},
 				attrPrivateKey: rschema.StringAttribute{
 					Required:    true,
 					Sensitive:   true,
 					WriteOnly:   true,
-					Description: "PEM-encoded private key. Write-only: never stored in Terraform state.",
+					Description: "PEM-encoded private key.",
 				},
 				attrCertificateMD5: rschema.StringAttribute{
 					Computed:    true,
@@ -126,7 +126,7 @@ type endpointCertificateOps struct {
 	get         func(ctx context.Context, rest *VMSRest, parentID int64) (Record, error)
 }
 
-func (o *endpointCertificateOps) parentID(ts *is.TFState) (int64, error) {
+func (o *endpointCertificateOps) parentID(ts is.ResourceState) (int64, error) {
 	if ts.IsKnownAndNotNull(o.parentAttr) {
 		if id := ts.Int64(o.parentAttr); id != 0 {
 			return id, nil
@@ -161,8 +161,17 @@ func (o *endpointCertificateOps) metadataRecord(parentID int64, pemData string, 
 			if info.FingerprintSHA256 != "" {
 				out[attrFingerprintSHA256] = info.FingerprintSHA256
 			}
+			return out
 		}
 	}
+	// TERF-311: after VMS reset_certificate (or NFS cert removal) the API returns
+	// null certificate_info. FillFromRecord only updates keys present on the
+	// record, so omitting computed fields would leave stale PEM metadata in
+	// state and hide drift. Clear them so the next plan re-applies the cert.
+	out[attrNotAfter] = ""
+	out[attrSubject] = ""
+	out[attrFingerprintSHA256] = ""
+	out[attrCertificateMD5] = ""
 	return out
 }
 
@@ -206,23 +215,17 @@ func parseAPICertTime(s string) (time.Time, error) {
 	return time.Time{}, last
 }
 
-var apiAttrAbbrev = map[string]string{
-	"commonName":             "CN",
-	"organizationName":       "O",
-	"organizationalUnitName": "OU",
-	"countryName":            "C",
-	"localityName":           "L",
-	"stateOrProvinceName":    "ST",
-	"serialNumber":           "SERIALNUMBER",
-	"emailAddress":           "emailAddress",
-}
-
+// formatAPIDistinguishedName converts VMS certificate_info subject RDNs into the
+// same string form as x509.Certificate.Subject.String() (via pkix.Name).
+// The API returns RDNs in certificate encoding order (often O,OU,CN for OpenSSL
+// subjects), while Go's String() uses a canonical reverse RDN order (CN,OU,O).
+// Matching that form avoids perpetual plan diffs / re-uploads after Read.
 func formatAPIDistinguishedName(raw any) string {
 	rdns, ok := raw.([]any)
 	if !ok {
 		return ""
 	}
-	var parts []string
+	var name pkix.Name
 	for _, rdn := range rdns {
 		avas, ok := rdn.([]any)
 		if !ok {
@@ -235,16 +238,37 @@ func formatAPIDistinguishedName(raw any) string {
 			}
 			typ := fmt.Sprint(pair[0])
 			val := fmt.Sprint(pair[1])
-			if abbr, ok := apiAttrAbbrev[typ]; ok {
-				typ = abbr
+			switch typ {
+			case "commonName":
+				name.CommonName = val
+			case "organizationName":
+				name.Organization = append(name.Organization, val)
+			case "organizationalUnitName":
+				name.OrganizationalUnit = append(name.OrganizationalUnit, val)
+			case "countryName":
+				name.Country = append(name.Country, val)
+			case "localityName":
+				name.Locality = append(name.Locality, val)
+			case "stateOrProvinceName":
+				name.Province = append(name.Province, val)
+			case "serialNumber":
+				name.SerialNumber = val
+			case "streetAddress":
+				name.StreetAddress = append(name.StreetAddress, val)
+			case "postalCode":
+				name.PostalCode = append(name.PostalCode, val)
+			case "emailAddress":
+				name.ExtraNames = append(name.ExtraNames, pkix.AttributeTypeAndValue{
+					Type:  []int{1, 2, 840, 113549, 1, 9, 1}, // emailAddress
+					Value: val,
+				})
 			}
-			parts = append(parts, typ+"="+val)
 		}
 	}
-	return strings.Join(parts, ",")
+	return name.String()
 }
 
-func (o *endpointCertificateOps) Read(ctx context.Context, rest *VMSRest, ts *is.TFState) (DisplayableRecord, error) {
+func (o *endpointCertificateOps) Read(ctx context.Context, rest *VMSRest, ts is.ResourceState) (DisplayableRecord, error) {
 	parentID, err := o.parentID(ts)
 	if err != nil {
 		return nil, err
@@ -262,7 +286,7 @@ func (o *endpointCertificateOps) Read(ctx context.Context, rest *VMSRest, ts *is
 	return o.metadataRecord(parentID, pemData, parent), nil
 }
 
-func (o *endpointCertificateOps) Apply(ctx context.Context, rest *VMSRest, ts *is.TFState) (DisplayableRecord, error) {
+func (o *endpointCertificateOps) Apply(ctx context.Context, rest *VMSRest, ts is.ResourceState) (DisplayableRecord, error) {
 	parentID, err := o.parentID(ts)
 	if err != nil {
 		return nil, err
@@ -331,6 +355,6 @@ func (o *endpointCertificateOps) ModifyPlan(ctx context.Context, req resource.Mo
 	return nil
 }
 
-func newResourceTFState(raw map[string]attr.Value, schema any, hints *is.TFStateHints) *is.TFState {
-	return is.NewTFStateMust(raw, schema, hints)
+func newResourceTFState(raw map[string]attr.Value, schema any, hints *is.TFStateHints) is.ResourceState {
+	return is.NewResourceState(raw, schema, hints)
 }

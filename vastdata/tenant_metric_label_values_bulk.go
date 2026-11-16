@@ -17,7 +17,7 @@ import (
 )
 
 type TenantMetricLabelValuesBulk struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 var tenantMetricLabelValuesBulkSchemaAttributes = map[string]any{
@@ -49,7 +49,7 @@ var tenantMetricLabelValuesBulkDatasourceAttributes = map[string]any{
 }
 
 func (m *TenantMetricLabelValuesBulk) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &TenantMetricLabelValuesBulk{tfstate: is.NewTFStateMust(
+	return &TenantMetricLabelValuesBulk{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -65,7 +65,7 @@ func (m *TenantMetricLabelValuesBulk) NewResourceManager(raw map[string]attr.Val
 }
 
 func (m *TenantMetricLabelValuesBulk) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TenantMetricLabelValuesBulk{tfstate: is.NewTFStateMust(
+	return &TenantMetricLabelValuesBulk{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -77,7 +77,7 @@ func (m *TenantMetricLabelValuesBulk) NewDatasourceManager(raw map[string]attr.V
 	)}
 }
 
-func (m *TenantMetricLabelValuesBulk) TfState() *is.TFState {
+func (m *TenantMetricLabelValuesBulk) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -194,7 +194,7 @@ func (m *TenantMetricLabelValuesBulk) UpdateResource(ctx context.Context, plan U
 func ensureTenantMetricLabelValuesBulkUpdatedWith(
 	ctx context.Context,
 	m *TenantMetricLabelValuesBulk,
-	stateTs, fieldsTs *is.TFState,
+	stateTs, fieldsTs is.ResourceState,
 	rest *VMSRest,
 ) (DisplayableRecord, error) {
 	tenantID := stateTs.Int64("tenant_id")

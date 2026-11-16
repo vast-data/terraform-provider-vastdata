@@ -18,11 +18,11 @@ var ProtectedPathSchemaRef = is.NewSchemaReference(
 )
 
 type ProtectedPath struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ProtectedPath) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ProtectedPath{tfstate: is.NewTFStateMust(
+	return &ProtectedPath{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -44,7 +44,7 @@ func (m *ProtectedPath) NewResourceManager(raw map[string]attr.Value, schema any
 }
 
 func (m *ProtectedPath) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ProtectedPath{tfstate: is.NewTFStateMust(
+	return &ProtectedPath{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -59,7 +59,7 @@ func (m *ProtectedPath) NewDatasourceManager(raw map[string]attr.Value, schema a
 	)}
 }
 
-func (m *ProtectedPath) TfState() *is.TFState {
+func (m *ProtectedPath) TfState() is.ResourceState {
 	return m.tfstate
 }
 
