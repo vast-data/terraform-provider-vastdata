@@ -1,3 +1,9 @@
+## 5.0.0
+
+BUG FIXES:
+
+* **vastdata_view_policy**: Fixed refresh hanging or running out of memory when NFS IP list fields contain wide CIDRs (e.g. `0.0.0.0/0`, `10.0.0.0/8`, IPv6 `/64`). IP lists are now compared as merged address ranges instead of being expanded host-by-host. The same drift protection now also covers `read_only`, `read_write`, `s3_read_only`, `s3_read_write`, `smb_read_only`, `smb_read_write` and `trash_access` (TERF-233).
+
 ## 4.1.1
 
 BUG FIXES:
@@ -24,10 +30,6 @@ ENHANCEMENTS:
 
 * **vastdata_cluster**: Removing the resource from configuration or running `terraform destroy` clears Terraform state only and does not call DELETE on the cluster.
 * **vastdata_tenant**: Added optional `delete_local_provider` to remove the VMS auto-created local provider on tenant destroy and on failed create rollback. Looks up the provider by tenant name or `provider-<tenant_name>`; skipped when `local_provider_id` is set in config during create rollback; missing providers are ignored.
-
-BUG FIXES:
-
-* **vastdata_view_policy**: Fixed refresh hanging or running out of memory when NFS IP list fields contain wide CIDRs (e.g. `0.0.0.0/0`, `10.0.0.0/8`, IPv6 `/64`). IP lists are now compared as merged address ranges instead of being expanded host-by-host. The same drift protection now also covers `read_only`, `read_write`, `s3_read_only`, `s3_read_write`, `smb_read_only`, `smb_read_write` and `trash_access` (TERF-233).
 
 ## 4.0.1
 
