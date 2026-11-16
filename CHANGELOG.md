@@ -1,8 +1,8 @@
-## Unreleased
+## 5.0.0
 
-BUG FIXES:
+ENHANCEMENTS:
 
-* **Retry on wrapped API errors**: `vastdata_vip_pool` and `vastdata_replication_peer` retries (and a few data source/delete paths) no longer crash the plugin with `interface conversion: error is *fmt.wrapError, not *core.ApiError` when an async task fails. Status codes and bodies are now read with `errors.As`, so wrapped API errors are handled.
+* **vastdata_tenant_client_metrics**: Add the ability to disable this resource.
 
 ## 4.1.1
 

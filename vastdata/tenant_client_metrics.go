@@ -85,8 +85,13 @@ func (m *TenantClientMetrics) UpdateResource(ctx context.Context, plan UpdateRes
 }
 
 func (m *TenantClientMetrics) DeleteResource(ctx context.Context, rest *VMSRest) error {
-	// No-op for tenant client metrics, as it cannot be deleted.
-	return nil
+	tenantId := m.tfstate.Int64("tenant_id")
+	_, err := rest.Tenants.TenantClientMetricsWithContext_PATCH(ctx, tenantId, params{
+		"config": map[string]any{
+			"enabled": false,
+		},
+	})
+	return err
 }
 
 // ensureTenantClientMetricsUpdatedWith verifies if the given TenantClientMetrics (looked up by state)
