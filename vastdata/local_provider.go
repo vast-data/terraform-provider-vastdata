@@ -15,11 +15,11 @@ var LocalProviderSchemaRef = is.NewSchemaReference(
 )
 
 type LocalProvider struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *LocalProvider) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &LocalProvider{tfstate: is.NewTFStateMust(
+	return &LocalProvider{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -29,7 +29,7 @@ func (m *LocalProvider) NewResourceManager(raw map[string]attr.Value, schema any
 }
 
 func (m *LocalProvider) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &LocalProvider{tfstate: is.NewTFStateMust(
+	return &LocalProvider{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *LocalProvider) NewDatasourceManager(raw map[string]attr.Value, schema a
 	)}
 }
 
-func (m *LocalProvider) TfState() *is.TFState {
+func (m *LocalProvider) TfState() is.ResourceState {
 	return m.tfstate
 }
 

@@ -51,18 +51,24 @@ resource "vastdata_bgp_config" "vastdb_bgp_config" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `any_external_asn` (Boolean) If true, allow CNodes to peer with any ASN. Supercedes specified external_asn.
 - `bfd_enabled` (Boolean)
 - `guid` (String)
 - `id` (Number) The ID of the BGP layer 3 connectivity configuration.
 - `ips_represent` (String) IP address representation (odd/even)
-- `md5_password` (String) A password used for BGP and BFD authentication.
+- `md5_password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) A password used for BGP and BFD authentication.
 - `method` (String)
 - `racks` (Attributes Set) (see [below for nested schema](#nestedatt--racks))
 - `status` (String)
 - `subnet_bits` (Number) The number of bits in the subnet. For IPv4, this should be 32, for IPv6, 128 (i.e., a single address in the subnet)
 - `vip_migration_grace_period_sec` (Number) The period of time after a BGP session is dropped before the virtual IPs advertised in the session link are moved to another CNode, in seconds
 - `vlan` (Number)
+
+### Read-Only
+
+- `md5_password_md5` (String) MD5 of md5_password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 
 <a id="nestedatt--racks"></a>
 ### Nested Schema for `racks`

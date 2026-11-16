@@ -10,8 +10,8 @@ import (
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 const vipPoolAllocateTimeout = 5 * time.Minute
@@ -24,11 +24,11 @@ var VipPoolSchemaRef = is.NewSchemaReference(
 )
 
 type VipPool struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *VipPool) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &VipPool{tfstate: is.NewTFStateMust(
+	return &VipPool{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -59,7 +59,7 @@ func (m *VipPool) NewResourceManager(raw map[string]attr.Value, schema any) Reso
 }
 
 func (m *VipPool) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &VipPool{tfstate: is.NewTFStateMust(
+	return &VipPool{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -69,7 +69,7 @@ func (m *VipPool) NewDatasourceManager(raw map[string]attr.Value, schema any) Da
 	}
 }
 
-func (m *VipPool) TfState() *is.TFState {
+func (m *VipPool) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -97,7 +97,7 @@ func (m *VipPool) CreateResource(ctx context.Context, rest *VMSRest) (Displayabl
 		return rest.VipPools.GetWithContext(ctx, ts.GetGenericSearchParams(ctx))
 	}
 
-	tflog.Debug(ctx, "VipPool.CreateResource: standard mode")
+	logging.Debug(ctx, "VipPool.CreateResource: standard mode")
 	delete(createParams, "ips_count")
 	return rest.VipPools.CreateWithContext(ctx, createParams)
 }
@@ -116,10 +116,10 @@ func (m *VipPool) UpdateResource(ctx context.Context, plan UpdateResource, rest 
 	id := stateTs.Int64("id")
 
 	if ipsCount != nil {
-		tflog.Debug(ctx, fmt.Sprintf("VipPool.UpdateResource: reallocate mode, id=%d, ips_count=%v", id, ipsCount))
+		logging.Debug(ctx, fmt.Sprintf("VipPool.UpdateResource: reallocate mode, id=%d, ips_count=%v", id, ipsCount))
 
 		body := params{"ips_count_to_add": ipsCount}
-		if ipRangesVal, ok := stateTs.Raw["ip_ranges"]; ok && !ipRangesVal.IsNull() && !ipRangesVal.IsUnknown() {
+		if ipRangesVal, ok := stateTs.RawValues()["ip_ranges"]; ok && !ipRangesVal.IsNull() && !ipRangesVal.IsUnknown() {
 			body["ip_ranges_to_remove"] = is.ConvertAttrValueToRaw(ipRangesVal, stateTs.Type("ip_ranges"))
 		}
 
@@ -140,10 +140,10 @@ func (m *VipPool) UpdateResource(ctx context.Context, plan UpdateResource, rest 
 	delete(updateParams, "id")
 
 	if len(updateParams) == 0 {
-		tflog.Debug(ctx, fmt.Sprintf("VipPool.UpdateResource: no changes for id=%d, refreshing state", id))
+		logging.Debug(ctx, fmt.Sprintf("VipPool.UpdateResource: no changes for id=%d, refreshing state", id))
 		return rest.VipPools.GetByIdWithContext(ctx, id)
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("VipPool.UpdateResource: standard update, id=%d", id))
+	logging.Debug(ctx, fmt.Sprintf("VipPool.UpdateResource: standard update, id=%d", id))
 	return rest.VipPools.UpdateWithContext(ctx, id, updateParams)
 }

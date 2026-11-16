@@ -3,13 +3,20 @@
 package provider
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -506,6 +513,82 @@ func TestS3PolicyAttachment_getSearchParamsFromState(t *testing.T) {
 			if tt.checkValueFunc != nil {
 				tt.checkValueFunc(t, val)
 			}
+		})
+	}
+}
+
+// Delete of an attachment whose user or group is already gone is a no-op:
+// there is nothing left to detach.
+func TestS3PolicyAttachment_DeleteResource_PrincipalGone(t *testing.T) {
+	const policy = `{"id":100,"guid":"policy-guid","name":"vastdb_s3policy"}`
+
+	tests := []struct {
+		name      string
+		sid       string
+		groupname string
+		userCode  int
+		groupCode int
+		wantErr   bool
+		wantPatch bool
+	}{
+		{name: "user 404", sid: "S-1-111", userCode: http.StatusNotFound},
+		{name: "group 404", groupname: "vastdb_group", groupCode: http.StatusNotFound},
+		{name: "user 500", sid: "S-1-111", userCode: http.StatusInternalServerError, wantErr: true},
+		{name: "user still attached", sid: "S-1-111", userCode: http.StatusOK, wantPatch: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var patched bool
+			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				switch {
+				case r.URL.Path == "/api/latest/s3policies/100/" || r.URL.Path == "/api/latest/s3policies/100":
+					_, _ = w.Write([]byte(policy))
+				case r.URL.Path == "/api/latest/users/query/":
+					if r.Method == http.MethodPatch {
+						patched = true
+						w.WriteHeader(http.StatusOK)
+						_, _ = w.Write([]byte(`{}`))
+						return
+					}
+					w.WriteHeader(tt.userCode)
+					if tt.userCode == http.StatusOK {
+						_, _ = w.Write([]byte(`{"id":1,"s3_policies_ids":[100]}`))
+						return
+					}
+					_, _ = w.Write([]byte(`{"detail":"User not found."}`))
+				case r.URL.Path == "/api/latest/groups/query/":
+					w.WriteHeader(tt.groupCode)
+					_, _ = w.Write([]byte(`{"detail":"Group not found."}`))
+				default:
+					t.Errorf("unexpected request %s %s", r.Method, r.URL.String())
+					w.WriteHeader(http.StatusNotFound)
+				}
+			}))
+			defer srv.Close()
+
+			u, err := url.Parse(srv.URL)
+			require.NoError(t, err)
+			port, err := strconv.ParseInt(u.Port(), 10, 64)
+			require.NoError(t, err)
+			rest, err := client.NewRest(u.Hostname(), port, "", "", "token", "", false, "test", 5*time.Second)
+			require.NoError(t, err)
+
+			raw := map[string]attr.Value{"s3_policy_id": types.Int64Value(100)}
+			if tt.sid != "" {
+				raw["sid"] = types.StringValue(tt.sid)
+			}
+			if tt.groupname != "" {
+				raw["groupname"] = types.StringValue(tt.groupname)
+			}
+			err = createTestS3PolicyAttachment(raw).DeleteResource(context.Background(), rest)
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			assert.Equal(t, tt.wantPatch, patched)
 		})
 	}
 }

@@ -94,12 +94,22 @@ func TestEndpointCertificateOps_MetadataRecord(t *testing.T) {
 	assert.Equal(t, info.MD5, rec[attrCertificateMD5])
 	assert.Len(t, info.MD5, 32)
 
+	// TERF-311: redacted PEM with no certificate_info must clear computed
+	// metadata so an external reset/removal is visible on the next plan.
 	redacted := o.metadataRecord(7, "*****", nil)
 	assert.Equal(t, int64(7), redacted["vms_id"])
-	_, hasFP := redacted[attrFingerprintSHA256]
-	assert.False(t, hasFP)
-	_, hasMD5 := redacted[attrCertificateMD5]
-	assert.False(t, hasMD5)
+	assert.Equal(t, "", redacted[attrFingerprintSHA256])
+	assert.Equal(t, "", redacted[attrCertificateMD5])
+	assert.Equal(t, "", redacted[attrSubject])
+	assert.Equal(t, "", redacted[attrNotAfter])
+
+	clearedInfo := o.metadataRecord(7, "***", Record{
+		"ssl_certificate_info": nil,
+	})
+	assert.Equal(t, "", clearedInfo[attrSubject])
+	assert.Equal(t, "", clearedInfo[attrFingerprintSHA256])
+	assert.Equal(t, "", clearedInfo[attrCertificateMD5])
+	assert.Equal(t, "", clearedInfo[attrNotAfter])
 
 	fromAPI := o.metadataRecord(7, "***", Record{
 		"ssl_certificate_info": map[string]any{
@@ -113,6 +123,44 @@ func TestEndpointCertificateOps_MetadataRecord(t *testing.T) {
 	})
 	assert.Equal(t, "CN=l3118-vms,O=VastData Test,C=US", fromAPI[attrSubject])
 	assert.Equal(t, "2027-10-06T08:12:43Z", fromAPI[attrNotAfter])
+	_, hasMD5 := fromAPI[attrCertificateMD5]
+	assert.False(t, hasMD5, "API certificate_info has no MD5; leave unset so prior state MD5 is kept when cert is still present")
+}
+
+// TERF-310: VMS returns subject RDNs in certificate encoding order (O,OU,CN for
+// OpenSSL multi-attribute subjects), while PEM parsing uses pkix.Name.String()
+// (CN,OU,O). Read must canonicalize to the PEM form or every plan re-uploads.
+func TestFormatAPIDistinguishedName_MatchesPEMSubjectOrder(t *testing.T) {
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	require.NoError(t, err)
+
+	tmpl := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			Organization:       []string{"VAST Data QA"},
+			OrganizationalUnit: []string{"Terraform"},
+			CommonName:         "tf-s3-cert-a",
+		},
+		NotBefore: time.Now().Add(-time.Hour).UTC(),
+		NotAfter:  time.Now().Add(24 * time.Hour).UTC(),
+		KeyUsage:  x509.KeyUsageDigitalSignature,
+	}
+	der, err := x509.CreateCertificate(rand.Reader, tmpl, tmpl, &key.PublicKey, key)
+	require.NoError(t, err)
+	certPEM := string(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der}))
+
+	pemInfo, err := parsePEMCertificateInfo(certPEM)
+	require.NoError(t, err)
+	assert.Equal(t, "CN=tf-s3-cert-a,OU=Terraform,O=VAST Data QA", pemInfo.Subject)
+
+	// API order mirrors OpenSSL encoding order (O, then OU, then CN).
+	apiSubject := formatAPIDistinguishedName([]any{
+		[]any{[]any{"organizationName", "VAST Data QA"}},
+		[]any{[]any{"organizationalUnitName", "Terraform"}},
+		[]any{[]any{"commonName", "tf-s3-cert-a"}},
+	})
+	assert.Equal(t, pemInfo.Subject, apiSubject)
+	assert.NotEqual(t, "O=VAST Data QA,OU=Terraform,CN=tf-s3-cert-a", apiSubject)
 }
 
 func TestEndpointCertificateOps_ParentID(t *testing.T) {

@@ -35,6 +35,8 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		return nil, fmt.Errorf("create schema reference is required but was nil")
 	}
 
+	defer beginSchemaPack(hints)()
+
 	resourcePath := hints.SchemaRef.Create.Path
 	resourceMethod := hints.SchemaRef.Create.Method
 	if resourcePath == "" {
@@ -53,15 +55,15 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	// Resolve createSchemaRef
 	switch resourceMethod {
 	case http.MethodPost:
-		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPost, resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(schemaPack, http.MethodPost, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get POST schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodGet:
-		if createSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get GET schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
-		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
+		if createSchemaRef, err = openapi_schema.GetRequestBodySchema(schemaPack, http.MethodPatch, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get PATCH schema for resource %q: %w", resourcePath, err)
 		}
 	default:
@@ -74,7 +76,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	switch resourceMethod {
 	case http.MethodPost:
 		// Try to get model schema from POST response
-		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPost, resourcePath)
+		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodPost, resourcePath)
 
 		// If POST doesn't have a response schema, try to use the Read endpoint as fallback
 		if err != nil && hints.SchemaRef.Read != nil {
@@ -82,25 +84,31 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			readMethod := hints.SchemaRef.Read.Method
 			if readMethod == http.MethodGet && readPath != "" {
 				warnWithContext(ctx, fmt.Sprintf("POST response schema not found for %q, using GET %q for model schema", resourcePath, readPath))
-				if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, readPath); err != nil {
+				if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, readPath); err != nil {
 					return nil, fmt.Errorf("failed to get model schema from POST response or GET %q: %w", readPath, err)
 				}
 			} else {
 				return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
 			}
 		} else if err != nil {
-			return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
+			// Write-only creates (no response body and no read endpoint) still need a model.
+			if createSchemaRef != nil {
+				modelSchemaRef = createSchemaRef
+				err = nil
+			} else {
+				return nil, fmt.Errorf("failed to get POST model schema for resource %q: %w", resourcePath, err)
+			}
 		}
 	case http.MethodGet:
 		// Use GET response schema for both create and model schemas (typically for read-only or schema-only resources)
-		if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodGet, resourcePath); err != nil {
+		if modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, resourcePath); err != nil {
 			return nil, fmt.Errorf("failed to get GET model schema for resource %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
-		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(http.MethodPatch, resourcePath)
+		modelSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodPatch, resourcePath)
 		if err != nil {
 			// Fallback: use PATCH request body schema
-			if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(http.MethodPatch, resourcePath); err != nil {
+			if modelSchemaRef, err = openapi_schema.GetRequestBodySchema(schemaPack, http.MethodPatch, resourcePath); err != nil {
 				return nil, fmt.Errorf("failed to get model schema for PATCH resource %q: %w", resourcePath, err)
 			}
 		}
@@ -136,7 +144,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		// Add fields from the POST request schema.
 		// fields are optional=true - means fields can be passed via POST request.
 		// fields are computed=false - at this stage we don't know if fields are returned by API or not. Might be overridden later.
-		addSchemaEntries(createSchemaRef.Value.Properties, requiredFields, hints, allProps, false, true, false, false, false, false)
+		addSchemaEntries(createSchemaRef.Value.Properties, requiredFields, hints, allProps, false, true, false, false, false, false, true)
 	}
 
 	if _, ok := allProps["id"]; ok {
@@ -190,12 +198,12 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			}
 			// optional false - field is part of response schema only so cannot be passed via POST request.
 			// computed true - field is returned by API so it is computed.
-			addSchemaEntries(map[string]*openapi3.SchemaRef{name: ref}, requiredFields, hints, allProps, false, false, true, false, false, false)
+			addSchemaEntries(map[string]*openapi3.SchemaRef{name: ref}, requiredFields, hints, allProps, false, false, true, false, false, false, true)
 		}
 	}
 
 	// Will be optional only fields (Query parameters).
-	params, err := openapi_schema.GetQueryParameters(http.MethodGet, resourcePath)
+	params, err := openapi_schema.GetQueryParameters(schemaPack, http.MethodGet, resourcePath)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +214,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 			continue
 		}
 		name := p.Name
-		if contains(excludeSearchParams, name) {
+		if contains(excludeSearchParams, name) || isExcluded(name, hints) {
 			continue
 		}
 		if p.Required {
@@ -218,12 +226,12 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		if _, exists := allProps[name]; exists {
 			continue
 		}
-		if !contains(excludeSearchParams, name) && !contains(hints.ReadOnlyFields, name) {
+		if !contains(excludeSearchParams, name) && !isExcluded(name, hints) && !contains(hints.ReadOnlyFields, name) {
 			return nil, fmt.Errorf("field %q was detected as read-only for resource %q"+
 				" but is not listed in ReadOnlyFields or ExcludedSchemaFields."+
 				" Such fields cannot be used in context of create/update but only as search query params", name, resourcePath)
 		}
-		addSchemaEntries(map[string]*openapi3.SchemaRef{name: buildTmpSchemaRefFromParam(p)}, nil, hints, allProps, false, true, false, false, false, false)
+		addSchemaEntries(map[string]*openapi3.SchemaRef{name: buildTmpSchemaRefFromParam(p)}, nil, hints, allProps, false, true, false, false, false, false, true)
 	}
 
 	// ---- NOTE: Just for printing information about searchable fields ----
@@ -234,7 +242,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 		infoWithContext(ctx, fmt.Sprintf("ReadOnly fields: %v", hints.ReadOnlyFields))
 	}
 
-	if searchableQueryParams, err := openapi_schema.SearchableQueryParams(resourcePath); err == nil {
+	if searchableQueryParams, err := openapi_schema.SearchableQueryParams(schemaPack, resourcePath); err == nil {
 		var filteredSearchableParams []string
 		for _, name := range searchableQueryParams {
 			if _, ok := allProps[name]; ok {
@@ -315,6 +323,7 @@ func GetResourceSchema(ctx context.Context, hints *TFStateHints) (*rschema.Schem
 	}
 
 	return &rschema.Schema{
+		Version:             schemaVersionForHints(hints),
 		Description:         description,
 		MarkdownDescription: description,
 		Attributes:          attrs,
@@ -345,11 +354,24 @@ func getResourceSchemaForCustom(hints *TFStateHints) (*rschema.Schema, error) {
 	}
 
 	return &rschema.Schema{
+		Version:             schemaVersionForHints(hints),
 		Description:         description,
 		MarkdownDescription: markdownDescription,
 		Attributes:          attrs,
 	}, nil
 
+}
+
+// schemaVersionForHints returns schema version 1 when WriteOnlyFields or
+// WriteOnlyMD5Fields are present so Terraform invokes UpgradeState.
+// Framework v1.15 passthrough (same version) does not nullify write-only attrs,
+// so leftover secrets from pre-WriteOnly state would otherwise fail with
+// "Invalid resource state upgrade".
+func schemaVersionForHints(hints *TFStateHints) int64 {
+	if hints != nil && (len(hints.WriteOnlyFields) > 0 || len(hints.WriteOnlyMD5Fields) > 0) {
+		return 1
+	}
+	return 0
 }
 
 func buildResourceAttributesFromMap(ctx context.Context, entries map[string]*SchemaEntry, hints *TFStateHints) map[string]rschema.Attribute {
@@ -520,7 +542,7 @@ func buildResourceAttribute(
 		switch (*itemSchema.Type)[0] {
 		case openapi3.TypeObject:
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 			attributes := buildResourceAttributesFromMap(ctx, nested, hints)
 
 			if isOrdered {
@@ -619,7 +641,7 @@ func buildResourceAttribute(
 
 			if valSchema.Type != nil && (*valSchema.Type)[0] == openapi3.TypeObject && len(valSchema.Properties) > 0 {
 				nested := make(map[string]*SchemaEntry)
-				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 				return rschema.MapNestedAttribute{
 					NestedObject: rschema.NestedAttributeObject{
 						Attributes: buildResourceAttributesFromMap(ctx, nested, hints),
@@ -647,7 +669,7 @@ func buildResourceAttribute(
 
 		if len(schema.Properties) > 0 {
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, entry.WriteOnly, entry.Sensitive, entry.Ordered)
+			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 			att := rschema.SingleNestedAttribute{
 				Attributes:          buildResourceAttributesFromMap(ctx, nested, hints),
 				Required:            entry.Required,

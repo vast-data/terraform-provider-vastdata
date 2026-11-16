@@ -15,11 +15,11 @@ var NisSchemaRef = is.NewSchemaReference(
 )
 
 type Nis struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Nis) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Nis{tfstate: is.NewTFStateMust(
+	return &Nis{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -29,7 +29,7 @@ func (m *Nis) NewResourceManager(raw map[string]attr.Value, schema any) Resource
 }
 
 func (m *Nis) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Nis{tfstate: is.NewTFStateMust(
+	return &Nis{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *Nis) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSo
 	)}
 }
 
-func (m *Nis) TfState() *is.TFState {
+func (m *Nis) TfState() is.ResourceState {
 	return m.tfstate
 }
 

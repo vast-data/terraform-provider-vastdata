@@ -15,7 +15,7 @@ func TestAddSchemaEntries_PrimitiveTypes(t *testing.T) {
 		"bar": {Value: &openapi3.Schema{Type: (*openapi3.Types)(&[]string{openapi3.TypeInteger})}},
 	}
 	target := map[string]*SchemaEntry{}
-	addSchemaEntries(props, []string{"foo"}, nil, target, false, true, false, false, false, false)
+	addSchemaEntries(props, []string{"foo"}, nil, target, false, true, false, false, false, false, true)
 	require.Contains(t, target, "foo")
 	require.True(t, target["foo"].Required)
 	require.Equal(t, "desc", target["foo"].Description)

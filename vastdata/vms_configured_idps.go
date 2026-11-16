@@ -11,11 +11,11 @@ import (
 )
 
 type VmsConfiguredIdps struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *VmsConfiguredIdps) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &VmsConfiguredIdps{tfstate: is.NewTFStateMust(
+	return &VmsConfiguredIdps{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -38,7 +38,7 @@ func (m *VmsConfiguredIdps) NewDatasourceManager(raw map[string]attr.Value, sche
 	)}
 }
 
-func (m *VmsConfiguredIdps) TfState() *is.TFState {
+func (m *VmsConfiguredIdps) TfState() is.ResourceState {
 	return m.tfstate
 }
 

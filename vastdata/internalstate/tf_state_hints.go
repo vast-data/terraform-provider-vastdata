@@ -83,6 +83,13 @@ type TFStateHints struct {
 	// optional or required. Write-only fields cannot be computed.
 	WriteOnlyFields []string
 
+	// WriteOnlyMD5Fields lists write-only secrets that have a computed <field>_md5
+	// companion used for change detection (see ContentMD5SchemaAttribute).
+	// GetUpdateParams omits all WriteOnlyFields from the PATCH body unless one of
+	// these fingerprints changed between plan and prior state. Companion write-only
+	// fields (e.g. password_retype next to password) follow the same decision.
+	WriteOnlyMD5Fields []string
+
 	// CreateOnlyFields lists fields that may be set on create (POST) but must never
 	// be sent on update (PATCH). Omitting them from configuration after create must
 	// not plan a null clear. These fields are also treated as Computed so
@@ -175,6 +182,10 @@ type TFStateHints struct {
 	// It is not used by the datasource read path.
 	RetryOn *RetryPolicy
 
+	// PathIDField is the record attribute used as the URL id for Get/Update/Delete
+	// (for example "guid" on DataEngine). Empty means "id".
+	PathIDField string
+
 	// AsyncTaskTimeout overrides the default timeout used when waiting
 	// for asynchronous task completion after create/update operations.
 	// When nil, the provider uses the default timeout (10 minutes).
@@ -263,6 +274,9 @@ type SchemaReference struct {
 
 	// Read specifies the OpenAPI endpoint to use for extracting the read schema (e.g., GET /volumes/{id}).
 	Read *OpenAPIEndpointRef
+
+	// Pack is the OpenAPI document id ("vms" or "dataengine"). Empty means VMS.
+	Pack OpenAPIPack
 }
 
 func NewSchemaReference(
@@ -298,6 +312,16 @@ type OpenAPIEndpointRef struct {
 	Method string
 	// Path in OpenAPI (e.g., "/volumes", "/volumes/{id}")
 	Path string
+}
+
+// Pack selects the OpenAPI document used to build the schema.
+// Empty means the VMS pack. DataEngine resources set openapi_schema.PackDataEngine.
+type OpenAPIPack = string
+
+func NewDataEngineSchemaReference(createMethod, createPath, readMethod, readPath string) *SchemaReference {
+	ref := NewSchemaReference(createMethod, createPath, readMethod, readPath)
+	ref.Pack = "dataengine"
+	return ref
 }
 
 type TFStateHintsForCustom struct {

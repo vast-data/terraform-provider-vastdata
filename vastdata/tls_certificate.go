@@ -7,10 +7,11 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 // POST /tlscertificates/ uses multipart/form-data which the schema generator
@@ -24,42 +25,47 @@ var TlsCertificateSchemaRef = is.NewSchemaReference(
 )
 
 type TlsCertificate struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *TlsCertificate) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &TlsCertificate{tfstate: is.NewTFStateMust(
+	return &TlsCertificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
-			Importable: &notImportable,
-			SchemaRef:  TlsCertificateSchemaRef,
+			Importable:         &notImportable,
+			SchemaRef:          TlsCertificateSchemaRef,
+			WriteOnlyFields:    []string{"ca_certificate_file", "revocation_file"},
+			WriteOnlyMD5Fields: []string{"ca_certificate_file", "revocation_file"},
+			SensitiveFields:    []string{"ca_certificate_file", "revocation_file"},
 			AdditionalSchemaAttributes: map[string]any{
 				// File-upload fields not present in the GET response schema.
 				"ca_certificate_file": rschema.StringAttribute{
 					Required:    true,
 					Sensitive:   true,
+					WriteOnly:   true,
 					Description: "CA certificate content (PEM/DER). Uploaded as a file to POST /tlscertificates/.",
 				},
 				"revocation_file": rschema.StringAttribute{
 					Optional:    true,
 					Sensitive:   true,
-					Description: "Certificate Revocation List (CRL) content. When cleared, the CRL is deleted via DELETE /tlscertificates/{id}/crl/.",
+					WriteOnly:   true,
+					Description: "Certificate Revocation List (CRL) content.",
 				},
+				"ca_certificate_file_md5": ContentMD5SchemaAttribute("ca_certificate_file", false),
+				"revocation_file_md5":     ContentMD5SchemaAttribute("revocation_file", false),
 				"tenant_id": rschema.Int64Attribute{
 					Optional:    true,
 					Computed:    true,
 					Description: "Tenant ID to associate with the TLS certificate.",
 				},
 			},
-			SensitiveFields:         []string{"ca_certificate_file", "revocation_file"},
-			PreserveUserValueFields: []string{"ca_certificate_file", "revocation_file"},
 		},
 	)}
 }
 
 func (m *TlsCertificate) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TlsCertificate{tfstate: is.NewTFStateMust(
+	return &TlsCertificate{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -68,12 +74,25 @@ func (m *TlsCertificate) NewDatasourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *TlsCertificate) TfState() *is.TFState {
+func (m *TlsCertificate) TfState() is.ResourceState {
 	return m.tfstate
 }
 
 func (m *TlsCertificate) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.TlsCertificates
+}
+
+func (m *TlsCertificate) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5Fields(ctx, req, resp,
+		"ca_certificate_file", "ca_certificate_file_md5",
+		"revocation_file", "revocation_file_md5",
+	)
+	return nil
+}
+
+func (m *TlsCertificate) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "ca_certificate_file", "revocation_file")
+	return record
 }
 
 // PrepareCreateResource calls POST /tlscertificates/is_operation_healthy/ to
@@ -89,7 +108,7 @@ func (m *TlsCertificate) PrepareCreateResource(ctx context.Context, rest *VMSRes
 	if warnings, ok := result["warnings"]; ok {
 		if ws, ok := warnings.([]any); ok && len(ws) > 0 {
 			for _, w := range ws {
-				tflog.Warn(ctx, fmt.Sprintf("TlsCertificate is_operation_healthy warning: %v", w))
+				logging.Warn(ctx, fmt.Sprintf("TlsCertificate is_operation_healthy warning: %v", w))
 			}
 		}
 	}
@@ -134,14 +153,19 @@ func (m *TlsCertificate) CreateResource(ctx context.Context, rest *VMSRest) (Dis
 	return result, nil
 }
 
-// AfterUpdateResource deletes the CRL when revocation_file is cleared.
+// AfterUpdateResource deletes the CRL when revocation_file_md5 is cleared.
 func (m *TlsCertificate) AfterUpdateResource(ctx context.Context, plan AfterUpdateResource, rest *VMSRest, record Record) error {
 	planTs := plan.(*TlsCertificate).TfState()
-
-	// If revocation_file was previously set and is now cleared, delete the CRL.
-	if m.tfstate.IsKnownAndNotNull("revocation_file") && !planTs.IsKnownAndNotNull("revocation_file") {
-		id := record.RecordID()
-		return rest.TlsCertificates.TlsCertificateCrlWithContext_DELETE(ctx, id)
+	stateHad := m.tfstate.IsKnownAndNotNull("revocation_file_md5") && m.tfstate.String("revocation_file_md5") != ""
+	planHas := planTs.IsKnownAndNotNull("revocation_file_md5") && planTs.String("revocation_file_md5") != ""
+	if !stateHad || planHas {
+		return nil
 	}
-	return nil
+	if exist, ok := record["revocations_exist"].(bool); ok && !exist {
+		return nil
+	}
+	id := record.RecordID()
+	err := rest.TlsCertificates.TlsCertificateCrlWithContext_DELETE(ctx, id)
+	// Already removed (e.g. prior apply deleted CRL but failed to clear md5).
+	return ignoreStatusCodes(err, http.StatusNotFound, http.StatusBadRequest)
 }

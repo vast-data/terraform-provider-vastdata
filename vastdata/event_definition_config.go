@@ -3,9 +3,11 @@ package provider
 
 import (
 	"context"
-	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"net/http"
+
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -19,27 +21,31 @@ var EventDefinitionConfigSchemaRef = is.NewSchemaReference(
 )
 
 type EventDefinitionConfig struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *EventDefinitionConfig) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &EventDefinitionConfig{tfstate: is.NewTFStateMust(
+	return &EventDefinitionConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
-			SchemaRef: EventDefinitionConfigSchemaRef,
+			SchemaRef:          EventDefinitionConfigSchemaRef,
+			WriteOnlyFields:    []string{"smtp_password"},
+			WriteOnlyMD5Fields: []string{"smtp_password"},
+			SensitiveFields:    []string{"smtp_password"},
 			AdditionalSchemaAttributes: map[string]any{
 				"id": rschema.Int64Attribute{
 					Required:    true,
 					Description: "Id of the event definition configuration",
 				},
+				"smtp_password_md5": ContentMD5SchemaAttribute("smtp_password", false),
 			},
 		},
 	)}
 }
 
 func (m *EventDefinitionConfig) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &EventDefinitionConfig{tfstate: is.NewTFStateMust(
+	return &EventDefinitionConfig{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -54,12 +60,22 @@ func (m *EventDefinitionConfig) NewDatasourceManager(raw map[string]attr.Value, 
 	)}
 }
 
-func (m *EventDefinitionConfig) TfState() *is.TFState {
+func (m *EventDefinitionConfig) TfState() is.ResourceState {
 	return m.tfstate
 }
 
 func (m *EventDefinitionConfig) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.EventDefinitionConfigs
+}
+
+func (m *EventDefinitionConfig) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
+	SetPlanContentMD5(ctx, req, resp, "smtp_password", "smtp_password_md5")
+	return nil
+}
+
+func (m *EventDefinitionConfig) TransformResponseRecord(record Record) Record {
+	DeleteRecordFields(record, "smtp_password")
+	return record
 }
 
 func (m *EventDefinitionConfig) DeleteResource(ctx context.Context, rest *VMSRest) error {

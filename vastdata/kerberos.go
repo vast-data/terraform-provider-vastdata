@@ -16,11 +16,11 @@ var KerberosSchemaRef = is.NewSchemaReference(
 )
 
 type Kerberos struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *Kerberos) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &Kerberos{tfstate: is.NewTFStateMust(
+	return &Kerberos{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -32,7 +32,7 @@ func (m *Kerberos) NewResourceManager(raw map[string]attr.Value, schema any) Res
 }
 
 func (m *Kerberos) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &Kerberos{tfstate: is.NewTFStateMust(
+	return &Kerberos{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -41,7 +41,7 @@ func (m *Kerberos) NewDatasourceManager(raw map[string]attr.Value, schema any) D
 	}
 }
 
-func (m *Kerberos) TfState() *is.TFState {
+func (m *Kerberos) TfState() is.ResourceState {
 	return m.tfstate
 }
 

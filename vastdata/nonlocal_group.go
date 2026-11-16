@@ -20,11 +20,11 @@ var NonlocalGroupSchemaRef = is.NewSchemaReference(
 )
 
 type NonlocalGroup struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *NonlocalGroup) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &NonlocalGroup{tfstate: is.NewTFStateMust(
+	return &NonlocalGroup{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -49,7 +49,7 @@ func (m *NonlocalGroup) NewResourceManager(raw map[string]attr.Value, schema any
 }
 
 func (m *NonlocalGroup) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &NonlocalGroup{tfstate: is.NewTFStateMust(
+	return &NonlocalGroup{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -88,7 +88,7 @@ func (m *NonlocalGroup) NewDatasourceManager(raw map[string]attr.Value, schema a
 	)}
 }
 
-func (m *NonlocalGroup) TfState() *is.TFState {
+func (m *NonlocalGroup) TfState() is.ResourceState {
 	return m.tfstate
 }
 
@@ -126,7 +126,7 @@ func (m *NonlocalGroup) DeleteResource(ctx context.Context, rest *VMSRest) error
 // needs to be updated with new fields (like tenant_id or s3_policies_ids) and performs the update if necessary.
 //
 // This is used in both CreateResource and UpdateResource for NonLocalGroup.
-func ensureNonlocalGroupUpdatedWith(ctx context.Context, stateTs, fieldsTs *is.TFState, rest *VMSRest) (DisplayableRecord, error) {
+func ensureNonlocalGroupUpdatedWith(ctx context.Context, stateTs, fieldsTs is.ResourceState, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := getSearchParams(ctx, stateTs, fieldsTs)
 	record, err := rest.Groups.GroupQueryWithContext_GET(ctx, searchParams)
 	if err != nil {

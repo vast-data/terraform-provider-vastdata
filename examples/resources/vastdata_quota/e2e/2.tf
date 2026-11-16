@@ -38,7 +38,6 @@ resource "vastdata_quota" "vastdb_quota" {
     identifier      = vastdata_user.vastdb_quota_user.name
     email           = "user1@example.com"
     identifier_type = "username"
-    is_group        = false
     hard_limit      = 100000
     soft_limit      = 50000
     grace_period    = "90m"
@@ -47,7 +46,6 @@ resource "vastdata_quota" "vastdb_quota" {
     name            = vastdata_group.vastdb_quota_group.name
     identifier      = vastdata_group.vastdb_quota_group.name
     identifier_type = "group"
-    is_group        = true
     hard_limit      = 100000
     soft_limit      = 50000
     grace_period    = "90m"

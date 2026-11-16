@@ -24,11 +24,11 @@ var FolderReadOnlySchemaRef = is.NewSchemaReference(
 )
 
 type FolderReadOnly struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *FolderReadOnly) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &FolderReadOnly{tfstate: is.NewTFStateMust(
+	return &FolderReadOnly{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -63,7 +63,7 @@ func (m *FolderReadOnly) NewResourceManager(raw map[string]attr.Value, schema an
 }
 
 func (m *FolderReadOnly) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &FolderReadOnly{tfstate: is.NewTFStateMust(
+	return &FolderReadOnly{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -72,7 +72,7 @@ func (m *FolderReadOnly) NewDatasourceManager(raw map[string]attr.Value, schema 
 	)}
 }
 
-func (m *FolderReadOnly) TfState() *is.TFState {
+func (m *FolderReadOnly) TfState() is.ResourceState {
 	return m.tfstate
 }
 

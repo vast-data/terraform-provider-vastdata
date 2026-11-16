@@ -18,11 +18,11 @@ var TenantMetricLabelsSchemaRef = is.NewSchemaReference(
 )
 
 type TenantMetricLabels struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *TenantMetricLabels) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &TenantMetricLabels{tfstate: is.NewTFStateMust(
+	return &TenantMetricLabels{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -37,7 +37,7 @@ func (m *TenantMetricLabels) NewResourceManager(raw map[string]attr.Value, schem
 }
 
 func (m *TenantMetricLabels) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TenantMetricLabels{tfstate: is.NewTFStateMust(
+	return &TenantMetricLabels{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -46,7 +46,7 @@ func (m *TenantMetricLabels) NewDatasourceManager(raw map[string]attr.Value, sch
 	)}
 }
 
-func (m *TenantMetricLabels) TfState() *is.TFState {
+func (m *TenantMetricLabels) TfState() is.ResourceState {
 	return m.tfstate
 }
 

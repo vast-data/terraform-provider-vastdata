@@ -27,12 +27,16 @@ data "vastdata_cluster" "vastdb_cluster" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `audit_dir_name` (String) Audit directory name, located under root directory. Protocol audit logs are saved to this directory.
 - `auto_drive_fw_upgrade` (Boolean) Enable/disable auto drives FW upgrade
 - `bmc_upgrade` (Boolean) BMC upgrade
 - `build` (String) The build to be installed on the cluster
+- `cert_pass` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Provides the password that protects the private key of the replication certificate uploaded as cluster_private_key, if password protected. The password must be supplied when uploading cluster_private_key and must be re-entered when modifying the certificate.
 - `cloud_lb` (Boolean) vast on cloud installation flag (default is False)
 - `cluster_guid` (String) Guid of the system
+- `cluster_private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Private Key file content of a CA signed certificate, used for mTLS encryption of replication peer connections where secure mode is enabled in the replication peer configuration.  A certificate and private key must be installed on each participating replication peer cluster, and the CA's root certificate must be installed on each peer.
 - `cnode_cores` (Number) Number of cnode cores
 - `cnode_ips` (Set of String) The list of cnode ips, optional
 - `cnode_ipv6_pool` (Set of String) The list of cnode ipv6 addresses, optional
@@ -65,7 +69,7 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `ekm_certificate` (String) The SSL certificate for the connection to the EKM servers
 - `ekm_domain` (String) EKM domain (Thales)
 - `ekm_port` (Number) Port number for connections to an External Key Manager. Applicable if encryption is enabled and encryption type is one of the external key management types. Valid range: 1024 - 65535. Default: 5696
-- `ekm_private_key` (String) The private key of the SSL certificate for the connection to the EKM servers.
+- `ekm_private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) The private key of the SSL certificate for the connection to the EKM servers.
 - `ekm_proxy_address` (String) Thales EKM proxy address: https://proxy-address:port
 - `ekm_servers` (String) List of EKM server IPs, additional to ekm_address. Up to five servers may be specified in total. For example: 10.0.0.1:5696,11.0.0.1:5697
 - `enable_dr` (Boolean) Enable data reduction
@@ -108,6 +112,7 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `mock_raider_gui_availability` (Boolean) Creates mock for HPE Raider GUI availability, default is False
 - `nb_eth_mtu` (Number) Ethernet Northbound MTU, optional
 - `nb_ib_mtu` (Number) Infiniband Northbound MTU, optional
+- `nfs4_private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Private key file content of TLS certificate for NFSv4. See also nfs4_certificate.
 - `no_perf_check` (Boolean) Don't check cluster performance (default is False, i.e. perform check)
 - `nvram_section_layout` (String) NVRAM Section Layout
 - `nvram_size` (Number) NVRAM size for mocked devices
@@ -119,6 +124,7 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `read_access_users_groups` (Set of String) Enter groups here to grant them read access to all files in the audit directory. To make the audit directory accessible to clients, create a view on the directory.
 - `restrict_user` (Boolean) Flag for restrict vastdata user, default is False
 - `s3_block_v2_authentication` (Boolean) Manage s3 blocks v2 authentication
+- `s3_private_key` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Private file content of the SSL certificate used to enable client connection to the S3 service over HTTPS.
 - `secondary_ekm_address` (String) EKM address
 - `secondary_ekm_port` (Number) EKM port. Valid range: 1024 - 65535.
 - `shards` (Number) Number of shards
@@ -143,15 +149,16 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `block_ipmi` (Boolean) IPMI/BMC access is blocked on this system
 - `bw` (Number) Bandwidth
 - `bw_mb` (Number) Bandwidth
-- `cert_pass` (String) Provides the password that protects the private key of the replication certificate uploaded as cluster_private_key, if password protected. The password must be supplied when uploading cluster_private_key and must be re-entered when modifying the certificate.
+- `cert_pass_md5` (String) MD5 of cert_pass (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `cloud_provider` (String) Cloud provider for VOC system, null for on-prem systems.
 - `cluster_certificate` (String) Certificate (public key) file content of a CA signed certificate for mTLS encryption of replication peer connections where secure mode is enabled in the replication peer configuration. A certificate and private key must be installed on each participating replication peer cluster, and the CA's root certificate must be installed on each peer.
-- `cluster_private_key` (String) Private Key file content of a CA signed certificate, used for mTLS encryption of replication peer connections where secure mode is enabled in the replication peer configuration.  A certificate and private key must be installed on each participating replication peer cluster, and the CA's root certificate must be installed on each peer.
+- `cluster_private_key_md5` (String) MD5 of cluster_private_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `cnode_metrics` (Boolean) Enable cnode-level metrics collection
 - `deployment_time` (String) Cluster deployment time
 - `drive_pci_port_type` (String) Cluster pci port type (dual, single)
 - `drr` (Number) Data reduction ratio (logical_space_in_use / physical_space_in_use)
 - `drr_text` (String) DRR presented as 1:5.6
+- `ekm_private_key_md5` (String) MD5 of ekm_private_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `enable_bucket_db_replication` (Boolean) True if bucket DB replication is enabled
 - `enable_bucket_replication` (Boolean) True if bucket replication is enabled
 - `enable_json_audit` (Boolean) If enabled, audit logs are saved in JSON format into a file in the directory specified as audit_dir_name.  Can be enabled in addition to enable_vast_db_audit.
@@ -222,7 +229,7 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `ndb_number_of_running_queries` (Number) NDB number of running queries
 - `ndb_rows_scanned_per_second` (Number) NDB rows scanned per second
 - `nfs4_certificate` (String) Certificate file content of TLS certificate, used to enforce TLS encryption on NFSv4 client connections. TLS encryption is controlled by the view policy and provides an alternative to Kerberos encryption for environments where Active Directory is not used.
-- `nfs4_private_key` (String) Private key file content of TLS certificate for NFSv4. See also nfs4_certificate.
+- `nfs4_private_key_md5` (String) MD5 of nfs4_private_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `nvram_raid_rebuild_progress` (Number) Percentage progress of NVRAM RAID rebuild, if in progress
 - `nvram_raid_rebuild_progress_fraction` (String) Progress of SSD RAID rebuild expressed as a fraction, if in progress
 - `nvram_raid_state` (String)
@@ -270,7 +277,7 @@ data "vastdata_cluster" "vastdb_cluster" {
 - `s3_allow_cors` (Boolean)
 - `s3_certificate` (String) Certificate file content of the SSL certificate used to enable client connection to the S3 service over HTTPS.
 - `s3_enable_v2_authentication` (Boolean) If true, version 2 authentication is blocked for S3 client API requests. Disabled by default.
-- `s3_private_key` (String) Private file content of the SSL certificate used to enable client connection to the S3 service over HTTPS.
+- `s3_private_key_md5` (String) MD5 of s3_private_key (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `s3_true_ip_config` (Attributes) (see [below for nested schema](#nestedatt--s3_true_ip_config))
 - `showmount_hide_slash` (Boolean) Suppress Linux showmount command output including "/"
 - `showmount_suppressed` (Boolean) Suppress Linux showmount command output on for NFSv3 users

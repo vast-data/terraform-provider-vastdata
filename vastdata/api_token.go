@@ -17,11 +17,11 @@ var ApiTokenSchemaRef = is.NewSchemaReference(
 )
 
 type ApiToken struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *ApiToken) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &ApiToken{tfstate: is.NewTFStateMust(
+	return &ApiToken{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -33,7 +33,7 @@ func (m *ApiToken) NewResourceManager(raw map[string]attr.Value, schema any) Res
 }
 
 func (m *ApiToken) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &ApiToken{tfstate: is.NewTFStateMust(
+	return &ApiToken{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -42,7 +42,7 @@ func (m *ApiToken) NewDatasourceManager(raw map[string]attr.Value, schema any) D
 	)}
 }
 
-func (m *ApiToken) TfState() *is.TFState {
+func (m *ApiToken) TfState() is.ResourceState {
 	return m.tfstate
 }
 

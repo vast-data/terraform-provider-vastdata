@@ -128,12 +128,14 @@ resource "vastdata_user" "vastdb_user" {
 
 ### Optional
 
+> **NOTE**: [Write-only arguments](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments) are supported in Terraform 1.11 and later.
+
 - `allow_create_bucket` (Boolean) Set to true to give the user permission to create S3 buckets. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `allow_delete_bucket` (Boolean) Set to true to give the user permission to delete S3 buckets. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `gids` (Set of Number) List of group GIDs of all groups to which the user should belong.
 - `leading_gid` (Number) Leading GID
 - `local` (Boolean) Not in use
-- `password` (String, Sensitive) Password
+- `password` (String, Sensitive, [Write-only](https://developer.hashicorp.com/terraform/language/resources/ephemeral#write-only-arguments)) Password
 - `s3_policies_ids` (Set of Number) S3 policies IDs, denoting which S3 identity policies are associated with the user. The user is granted and denied S3 permissions according to the associated S3 identity policies.
 - `s3_superuser` (Boolean) Set to true to give the user S3 superuser permission. In case of conflict with an S3 identity policy attached to the user or to a relevant group, this setting is overridden.
 - `uid` (Number) NFS UID
@@ -150,6 +152,7 @@ resource "vastdata_user" "vastdb_user" {
 - `leading_group_name` (String) Leading Group
 - `local_provider` (Attributes) (see [below for nested schema](#nestedatt--local_provider))
 - `password_is_set` (Boolean) Password is set
+- `password_md5` (String) MD5 of password (lowercase hex). Computed from the configured value at plan time so changes to the write-only field are detected. Not settable.
 - `primary_group_sid` (String) Primary group SID
 - `s3_policies` (Attributes Set) (see [below for nested schema](#nestedatt--s3_policies))
 - `sid` (String) SID

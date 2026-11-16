@@ -19,11 +19,11 @@ var UserCopySchemaRef = is.NewSchemaReference(
 )
 
 type UserCopy struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *UserCopy) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &UserCopy{tfstate: is.NewTFStateMust(
+	return &UserCopy{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -33,7 +33,7 @@ func (m *UserCopy) NewResourceManager(raw map[string]attr.Value, schema any) Res
 	)}
 }
 
-func (m *UserCopy) TfState() *is.TFState {
+func (m *UserCopy) TfState() is.ResourceState {
 	return m.tfstate
 }
 

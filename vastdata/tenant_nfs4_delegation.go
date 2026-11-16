@@ -19,11 +19,11 @@ var TenantNfs4DelegationSchemaRef = is.NewSchemaReference(
 )
 
 type TenantNfs4Delegation struct {
-	tfstate *is.TFState
+	tfstate is.ResourceState
 }
 
 func (m *TenantNfs4Delegation) NewResourceManager(raw map[string]attr.Value, schema any) ResourceManager {
-	return &TenantNfs4Delegation{tfstate: is.NewTFStateMust(
+	return &TenantNfs4Delegation{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -43,7 +43,7 @@ func (m *TenantNfs4Delegation) NewResourceManager(raw map[string]attr.Value, sch
 }
 
 func (m *TenantNfs4Delegation) NewDatasourceManager(raw map[string]attr.Value, schema any) DataSourceManager {
-	return &TenantNfs4Delegation{tfstate: is.NewTFStateMust(
+	return &TenantNfs4Delegation{tfstate: is.NewResourceState(
 		raw,
 		schema,
 		&is.TFStateHints{
@@ -62,7 +62,7 @@ func (m *TenantNfs4Delegation) NewDatasourceManager(raw map[string]attr.Value, s
 	)}
 }
 
-func (m *TenantNfs4Delegation) TfState() *is.TFState {
+func (m *TenantNfs4Delegation) TfState() is.ResourceState {
 	return m.tfstate
 }
 
