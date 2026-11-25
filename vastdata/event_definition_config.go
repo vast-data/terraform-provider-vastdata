@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -66,11 +65,6 @@ func (m *EventDefinitionConfig) TfState() is.ResourceState {
 
 func (m *EventDefinitionConfig) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.EventDefinitionConfigs
-}
-
-func (m *EventDefinitionConfig) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "smtp_password", "smtp_password_md5")
-	return nil
 }
 
 func (m *EventDefinitionConfig) TransformResponseRecord(record Record) Record {

@@ -697,6 +697,46 @@ func (l *ResourceLifecycle) UpgradeResourceSchema(
 // A failing hook is returned immediately, and no callback of that stage runs.
 // -----------------
 
+// PrepareDesiredState seeds WriteOnlyMD5Fields companions on m, then runs the
+// manager's PrepareDesiredState hook when present. Safe for Terraform ModifyPlan
+// and Crossplane Observe/Update (framework-agnostic).
+func (l *ResourceLifecycle) PrepareDesiredState(ctx context.Context, m ResourceManager) error {
+	return runPrepareDesiredState(ctx, m)
+}
+
+// ValidateResourceConfig runs the manager's ValidateResourceConfig hook when present.
+func (l *ResourceLifecycle) ValidateResourceConfig(ctx context.Context, m ResourceManager) error {
+	return runValidateResourceConfig(ctx, m)
+}
+
+// runPrepareDesiredState is the shared implementation (also usable without a lifecycle).
+func runPrepareDesiredState(ctx context.Context, m ResourceManager) error {
+	if m == nil || m.TfState() == nil {
+		return nil
+	}
+	ApplyWriteOnlyMD5FromHints(m.TfState())
+	if imp, ok := m.(PrepareDesiredState); ok {
+		if err := imp.PrepareDesiredState(ctx, m.TfState()); err != nil {
+			return fmt.Errorf("PrepareDesiredState: %w", err)
+		}
+	}
+	return nil
+}
+
+func runValidateResourceConfig(ctx context.Context, m ResourceManager) error {
+	if m == nil {
+		return nil
+	}
+	imp, ok := m.(ValidateResourceConfig)
+	if !ok {
+		return nil
+	}
+	if err := imp.ValidateResourceConfig(ctx); err != nil {
+		return fmt.Errorf("ValidateResourceConfig: %w", err)
+	}
+	return nil
+}
+
 func (l *ResourceLifecycle) runPrepareCreateResource(ctx context.Context, m ResourceManager) error {
 	if imp, ok := m.(PrepareCreateResource); ok {
 		if err := imp.PrepareCreateResource(ctx, l.Rest); err != nil {

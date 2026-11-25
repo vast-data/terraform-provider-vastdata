@@ -7,7 +7,6 @@ import (
 
 	"github.com/ProtonMail/gopenpgp/v2/helper"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -96,14 +95,6 @@ func (m *Certificate) PrepareCreateResource(ctx context.Context, rest *VMSRest) 
 }
 
 // ModifyPlan fingerprints write-only PEM fields so rotations plan an update.
-func (m *Certificate) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"ca_certificate", "ca_certificate_md5",
-		"certificate", "certificate_md5",
-		"private_key", "private_key_md5",
-	)
-	return nil
-}
 
 // TransformResponseRecord drops PEM fields from GET responses. The API returns
 // redacted placeholders that must not be written into Terraform state.

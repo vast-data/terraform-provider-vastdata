@@ -696,9 +696,10 @@ func allPrimitiveScalars(vals []any) bool {
 //
 //  1. Keep the secret as WriteOnly (+ Sensitive).
 //  2. Add a computed "<field>_md5" attribute (see ContentMD5SchemaAttribute).
-//  3. In ModifyPlan, call SetPlanContentMD5 so the plan fingerprint comes from
-//     the configured value.
-//  4. On read/transform, call SetRecordContentMD5 when the API still returns the
+//  3. List the field in WriteOnlyMD5Fields — ResourceLifecycle.PrepareDesiredState
+//     seeds <field>_md5 via ApplyWriteOnlyMD5FromHints (TF ModifyPlan and Crossplane).
+//  4. For non-ContentMD5 fingerprints (e.g. DER cert md5), implement PrepareDesiredState.
+//  5. On read/transform, call SetRecordContentMD5 when the API still returns the
 //     secret (or clear the md5 when it does not) so state stays in sync.
 //
 // Used by vastdata_license (replace on md5 change) and
@@ -740,9 +741,45 @@ func ContentMD5SchemaAttribute(sourceField string, requiresReplace bool) rschema
 	}
 }
 
+// SetStateContentMD5 sets md5Field on st from ContentMD5Hex(sourceField).
+// Empty/null source clears md5Field (TERF-320). Shared by TF and Crossplane.
+func SetStateContentMD5(st is.ResourceState, sourceField, md5Field string) {
+	if st == nil || !st.HasAttribute(md5Field) {
+		return
+	}
+	raw := st.RawValues()
+	v, ok := raw[sourceField]
+	if !ok || v == nil || v.IsNull() || v.IsUnknown() {
+		raw[md5Field] = types.StringNull()
+		return
+	}
+	s, ok := v.(types.String)
+	if !ok || s.ValueString() == "" {
+		raw[md5Field] = types.StringNull()
+		return
+	}
+	st.Set(md5Field, ContentMD5Hex(s.ValueString()))
+}
+
+// ApplyWriteOnlyMD5FromHints seeds every WriteOnlyMD5Fields companion <field>_md5
+// from the secret currently on st (ContentMD5Hex). Custom PrepareDesiredState
+// hooks may overwrite specific companions afterward (e.g. DER cert md5).
+func ApplyWriteOnlyMD5FromHints(st is.ResourceState) {
+	if st == nil {
+		return
+	}
+	hints := st.StateHints()
+	if hints == nil || len(hints.WriteOnlyMD5Fields) == 0 {
+		return
+	}
+	for _, field := range hints.WriteOnlyMD5Fields {
+		SetStateContentMD5(st, field, field+"_md5")
+	}
+}
+
 // SetPlanContentMD5 reads sourceField from config and sets md5Field on the plan
-// to ContentMD5Hex(value). When the source is null/empty (removed from config),
-// clears md5Field so Terraform detects the removal (TERF-320).
+// to ContentMD5Hex(value). Prefer ApplyWriteOnlyMD5FromHints / PrepareDesiredState;
+// kept for tests and any remaining direct callers.
 func SetPlanContentMD5(
 	ctx context.Context,
 	req resource.ModifyPlanRequest,

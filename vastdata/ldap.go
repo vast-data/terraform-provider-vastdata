@@ -2,11 +2,9 @@
 package provider
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -55,11 +53,6 @@ func (m *Ldap) TfState() is.ResourceState {
 
 func (m *Ldap) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Ldaps
-}
-
-func (m *Ldap) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "bindpw", "bindpw_md5")
-	return nil
 }
 
 func (m *Ldap) TransformResponseRecord(record Record) Record {

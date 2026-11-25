@@ -2,11 +2,9 @@
 package provider
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -53,11 +51,6 @@ func (m *BgpConfig) TfState() is.ResourceState {
 
 func (m *BgpConfig) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.BGPConfigs
-}
-
-func (m *BgpConfig) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "md5_password", "md5_password_md5")
-	return nil
 }
 
 func (m *BgpConfig) TransformResponseRecord(record Record) Record {

@@ -7,7 +7,6 @@ import (
 
 	version "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -99,17 +98,6 @@ func (m *Cluster) NewDatasourceManager(raw map[string]attr.Value, schema any) Da
 
 func (m *Cluster) TfState() is.ResourceState {
 	return m.tfstate
-}
-
-func (m *Cluster) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"cluster_private_key", "cluster_private_key_md5",
-		"s3_private_key", "s3_private_key_md5",
-		"nfs4_private_key", "nfs4_private_key_md5",
-		"cert_pass", "cert_pass_md5",
-		"ekm_private_key", "ekm_private_key_md5",
-	)
-	return nil
 }
 
 func (m *Cluster) TransformResponseRecord(record Record) Record {

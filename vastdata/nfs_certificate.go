@@ -5,7 +5,6 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -68,6 +67,6 @@ func (m *NfsCertificate) DeleteResource(_ context.Context, _ *VMSRest) error {
 	return nil
 }
 
-func (m *NfsCertificate) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	return m.ops().ModifyPlan(ctx, req, resp)
+func (m *NfsCertificate) PrepareDesiredState(ctx context.Context, desired is.ResourceState) error {
+	return m.ops().PrepareDesiredState(ctx, desired)
 }

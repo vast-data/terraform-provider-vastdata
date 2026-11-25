@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -62,14 +61,6 @@ func (m *SupportBundlesQueue) TfState() is.ResourceState {
 
 func (m *SupportBundlesQueue) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.SupportBundlesQueue
-}
-
-func (m *SupportBundlesQueue) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"access_key", "access_key_md5",
-		"secret_key", "secret_key_md5",
-	)
-	return nil
 }
 
 func (m *SupportBundlesQueue) TransformResponseRecord(record Record) Record {

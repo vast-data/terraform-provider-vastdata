@@ -262,6 +262,16 @@ type PrepareDeleteResource interface {
 	PrepareDeleteResource(context.Context, *VMSRest) error
 }
 
+// PrepareDesiredState derives plan/desired fingerprints and computed companions
+// (e.g. certificate not_after) on a ResourceState. Framework-agnostic so both
+// Terraform ModifyPlan and Crossplane Observe/Update can share it.
+// Generic WriteOnlyMD5Fields seeding is done by ResourceLifecycle before this hook.
+type PrepareDesiredState interface {
+	PrepareDesiredState(ctx context.Context, desired is.ResourceState) error
+}
+
+// ModifyPlanResource is deprecated: prefer PrepareDesiredState. Kept so any
+// remaining TF-only plan hooks can still run from modifyPlanImpl as a fallback.
 type ModifyPlanResource interface {
 	ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error
 }

@@ -13,8 +13,6 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -322,36 +320,29 @@ func (o *endpointCertificateOps) Apply(ctx context.Context, rest *VMSRest, ts is
 	return o.metadataRecord(parentID, pemData, parent), nil
 }
 
-func (o *endpointCertificateOps) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	if req.Plan.Raw.IsNull() {
+// PrepareDesiredState derives DER-based certificate_md5 and PEM metadata onto desired.
+// Overwrites the ContentMD5 companion seeded from WriteOnlyMD5Fields (PEM string).
+func (o *endpointCertificateOps) PrepareDesiredState(_ context.Context, desired is.ResourceState) error {
+	if desired == nil {
 		return nil
 	}
-	set := func(name string, v attr.Value) {
-		resp.Diagnostics.Append(resp.Plan.SetAttribute(ctx, path.Root(name), v)...)
-	}
-	var cert types.String
-	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root(attrCertificate), &cert)...)
-	if resp.Diagnostics.HasError() {
+	raw := desired.RawValues()
+	v, ok := raw[attrCertificate]
+	if !ok || v == nil || v.IsNull() || v.IsUnknown() {
 		return nil
 	}
-	if cert.IsUnknown() {
-		set(attrCertificateMD5, types.StringUnknown())
-		set(attrNotAfter, types.StringUnknown())
-		set(attrSubject, types.StringUnknown())
-		set(attrFingerprintSHA256, types.StringUnknown())
+	s, ok := v.(types.String)
+	if !ok || s.ValueString() == "" {
 		return nil
 	}
-	if cert.IsNull() || cert.ValueString() == "" {
-		return nil
-	}
-	info, err := parsePEMCertificateInfo(cert.ValueString())
+	info, err := parsePEMCertificateInfo(s.ValueString())
 	if err != nil {
 		return err
 	}
-	set(attrCertificateMD5, types.StringValue(info.MD5))
-	set(attrNotAfter, types.StringValue(info.NotAfter))
-	set(attrSubject, types.StringValue(info.Subject))
-	set(attrFingerprintSHA256, types.StringValue(info.FingerprintSHA256))
+	desired.Set(attrCertificateMD5, info.MD5)
+	desired.Set(attrNotAfter, info.NotAfter)
+	desired.Set(attrSubject, info.Subject)
+	desired.Set(attrFingerprintSHA256, info.FingerprintSHA256)
 	return nil
 }
 

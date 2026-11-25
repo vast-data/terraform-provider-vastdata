@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -87,7 +86,3 @@ func (m *License) TransformResponseRecord(record Record) Record {
 }
 
 // ModifyPlan sets license_key_md5 from the write-only license_key in config.
-func (m *License) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "license_key", "license_key_md5")
-	return nil
-}

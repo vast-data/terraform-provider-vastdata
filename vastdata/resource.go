@@ -9,9 +9,12 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -240,16 +243,55 @@ func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRe
 		return
 	}
 	manager := r.NewManager(req.Plan)
-	imp, ok := manager.(ModifyPlanResource)
-	if !ok {
-		return
-	}
-	logging.Debug(ctx, fmt.Sprintf("ModifyPlanResource[%s]: do.", r.managerName))
-	if err := imp.ModifyPlan(ctx, req, resp); err != nil {
+	// Write-only attrs are null in Plan; load them from Config so MD5 seeding sees secrets.
+	r.overlayWriteOnlyFromConfig(manager, req.Config)
+
+	logging.Debug(ctx, fmt.Sprintf("PrepareDesiredState[%s]: do.", r.managerName))
+	if err := r.lifecycle.PrepareDesiredState(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("ModifyPlanResource[%q]", r.managerName),
+			fmt.Sprintf("PrepareDesiredState[%q]", r.managerName),
 			err.Error(),
 		)
+		return
+	}
+	syncComputedAttrsToPlan(ctx, manager.TfState(), &resp.Plan, &resp.Diagnostics)
+
+	// Legacy TF-only ModifyPlan fallback (prefer PrepareDesiredState).
+	if imp, ok := manager.(ModifyPlanResource); ok {
+		logging.Debug(ctx, fmt.Sprintf("ModifyPlanResource[%s]: do.", r.managerName))
+		if err := imp.ModifyPlan(ctx, req, resp); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("ModifyPlanResource[%q]", r.managerName),
+				err.Error(),
+			)
+		}
+	}
+}
+
+// syncComputedAttrsToPlan copies known non-null computed attributes from st onto the
+// plan (WriteOnlyMD5 companions and PrepareDesiredState-derived fields).
+func syncComputedAttrsToPlan(ctx context.Context, st is.ResourceState, plan *tfsdk.Plan, diags *diag.Diagnostics) {
+	if st == nil || plan == nil || diags == nil {
+		return
+	}
+	for k, v := range st.RawValues() {
+		if v == nil || v.IsNull() || v.IsUnknown() {
+			continue
+		}
+		if !st.IsComputed(k) {
+			continue
+		}
+		diags.Append(plan.SetAttribute(ctx, path.Root(k), v)...)
+	}
+	// TERF-320: cleared optional write-only secrets must null their *_md5 companions.
+	if hints := st.StateHints(); hints != nil {
+		for _, field := range hints.WriteOnlyMD5Fields {
+			md5Field := field + "_md5"
+			v, ok := st.RawValues()[md5Field]
+			if !ok || v == nil || v.IsNull() {
+				diags.Append(plan.SetAttribute(ctx, path.Root(md5Field), types.StringNull())...)
+			}
+		}
 	}
 }
 
@@ -619,16 +661,12 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 
 func (r *Resource) validateConfigImpl(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
 	manager := r.NewManager(req.Config)
-	if imp, ok := manager.(ValidateResourceConfig); ok {
-		if err := imp.ValidateResourceConfig(ctx); err != nil {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("ValidateResourceConfig[%q]", r.managerName),
-				err.Error(),
-			)
-			return
-		}
+	if err := r.lifecycle.ValidateResourceConfig(ctx, manager); err != nil {
+		resp.Diagnostics.AddError(
+			fmt.Sprintf("ValidateResourceConfig[%q]", r.managerName),
+			err.Error(),
+		)
 	}
-
 }
 
 func (r *Resource) upgradeStateImpl(ctx context.Context) map[int64]resource.StateUpgrader {

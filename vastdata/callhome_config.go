@@ -9,7 +9,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -133,17 +132,6 @@ func (m *CallhomeConfig) API(rest *VMSRest) VastResourceAPIWithContext {
 
 // ModifyPlan fingerprints write-only secrets so rotations plan an update
 // (TERF-317: proxy_password and other secrets were invisible to the plan).
-func (m *CallhomeConfig) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"proxy_password", "proxy_password_md5",
-		"aws_s3_ak", "aws_s3_ak_md5",
-		"aws_s3_sk", "aws_s3_sk_md5",
-		"cloud_api_key", "cloud_api_key_md5",
-		"uplink_password", "uplink_password_md5",
-		"uplink_token", "uplink_token_md5",
-	)
-	return nil
-}
 
 func (m *CallhomeConfig) TransformResponseRecord(record Record) Record {
 	DeleteRecordFields(record,

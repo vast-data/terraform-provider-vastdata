@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -54,15 +53,6 @@ func (m *ClusterEkm) NewResourceManager(raw map[string]attr.Value, schema any) R
 
 func (m *ClusterEkm) TfState() is.ResourceState {
 	return m.tfstate
-}
-
-func (m *ClusterEkm) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"ekm_private_key", "ekm_private_key_md5",
-		"ekm_certificate", "ekm_certificate_md5",
-		"ekm_ca_certificate", "ekm_ca_certificate_md5",
-	)
-	return nil
 }
 
 func (m *ClusterEkm) TransformResponseRecord(record Record) Record {

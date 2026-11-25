@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -85,11 +84,6 @@ func (m *ActiveDirectory) TfState() is.ResourceState {
 
 func (m *ActiveDirectory) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.ActiveDirectories
-}
-
-func (m *ActiveDirectory) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "bindpw", "bindpw_md5")
-	return nil
 }
 
 func (m *ActiveDirectory) TransformResponseRecord(record Record) Record {

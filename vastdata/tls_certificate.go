@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -80,14 +79,6 @@ func (m *TlsCertificate) TfState() is.ResourceState {
 
 func (m *TlsCertificate) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.TlsCertificates
-}
-
-func (m *TlsCertificate) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"ca_certificate_file", "ca_certificate_file_md5",
-		"revocation_file", "revocation_file_md5",
-	)
-	return nil
 }
 
 func (m *TlsCertificate) TransformResponseRecord(record Record) Record {

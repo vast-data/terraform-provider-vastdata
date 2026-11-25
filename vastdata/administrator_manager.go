@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -60,10 +59,6 @@ func (m *AdministratorManager) API(rest *VMSRest) VastResourceAPIWithContext {
 
 // ModifyPlan sets password_md5 from the write-only password in config so
 // Terraform can detect password changes without storing the secret in state.
-func (m *AdministratorManager) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "password", "password_md5")
-	return nil
-}
 
 // TransformResponseRecord drops password material if the API ever returns it
 // so the secret cannot land in Terraform state.

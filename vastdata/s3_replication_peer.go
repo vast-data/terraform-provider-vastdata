@@ -2,11 +2,9 @@
 package provider
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -54,14 +52,6 @@ func (m *S3ReplicationPeer) TfState() is.ResourceState {
 
 func (m *S3ReplicationPeer) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.S3replicationPeers
-}
-
-func (m *S3ReplicationPeer) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5Fields(ctx, req, resp,
-		"access_key", "access_key_md5",
-		"secret_key", "secret_key_md5",
-	)
-	return nil
 }
 
 func (m *S3ReplicationPeer) TransformResponseRecord(record Record) Record {

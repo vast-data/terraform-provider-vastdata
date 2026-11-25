@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
 
@@ -42,11 +41,6 @@ func (m *ManagerPassword) TfState() is.ResourceState {
 }
 
 func (m *ManagerPassword) API(_ *VMSRest) VastResourceAPIWithContext {
-	return nil
-}
-
-func (m *ManagerPassword) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "password", "password_md5")
 	return nil
 }
 

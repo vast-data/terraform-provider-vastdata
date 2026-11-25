@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
 )
@@ -58,11 +57,6 @@ func (m *KerberosKeytab) TfState() is.ResourceState {
 
 func (m *KerberosKeytab) API(rest *VMSRest) VastResourceAPIWithContext {
 	return rest.Kerberos
-}
-
-func (m *KerberosKeytab) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) error {
-	SetPlanContentMD5(ctx, req, resp, "admin_password", "admin_password_md5")
-	return nil
 }
 
 func (m *KerberosKeytab) TransformResponseRecord(record Record) Record {
