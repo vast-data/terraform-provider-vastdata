@@ -1,16 +1,43 @@
 ## 5.0.0
 
-BUG FIXES:
+NEW RESOURCES:
 
-* **vastdata_cluster_ekm**: Call `POST /clusters/{id}/set_certificates/` with the full EKM configuration on update instead of sending a partial diff to `add_ekm` (which omitted unchanged `encryption_type`, `ekm_servers`, and `ekm_auth_domain` and failed with HTTP 400 `INTERNAL encryption type does not allow following parameters`) (TERF-322).
+* **vastdata_de_engine**: Enable and manage VAST Data Engine on a tenant.
+* **vastdata_de_kubernetes_cluster**: Register and manage Kubernetes clusters for Data Engine.
+* **vastdata_de_kubernetes_secret**: Manage Kubernetes secrets referenced by Data Engine workloads.
+* **vastdata_de_container_registry**: Register and manage container registries for Data Engine function images.
+* **vastdata_de_mtls_authentication_credential**: Manage Data Engine mTLS authentication credentials (supports in-place certificate rotation).
+* **vastdata_de_function**: Manage Data Engine serverless functions and revisions.
+* **vastdata_de_schedule_trigger**: Manage schedule (cron) triggers for Data Engine pipelines.
+* **vastdata_de_element_trigger**: Manage element triggers for Data Engine pipelines.
+* **vastdata_de_pipeline**: Manage Data Engine pipelines wiring functions and triggers.
 
-* **vastdata_topic**: Include `tenant_id` on topic show/delete so destroy works for non-default tenants (previously DELETE omitted `tenant_id`, got 404, and Terraform still reported Destruction complete).
+NEW DATA SOURCES:
 
-* **vastdata_view_policy**: Fixed refresh hanging or running out of memory when NFS IP list fields contain wide CIDRs (e.g. `0.0.0.0/0`, `10.0.0.0/8`, IPv6 `/64`). IP lists are now compared as merged address ranges instead of being expanded host-by-host. The same drift protection now also covers `read_only`, `read_write`, `s3_read_only`, `s3_read_write`, `smb_read_only`, `smb_read_write` and `trash_access` (TERF-233).
+* **vastdata_de_kubernetes_cluster**: Look up a Data Engine Kubernetes cluster.
+* **vastdata_de_container_registry**: Look up a Data Engine container registry.
+* **vastdata_de_mtls_authentication_credential**: Look up a Data Engine mTLS authentication credential.
+* **vastdata_de_function**: Look up a Data Engine function.
+* **vastdata_de_schedule_trigger**: Look up a Data Engine schedule trigger.
+* **vastdata_de_element_trigger**: Look up a Data Engine element trigger.
+* **vastdata_de_pipeline**: Look up a Data Engine pipeline.
+* **vastdata_de_traces**: Query Data Engine execution traces with filtering and cursor pagination.
+* **vastdata_de_logs**: Query Data Engine function/pipeline logs with severity, scope, and message filtering.
+* **vastdata_de_metrics**: Query aggregated Data Engine metrics over a time window.
+* **vastdata_de_metric_names**: Discover available Data Engine metric names and metadata.
+* **vastdata_de_trace_tree**: Inspect the root trace and function spans for a given `trace_id`.
+* **vastdata_de_span_logs**: Query ordered log records for a specific trace/span.
+* **vastdata_de_count_functions**: Count functions active within an epoch-microsecond time window.
 
 ENHANCEMENTS:
 
 * **vastdata_tenant_client_metrics**: Add the ability to disable this resource.
+
+BUG FIXES:
+
+* **vastdata_topic**: Include `tenant_id` on topic show/delete so destroy works for non-default tenants (previously DELETE omitted `tenant_id`, got 404, and Terraform still reported Destruction complete).
+* **vastdata_view_policy**: Fixed refresh hanging or running out of memory when NFS IP list fields contain wide CIDRs (e.g. `0.0.0.0/0`, `10.0.0.0/8`, IPv6 `/64`). IP lists are now compared as merged address ranges instead of being expanded host-by-host. The same drift protection now also covers `read_only`, `read_write`, `s3_read_only`, `s3_read_write`, `smb_read_only`, `smb_read_write` and `trash_access` (TERF-233).
+* **vastdata_cluster_ekm**: Call `POST /clusters/{id}/set_certificates/` with the full EKM configuration on update instead of sending a partial diff to `add_ekm` (which omitted unchanged `encryption_type`, `ekm_servers`, and `ekm_auth_domain` and failed with HTTP 400 `INTERNAL encryption type does not allow following parameters`) (TERF-322).
 
 ## 4.1.1
 
