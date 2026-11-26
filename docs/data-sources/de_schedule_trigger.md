@@ -70,25 +70,19 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 <a id="nestedatt--broker"></a>
 ### Nested Schema for `broker`
 
-Required:
-
-- `name` (String) Broker name for external or Bucket (View) name for internal.
-- `type` (String)
-
 Read-Only:
 
 - `is_accessible_to_data_engine` (Boolean) When true (default), the Data Engine will periodically validate that the broker is accessible. Set to false if the broker is not reachable from the Data Engine (e.g., external brokers behind firewalls).
+- `name` (String) Broker name for external or Bucket (View) name for internal.
+- `type` (String)
 - `url` (String) Deprecated. The broker URL is now resolved from VMS by broker name. This field is ignored for VMS-registered brokers and only used as a legacy fallback for brokers not yet registered in VMS. It will be removed in a future release.
 
 
 <a id="nestedatt--owner"></a>
 ### Nested Schema for `owner`
 
-Required:
+Read-Only:
 
 - `id` (String) The unique identifier for the owner.
 - `id_type` (String) The type of identifier for the owner.
-
-Read-Only:
-
 - `name` (String) The presentable name of the owner

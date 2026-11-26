@@ -56,22 +56,19 @@ data "vastdata_qos_policy" "vastdb_qos_policy_by_name" {
 <a id="nestedatt--attached_users"></a>
 ### Nested Schema for `attached_users`
 
-Required:
+Read-Only:
 
 - `fqdn` (String) The Fully Qualified Domain Name (FQDN) of the user's domain.
 - `identifier_type` (String) The attribute used to identify the user.
 - `identifier_value` (String) The value of the identifying attribute for the user. Must be of the attribute specified as identifier_type.
-- `name` (String) User's name
-
-Read-Only:
-
 - `label` (String) A label for the user
+- `name` (String) User's name
 
 
 <a id="nestedatt--capacity_limits"></a>
 ### Nested Schema for `capacity_limits`
 
-Required:
+Read-Only:
 
 - `max_reads_bw_mbps_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
 - `max_reads_iops_per_gb_capacity` (Number) Maximal amount of performance per GB to provide when there is no resource contention
@@ -91,7 +88,7 @@ Read-Only:
 <a id="nestedatt--static_limits"></a>
 ### Nested Schema for `static_limits`
 
-Required:
+Read-Only:
 
 - `burst_reads_bw_mb` (Number) Burst reads BW Mb
 - `burst_reads_iops` (Number) Burst reads IOPS

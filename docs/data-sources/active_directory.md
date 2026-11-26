@@ -70,10 +70,6 @@ Read-Only:
 <a id="nestedatt--ldap"></a>
 ### Nested Schema for `ldap`
 
-Required:
-
-- `searchbase` (String) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only
-
 Read-Only:
 
 - `abac_read_only_value_name` (String)
@@ -109,6 +105,7 @@ in case posix_attributes_source is set to SPECIFIC_DOMAINS.
 when set to False - Posix attributes of users/groups from non-joined domain are not supported.
 As a condition Global catalog needs to be configured to support Posix attributes. (deprecated since 4.6)
 - `reverse_lookup` (Boolean) Resolve LDAP netgroups into hostnames
+- `searchbase` (String) The Base DN is the starting point the LDAP provider uses when searching for users and groups. If the Group Base DN is configured it will be used instead of the Base DN, for groups only
 - `state` (String)
 - `super_admin_groups` (Set of String) List of groups on the LDAP provider. Members of these groups can log into VMS as cluster admin users.
 - `tenant_id` (Number) Tenant ID
@@ -119,6 +116,7 @@ As a condition Global catalog needs to be configured to support Posix attributes
 - `uid_member_value_property_name` (String) The attribute which represents the value of the LDAP group's member property.
 - `uid_number` (String)
 - `url` (String) Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format SCHEME://ADDRESS. ADDRESS can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
+- `urls` (Set of String) Comma-separated list of URIs of LDAP servers (Domain Controllers (DCs) in Active Directory), in priority order. The URI with highest priority that has a good health status is used. Specify each URI in the format SCHEME://ADDRESS. ADDRESS can be either a DNS name or an IP address. e.g. ldap://ldap.company.com, ldaps://ldaps.company.com, ldap://192.0.2.2
 - `use_auto_discovery` (Boolean) When enabled, Active Directory Domain Controllers (DCs) and Active Directory domains are auto discovered. Queries extend beyond the joined domain to all domains in the forest. When disabled, queries are restricted to the joined domain and DCs must be provided in the URLs field.
 - `use_ldaps` (Boolean) Use LDAPS for auto-Discovery. To activate, set use-auto-discovery to true also.
 - `use_multi_forest` (Boolean) Allow access for users from trusted domains on other forests.

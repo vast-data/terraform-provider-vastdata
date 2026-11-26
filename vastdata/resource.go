@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -243,18 +244,29 @@ func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRe
 		return
 	}
 	manager := r.NewManager(req.Plan)
-	// Write-only attrs are null in Plan; load them from Config so MD5 seeding sees secrets.
-	r.overlayWriteOnlyFromConfig(manager, req.Config)
+	st := manager.TfState()
+	hasWriteOnlyMD5 := st != nil && st.StateHints() != nil && len(st.StateHints().WriteOnlyMD5Fields) > 0
+	_, hasPrepare := manager.(PrepareDesiredState)
 
-	logging.Debug(ctx, fmt.Sprintf("PrepareDesiredState[%s]: do.", r.managerName))
-	if err := r.lifecycle.PrepareDesiredState(ctx, manager); err != nil {
-		resp.Diagnostics.AddError(
-			fmt.Sprintf("PrepareDesiredState[%q]", r.managerName),
-			err.Error(),
-		)
-		return
+	if hasWriteOnlyMD5 || hasPrepare {
+		// Write-only attrs are null in Plan; load them from Config so MD5 seeding sees secrets.
+		r.overlayWriteOnlyFromConfig(manager, req.Config)
+
+		var before map[string]attr.Value
+		if st != nil {
+			before = maps.Clone(st.RawValues())
+		}
+
+		logging.Debug(ctx, fmt.Sprintf("PrepareDesiredState[%s]: do.", r.managerName))
+		if err := r.lifecycle.PrepareDesiredState(ctx, manager); err != nil {
+			resp.Diagnostics.AddError(
+				fmt.Sprintf("PrepareDesiredState[%q]", r.managerName),
+				err.Error(),
+			)
+			return
+		}
+		syncComputedAttrsToPlan(ctx, before, st, req.Config, &resp.Plan, &resp.Diagnostics)
 	}
-	syncComputedAttrsToPlan(ctx, manager.TfState(), &resp.Plan, &resp.Diagnostics)
 
 	// Legacy TF-only ModifyPlan fallback (prefer PrepareDesiredState).
 	if imp, ok := manager.(ModifyPlanResource); ok {
@@ -268,9 +280,18 @@ func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRe
 	}
 }
 
-// syncComputedAttrsToPlan copies known non-null computed attributes from st onto the
-// plan (WriteOnlyMD5 companions and PrepareDesiredState-derived fields).
-func syncComputedAttrsToPlan(ctx context.Context, st is.ResourceState, plan *tfsdk.Plan, diags *diag.Diagnostics) {
+// syncComputedAttrsToPlan writes ONLY computed attributes that PrepareDesiredState
+// actually changed onto the plan (WriteOnlyMD5 companions and PrepareDesiredState-derived
+// fields). Untouched attributes are left alone so resp.Plan keeps Terraform's exact
+// unknown elements (e.g. kafka_vip_pools = [vip_pool.id] before apply).
+func syncComputedAttrsToPlan(
+	ctx context.Context,
+	before map[string]attr.Value,
+	st is.ResourceState,
+	cfg tfsdk.Config,
+	plan *tfsdk.Plan,
+	diags *diag.Diagnostics,
+) {
 	if st == nil || plan == nil || diags == nil {
 		return
 	}
@@ -281,12 +302,26 @@ func syncComputedAttrsToPlan(ctx context.Context, st is.ResourceState, plan *tfs
 		if !st.IsComputed(k) {
 			continue
 		}
+		if prev, existed := before[k]; existed && prev != nil && v.Equal(prev) {
+			continue
+		}
 		diags.Append(plan.SetAttribute(ctx, path.Root(k), v)...)
 	}
 	// TERF-320: cleared optional write-only secrets must null their *_md5 companions.
+	// If the secret itself is unknown in config, keep *_md5 unknown rather than null.
 	if hints := st.StateHints(); hints != nil {
 		for _, field := range hints.WriteOnlyMD5Fields {
 			md5Field := field + "_md5"
+			if !st.HasAttribute(md5Field) {
+				continue
+			}
+			if !cfg.Raw.IsNull() && cfg.Raw.IsKnown() {
+				var src types.String
+				if d := cfg.GetAttribute(ctx, path.Root(field), &src); !d.HasError() && src.IsUnknown() {
+					diags.Append(plan.SetAttribute(ctx, path.Root(md5Field), types.StringUnknown())...)
+					continue
+				}
+			}
 			v, ok := st.RawValues()[md5Field]
 			if !ok || v == nil || v.IsNull() {
 				diags.Append(plan.SetAttribute(ctx, path.Root(md5Field), types.StringNull())...)

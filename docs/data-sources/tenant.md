@@ -119,6 +119,29 @@ Read-Only:
 <a id="nestedatt--qos"></a>
 ### Nested Schema for `qos`
 
+Read-Only:
+
+- `static_limits` (Attributes) (see [below for nested schema](#nestedatt--qos--static_limits))
+
+<a id="nestedatt--qos--static_limits"></a>
+### Nested Schema for `qos.static_limits`
+
+Read-Only:
+
+- `burst_reads_bw_mb` (Number) Burst reads BW Mb
+- `burst_reads_iops` (Number) Burst reads IOPS
+- `burst_reads_loan_iops` (Number) Burst reads loan IOPS
+- `burst_reads_loan_mb` (Number) Burst reads loan Mb
+- `burst_writes_bw_mb` (Number) Burst writes BW Mb
+- `burst_writes_iops` (Number) Burst writes IOPS
+- `burst_writes_loan_iops` (Number) Burst writes loan IOPS
+- `burst_writes_loan_mb` (Number) Burst writes loan Mb
+- `max_reads_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_reads_iops` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_bw_mbps` (Number) Maximal amount of performance to provide when there is no resource contention
+- `max_writes_iops` (Number) Maximal amount of performance to provide when there is no resource contention
+
+
 
 <a id="nestedatt--view_count"></a>
 ### Nested Schema for `view_count`

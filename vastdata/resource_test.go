@@ -1159,3 +1159,124 @@ func TestRetryOnExpression_DeleteRetriesReplicationPeerProtectionPolicyConflict(
 	require.NoError(t, err)
 	require.Equal(t, 2, attempts)
 }
+
+// Regression test: ModifyPlan must not clobber Optional+Computed sets containing
+// unknown elements (e.g. kafka_vip_pools = [vip_pool.id] before apply) into
+// Set([Null]) — neither on plain resources nor on resources with WriteOnlyMD5Fields.
+func TestModifyPlan_PreservesUnknownSetElements(t *testing.T) {
+	t.Parallel()
+
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"name":            rschema.StringAttribute{Required: true},
+		"kafka_vip_pools": rschema.SetAttribute{Optional: true, Computed: true, ElementType: types.Int64Type},
+		"password":        rschema.StringAttribute{Optional: true, WriteOnly: true, Sensitive: true},
+		"password_md5":    rschema.StringAttribute{Computed: true},
+	}}
+
+	objType := tftypes.Object{AttributeTypes: map[string]tftypes.Type{
+		"name":            tftypes.String,
+		"kafka_vip_pools": tftypes.Set{ElementType: tftypes.Number},
+		"password":        tftypes.String,
+		"password_md5":    tftypes.String,
+	}}
+
+	unknownSet := tftypes.NewValue(
+		tftypes.Set{ElementType: tftypes.Number},
+		[]tftypes.Value{tftypes.NewValue(tftypes.Number, tftypes.UnknownValue)},
+	)
+
+	t.Run("plain_resource_untouched", func(t *testing.T) {
+		r := buildTestResourceWithSchema(schema, &is.TFStateHints{})
+		rawPlan := tftypes.NewValue(objType, map[string]tftypes.Value{
+			"name":            tftypes.NewValue(tftypes.String, "broker"),
+			"kafka_vip_pools": unknownSet,
+			"password":        tftypes.NewValue(tftypes.String, nil),
+			"password_md5":    tftypes.NewValue(tftypes.String, tftypes.UnknownValue),
+		})
+		req := resource.ModifyPlanRequest{
+			Config: tfsdk.Config{Schema: schema, Raw: rawPlan},
+			Plan:   tfsdk.Plan{Schema: schema, Raw: rawPlan},
+		}
+		resp := &resource.ModifyPlanResponse{
+			Plan: tfsdk.Plan{Schema: schema, Raw: rawPlan},
+		}
+		r.ModifyPlan(context.Background(), req, resp)
+		require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+
+		var got types.Set
+		require.False(t, resp.Plan.GetAttribute(context.Background(), path.Root("kafka_vip_pools"), &got).HasError())
+		elems := got.Elements()
+		require.Len(t, elems, 1)
+		assert.True(t, elems[0].IsUnknown(), "unknown set element must stay unknown, not null")
+	})
+
+	t.Run("write_only_md5_resource_preserves_unknown_set_and_seeds_md5", func(t *testing.T) {
+		r := buildTestResourceWithSchema(schema, &is.TFStateHints{
+			WriteOnlyFields:    []string{"password"},
+			WriteOnlyMD5Fields: []string{"password"},
+		})
+		rawPlan := tftypes.NewValue(objType, map[string]tftypes.Value{
+			"name":            tftypes.NewValue(tftypes.String, "u1"),
+			"kafka_vip_pools": unknownSet,
+			"password":        tftypes.NewValue(tftypes.String, nil),
+			"password_md5":    tftypes.NewValue(tftypes.String, tftypes.UnknownValue),
+		})
+		rawConfig := tftypes.NewValue(objType, map[string]tftypes.Value{
+			"name":            tftypes.NewValue(tftypes.String, "u1"),
+			"kafka_vip_pools": unknownSet,
+			"password":        tftypes.NewValue(tftypes.String, "LabPass123!"),
+			"password_md5":    tftypes.NewValue(tftypes.String, nil),
+		})
+		req := resource.ModifyPlanRequest{
+			Config: tfsdk.Config{Schema: schema, Raw: rawConfig},
+			Plan:   tfsdk.Plan{Schema: schema, Raw: rawPlan},
+		}
+		resp := &resource.ModifyPlanResponse{
+			Plan: tfsdk.Plan{Schema: schema, Raw: rawPlan},
+		}
+		r.ModifyPlan(context.Background(), req, resp)
+		require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+
+		var gotSet types.Set
+		require.False(t, resp.Plan.GetAttribute(context.Background(), path.Root("kafka_vip_pools"), &gotSet).HasError())
+		elems := gotSet.Elements()
+		require.Len(t, elems, 1)
+		assert.True(t, elems[0].IsUnknown(), "unknown set element must stay unknown, not null")
+
+		var gotMD5 types.String
+		require.False(t, resp.Plan.GetAttribute(context.Background(), path.Root("password_md5"), &gotMD5).HasError())
+		assert.Equal(t, ContentMD5Hex("LabPass123!"), gotMD5.ValueString())
+	})
+
+	t.Run("unknown_write_only_secret_keeps_md5_unknown", func(t *testing.T) {
+		r := buildTestResourceWithSchema(schema, &is.TFStateHints{
+			WriteOnlyFields:    []string{"password"},
+			WriteOnlyMD5Fields: []string{"password"},
+		})
+		rawPlan := tftypes.NewValue(objType, map[string]tftypes.Value{
+			"name":            tftypes.NewValue(tftypes.String, "u1"),
+			"kafka_vip_pools": unknownSet,
+			"password":        tftypes.NewValue(tftypes.String, nil),
+			"password_md5":    tftypes.NewValue(tftypes.String, tftypes.UnknownValue),
+		})
+		rawConfig := tftypes.NewValue(objType, map[string]tftypes.Value{
+			"name":            tftypes.NewValue(tftypes.String, "u1"),
+			"kafka_vip_pools": unknownSet,
+			"password":        tftypes.NewValue(tftypes.String, tftypes.UnknownValue),
+			"password_md5":    tftypes.NewValue(tftypes.String, nil),
+		})
+		req := resource.ModifyPlanRequest{
+			Config: tfsdk.Config{Schema: schema, Raw: rawConfig},
+			Plan:   tfsdk.Plan{Schema: schema, Raw: rawPlan},
+		}
+		resp := &resource.ModifyPlanResponse{
+			Plan: tfsdk.Plan{Schema: schema, Raw: rawPlan},
+		}
+		r.ModifyPlan(context.Background(), req, resp)
+		require.False(t, resp.Diagnostics.HasError(), resp.Diagnostics.Errors())
+
+		var gotMD5 types.String
+		require.False(t, resp.Plan.GetAttribute(context.Background(), path.Root("password_md5"), &gotMD5).HasError())
+		assert.True(t, gotMD5.IsUnknown(), "password_md5 must remain unknown when password is unknown")
+	})
+}

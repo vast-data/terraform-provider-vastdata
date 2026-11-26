@@ -55,4 +55,6 @@ resource "vastdata_user" "broker_owner" {
   allow_delete_bucket = true
 
   password = var.broker_owner_password == null ? null : var.broker_owner_password
+
+  depends_on = [vastdata_tenant.dataengine]
 }

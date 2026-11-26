@@ -154,8 +154,9 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 		case lookupErr != nil:
 			// Nothing exists yet: create it.
 			created = true
+			createQuery := runTransformQueryParams(manager, nil, rest)
 			defaultCreate := func(ctx context.Context, _ *VMSRest) (DisplayableRecord, error) {
-				return api.CreateWithContext(ctx, createParams)
+				return createWithOptionalQuery(ctx, api, createQuery, createParams)
 			}
 			if createRetryOn != nil {
 				defaultCreate = WithRetry(createRetryOn, "CreateResource", l.Name, defaultCreate)
@@ -171,12 +172,16 @@ func (l *ResourceLifecycle) Create(ctx context.Context, manager ResourceManager)
 			// NOTE: the default implementation only works for resources with an 'id' field.
 			// Resources without one must implement CreateResource.
 			if diff := diffMap(createParams, existing); len(diff) > 0 {
-				id, exists := existing["id"]
+				idField := pathIDField(state.StateHints())
+				id, exists := existing[idField]
 				if !exists {
-					return l.stageErr("adopt", fmt.Errorf("record does not have 'id' field; implement CreateResource for this resource"))
+					id, exists = existing["id"]
+				}
+				if !exists {
+					return l.stageErr("adopt", fmt.Errorf("record does not have %q field; implement CreateResource for this resource", idField))
 				}
 				// Send only the difference between the existing record and what we want.
-				record, err = api.UpdateWithContext(ctx, id, diff)
+				record, err = updateWithOptionalQuery(ctx, api, id, runTransformQueryParams(manager, nil, rest), diff)
 			}
 		}
 	}
@@ -323,7 +328,8 @@ func (l *ResourceLifecycle) Update(ctx context.Context, current, desired Resourc
 		delete(updateParams, "id")
 		delete(updateParams, idField) // The path id must never be updated.
 		if len(updateParams) > 0 {
-			record, err = api.UpdateWithContext(ctx, id, updateParams)
+			// Prefer desired manager for query transforms (tenant_name etc. live on plan).
+			record, err = updateWithOptionalQuery(ctx, api, id, runTransformQueryParams(desired, nil, rest), updateParams)
 		}
 	}
 	if err != nil {
@@ -541,6 +547,34 @@ func runTransformRequestBody(m any, body params) params {
 		return imp.TransformRequestBody(body)
 	}
 	return body
+}
+
+// runTransformQueryParams lets the manager add URL query params (e.g. Data Engine
+// ?tenant_name= for cluster-admin auth). Returns nil when the manager does not
+// implement TransformQueryParams.
+func runTransformQueryParams(m any, query params, rest *VMSRest) params {
+	if imp, ok := m.(TransformQueryParams); ok {
+		return imp.TransformQueryParams(query, rest)
+	}
+	return nil
+}
+
+// createWithOptionalQuery calls CreateWithContext with query+body when query is
+// non-nil (including empty map from TransformQueryParams), otherwise body-only.
+func createWithOptionalQuery(ctx context.Context, api VastResourceAPIWithContext, query, body params) (DisplayableRecord, error) {
+	if query != nil {
+		return api.CreateWithContext(ctx, query, body)
+	}
+	return api.CreateWithContext(ctx, body)
+}
+
+// updateWithOptionalQuery calls UpdateWithContext with query+body when query is
+// non-nil, otherwise body-only.
+func updateWithOptionalQuery(ctx context.Context, api VastResourceAPIWithContext, id any, query, body params) (DisplayableRecord, error) {
+	if query != nil {
+		return api.UpdateWithContext(ctx, id, query, body)
+	}
+	return api.UpdateWithContext(ctx, id, body)
 }
 
 // runTransformResponseRecord lets the manager rewrite a record the API returned.

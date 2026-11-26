@@ -66,11 +66,8 @@ where resource type is one of: triggers / functions / pipelines / topics / kuber
 <a id="nestedatt--owner"></a>
 ### Nested Schema for `owner`
 
-Required:
+Read-Only:
 
 - `id` (String) The unique identifier for the owner.
 - `id_type` (String) The type of identifier for the owner.
-
-Read-Only:
-
 - `name` (String) The presentable name of the owner

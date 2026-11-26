@@ -51,7 +51,15 @@ func GetDatasourceSchema(ctx context.Context, hints *TFStateHints) (*dschema.Sch
 
 	switch resourceMethod {
 	case http.MethodGet:
-		if readSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, resourcePath); err != nil {
+		if schemaPack == openapi_schema.PackTelemetry {
+			// Telemetries-query endpoints return full query envelopes
+			// (e.g. {"data": [...], "pagination": {...}}, {"query": ..., "results": [...]},
+			// {"items": [...]}). Keep the raw response envelope instead of unwrapping "data".
+			readSchemaRef, err = openapi_schema.GetRawResponseModelSchema(schemaPack, http.MethodGet, resourcePath)
+		} else {
+			readSchemaRef, err = openapi_schema.GetResponseModelSchema(schemaPack, http.MethodGet, resourcePath)
+		}
+		if err != nil {
 			return nil, fmt.Errorf("failed to get schema for GET %q: %w", resourcePath, err)
 		}
 	case http.MethodPatch:
@@ -225,6 +233,15 @@ func buildDatasourceAttributesFromMap(
 	entries map[string]*SchemaEntry,
 	hints *TFStateHints,
 ) map[string]dschema.Attribute {
+	return buildDatasourceAttributesWithVisited(ctx, entries, hints, map[*openapi3.Schema]bool{})
+}
+
+func buildDatasourceAttributesWithVisited(
+	ctx context.Context,
+	entries map[string]*SchemaEntry,
+	hints *TFStateHints,
+	visited map[*openapi3.Schema]bool,
+) map[string]dschema.Attribute {
 	result := make(map[string]dschema.Attribute, len(entries))
 	for name, entry := range entries {
 		schema := resolveComposedSchema(resolveAllRefs(&openapi3.SchemaRef{Value: entry.Prop}))
@@ -239,7 +256,7 @@ func buildDatasourceAttributesFromMap(
 			entry.Optional = false
 		}
 
-		attr := buildDatasourceAttribute(ctx, name, schema, entry, hints)
+		attr := buildDatasourceAttribute(ctx, name, schema, entry, hints, visited)
 		if attr == nil {
 			continue
 		}
@@ -254,6 +271,7 @@ func buildDatasourceAttribute(
 	schema *openapi3.Schema,
 	entry *SchemaEntry,
 	hints *TFStateHints,
+	visited map[*openapi3.Schema]bool,
 ) dschema.Attribute {
 	schema = resolveComposedSchema(schema)
 	if schema == nil || schema.Type == nil || len(*schema.Type) == 0 {
@@ -320,9 +338,23 @@ func buildDatasourceAttribute(
 
 		switch (*itemSchema.Type)[0] {
 		case openapi3.TypeObject:
+			if visited[itemSchema] {
+				warnWithContext(ctx, fmt.Sprintf("Skipping recursive schema cycle on attribute %q", name))
+				return nil
+			}
+			visited[itemSchema] = true
+			defer delete(visited, itemSchema)
+
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(itemSchema.Properties, itemSchema.Required, hints, nested, false, false, true, false, false, entry.Ordered, false)
-			attrs := buildDatasourceAttributesFromMap(ctx, nested, hints)
+			// Array-of-objects attributes in a datasource are always Computed;
+			// pass nil requiredFields and strip top-level Required/Optional hints
+			// so nested response fields stay Computed.
+			childHints := computedNestedHints(hints)
+			addSchemaEntries(itemSchema.Properties, nil, childHints, nested, false, false, true, false, false, entry.Ordered, false)
+			attrs := buildDatasourceAttributesWithVisited(ctx, nested, childHints, visited)
+			if len(attrs) == 0 {
+				return nil
+			}
 
 			if isOrdered {
 				return dschema.ListNestedAttribute{
@@ -345,6 +377,10 @@ func buildDatasourceAttribute(
 
 		case openapi3.TypeArray:
 			inner := resolveComposedSchema(resolveAllRefs(itemSchema.Items))
+			if inner == nil || inner.Type == nil || len(*inner.Type) == 0 {
+				warnWithContext(ctx, fmt.Sprintf("Skipping nested array attribute %q: untyped/ambiguous item schema", name))
+				return nil
+			}
 			innerType := buildAttrTypeFromSchema(inner)
 
 			if isOrdered {
@@ -391,12 +427,25 @@ func buildDatasourceAttribute(
 			valType := buildAttrTypeFromSchema(valSchema)
 
 			if valSchema.Type != nil && (*valSchema.Type)[0] == openapi3.TypeObject && len(valSchema.Properties) > 0 {
+				if visited[valSchema] {
+					warnWithContext(ctx, fmt.Sprintf("Skipping recursive schema cycle on map attribute %q", name))
+					return nil
+				}
+				visited[valSchema] = true
+				defer delete(visited, valSchema)
+
+				nestedRequired := valSchema.Required
+				childHints := hints
+				if entry.Computed && !entry.Required && !entry.Optional {
+					nestedRequired = nil
+					childHints = computedNestedHints(hints)
+				}
 				nested := make(map[string]*SchemaEntry)
-				addSchemaEntries(valSchema.Properties, valSchema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
+				addSchemaEntries(valSchema.Properties, nestedRequired, childHints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 
 				return dschema.MapNestedAttribute{
 					NestedObject: dschema.NestedAttributeObject{
-						Attributes: buildDatasourceAttributesFromMap(ctx, nested, hints),
+						Attributes: buildDatasourceAttributesWithVisited(ctx, nested, childHints, visited),
 					},
 					Required:            entry.Required,
 					Optional:            entry.Optional,
@@ -419,11 +468,24 @@ func buildDatasourceAttribute(
 		}
 
 		if len(schema.Properties) > 0 {
+			if visited[schema] {
+				warnWithContext(ctx, fmt.Sprintf("Skipping recursive schema cycle on object attribute %q", name))
+				return nil
+			}
+			visited[schema] = true
+			defer delete(visited, schema)
+
+			nestedRequired := schema.Required
+			childHints := hints
+			if entry.Computed && !entry.Required && !entry.Optional {
+				nestedRequired = nil
+				childHints = computedNestedHints(hints)
+			}
 			nested := make(map[string]*SchemaEntry)
-			addSchemaEntries(schema.Properties, schema.Required, hints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
+			addSchemaEntries(schema.Properties, nestedRequired, childHints, nested, entry.Required, entry.Optional, entry.Computed, false, entry.Sensitive, entry.Ordered, false)
 
 			return dschema.SingleNestedAttribute{
-				Attributes:          buildDatasourceAttributesFromMap(ctx, nested, hints),
+				Attributes:          buildDatasourceAttributesWithVisited(ctx, nested, childHints, visited),
 				Required:            entry.Required,
 				Optional:            entry.Optional,
 				Computed:            entry.Computed,
@@ -438,4 +500,19 @@ func buildDatasourceAttribute(
 	default:
 		panic(fmt.Sprintf("unsupported schema type %q for attribute %q", (*schema.Type)[0], name))
 	}
+}
+
+// computedNestedHints returns a shallow copy of hints stripped of top-level
+// Required/Optional overrides so purely Computed nested datasource attributes
+// never inherit top-level RequiredSchemaFields/OptionalSchemaFields that happen
+// to share a short attribute name (e.g. root trace_id vs data[*].trace_id).
+func computedNestedHints(hints *TFStateHints) *TFStateHints {
+	if hints == nil {
+		return nil
+	}
+	cp := *hints
+	cp.RequiredSchemaFields = nil
+	cp.OptionalSchemaFields = nil
+	cp.NotComputedSchemaFields = nil
+	return &cp
 }

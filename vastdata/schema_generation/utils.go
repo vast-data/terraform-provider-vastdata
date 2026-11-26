@@ -51,6 +51,14 @@ func openAPIPack(hints *TFStateHints) openapi_schema.Pack {
 	return openapi_schema.PackVMS
 }
 
+// NewTelemetrySchemaReference builds a SchemaReference targeting the Data Engine
+// telemetries-query OpenAPI pack (openapi_schema.PackTelemetry).
+func NewTelemetrySchemaReference(createMethod, createPath, readMethod, readPath string) *is.SchemaReference {
+	ref := is.NewSchemaReference(createMethod, createPath, readMethod, readPath)
+	ref.Pack = string(openapi_schema.PackTelemetry)
+	return ref
+}
+
 func resolveComposedSchema(schema *openapi3.Schema) *openapi3.Schema {
 	return openapi_schema.ResolveComposedSchema(schemaPack, schema)
 }

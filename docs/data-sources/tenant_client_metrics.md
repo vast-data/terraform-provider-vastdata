@@ -28,14 +28,11 @@ description: |-
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
 
-Required:
-
-- `enabled` (Boolean) Enables collection of client metrics. If you enable the collection of client metrics, make sure bucket_owner and bucket_name are set as well.
-
 Read-Only:
 
 - `bucket_name` (String) The name of the client metrics database S3 bucket.
 - `bucket_owner` (String) The user designated as the S3 bucket owner for the client metrics database for the selected tenant.
+- `enabled` (Boolean) Enables collection of client metrics. If you enable the collection of client metrics, make sure bucket_owner and bucket_name are set as well.
 - `max_capacity_mb` (Number) The maximum size of the client metrics database, in MBB. If the limit is reached, older data is deleted from the database.
 - `retention_time_sec` (Number) The retention period, in seconds, for client metrics data that is stored in the client metrics database. Data older than this time is deleted from the database.
 
@@ -43,15 +40,42 @@ Read-Only:
 <a id="nestedatt--default_columns"></a>
 ### Nested Schema for `default_columns`
 
-Required:
+Read-Only:
 
+- `field` (Attributes) Column type (see [below for nested schema](#nestedatt--default_columns--field))
 - `name` (String) Name of the object
+
+<a id="nestedatt--default_columns--field"></a>
+### Nested Schema for `default_columns.field`
+
+Read-Only:
+
+- `column_type` (String)
+- `key_type` (Attributes) Column type for the map key (only when `column_type` is "map") (see [below for nested schema](#nestedatt--default_columns--field--key_type))
+- `value_type` (Attributes) Column type for the map value (only when `column_type` is "map") (see [below for nested schema](#nestedatt--default_columns--field--value_type))
+
+<a id="nestedatt--default_columns--field--key_type"></a>
+### Nested Schema for `default_columns.field.key_type`
+
+Read-Only:
+
+- `column_type` (String) The type of the key (e.g., "string", "bool")
+
+
+<a id="nestedatt--default_columns--field--value_type"></a>
+### Nested Schema for `default_columns.field.value_type`
+
+Read-Only:
+
+- `column_type` (String) The type of the value (e.g., "string", "bool")
+
+
 
 
 <a id="nestedatt--user_defined_columns"></a>
 ### Nested Schema for `user_defined_columns`
 
-Required:
+Read-Only:
 
 - `database_name` (String) Name of the Database
 - `name` (String) Name of the object

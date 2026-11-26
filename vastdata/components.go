@@ -120,6 +120,13 @@ var allTFComponents = []TFManager{
 	&DeScheduleTrigger{},
 	&DeElementTrigger{},
 	&DePipeline{},
+	&DeTraces{},
+	&DeLogs{},
+	&DeMetrics{},
+	&DeMetricNames{},
+	&DeTraceTree{},
+	&DeSpanLogs{},
+	&DeCountFunctions{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate

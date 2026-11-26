@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	dschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	planmodifiers "github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -527,4 +528,28 @@ func preserveContainerRegistryNameInRecord(rec Record, ts is.ResourceState) Reco
 	}
 	out[deContainerRegistryNameAttr] = name
 	return out
+}
+
+// ---------------------------------------------------------------------------
+// Telemetries-query data source helpers (de_traces, de_logs, de_metrics, …)
+// ---------------------------------------------------------------------------
+
+func deTenantNameDatasourceAttribute() dschema.StringAttribute {
+	return dschema.StringAttribute{
+		Optional: true,
+		Description: "Tenant name for Data Engine API queries. Required for cluster-admin " +
+			"auth; optional when the provider already authenticates as that tenant.",
+	}
+}
+
+// deTelemetryQueryParams collects all user-supplied Required and Optional
+// attributes from the Swagger-generated datasource state and merges tenant_name.
+func deTelemetryQueryParams(tfState is.ResourceState, rest *VMSRest) params {
+	query := params(tfState.GetFilteredValues(
+		is.FilterOr,
+		nil,
+		is.SearchRequired,
+		is.SearchOptional,
+	))
+	return deTransformQueryParams(query, tfState, rest)
 }
