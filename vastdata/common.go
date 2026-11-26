@@ -677,6 +677,7 @@ func getSearchParams(ctx context.Context, tfState, planTfState is.ResourceState)
 // Returns:
 //   - DisplayableRecord: the found record
 //   - error: if not found or all lookups fail
+//
 // pathIDField returns the record attribute used as the URL path id for Get/Update/Delete.
 // Empty PathIDField means the default VMS "id" field.
 func pathIDField(hints *is.TFStateHints) string {

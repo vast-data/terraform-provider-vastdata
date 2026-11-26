@@ -257,7 +257,10 @@ func buildDatasourceAttribute(
 ) dschema.Attribute {
 	schema = resolveComposedSchema(schema)
 	if schema == nil || schema.Type == nil || len(*schema.Type) == 0 {
-		panic(fmt.Sprintf("missing or invalid schema type for attribute %q", name))
+		// Schema-less OpenAPI fields (e.g. TriggerGetResponse.config) are skipped
+		// earlier in addSchemaEntries; treat any remaining cases as omit, not panic.
+		warnWithContext(ctx, fmt.Sprintf("skipping attribute %q: missing or invalid schema type", name))
+		return nil
 	}
 
 	desc := entry.Description

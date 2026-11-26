@@ -244,7 +244,7 @@ func (m *DeMtlsAuthenticationCredential) PrepareUpdateResource(_ context.Context
 // prepareMtlsPEMs fills certificate_*_b64 from kubeconfig_data when present.
 // On create (requireMaterial), PEMs or kubeconfig are mandatory; on update, omitted
 // PEMs keep prior state (optional+computed + PreserveUserValueFields).
-func prepareMtlsPEMs(ts *is.TFState, requireMaterial bool) error {
+func prepareMtlsPEMs(ts is.ResourceState, requireMaterial bool) error {
 	if ts == nil {
 		return fmt.Errorf("mtls authentication credential: empty state")
 	}

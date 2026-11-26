@@ -837,7 +837,6 @@ func TestDelete_EmptyDeleteResourceSkipsAPI(t *testing.T) {
 	}
 }
 
-
 func TestPathIDField(t *testing.T) {
 	if got := pathIDField(nil); got != "id" {
 		t.Fatalf("nil hints: got %q, want id", got)
