@@ -896,6 +896,156 @@ func (m *deleteErrorAPI) GetIteratorWithContext(context.Context, vast_client.Par
 	return nil
 }
 
+type deDeleteProbeAPI struct {
+	listed          RecordSet
+	deletedIDs      []any
+	deleteWithCalls int
+}
+
+func (m *deDeleteProbeAPI) Session() core.RESTSession { return nil }
+func (m *deDeleteProbeAPI) GetResourceType() string   { return "test" }
+func (m *deDeleteProbeAPI) GetResourcePath() string   { return "test" }
+func (m *deDeleteProbeAPI) GetApiRoot() string        { return "" }
+func (m *deDeleteProbeAPI) List(vast_client.Params) (RecordSet, error) {
+	return m.listed, nil
+}
+func (m *deDeleteProbeAPI) Create(...vast_client.Params) (Record, error) { return nil, nil }
+func (m *deDeleteProbeAPI) Update(any, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) Delete(vast_client.Params, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) DeleteById(any, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) Ensure(vast_client.Params, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) Get(vast_client.Params) (Record, error) { return nil, nil }
+func (m *deDeleteProbeAPI) GetById(any, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) Exists(vast_client.Params) (bool, error) {
+	return false, nil
+}
+func (m *deDeleteProbeAPI) MustExists(vast_client.Params) bool { return false }
+func (m *deDeleteProbeAPI) GetIterator(vast_client.Params, int) core.Iterator {
+	return nil
+}
+func (m *deDeleteProbeAPI) Lock(...any) func() { return func() {} }
+func (m *deDeleteProbeAPI) ListWithContext(context.Context, vast_client.Params) (RecordSet, error) {
+	return m.listed, nil
+}
+func (m *deDeleteProbeAPI) CreateWithContext(context.Context, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) UpdateWithContext(context.Context, any, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) DeleteWithContext(context.Context, vast_client.Params, ...vast_client.Params) (Record, error) {
+	m.deleteWithCalls++
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) DeleteByIdWithContext(_ context.Context, id any, _ ...vast_client.Params) (Record, error) {
+	m.deletedIDs = append(m.deletedIDs, id)
+	return Record{}, nil
+}
+func (m *deDeleteProbeAPI) EnsureWithContext(context.Context, vast_client.Params, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) GetWithContext(context.Context, vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) GetByIdWithContext(context.Context, any, ...vast_client.Params) (Record, error) {
+	return nil, nil
+}
+func (m *deDeleteProbeAPI) ExistsWithContext(context.Context, vast_client.Params) (bool, error) {
+	return false, nil
+}
+func (m *deDeleteProbeAPI) MustExistsWithContext(context.Context, vast_client.Params) bool {
+	return false
+}
+func (m *deDeleteProbeAPI) GetIteratorWithContext(context.Context, vast_client.Params, int) core.Iterator {
+	return nil
+}
+
+func TestFindRecordByLocalFilter_EmptyIsNotFoundErr(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"guid":        rschema.StringAttribute{Optional: true, Computed: true},
+		"name":        rschema.StringAttribute{Optional: true},
+		"tenant_name": rschema.StringAttribute{Optional: true},
+	}}
+	tf := is.NewTFStateMust(
+		map[string]attr.Value{
+			"guid":        types.StringNull(),
+			"name":        types.StringValue("de-lab-k8s-mock"),
+			"tenant_name": types.StringValue("de-lab"),
+		},
+		schema,
+		&is.TFStateHints{},
+	)
+	_, err := findRecordByLocalFilter(
+		context.Background(),
+		&deDeleteProbeAPI{listed: RecordSet{}},
+		tf,
+		nil,
+		"kubernetes-clusters",
+	)
+	require.True(t, isNotFoundErr(err), "got %v", err)
+}
+
+func TestDeleteRecordByLocalFilter_DoesNotDeleteUnrelatedListHit(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"guid":        rschema.StringAttribute{Optional: true, Computed: true},
+		"name":        rschema.StringAttribute{Optional: true},
+		"tenant_name": rschema.StringAttribute{Optional: true},
+	}}
+	tf := is.NewTFStateMust(
+		map[string]attr.Value{
+			"guid":        types.StringNull(),
+			"name":        types.StringValue("de-lab-k8s-mock"),
+			"tenant_name": types.StringValue("de-lab"),
+		},
+		schema,
+		&is.TFStateHints{},
+	)
+	api := &deDeleteProbeAPI{listed: RecordSet{
+		{"id": float64(7512178778483720000), "guid": "1eee7d6f-4dcc-45ff-bb29-35b496c41570", "name": "de-lab-k8s"},
+	}}
+
+	err := deleteRecordByLocalFilter(context.Background(), api, tf, nil, "kubernetes-clusters")
+	require.NoError(t, err)
+	assert.Equal(t, 0, api.deleteWithCalls)
+	assert.Empty(t, api.deletedIDs)
+}
+
+func TestDeleteRecordByLocalFilter_DeletesMatchingGuid(t *testing.T) {
+	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
+		"guid":        rschema.StringAttribute{Optional: true, Computed: true},
+		"name":        rschema.StringAttribute{Optional: true},
+		"tenant_name": rschema.StringAttribute{Optional: true},
+	}}
+	tf := is.NewTFStateMust(
+		map[string]attr.Value{
+			"guid":        types.StringNull(),
+			"name":        types.StringValue("de-lab-k8s-mock"),
+			"tenant_name": types.StringValue("de-lab"),
+		},
+		schema,
+		&is.TFStateHints{},
+	)
+	api := &deDeleteProbeAPI{listed: RecordSet{
+		{"id": 1, "guid": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "name": "de-lab-k8s"},
+		{"id": 2, "guid": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "name": "de-lab-k8s-mock"},
+	}}
+
+	err := deleteRecordByLocalFilter(context.Background(), api, tf, nil, "kubernetes-clusters")
+	require.NoError(t, err)
+	assert.Equal(t, 0, api.deleteWithCalls)
+	assert.Equal(t, []any{"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"}, api.deletedIDs)
+}
+
 func TestDeleteRecordBySearchParams_ReturnsNon404ApiError(t *testing.T) {
 	schema := rschema.Schema{Attributes: map[string]rschema.Attribute{
 		"id": rschema.Int64Attribute{Optional: true, Computed: true},

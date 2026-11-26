@@ -7,6 +7,9 @@ project {
     # examples used within documentation (prose)
     "examples/**",
 
+    # DataEngine modules are VAST-owned; do not stamp HashiCorp headers
+    "modules/**",
+
     # GitHub Actions workflow-specific configurations
     ".github/labeler-*.yml",
 

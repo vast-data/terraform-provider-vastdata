@@ -1,0 +1,120 @@
+# Copy to terraform.tfvars and fill in. Do not commit secrets.
+# Only required inputs are uncommented; optional knobs are documented below.
+
+# --- Required: VMS connection ------------------------------------------------
+vms_host     = "10.143.11.201"
+vms_username = "admin"
+vms_password = "CHANGE_ME"
+# Alternative to username/password:
+# vms_api_token = "...."
+# vms_port         = 443
+# skip_ssl_verify  = true   # default true
+
+# --- Required (local identity, default): unique POSIX IDs --------------------
+app_group_gid    = 854321
+broker_owner_uid = 123456
+
+# --- Required: DataEngine VIP pool (must not overlap other pools) ------------
+vip_pool = {
+  subnet_cidr = 16
+  ip_ranges   = [["172.200.205.13", "172.200.205.18"]]
+  # gw_ip       = "172.200.0.1"
+  # vlan        = 100
+  # domain_name = "de-lab-vippool"
+}
+
+# --- Optional: naming / identity (local is default) --------------------------
+# name_prefix            = "de-lab"
+# identity_provider_type = "local"     # or "ldap" | "active_directory"
+# create_local_provider  = true        # default; set false + local_provider_id to reuse
+# local_provider_name    = "de-lab-provider"
+# local_provider_id      = 1
+# broker_owner_password  = "CHANGE_ME_STRONG"
+#
+# LDAP/AD instead of local (provider must already exist; enable VMS auth on it first):
+# identity_provider_type = "ldap"
+# ldap_provider_id       = 2
+# app_group_name         = "existing-ad-or-ldap-group"
+# broker_owner_name      = "existing-ad-or-ldap-user"
+# # (omit app_group_gid / broker_owner_uid — not used)
+#
+# identity_provider_type = "active_directory"
+# ad_provider_id         = 3
+# app_group_name         = "existing-ad-group"
+# broker_owner_name      = "existing-ad-user"
+
+# --- Optional: broker view / S3 policy / topics ------------------------------
+# broker_view_path             = "/engine-event-broker"
+# s3_view_policy_auth_source   = "RPC_AND_PROVIDERS"  # GUI: NFS RPC and Providers
+# main_topic_name              = "engine-main"
+# deadletter_topic_name        = "engine-deadletter"
+# topic_partitions             = 3
+
+# --- Optional: destroy behavior ----------------------------------------------
+# delete_dir          = true    # default true — delete view dirs on destroy (needs Trash API)
+# force_delete_tenant = true    # lab: empty /tenant dir often needs force on destroy
+
+# --- Data Engine + tenant-admin manager --------------------------------------
+enable_data_engine = true
+
+create_tenant_admin      = true
+create_tenant_admin_role = true
+tenant_admin_password    = "CHANGE_ME_STRONG"
+
+# --- Optional: link RKE2 cluster (after examples/dataengine/rke2 apply) -------
+# enable_kubernetes_cluster = true
+# kubernetes_kube_api_url     = "https://10.178.218.130:6443"  # first CP management_ip
+# Preferred — kubeconfig (write-only on provider; not stored in TF state):
+# kubernetes_kubeconfig_path = "../rke2/out/kubeconfig"
+# # kubernetes_kubeconfig_context = "default"
+# Alternative — separate PEM files from finalize:
+# # kubernetes_mtls_artifacts_dir = "../rke2/out"
+# kubernetes_namespaces = [
+#   "default", "istio-system", "knative-eventing", "knative-operator",
+#   "knative-serving", "kube-node-lease", "kube-public", "kube-system",
+#   "local-path-storage", "vast-dataengine", "vast-pipelines", "zarf",
+# ]
+#
+# --- Optional: container registry (after K8s cluster is registered) -----------
+# enable_container_registry = true
+# # Lab Podman registry:
+# # container_registry_url = "https://10.178.218.55:5000"
+# # Docker Hub (public repo; use password + PAT for private / rate limits):
+# container_registry_name      = "dockerhub"
+# container_registry_url       = "https://registry-1.docker.io"
+# container_registry_auth_type = "none"
+# # container_registry_auth_type = "password"
+# # container_registry_username  = "fnn45"
+# # container_registry_password  = "dckr_pat_..."
+# tenant_admin_username  = "de-lab-admin"   # default: "${name_prefix}-admin"
+# tenant_admin_role_name = "de-lab-tenant-admin"
+# Or assign a pre-existing role by name:
+# create_tenant_admin_role = false
+# tenant_admin_role_name   = "existing-role-name"
+
+# --- Optional: API token for later vastde ------------------------------------
+# create_api_token = true    # default true
+# api_token_name   = "de-lab-vastde-admin"  # change if a revoked token blocks reuse
+# api_token_expiry = "1Y"
+
+# --- Optional: CSI helpers (off by default) ----------------------------------
+# enable_csi           = true
+# create_csi_tenant    = true   # dedicated CSI tenant; false = share DE tenant
+# trash_gid            = 0
+# docker_repo_path     = "/de-lab-docker/images"
+# csi_manager_password = "CHANGE_ME_STRONG"
+# csi_vip_pool = {
+#   subnet_cidr = 16
+#   ip_ranges   = [["172.200.205.19", "172.200.205.24"]]
+# }
+# csi_view_policy = {
+#   auth_source     = "RPC"   # GUI: NFS RPC (default)
+#   bind_vip_pool   = true    # bind CSI VIP to policy (default)
+#   nfs_no_squash   = ["*"]
+#   nfs_root_squash = []
+# }
+# Fine-grained roles (codenames from /permissions/get). Empty = type-based defaults.
+# csi_tenant_admin_permissions_list = ["create_view", "edit_view", "delete_view", "view_view"]
+# csi_tenant_admin_extra_permissions_list = ["view_events"]
+# csi_service_account_permissions_list = []
+# csi_service_account_extra_permissions_list = []

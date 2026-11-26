@@ -313,14 +313,15 @@ func (l *ResourceLifecycle) Update(ctx context.Context, current, desired Resourc
 		if record, err = getRecordBySearchParams(ctx, api, currentState, desiredState, l.Name, "Update"); err != nil {
 			return l.stageErr("update", err)
 		}
-		// NOTE: the default implementation only works for resources with an 'id' field.
-		id, exists := asRecord(record)["id"]
+		idField := pathIDField(desiredState.StateHints())
+		id, exists := asRecord(record)[idField]
 		if !exists {
-			return l.stageErr("update", fmt.Errorf("record does not have 'id' field; implement UpdateResource for this resource"))
+			return l.stageErr("update", fmt.Errorf("record does not have %q field; implement UpdateResource for this resource", idField))
 		}
 		updateParams := desiredState.GetUpdateParams(currentState)
 		updateParams = runTransformRequestBody(current, updateParams)
-		delete(updateParams, "id") // The ID must never be updated.
+		delete(updateParams, "id")
+		delete(updateParams, idField) // The path id must never be updated.
 		if len(updateParams) > 0 {
 			record, err = api.UpdateWithContext(ctx, id, updateParams)
 		}

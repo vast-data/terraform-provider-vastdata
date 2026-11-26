@@ -38,6 +38,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	vast_client "github.com/vast-data/go-vast-client"
+	"github.com/vast-data/go-vast-client/core"
 	"github.com/vast-data/go-vast-client/resources/untyped"
 	"github.com/vast-data/terraform-provider-vastdata/vastdata/client"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
@@ -169,6 +170,218 @@ func ignoreResourceGone(err error) error {
 	return ignoreStatusCodes(err, http.StatusNotFound)
 }
 
+func notFoundErr(resource string, query any) error {
+	return &core.NotFoundError{Resource: resource, Query: fmt.Sprint(query)}
+}
+
+// sleepCtx waits for d or returns early if ctx is cancelled.
+func sleepCtx(ctx context.Context, d time.Duration) error {
+	t := time.NewTimer(d)
+	defer t.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-t.C:
+		return nil
+	}
+}
+
+// waitCondition is called once per wait cycle.
+type waitCondition func(ctx context.Context) (done bool, err error)
+
+type waitWithTimeoutConfig struct {
+	// Timeout is the maximum wall-clock time to wait. Required when Cycles <= 0.
+	Timeout time.Duration
+	// Sleep is the delay after a false condition before the next cycle.
+	// Defaults to 5s when <= 0.
+	Sleep time.Duration
+	// Cycles is the maximum number of condition evaluations. 0 means unlimited
+	// (Timeout must be > 0).
+	Cycles int
+	// TimeoutMessage is included in the default timeout error when OnTimeout is nil.
+	TimeoutMessage string
+	// OnTimeout, if set, builds the error returned when Timeout/Cycles is exhausted.
+	OnTimeout func() error
+}
+
+// errWaitTimeout marks exhaustion of waitWithTimeout's Timeout or Cycles budget.
+var errWaitTimeout = errors.New("wait timed out")
+
+// waitWithTimeout repeatedly invokes cond until it returns done=true, an error,
+// or the configured Timeout/Cycles budget is exhausted. Sleep is applied between
+// unsuccessful attempts (not after success or fatal error).
+func waitWithTimeout(ctx context.Context, cfg waitWithTimeoutConfig, cond waitCondition) error {
+	if cond == nil {
+		return fmt.Errorf("waitWithTimeout: condition is required")
+	}
+	if cfg.Timeout <= 0 && cfg.Cycles <= 0 {
+		return fmt.Errorf("waitWithTimeout: Timeout or Cycles is required")
+	}
+	if cfg.Sleep <= 0 {
+		cfg.Sleep = 5 * time.Second
+	}
+
+	var deadline time.Time
+	if cfg.Timeout > 0 {
+		deadline = time.Now().Add(cfg.Timeout)
+	}
+
+	timeoutErr := func() error {
+		if cfg.OnTimeout != nil {
+			return cfg.OnTimeout()
+		}
+		if cfg.TimeoutMessage != "" {
+			return fmt.Errorf("%w: %s", errWaitTimeout, cfg.TimeoutMessage)
+		}
+		if cfg.Cycles > 0 && cfg.Timeout <= 0 {
+			return fmt.Errorf("%w: condition not met after %d cycles", errWaitTimeout, cfg.Cycles)
+		}
+		return fmt.Errorf("%w after %v", errWaitTimeout, cfg.Timeout)
+	}
+
+	for attempt := 1; ; attempt++ {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		if !deadline.IsZero() && time.Now().After(deadline) {
+			return timeoutErr()
+		}
+		if cfg.Cycles > 0 && attempt > cfg.Cycles {
+			return timeoutErr()
+		}
+
+		done, err := cond(ctx)
+		if err != nil {
+			return err
+		}
+		if done {
+			return nil
+		}
+
+		if cfg.Cycles > 0 && attempt >= cfg.Cycles {
+			return timeoutErr()
+		}
+		if !deadline.IsZero() && time.Now().After(deadline) {
+			return timeoutErr()
+		}
+		if err := sleepCtx(ctx, cfg.Sleep); err != nil {
+			return err
+		}
+	}
+}
+
+// requirePathGUID returns a non-empty trimmed "guid" from tfstate for APIs that
+// address resources as /{collection}/{guid}. resourceName is used in errors.
+func requirePathGUID(tfstate is.ResourceState, resourceName string) (string, error) {
+	if tfstate == nil || is.IsNilState(tfstate) || !tfstate.IsKnownAndNotNull("guid") {
+		return "", fmt.Errorf("%s: guid is required", resourceName)
+	}
+	guid := strings.TrimSpace(tfstate.String("guid"))
+	if guid == "" {
+		return "", fmt.Errorf("%s: guid is empty", resourceName)
+	}
+	return guid, nil
+}
+
+// pathGUIDOrPlan returns guid from state, falling back to plan (create→update edge).
+func pathGUIDOrPlan(state, plan is.ResourceState, resourceName string) (string, error) {
+	guid, err := requirePathGUID(state, resourceName)
+	if err == nil {
+		return guid, nil
+	}
+	if plan != nil && !is.IsNilState(plan) {
+		if g, planErr := requirePathGUID(plan, resourceName); planErr == nil {
+			return g, nil
+		}
+	}
+	return "", err
+}
+
+// nestedMap walks nested map/Record keys and returns the final map, or nil.
+func nestedMap(rec Record, keys ...string) map[string]any {
+	cur := any(rec)
+	for _, key := range keys {
+		m, ok := cur.(map[string]any)
+		if !ok {
+			if r, ok := cur.(Record); ok {
+				m = map[string]any(r)
+			} else {
+				return nil
+			}
+		}
+		cur = m[key]
+	}
+	if m, ok := cur.(map[string]any); ok {
+		return m
+	}
+	if r, ok := cur.(Record); ok {
+		return map[string]any(r)
+	}
+	return nil
+}
+
+// nestedString walks nested map/Record keys and returns a trimmed string, or "".
+func nestedString(rec Record, keys ...string) string {
+	cur := any(rec)
+	for _, key := range keys {
+		m, ok := cur.(map[string]any)
+		if !ok {
+			if r, ok := cur.(Record); ok {
+				m = map[string]any(r)
+			} else {
+				return ""
+			}
+		}
+		cur = m[key]
+	}
+	if cur == nil {
+		return ""
+	}
+	s := strings.TrimSpace(fmt.Sprint(cur))
+	if s == "<nil>" {
+		return ""
+	}
+	return s
+}
+
+// withTransformedQueryParams applies TransformQueryParams when manager implements
+// it (Create/Read/Update/Delete). Non-implementers keep query as-is (nil → empty).
+func withTransformedQueryParams(ctx context.Context, manager any, managerName string, query params, rest *VMSRest) params {
+	if query == nil {
+		query = params{}
+	}
+	if t, ok := manager.(TransformQueryParams); ok {
+		logging.Debug(ctx, fmt.Sprintf("TransformQueryParams[%s]: do.", managerName))
+		return t.TransformQueryParams(query, rest)
+	}
+	return query
+}
+
+// filterRecordSetByAttrs returns records whose attributes match all entries in want.
+// An empty want returns records unchanged.
+func filterRecordSetByAttrs(records RecordSet, want map[string]any) RecordSet {
+	if len(want) == 0 {
+		return records
+	}
+	out := make(RecordSet, 0, len(records))
+	for _, rec := range records {
+		if recordMatchesAttrs(rec, want) {
+			out = append(out, rec)
+		}
+	}
+	return out
+}
+
+func recordMatchesAttrs(rec Record, want map[string]any) bool {
+	for k, v := range want {
+		rv, ok := rec[k]
+		if !ok || fmt.Sprint(rv) != fmt.Sprint(v) {
+			return false
+		}
+	}
+	return true
+}
+
 // PopulateIDFieldsFromNestedObjects examines all keys in tfstate that end with "_id"
 // and attempts to populate them from nested objects in the record.
 //
@@ -242,12 +455,29 @@ const (
 
 // Common modifiers
 const (
-	ModifierForceNew = schema_generation.ModifierForceNew
+	ModifierForceNew             = schema_generation.ModifierForceNew
+	ModifierForceNewIfConfigured = schema_generation.ModifierForceNewIfConfigured
 )
 
 // ----------------------------------
 // MISC
 // ----------------------------------
+
+// isRedacted reports whether v is an API placeholder for secret material
+// (e.g. "******") rather than a real value. Use when GET responses redact
+// fields that must not be written into Terraform state.
+func isRedacted(v any) bool {
+	s, ok := v.(string)
+	if !ok {
+		return false
+	}
+	switch strings.TrimSpace(s) {
+	case "******", "********", "[REDACTED]", "redacted":
+		return true
+	default:
+		return false
+	}
+}
 
 func withContext(ctx context.Context, method string, managerName string, fn func(ctx context.Context)) {
 	ctx = client.ContextWithRequestID(ctx)
@@ -447,6 +677,16 @@ func getSearchParams(ctx context.Context, tfState, planTfState is.ResourceState)
 // Returns:
 //   - DisplayableRecord: the found record
 //   - error: if not found or all lookups fail
+//
+// pathIDField returns the record attribute used as the URL path id for Get/Update/Delete.
+// Empty PathIDField means the default VMS "id" field.
+func pathIDField(hints *is.TFStateHints) string {
+	if hints != nil && hints.PathIDField != "" {
+		return hints.PathIDField
+	}
+	return "id"
+}
+
 func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext, tfState is.ResourceState, planTfState is.ResourceState, managerName, op string) (DisplayableRecord, error) {
 	var (
 		record DisplayableRecord
@@ -463,20 +703,33 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 		)
 	}
 
-	id, idExists := searchParams["id"]
+	idField := pathIDField(tfState.StateHints())
+	pathID, pathIDExists := searchParams[idField]
 	guid, guidExists := searchParams["guid"]
+	// When PathIDField is "guid", do not fall back to numeric "id" for GetById —
+	// DataEngine URLs expect {guid} and numeric ids are precision-unsafe.
+	useDefaultIDPath := idField == "id"
 
-	// Attempt 1: get resource by ID.
-	if idExists {
-		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
-		// If the ID is set, we assume it's a direct call by ID
-		record, err = api.GetByIdWithContext(ctx, id)
+	// Query keys that belong on GetById (e.g. ?tenant_name=), not in the path.
+	idQuery := params{}
+	if tn, ok := searchParams["tenant_name"]; ok {
+		idQuery["tenant_name"] = tn
 	}
-	// Attempt 2: get resource by GUID.
+
+	// Attempt 1: get resource by path id (id or guid).
+	if pathIDExists {
+		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found %s = %v.", op, managerName, idField, pathID))
+		if len(idQuery) > 0 {
+			record, err = api.GetByIdWithContext(ctx, pathID, idQuery)
+		} else {
+			record, err = api.GetByIdWithContext(ctx, pathID)
+		}
+	}
+	// Attempt 2: get resource by GUID (VMS-style fallback only).
 	// Listed: some endpoints ignore the guid query parameter and
 	// return every record, which Get rejects as "too many records". The guid is compared
 	// here, and a list with no match is a 404 so the caller treats it as not found.
-	if (!idExists || expectStatusCodes(err, http.StatusNotFound)) && guidExists {
+	if useDefaultIDPath && (!pathIDExists || expectStatusCodes(err, http.StatusNotFound)) && guidExists {
 		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found GUID = %v.", op, managerName, guid))
 		var records RecordSet
 		records, err = api.ListWithContext(ctx, params{"guid": guid})
@@ -484,23 +737,23 @@ func getRecordBySearchParams(ctx context.Context, api VastResourceAPIWithContext
 			record, err = recordByGUID(records, guid)
 		}
 	}
-	// Attempt 3: if both ID and GUID are not set or both reads failed, we use the search parameters.
-	if (!idExists && !guidExists) || expectStatusCodes(err, http.StatusNotFound) {
-		// If neither ID nor GUID is set or both reads failed, we use the search parameters
+	// Attempt 3: if path id (and guid for default id path) are not set or prior reads failed, use search parameters.
+	triedDirect := pathIDExists || (useDefaultIDPath && guidExists)
+	if !triedDirect || expectStatusCodes(err, http.StatusNotFound) {
 		searchParams.Without("id", "guid")
 		if len(searchParams) > 0 {
-			if !idExists && !guidExists {
+			if !triedDirect {
 				logging.Debug(
 					ctx,
-					fmt.Sprintf("%s[%s]: no ID or GUID set, using search parameters %v.",
+					fmt.Sprintf("%s[%s]: no path id set, using search parameters %v.",
 						op, managerName, searchParams,
 					),
 				)
 			} else {
 				logging.Debug(
 					ctx,
-					fmt.Sprintf("%s[%s]: ID %v or GUID %v not found, using search parameters %v.",
-						op, managerName, id, guid, searchParams,
+					fmt.Sprintf("%s[%s]: %s %v not found, using search parameters %v.",
+						op, managerName, idField, pathID, searchParams,
 					),
 				)
 			}
@@ -566,12 +819,20 @@ func deleteRecordBySearchParams(ctx context.Context, api VastResourceAPIWithCont
 		deleteQueryParams = tfState.GetDeleteOnlyQueryParams()
 	}
 
-	if id, ok := searchParams["id"]; ok {
-		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found ID = %v.", op, managerName, id))
-		// If the ID is set, we assume it's a direct call by ID
+	idField := pathIDField(tfState.StateHints())
+	if tn, ok := searchParams["tenant_name"]; ok {
+		if deleteQueryParams == nil {
+			deleteQueryParams = params{}
+		}
+		q := params(deleteQueryParams)
+		q.Update(params{"tenant_name": tn}, true)
+		deleteQueryParams = q
+	}
+	if id, ok := searchParams[idField]; ok {
+		logging.Debug(ctx, fmt.Sprintf("%s[%s]: found %s = %v.", op, managerName, idField, id))
 		result, err = api.DeleteByIdWithContext(ctx, id, deleteQueryParams, deleteBodyParams)
 	} else {
-		logging.Debug(ctx, fmt.Sprintf("%s[%s]: no ID found, using search params.", op, managerName))
+		logging.Debug(ctx, fmt.Sprintf("%s[%s]: no %s found, using search params.", op, managerName, idField))
 		result, err = api.DeleteWithContext(ctx, searchParams, deleteQueryParams, deleteBodyParams)
 	}
 	return result, ignoreStatusCodes(err, http.StatusNotFound)

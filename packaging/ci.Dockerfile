@@ -1,6 +1,6 @@
 # Copyright (c) HashiCorp, Inc.
 
-FROM golang:1.24 AS builder
+FROM golang:1.25 AS builder
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \

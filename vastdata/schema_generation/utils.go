@@ -121,8 +121,9 @@ func addSchemaEntries(
 		if schema == nil || isExcluded(name, hints) {
 			continue
 		}
-		if isAmbiguousObject(schema) {
-			// Skip ambiguous objects with no properties
+		if isAmbiguousObject(schema) || IsEmptySchema(&openapi3.SchemaRef{Value: schema}) {
+			// Skip ambiguous/empty schemas (e.g. Data Engine TriggerGetResponse.config
+			// is intentionally schema-less: nullable with no type/properties).
 			warnWithContext(context.Background(), fmt.Sprintf("Skipping ambiguous object schema for field '%s' with no properties", name))
 			continue
 		}

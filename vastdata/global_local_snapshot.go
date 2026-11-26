@@ -90,7 +90,7 @@ func (m *GlobalLocalSnapshot) DeleteResource(ctx context.Context, rest *VMSRest)
 	}
 
 	// Delete the global snapshot stream with remove_dir parameter
-	_, err = rest.GlobalSnapshotStreams.DeleteByIdWithContext(ctx, response.RecordID(), nil, params{"remove_dir": true})
+	_, err = rest.GlobalSnapshotStreams.DeleteByIdWithContext(ctx, response.RecordID(), params{"remove_dir": true})
 
 	// Ignore 404 errors (already deleted)
 	return ignoreStatusCodes(err, http.StatusNotFound)

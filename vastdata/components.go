@@ -111,6 +111,15 @@ var allTFComponents = []TFManager{
 	&License{},
 	&CallhomeConfig{},
 	&VmsNetworkSettings{},
+	&DeEngine{},
+	&DeMtlsAuthenticationCredential{},
+	&DeKubernetesCluster{},
+	&DeKubernetesSecret{},
+	&DeContainerRegistry{},
+	&DeFunction{},
+	&DeScheduleTrigger{},
+	&DeElementTrigger{},
+	&DePipeline{},
 }
 
 // GetResourceFactories returns a list of factory functions that instantiate
@@ -482,6 +491,16 @@ type UpgradeResourceSchema interface {
 // The `Record` type is assumed to be a map[string]any.
 type TransformResponseRecord interface {
 	TransformResponseRecord(response Record) Record
+}
+
+// TransformQueryParams allows a resource to modify outgoing URL query params
+// before Create/Read/Update/Delete/List API calls. Use this to inject
+// session-scoped defaults (for example Data Engine ?tenant_name=).
+//
+// rest is the authenticated VMS client. The `params` type is assumed to be a
+// map[string]any.
+type TransformQueryParams interface {
+	TransformQueryParams(query params, rest *VMSRest) params
 }
 
 // NormalizeRecordForCreateAdopt allows a resource to normalize an existing API record

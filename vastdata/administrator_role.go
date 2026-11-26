@@ -27,6 +27,11 @@ func (m *AdministratorRole) NewResourceManager(raw map[string]attr.Value, schema
 		&is.TFStateHints{
 			SchemaRef:            AdministratorRoleSchemaRef,
 			ComputedSchemaFields: []string{"permissions_list"},
+			// Request "permissions" are legacy types (view/create/edit/delete).
+			// Response "permissions" are permission codenames (mapped to permissions_list).
+			// Same JSON key — do not let GET overwrite the configured types with [].
+			PreserveUserValueFields: []string{"permissions"},
+			NotComputedSchemaFields: []string{"permissions"},
 		},
 	)}
 }
@@ -57,8 +62,11 @@ func (m *AdministratorRole) ReadDatasource(ctx context.Context, rest *VMSRest) (
 	}
 
 	if permissions, ok := record["permissions"]; ok && permissions != nil {
+		// Response permissions are codenames; surface them on permissions_list.
 		record["permissions_list"] = permissions
 	}
+	// Drop response permissions so they cannot clobber TF "permissions" (legacy types).
+	delete(record, "permissions")
 	return record, nil
 
 }
