@@ -96,8 +96,8 @@ func normalizeBlobExpansionRecord(record DisplayableRecord) DisplayableRecord {
 func (m *BlobExpansion) ReadDatasource(ctx context.Context, rest *VMSRest) (DisplayableRecord, error) {
 	searchParams := m.blobExpansionSearchParams()
 	record, err := rest.BlobExpansions.BlobExpansionShowWithContext_GET(ctx, searchParams)
-	if isApiError(err) {
-		if strings.Contains(err.(*ApiError).Body, "Invalid blob expansion configuration") {
+	if apiErr, ok := asApiError(err); ok {
+		if strings.Contains(apiErr.Body, "Invalid blob expansion configuration") {
 			return nil, nil
 		}
 	}
