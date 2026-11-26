@@ -79,11 +79,13 @@ func (m *ClusterEkm) CreateResource(ctx context.Context, rest *VMSRest) (Display
 func (m *ClusterEkm) UpdateResource(ctx context.Context, plan UpdateResource, rest *VMSRest) (DisplayableRecord, error) {
 	clusterId := m.tfstate.Int64("cluster_id")
 	planTs := plan.(*ClusterEkm).TfState()
-	// GetUpdateParams respects WriteOnlyMD5Fields so unchanged secrets are not re-sent.
-	params := planTs.GetUpdateParams(m.tfstate)
+	// POST /clusters/{id}/set_certificates/ expects the full EKM configuration
+	// rather than a partial diff: omitting encryption_type causes VMS to default
+	// to INTERNAL and reject certificate fields with HTTP 400 (TERF-322).
+	params := planTs.GetCreateParams()
 	params.Without("cluster_id") // Remove cluster_id from params, as it's part of the URL
 
-	return addClusterEkm(ctx, clusterId, params, rest)
+	return setClusterEkmCertificates(ctx, clusterId, params, rest)
 }
 
 func (m *ClusterEkm) DeleteResource(_ context.Context, _ *VMSRest) error {
@@ -91,13 +93,23 @@ func (m *ClusterEkm) DeleteResource(_ context.Context, _ *VMSRest) error {
 	return nil
 }
 
-// addClusterEkm adds EKM configuration to a specific cluster with the given parameters.
-// This is used by both CreateResource and UpdateResource for ClusterEkm.
+// addClusterEkm adds EKM configuration to a specific cluster via POST /clusters/{id}/add_ekm/.
 func addClusterEkm(ctx context.Context, clusterId int64, params map[string]any, rest *VMSRest) (DisplayableRecord, error) {
 	if clusterId == 0 {
 		return nil, fmt.Errorf("failed to get cluster ID: cluster ID is empty")
 	}
 
 	err := rest.Clusters.ClusterAddEkmWithContext_POST(ctx, clusterId, params)
+	return nil, err
+}
+
+// setClusterEkmCertificates updates EKM certificates and configuration on a cluster
+// via POST /clusters/{id}/set_certificates/.
+func setClusterEkmCertificates(ctx context.Context, clusterId int64, params map[string]any, rest *VMSRest) (DisplayableRecord, error) {
+	if clusterId == 0 {
+		return nil, fmt.Errorf("failed to get cluster ID: cluster ID is empty")
+	}
+
+	err := rest.Clusters.ClusterSetCertificatesWithContext_POST(ctx, clusterId, params)
 	return nil, err
 }
