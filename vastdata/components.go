@@ -5,6 +5,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"maps"
 	"sort"
 
 	version "github.com/hashicorp/go-version"
@@ -222,6 +223,19 @@ func NewResourceManagerByName(ctx context.Context, name string) (ResourceManager
 		return nil, fmt.Errorf("unknown resource %q", name)
 	}
 	return newManagerWithSchemaOnly(ctx, prototype.NewResourceManager)
+}
+
+// NewResourceManagerFromState builds the named resource's manager holding a copy of st's
+// values. The schema comes from st, so none is generated.
+func NewResourceManagerFromState(name string, st is.ResourceState) (ResourceManager, error) {
+	prototype, ok := ResourceManagerPrototypes()[name]
+	if !ok {
+		return nil, fmt.Errorf("unknown resource %q", name)
+	}
+	if is.IsNilState(st) || !st.IsEnabled() {
+		return nil, fmt.Errorf("resource %q: state has no schema", name)
+	}
+	return prototype.NewResourceManager(maps.Clone(st.RawValues()), st.SchemaDefinition()), nil
 }
 
 type ResourceFactoryFn func(raw map[string]attr.Value, schema any) ResourceManager

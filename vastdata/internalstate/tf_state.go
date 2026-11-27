@@ -160,6 +160,8 @@ type TFState struct {
 	TypeMap map[string]attr.Type // for schema introspection
 	Hints   *TFStateHints
 	Enabled bool
+	// Empty marks the state of a resource that does not exist (see MarkEmpty).
+	Empty bool
 }
 
 func NewTFState(raw map[string]attr.Value, schema any, kind SchemaContext, hints *TFStateHints) (*TFState, error) {
@@ -248,6 +250,7 @@ func (s *TFState) CopyTFState() *TFState {
 		TypeMap: s.TypeMap,
 		Hints:   s.Hints,
 		Enabled: s.Enabled,
+		Empty:   s.Empty,
 	}
 }
 
@@ -1367,6 +1370,9 @@ type ResourceState interface {
 
 	// IsEnabled reports whether a schema is attached (false for schema-less placeholder states).
 	IsEnabled() bool
+	// IsEmpty reports whether the state describes no resource: one that was never created,
+	// is gone, or that nothing was planned for. See MarkEmpty.
+	IsEmpty() bool
 	// StateHints returns the manager hints (may be nil for placeholder states).
 	StateHints() *TFStateHints
 	// SchemaDefinition returns the schema the state was built from
@@ -1436,6 +1442,41 @@ var _ ResourceState = (*TFState)(nil)
 
 // IsEnabled implements ResourceState.
 func (s *TFState) IsEnabled() bool { return s.Enabled }
+
+// IsEmpty implements ResourceState. A nil state is empty.
+func (s *TFState) IsEmpty() bool { return s == nil || s.Empty }
+
+// EmptyState is the state of a resource that does not exist, without a schema: it holds no
+// attributes and IsEnabled is false. MarkEmpty gives one that still reads like the state of
+// a given resource.
+func EmptyState() ResourceState {
+	return &TFState{Raw: map[string]attr.Value{}, Meta: map[string]attrMeta{}, Empty: true}
+}
+
+// MarkEmpty marks s as the state of a resource that does not exist and returns it. Its
+// attributes keep their values, usually all null; it still carries the schema, so it can be
+// read like any other state.
+func MarkEmpty(s ResourceState) ResourceState {
+	if c := coreOf(s); c != nil {
+		c.Empty = true
+	}
+	return s
+}
+
+// OverlayWriteOnly copies the write-only values config sets into dst. A plan and a state never
+// hold them (Terraform keeps them null), so what is created or updated takes them from the
+// configuration, as Terraform's Create and Update do.
+func OverlayWriteOnly(dst, config ResourceState) {
+	if IsNilState(dst) || IsNilState(config) || !dst.IsEnabled() || dst.StateHints() == nil {
+		return
+	}
+	cfg := config.RawValues()
+	for _, k := range dst.StateHints().WriteOnlyFields {
+		if v, ok := cfg[k]; ok && v != nil && !v.IsNull() && !v.IsUnknown() {
+			dst.RawValues()[k] = v
+		}
+	}
+}
 
 // StateHints implements ResourceState.
 func (s *TFState) StateHints() *TFStateHints { return s.Hints }

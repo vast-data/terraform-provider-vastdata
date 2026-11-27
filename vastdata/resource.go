@@ -52,6 +52,16 @@ func (r *Resource) EmptyManager() ResourceManager {
 	return r.newManager(nil, nil)
 }
 
+// planLifecycle returns the lifecycle for the plan-time hooks (ValidateConfig, ModifyPlan).
+// Those never call the VAST API, so they must also work on a resource that was not
+// configured with a client — which is how vastdata/planner runs them in-process.
+func (r *Resource) planLifecycle() *ResourceLifecycle {
+	if r.lifecycle != nil {
+		return r.lifecycle
+	}
+	return NewResourceLifecycle(nil, r.managerName)
+}
+
 func (r *Resource) ManagerWithSchemaOnly(ctx context.Context) (ResourceManager, error) {
 	return newManagerWithSchemaOnly(ctx, r.newManager)
 }
@@ -120,14 +130,7 @@ func (r *Resource) overlayWriteOnlyFromConfig(manager ResourceManager, config tf
 	if ts == nil || !ts.IsEnabled() || ts.StateHints() == nil || len(ts.StateHints().WriteOnlyFields) == 0 {
 		return
 	}
-	cfgTs := r.NewManager(config).TfState()
-	for _, key := range ts.StateHints().WriteOnlyFields {
-		v, ok := cfgTs.RawValues()[key]
-		if !ok || v == nil || v.IsNull() || v.IsUnknown() {
-			continue
-		}
-		ts.RawValues()[key] = v
-	}
+	is.OverlayWriteOnly(ts, r.NewManager(config).TfState())
 }
 
 // ----------------------------------------
@@ -258,7 +261,7 @@ func (r *Resource) modifyPlanImpl(ctx context.Context, req resource.ModifyPlanRe
 		}
 
 		logging.Debug(ctx, fmt.Sprintf("PrepareDesiredState[%s]: do.", r.managerName))
-		if err := r.lifecycle.PrepareDesiredState(ctx, manager); err != nil {
+		if err := r.planLifecycle().PrepareDesiredState(ctx, manager); err != nil {
 			resp.Diagnostics.AddError(
 				fmt.Sprintf("PrepareDesiredState[%q]", r.managerName),
 				err.Error(),
@@ -696,7 +699,7 @@ func (r *Resource) deleteImpl(ctx context.Context, req resource.DeleteRequest, r
 
 func (r *Resource) validateConfigImpl(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
 	manager := r.NewManager(req.Config)
-	if err := r.lifecycle.ValidateResourceConfig(ctx, manager); err != nil {
+	if err := r.planLifecycle().ValidateResourceConfig(ctx, manager); err != nil {
 		resp.Diagnostics.AddError(
 			fmt.Sprintf("ValidateResourceConfig[%q]", r.managerName),
 			err.Error(),

@@ -11,9 +11,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	rschema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 var DePipelineSchemaRef = is.NewDataEngineSchemaReference(
@@ -232,7 +232,7 @@ func (m *DePipeline) createOrAdopt(
 		}
 		if existing == nil {
 			// Name conflict without a readable object — usually mid-delete; wait and retry.
-			tflog.Warn(ctx, "DePipeline Create: 409 with no adoptable pipeline — waiting for teardown")
+			logging.Warn(ctx, "DePipeline Create: 409 with no adoptable pipeline — waiting for teardown")
 			return false, nil
 		}
 
@@ -240,11 +240,11 @@ func (m *DePipeline) createOrAdopt(
 		if guid == "" {
 			return false, fmt.Errorf("de_pipeline: adopted pipeline missing guid")
 		}
-		tflog.Warn(ctx, "DePipeline Create: adopting existing pipeline after 409 conflict")
+		logging.Warn(ctx, "DePipeline Create: adopting existing pipeline after 409 conflict")
 		if len(body) > 0 {
 			if _, updErr := api.UpdateWithContext(ctx, guid, query, body); updErr != nil {
 				if isStackBeingDeleted(updErr) {
-					tflog.Warn(ctx, fmt.Sprintf(
+					logging.Warn(ctx, fmt.Sprintf(
 						"DePipeline Create: stack being deleted for %s — waiting then recreating", guid,
 					))
 					if waitErr := m.waitGone(ctx, rest, api, guid); waitErr != nil {
@@ -349,7 +349,7 @@ func (m *DePipeline) updateWithStackDeleteRetry(
 		if !isStackBeingDeleted(err) {
 			return false, err
 		}
-		tflog.Warn(ctx, fmt.Sprintf(
+		logging.Warn(ctx, fmt.Sprintf(
 			"DePipeline Update: stack being deleted for %s — retrying", guid,
 		))
 		return false, nil
@@ -389,7 +389,7 @@ func (m *DePipeline) deployAndWait(ctx context.Context, rest *VMSRest, api VastR
 
 func (m *DePipeline) deploy(ctx context.Context, rest *VMSRest, guid string) error {
 	query := m.TransformQueryParams(nil, rest)
-	tflog.Info(ctx, fmt.Sprintf("DePipeline: deploying %s", guid))
+	logging.Info(ctx, fmt.Sprintf("DePipeline: deploying %s", guid))
 	if _, err := rest.DataEngine.Pipelines.DeployWithContext(ctx, guid, query); err != nil {
 		return fmt.Errorf("de_pipeline deploy: %w", err)
 	}
@@ -416,7 +416,7 @@ func (m *DePipeline) waitReady(ctx context.Context, rest *VMSRest, api VastResou
 		status := nestedString(rec, "status")
 		reason := nestedString(rec, "reason")
 		lastStatus, lastReason = status, reason
-		tflog.Debug(ctx, fmt.Sprintf("DePipeline wait: status=%q reason=%q", status, reason))
+		logging.Debug(ctx, fmt.Sprintf("DePipeline wait: status=%q reason=%q", status, reason))
 		switch strings.ToLower(strings.TrimSpace(status)) {
 		case "ready":
 			return true, nil
@@ -438,7 +438,7 @@ func (m *DePipeline) waitReady(ctx context.Context, rest *VMSRest, api VastResou
 				)
 			}
 			if err := m.deploy(ctx, rest, guid); err != nil {
-				tflog.Warn(ctx, fmt.Sprintf(
+				logging.Warn(ctx, fmt.Sprintf(
 					"DePipeline wait: redeploy after transient error failed (will retry): %v", err,
 				))
 			}
@@ -488,7 +488,7 @@ func (m *DePipeline) waitGone(ctx context.Context, rest *VMSRest, api VastResour
 			}
 			return false, err
 		}
-		tflog.Debug(ctx, fmt.Sprintf("DePipeline waitGone: %s still present", guid))
+		logging.Debug(ctx, fmt.Sprintf("DePipeline waitGone: %s still present", guid))
 		return false, nil
 	})
 }

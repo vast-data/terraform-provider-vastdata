@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/vast-data/go-vast-client/core"
 	is "github.com/vast-data/terraform-provider-vastdata/vastdata/internalstate"
+	"github.com/vast-data/terraform-provider-vastdata/vastdata/logging"
 )
 
 // DeEngine manages tenant Data Engine via POST/GET/DELETE /serverless/data-engine.
@@ -96,7 +96,7 @@ func (m *DeEngine) CreateResource(ctx context.Context, rest *VMSRest) (Displayab
 
 	// Adopt if already enabled (custom CreateResource skips the default LookupForCreate path).
 	if rec, ok := m.tryAdopt(ctx, rest, api); ok {
-		tflog.Info(ctx, "DeEngine Create: already enabled — adopting existing Data Engine")
+		logging.Info(ctx, "DeEngine Create: already enabled — adopting existing Data Engine")
 		return rec, nil
 	}
 
@@ -120,7 +120,7 @@ func (m *DeEngine) CreateResource(ctx context.Context, rest *VMSRest) (Displayab
 		attempt++
 		if attempt > 1 {
 			if rec, ok := m.tryAdopt(ctx, rest, api); ok {
-				tflog.Info(ctx, "DeEngine Create: adopted after conflict/retry")
+				logging.Info(ctx, "DeEngine Create: adopted after conflict/retry")
 				out = rec
 				return true, nil
 			}
@@ -138,7 +138,7 @@ func (m *DeEngine) CreateResource(ctx context.Context, rest *VMSRest) (Displayab
 		if !expectStatusCodes(err, http.StatusConflict) {
 			return false, err
 		}
-		tflog.Warn(ctx, fmt.Sprintf("DeEngine Create: 409 on attempt %d — waiting to adopt/retry", attempt))
+		logging.Warn(ctx, fmt.Sprintf("DeEngine Create: 409 on attempt %d — waiting to adopt/retry", attempt))
 		return false, nil
 	})
 	if err != nil {
@@ -239,7 +239,7 @@ func (m *DeEngine) waitStatus(ctx context.Context, rest *VMSRest, api VastResour
 			cur := nestedString(status, "setup", "status")
 			msg := nestedString(status, "setup", "message")
 			del := nestedString(status, "deletion", "status")
-			tflog.Debug(ctx, fmt.Sprintf("DeEngine wait: setup.status=%q want=%q message=%q deletion.status=%q",
+			logging.Debug(ctx, fmt.Sprintf("DeEngine wait: setup.status=%q want=%q message=%q deletion.status=%q",
 				cur, want, msg, del))
 
 			switch {
